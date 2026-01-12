@@ -11,31 +11,13 @@
     </x-slot>
 
     <x-ui-page-container spacing="space-y-8">
-        {{-- Hero Header Section --}}
-        <div class="relative overflow-hidden rounded-2xl border border-[var(--ui-border)]/60 shadow-lg">
-            @if($ciBoard->primary_color || $ciBoard->colors->first())
-                <div class="absolute inset-0 opacity-5" style="background: linear-gradient(135deg, {{ $ciBoard->primary_color ?? $ciBoard->colors->first()->color ?? '#6366f1' }} 0%, {{ $ciBoard->secondary_color ?? $ciBoard->colors->skip(1)->first()->color ?? '#8b5cf6' }} 100%);"></div>
-            @endif
-            <div class="relative p-8 lg:p-12 bg-gradient-to-br from-white via-white to-[var(--ui-muted-5)]">
-                <div class="flex items-start justify-between gap-6">
-                    <div class="flex-1">
-                        <div class="flex items-center gap-3 mb-3">
-                            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-[var(--ui-primary)] to-[var(--ui-primary-80)] flex items-center justify-center shadow-lg">
-                                @svg('heroicon-o-paint-brush', 'w-6 h-6 text-white')
-                            </div>
-                            <div>
-                                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[var(--ui-primary-10)] border border-[var(--ui-primary)]/20 text-xs font-semibold text-[var(--ui-primary)]">
-                                    @svg('heroicon-o-sparkles', 'w-3 h-3')
-                                    Corporate Identity
-                                </span>
-                            </div>
-                        </div>
-                        <h1 class="text-4xl lg:text-5xl font-bold text-[var(--ui-secondary)] mb-3 tracking-tight leading-tight">{{ $ciBoard->name }}</h1>
-                        @if($ciBoard->description)
-                            <p class="text-lg text-[var(--ui-muted)] leading-relaxed max-w-2xl">{{ $ciBoard->description }}</p>
-                        @endif
-                    </div>
-                </div>
+        {{-- Header Section --}}
+        <div class="bg-white rounded-xl border border-[var(--ui-border)]/60 shadow-sm overflow-hidden">
+            <div class="p-6 lg:p-8">
+                <h1 class="text-3xl font-bold text-[var(--ui-secondary)] mb-4 tracking-tight leading-tight">{{ $ciBoard->name }}</h1>
+                @if($ciBoard->description)
+                    <p class="text-[var(--ui-secondary)]">{{ $ciBoard->description }}</p>
+                @endif
             </div>
         </div>
 
