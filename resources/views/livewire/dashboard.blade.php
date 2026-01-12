@@ -48,7 +48,12 @@
                 <div>
                     <h3 class="text-sm font-bold text-[var(--ui-secondary)] uppercase tracking-wider mb-3">Aktionen</h3>
                     <div class="space-y-2">
-                        {{-- Platzhalter für zukünftige Aktionen --}}
+                        <x-ui-button variant="secondary-outline" size="sm" wire:click="createBrand" class="w-full">
+                            <span class="flex items-center gap-2">
+                                @svg('heroicon-o-plus', 'w-4 h-4')
+                                <span>Neue Marke</span>
+                            </span>
+                        </x-ui-button>
                     </div>
                 </div>
 

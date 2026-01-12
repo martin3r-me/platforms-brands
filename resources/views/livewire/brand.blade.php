@@ -7,15 +7,13 @@
         {{-- Header Section --}}
         <div class="bg-white rounded-xl border border-[var(--ui-border)]/60 shadow-sm overflow-hidden">
             <div class="p-6 lg:p-8">
+                <h1 class="text-3xl font-bold text-[var(--ui-secondary)] mb-4 tracking-tight leading-tight">{{ $brand->name }}</h1>
+                
                 @if($brand->description)
-                    <div class="mb-4">
+                    <div class="mt-4">
                         <p class="text-[var(--ui-secondary)]">{{ $brand->description }}</p>
                     </div>
                 @endif
-
-                <div class="mt-8">
-                    <p class="text-[var(--ui-muted)]">Die Marken-Ansicht wird hier implementiert.</p>
-                </div>
             </div>
         </div>
     </x-ui-page-container>
@@ -28,7 +26,7 @@
                     <h3 class="text-xs font-semibold uppercase tracking-wide text-[var(--ui-muted)] mb-3">Aktionen</h3>
                     <div class="flex flex-col gap-2">
                         @can('update', $brand)
-                            <x-ui-button variant="secondary-outline" size="sm" x-data @click="$dispatch('open-modal-brand-settings', { brandId: {{ $brand->id }} })">
+                            <x-ui-button variant="secondary-outline" size="sm" x-data @click="$dispatch('open-modal-brand-settings', { brandId: {{ $brand->id }} })" class="w-full">
                                 <span class="inline-flex items-center gap-2">
                                     @svg('heroicon-o-cog-6-tooth','w-4 h-4')
                                     <span>Einstellungen</span>
@@ -102,4 +100,6 @@
             </div>
         </x-ui-page-sidebar>
     </x-slot>
+
+    <livewire:brands.brand-settings-modal/>
 </x-ui-page>

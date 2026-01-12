@@ -5,6 +5,7 @@ namespace Platform\Brands\Livewire;
 use Livewire\Component;
 use Illuminate\Support\Facades\Auth;
 use Platform\Brands\Models\BrandsBrand;
+use Livewire\Attributes\On;
 
 class Brand extends Component
 {
@@ -16,6 +17,12 @@ class Brand extends Component
         
         // Berechtigung prüfen
         $this->authorize('view', $this->brand);
+    }
+
+    #[On('updateBrand')] 
+    public function updateBrand()
+    {
+        $this->brand->refresh();
     }
 
     public function rendered()
