@@ -26,6 +26,13 @@ class BrandsServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        // Config veröffentlichen & zusammenführen (MUSS VOR registerModule sein!)
+        $this->publishes([
+            __DIR__.'/../config/brands.php' => config_path('brands.php'),
+        ], 'config');
+
+        $this->mergeConfigFrom(__DIR__.'/../config/brands.php', 'brands');
+
         // Modul-Registrierung nur, wenn Config & Tabelle vorhanden
         if (
             config()->has('brands.routing') &&
@@ -49,13 +56,6 @@ class BrandsServiceProvider extends ServiceProvider
                 $this->loadRoutesFrom(__DIR__.'/../routes/web.php');
             });
         }
-
-        // Config veröffentlichen & zusammenführen
-        $this->publishes([
-            __DIR__.'/../config/brands.php' => config_path('brands.php'),
-        ], 'config');
-
-        $this->mergeConfigFrom(__DIR__.'/../config/brands.php', 'brands');
 
         // Migrations, Views, Livewire-Komponenten
         $this->loadMigrationsFrom(__DIR__.'/../database/migrations');

@@ -8,7 +8,7 @@ return [
     'guard' => 'web',
 
     'navigation' => [
-        'route' => 'brands.brands.show',
+        'route' => 'brands.dashboard',
         'icon'  => 'heroicon-o-tag',
         'order' => 30,
     ],
