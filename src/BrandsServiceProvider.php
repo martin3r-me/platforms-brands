@@ -13,8 +13,10 @@ use Platform\Core\Routing\ModuleRouter;
 
 use Platform\Brands\Models\BrandsBrand;
 use Platform\Brands\Models\BrandsCiBoard;
+use Platform\Brands\Models\BrandsCiBoardColor;
 use Platform\Brands\Policies\BrandPolicy;
 use Platform\Brands\Policies\CiBoardPolicy;
+use Platform\Brands\Policies\CiBoardColorPolicy;
 
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
@@ -113,6 +115,7 @@ class BrandsServiceProvider extends ServiceProvider
         $policies = [
             BrandsBrand::class => BrandPolicy::class,
             BrandsCiBoard::class => CiBoardPolicy::class,
+            BrandsCiBoardColor::class => CiBoardColorPolicy::class,
         ];
 
         foreach ($policies as $model => $policy) {
@@ -147,6 +150,13 @@ class BrandsServiceProvider extends ServiceProvider
             $registry->register(new \Platform\Brands\Tools\GetCiBoardTool());
             $registry->register(new \Platform\Brands\Tools\UpdateCiBoardTool());
             $registry->register(new \Platform\Brands\Tools\DeleteCiBoardTool());
+            
+            // CiBoardColor-Tools
+            $registry->register(new \Platform\Brands\Tools\CreateCiBoardColorTool());
+            $registry->register(new \Platform\Brands\Tools\ListCiBoardColorsTool());
+            $registry->register(new \Platform\Brands\Tools\GetCiBoardColorTool());
+            $registry->register(new \Platform\Brands\Tools\UpdateCiBoardColorTool());
+            $registry->register(new \Platform\Brands\Tools\DeleteCiBoardColorTool());
         } catch (\Throwable $e) {
             // Silent fail - Tool-Registry könnte nicht verfügbar sein
         }

@@ -72,6 +72,11 @@ class BrandsCiBoard extends Model implements HasDisplayName
         return $this->belongsTo(\Platform\Core\Models\Team::class);
     }
 
+    public function colors()
+    {
+        return $this->hasMany(BrandsCiBoardColor::class, 'brand_ci_board_id')->orderBy('order');
+    }
+
     public function getDisplayName(): ?string
     {
         return $this->name;

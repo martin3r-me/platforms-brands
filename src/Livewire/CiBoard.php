@@ -15,7 +15,7 @@ class CiBoard extends Component
     public function mount(BrandsCiBoard $brandsCiBoard)
     {
         // Model neu laden, um sicherzustellen, dass alle Daten vorhanden sind
-        $this->ciBoard = $brandsCiBoard->fresh();
+        $this->ciBoard = $brandsCiBoard->fresh()->load('colors');
         
         // Farben initialisieren, falls null (für Color-Input benötigt)
         if (empty($this->ciBoard->primary_color)) {
