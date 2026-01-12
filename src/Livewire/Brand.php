@@ -25,6 +25,31 @@ class Brand extends Component
         $this->brand->refresh();
     }
 
+    public function createCiBoard()
+    {
+        $this->authorize('update', $this->brand);
+        
+        $user = Auth::user();
+        $team = $user->currentTeam;
+        
+        if (!$team) {
+            session()->flash('error', 'Kein Team ausgewählt.');
+            return;
+        }
+
+        $ciBoard = \Platform\Brands\Models\BrandsCiBoard::create([
+            'name' => 'Neues CI Board',
+            'description' => null,
+            'user_id' => $user->id,
+            'team_id' => $team->id,
+            'brand_id' => $this->brand->id,
+        ]);
+
+        $this->brand->refresh();
+        
+        return $this->redirect(route('brands.ci-boards.show', $ciBoard), navigate: true);
+    }
+
     public function rendered()
     {
         $this->dispatch('comms', [
@@ -63,9 +88,13 @@ class Brand extends Component
     public function render()
     {
         $user = Auth::user();
+        
+        // CI Boards für diese Marke laden
+        $boards = $this->brand->ciBoards;
 
         return view('brands::livewire.brand', [
             'user' => $user,
+            'boards' => $boards,
         ])->layout('platform::layouts.app');
     }
 }

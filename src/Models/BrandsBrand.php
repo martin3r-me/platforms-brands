@@ -104,4 +104,12 @@ class BrandsBrand extends Model implements HasTimeAncestors, HasKeyResultAncesto
     {
         return $this->name;
     }
+
+    /**
+     * CI Boards dieser Marke
+     */
+    public function ciBoards()
+    {
+        return $this->hasMany(BrandsCiBoard::class, 'brand_id')->orderBy('order');
+    }
 }

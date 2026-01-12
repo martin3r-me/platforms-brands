@@ -12,7 +12,9 @@ use Platform\Core\PlatformCore;
 use Platform\Core\Routing\ModuleRouter;
 
 use Platform\Brands\Models\BrandsBrand;
+use Platform\Brands\Models\BrandsCiBoard;
 use Platform\Brands\Policies\BrandPolicy;
+use Platform\Brands\Policies\CiBoardPolicy;
 
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
@@ -110,6 +112,7 @@ class BrandsServiceProvider extends ServiceProvider
     {
         $policies = [
             BrandsBrand::class => BrandPolicy::class,
+            BrandsCiBoard::class => CiBoardPolicy::class,
         ];
 
         foreach ($policies as $model => $policy) {
@@ -137,6 +140,13 @@ class BrandsServiceProvider extends ServiceProvider
             // CRM-Verknüpfungen
             $registry->register(new \Platform\Brands\Tools\LinkBrandCompanyTool());
             $registry->register(new \Platform\Brands\Tools\LinkBrandContactTool());
+            
+            // CiBoard-Tools
+            $registry->register(new \Platform\Brands\Tools\CreateCiBoardTool());
+            $registry->register(new \Platform\Brands\Tools\ListCiBoardsTool());
+            $registry->register(new \Platform\Brands\Tools\GetCiBoardTool());
+            $registry->register(new \Platform\Brands\Tools\UpdateCiBoardTool());
+            $registry->register(new \Platform\Brands\Tools\DeleteCiBoardTool());
         } catch (\Throwable $e) {
             // Silent fail - Tool-Registry könnte nicht verfügbar sein
         }
