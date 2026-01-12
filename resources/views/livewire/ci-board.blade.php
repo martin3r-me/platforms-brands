@@ -211,7 +211,7 @@
                     
                     <div>
                         <label class="block text-sm font-semibold text-[var(--ui-secondary)] mb-2 flex items-center gap-2">
-                            @svg('heroicon-o-font', 'w-4 h-4 text-[var(--ui-primary)]')
+                            @svg('heroicon-o-document-text', 'w-4 h-4 text-[var(--ui-primary)]')
                             Schriftart
                         </label>
                         <input type="text" 
