@@ -64,6 +64,9 @@ class BrandsServiceProvider extends ServiceProvider
 
         // Policies registrieren
         $this->registerPolicies();
+
+        // Tools registrieren
+        $this->registerTools();
     }
     
     protected function registerLivewireComponents(): void
@@ -113,6 +116,29 @@ class BrandsServiceProvider extends ServiceProvider
             if (class_exists($model) && class_exists($policy)) {
                 Gate::policy($model, $policy);
             }
+        }
+    }
+
+    /**
+     * Registriert Tools für das Brands-Modul
+     */
+    protected function registerTools(): void
+    {
+        try {
+            $registry = resolve(\Platform\Core\Tools\ToolRegistry::class);
+            
+            // Brand-Tools
+            $registry->register(new \Platform\Brands\Tools\CreateBrandTool());
+            $registry->register(new \Platform\Brands\Tools\ListBrandsTool());
+            $registry->register(new \Platform\Brands\Tools\GetBrandTool());
+            $registry->register(new \Platform\Brands\Tools\UpdateBrandTool());
+            $registry->register(new \Platform\Brands\Tools\DeleteBrandTool());
+            
+            // CRM-Verknüpfungen
+            $registry->register(new \Platform\Brands\Tools\LinkBrandCompanyTool());
+            $registry->register(new \Platform\Brands\Tools\LinkBrandContactTool());
+        } catch (\Throwable $e) {
+            // Silent fail - Tool-Registry könnte nicht verfügbar sein
         }
     }
 }
