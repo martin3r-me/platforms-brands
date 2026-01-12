@@ -17,6 +17,17 @@ class CiBoard extends Component
         // Model neu laden, um sicherzustellen, dass alle Daten vorhanden sind
         $this->ciBoard = $brandsCiBoard->fresh();
         
+        // Farben initialisieren, falls null (für Color-Input benötigt)
+        if (empty($this->ciBoard->primary_color)) {
+            $this->ciBoard->primary_color = '#000000';
+        }
+        if (empty($this->ciBoard->secondary_color)) {
+            $this->ciBoard->secondary_color = '#000000';
+        }
+        if (empty($this->ciBoard->accent_color)) {
+            $this->ciBoard->accent_color = '#000000';
+        }
+        
         // Berechtigung prüfen
         $this->authorize('view', $this->ciBoard);
     }
@@ -54,6 +65,21 @@ class CiBoard extends Component
 
     public function save()
     {
+        // Farbwerte normalisieren vor dem Speichern
+        foreach (['primary_color', 'secondary_color', 'accent_color'] as $colorField) {
+            $value = $this->ciBoard->$colorField;
+            if (!empty($value)) {
+                $value = ltrim($value, '#');
+                if (strlen($value) === 3) {
+                    $value = $value[0] . $value[0] . $value[1] . $value[1] . $value[2] . $value[2];
+                }
+                $this->ciBoard->$colorField = '#' . $value;
+            } else {
+                // Wenn leer, setze auf null (nicht auf #000000)
+                $this->ciBoard->$colorField = null;
+            }
+        }
+        
         $this->validate();
         
         // Policy prüfen
@@ -62,6 +88,17 @@ class CiBoard extends Component
         // Speichern
         $this->ciBoard->save();
         $this->ciBoard->refresh();
+        
+        // Nach dem Speichern wieder Standard-Werte für Color-Input setzen, falls null
+        if (empty($this->ciBoard->primary_color)) {
+            $this->ciBoard->primary_color = '#000000';
+        }
+        if (empty($this->ciBoard->secondary_color)) {
+            $this->ciBoard->secondary_color = '#000000';
+        }
+        if (empty($this->ciBoard->accent_color)) {
+            $this->ciBoard->accent_color = '#000000';
+        }
         
         $this->dispatch('updateSidebar');
         $this->dispatch('updateCiBoard');
@@ -80,6 +117,29 @@ class CiBoard extends Component
         // Validierung bei Änderungen
         if (str_starts_with($propertyName, 'ciBoard.')) {
             $field = str_replace('ciBoard.', '', $propertyName);
+            
+            // Farbwerte normalisieren (entferne # falls vorhanden, dann wieder hinzufügen)
+            if (in_array($field, ['primary_color', 'secondary_color', 'accent_color'])) {
+                $value = $this->ciBoard->$field;
+                if (!empty($value)) {
+                    // Entferne # falls vorhanden
+                    $value = ltrim($value, '#');
+                    // Stelle sicher, dass es 6 Hex-Zeichen sind
+                    if (strlen($value) === 3) {
+                        // Expandiere #RGB zu #RRGGBB
+                        $value = $value[0] . $value[0] . $value[1] . $value[1] . $value[2] . $value[2];
+                    }
+                    // Füge # hinzu falls nicht vorhanden
+                    if (!str_starts_with($value, '#')) {
+                        $value = '#' . $value;
+                    }
+                    $this->ciBoard->$field = $value;
+                } else {
+                    // Wenn leer, setze auf Standard
+                    $this->ciBoard->$field = '#000000';
+                }
+            }
+            
             $this->validateOnly("ciBoard.$field");
         }
     }

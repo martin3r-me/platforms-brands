@@ -38,11 +38,14 @@
                                 <label class="block text-sm font-medium text-[var(--ui-secondary)] mb-2">Primärfarbe</label>
                                 <div class="flex items-center gap-3">
                                     <input type="color" 
-                                           wire:model="ciBoard.primary_color" 
+                                           wire:model.live="ciBoard.primary_color" 
+                                           value="{{ $ciBoard->primary_color ?? '#000000' }}"
                                            class="w-16 h-10 rounded border border-[var(--ui-border)] cursor-pointer">
                                     <input type="text" 
-                                           wire:model="ciBoard.primary_color" 
+                                           wire:model.live="ciBoard.primary_color" 
+                                           value="{{ $ciBoard->primary_color ?? '' }}"
                                            placeholder="#000000"
+                                           pattern="^#[0-9A-Fa-f]{6}$"
                                            class="flex-1 px-3 py-2 border border-[var(--ui-border)] rounded-lg focus:ring-2 focus:ring-[var(--ui-primary)] focus:border-transparent">
                                 </div>
                             </div>
@@ -51,11 +54,14 @@
                                 <label class="block text-sm font-medium text-[var(--ui-secondary)] mb-2">Sekundärfarbe</label>
                                 <div class="flex items-center gap-3">
                                     <input type="color" 
-                                           wire:model="ciBoard.secondary_color" 
+                                           wire:model.live="ciBoard.secondary_color" 
+                                           value="{{ $ciBoard->secondary_color ?? '#000000' }}"
                                            class="w-16 h-10 rounded border border-[var(--ui-border)] cursor-pointer">
                                     <input type="text" 
-                                           wire:model="ciBoard.secondary_color" 
+                                           wire:model.live="ciBoard.secondary_color" 
+                                           value="{{ $ciBoard->secondary_color ?? '' }}"
                                            placeholder="#000000"
+                                           pattern="^#[0-9A-Fa-f]{6}$"
                                            class="flex-1 px-3 py-2 border border-[var(--ui-border)] rounded-lg focus:ring-2 focus:ring-[var(--ui-primary)] focus:border-transparent">
                                 </div>
                             </div>
@@ -64,11 +70,14 @@
                                 <label class="block text-sm font-medium text-[var(--ui-secondary)] mb-2">Akzentfarbe</label>
                                 <div class="flex items-center gap-3">
                                     <input type="color" 
-                                           wire:model="ciBoard.accent_color" 
+                                           wire:model.live="ciBoard.accent_color" 
+                                           value="{{ $ciBoard->accent_color ?? '#000000' }}"
                                            class="w-16 h-10 rounded border border-[var(--ui-border)] cursor-pointer">
                                     <input type="text" 
-                                           wire:model="ciBoard.accent_color" 
+                                           wire:model.live="ciBoard.accent_color" 
+                                           value="{{ $ciBoard->accent_color ?? '' }}"
                                            placeholder="#000000"
+                                           pattern="^#[0-9A-Fa-f]{6}$"
                                            class="flex-1 px-3 py-2 border border-[var(--ui-border)] rounded-lg focus:ring-2 focus:ring-[var(--ui-primary)] focus:border-transparent">
                                 </div>
                             </div>
