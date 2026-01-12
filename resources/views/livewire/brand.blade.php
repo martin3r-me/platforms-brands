@@ -5,7 +5,7 @@
     </x-slot>
 
     <x-slot name="sidebar">
-        <x-ui-page-sidebar title="Marken-Übersicht" width="w-80" :defaultOpen="true">
+        <x-ui-page-sidebar title="Marken-Übersicht" width="w-80" :defaultOpen="true" storeKey="sidebarOpen" side="left">
             <div class="p-4 space-y-6">
                 {{-- Aktionen --}}
                 <div>
@@ -40,6 +40,26 @@
                                 </span>
                             </div>
                         @endif
+                    </div>
+                </div>
+            </div>
+        </x-ui-page-sidebar>
+    </x-slot>
+
+    <x-slot name="activity">
+        <x-ui-page-sidebar title="Aktivitäten" width="w-80" :defaultOpen="false" storeKey="activityOpen" side="right">
+            <div class="p-4 space-y-4">
+                <div class="text-sm text-[var(--ui-muted)]">Letzte Aktivitäten</div>
+                <div class="space-y-3 text-sm">
+                    {{-- Dummy: Aktivitäten werden später implementiert --}}
+                    {{-- @foreach(($activities ?? []) as $activity)
+                        <div class="p-2 rounded border border-[var(--ui-border)]/60 bg-[var(--ui-muted-5)]">
+                            <div class="font-medium text-[var(--ui-secondary)] truncate">{{ $activity['title'] ?? 'Aktivität' }}</div>
+                            <div class="text-[var(--ui-muted)]">{{ $activity['time'] ?? '' }}</div>
+                        </div>
+                    @endforeach --}}
+                    <div class="p-2 rounded border border-[var(--ui-border)]/60 bg-[var(--ui-muted-5)]">
+                        <div class="text-[var(--ui-muted)] text-xs">Keine Aktivitäten vorhanden</div>
                     </div>
                 </div>
             </div>
