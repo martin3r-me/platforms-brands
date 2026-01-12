@@ -5,7 +5,7 @@
     </x-slot>
 
     <x-slot name="sidebar">
-        <x-ui-page-sidebar title="Marken-Übersicht" width="w-80" :defaultOpen="true" storeKey="sidebarOpen" side="left">
+        <x-ui-page-sidebar title="Marken-Übersicht" width="w-80" :defaultOpen="true">
             <div class="p-4 space-y-6">
                 {{-- Aktionen --}}
                 <div>
@@ -47,7 +47,7 @@
     </x-slot>
 
     <x-slot name="activity">
-        <x-ui-page-sidebar title="Aktivitäten" width="w-80" :defaultOpen="false" storeKey="activityOpen" side="right">
+        <x-ui-page-sidebar title="Aktivitäten" width="w-80" :defaultOpen="true" storeKey="activityOpen" side="right">
             <div class="p-4 space-y-4">
                 <div class="text-sm text-[var(--ui-muted)]">Letzte Aktivitäten</div>
                 <div class="space-y-3 text-sm">
