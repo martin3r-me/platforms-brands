@@ -30,49 +30,57 @@
 
                 {{-- Company --}}
                 <x-ui-input-select
-                    name="brand.company_id"
+                    name="selectedCompanyId"
                     label="Unternehmen (CRM)"
                     :options="$this->companyOptions"
-                    optionValue="id"
-                    optionLabel="name"
+                    optionValue="value"
+                    optionLabel="label"
                     :nullable="true"
                     nullLabel="Kein Unternehmen"
-                    wire:model.live="brand.company_id"
+                    wire:model.live="selectedCompanyId"
                     placeholder="Unternehmen wählen..."
-                    :errorKey="'brand.company_id'"
+                    :errorKey="'selectedCompanyId'"
                 />
 
                 {{-- Contact --}}
                 <x-ui-input-select
-                    name="brand.contact_id"
+                    name="selectedContactId"
                     label="Kontaktperson (CRM)"
                     :options="$this->contactOptions"
-                    optionValue="id"
-                    optionLabel="display_name"
+                    optionValue="value"
+                    optionLabel="label"
                     :nullable="true"
                     nullLabel="Keine Kontaktperson"
-                    wire:model.live="brand.contact_id"
+                    wire:model.live="selectedContactId"
                     placeholder="Kontaktperson wählen..."
-                    :errorKey="'brand.contact_id'"
+                    :errorKey="'selectedContactId'"
                 />
             @else
                 <div class="flex items-start justify-between text-sm p-2 rounded border border-[var(--ui-border)] bg-white">
                     <span class="text-[var(--ui-muted)] mr-3">Beschreibung</span>
                     <span class="font-medium text-[var(--ui-body-color)] text-right">{{ $brand->description ?? '–' }}</span>
                 </div>
-                @if($brand->company)
+                @if($brand->getCompany())
+                    @php
+                        $company = $brand->getCompany();
+                        $companyResolver = app(\Platform\Core\Contracts\CrmCompanyResolverInterface::class);
+                    @endphp
                     <div class="flex items-center justify-between text-sm p-2 rounded border border-[var(--ui-border)] bg-white">
                         <span class="text-[var(--ui-muted)]">Unternehmen</span>
-                        <a href="{{ route('crm.companies.show', $brand->company) }}" class="font-medium text-[var(--ui-primary)] hover:underline">
-                            {{ $brand->company->name }}
+                        <a href="{{ $companyResolver->url($company->id) }}" class="font-medium text-[var(--ui-primary)] hover:underline">
+                            {{ $companyResolver->displayName($company->id) }}
                         </a>
                     </div>
                 @endif
-                @if($brand->contact)
+                @if($brand->getContact())
+                    @php
+                        $contact = $brand->getContact();
+                        $contactResolver = app(\Platform\Core\Contracts\CrmContactResolverInterface::class);
+                    @endphp
                     <div class="flex items-center justify-between text-sm p-2 rounded border border-[var(--ui-border)] bg-white">
                         <span class="text-[var(--ui-muted)]">Kontaktperson</span>
-                        <a href="{{ route('crm.contacts.show', $brand->contact) }}" class="font-medium text-[var(--ui-primary)] hover:underline">
-                            {{ $brand->contact->display_name }}
+                        <a href="{{ $contactResolver->url($contact->id) }}" class="font-medium text-[var(--ui-primary)] hover:underline">
+                            {{ $contactResolver->displayName($contact->id) }}
                         </a>
                     </div>
                 @endif

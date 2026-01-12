@@ -30,18 +30,27 @@ class Sidebar extends Component
 
     public function createBrand()
     {
-        // Wird später implementiert
-        // $user = Auth::user();
-        // $teamId = $user->currentTeam->id;
-        // 
-        // $brand = new BrandsBrand();
-        // $brand->name = 'Neue Marke';
-        // $brand->user_id = $user->id;
-        // $brand->team_id = $teamId;
-        // $brand->order = BrandsBrand::where('team_id', $teamId)->max('order') + 1;
-        // $brand->save();
-        // 
-        // return redirect()->route('brands.brands.show', ['brandsBrand' => $brand->id]);
+        $user = Auth::user();
+        $team = $user->currentTeam;
+        
+        if (!$team) {
+            return;
+        }
+
+        // Policy-Berechtigung prüfen
+        $this->authorize('create', BrandsBrand::class);
+
+        // Neue Marke anlegen
+        $brand = BrandsBrand::create([
+            'name' => 'Neue Marke',
+            'user_id' => $user->id,
+            'team_id' => $team->id,
+        ]);
+
+        $this->dispatch('updateSidebar');
+        
+        // Zur Marken-Ansicht weiterleiten
+        return $this->redirect(route('brands.brands.show', $brand), navigate: true);
     }
 
     public function render()

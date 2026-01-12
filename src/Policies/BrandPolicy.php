@@ -30,9 +30,8 @@ class BrandPolicy
      */
     public function delete(User $user, BrandsBrand $brand): bool
     {
-        // Nur Ersteller oder Team-Admin darf löschen
-        return $brand->user_id === $user->id || 
-               $brand->team_id === $user->currentTeam?->id;
+        // Nur Ersteller oder Team-Mitglied im selben Team darf löschen
+        return $brand->team_id === $user->currentTeam?->id;
     }
 
     /**
@@ -42,5 +41,15 @@ class BrandPolicy
     {
         // Jeder Team-Mitglied kann Marken erstellen
         return $user->currentTeam !== null;
+    }
+
+    /**
+     * Darf der User die Settings öffnen?
+     * Jeder mit view-Rechten kann Settings öffnen
+     */
+    public function settings(User $user, BrandsBrand $brand): bool
+    {
+        // Jeder mit view-Rechten kann Settings öffnen
+        return $this->view($user, $brand);
     }
 }

@@ -27,19 +27,28 @@ class Dashboard extends Component
     public function createBrand()
     {
         $user = Auth::user();
-        $teamId = $user->currentTeam->id;
+        
+        // Policy-Berechtigung prüfen
+        $this->authorize('create', BrandsBrand::class);
+
+        $team = $user->currentTeam;
+        
+        if (!$team) {
+            session()->flash('error', 'Kein Team ausgewählt.');
+            return;
+        }
 
         // Neue Marke anlegen
         $brand = BrandsBrand::create([
             'name' => 'Neue Marke',
             'user_id' => $user->id,
-            'team_id' => $teamId,
+            'team_id' => $team->id,
         ]);
 
         $this->dispatch('updateSidebar');
         
         // Zur Marken-Ansicht weiterleiten
-        return redirect()->route('brands.brands.show', $brand);
+        return $this->redirect(route('brands.brands.show', $brand), navigate: true);
     }
 
     public function render()

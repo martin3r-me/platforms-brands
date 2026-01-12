@@ -11,13 +11,17 @@ use Platform\Core\Traits\HasColors;
 use Platform\Core\Contracts\HasTimeAncestors;
 use Platform\Core\Contracts\HasKeyResultAncestors;
 use Platform\Core\Contracts\HasDisplayName;
+use Platform\Crm\Traits\HasCompanyLinksTrait;
+use Platform\Hcm\Traits\HasEmployeeContact;
+use Platform\Crm\Contracts\CompanyInterface;
+use Platform\Crm\Contracts\ContactInterface;
 
 /**
  * @ai.description Marke dient als Container für Brand-Management im Team.
  */
 class BrandsBrand extends Model implements HasTimeAncestors, HasKeyResultAncestors, HasDisplayName
 {
-    use HasOrganizationContexts, HasColors;
+    use HasOrganizationContexts, HasColors, HasCompanyLinksTrait, HasEmployeeContact;
 
     protected $table = 'brands_brands';
 
@@ -28,8 +32,6 @@ class BrandsBrand extends Model implements HasTimeAncestors, HasKeyResultAncesto
         'order',
         'user_id',
         'team_id',
-        'company_id',
-        'contact_id',
         'done',
         'done_at',
     ];
@@ -61,14 +63,20 @@ class BrandsBrand extends Model implements HasTimeAncestors, HasKeyResultAncesto
         return $this->belongsTo(\Platform\Core\Models\Team::class);
     }
 
-    public function company(): BelongsTo
+    /**
+     * Gibt das primäre verknüpfte Unternehmen zurück (über Interface)
+     */
+    public function getCompany(): ?CompanyInterface
     {
-        return $this->belongsTo(\Platform\Crm\Models\CrmCompany::class);
+        return $this->companyLinks()->first()?->company;
     }
 
-    public function contact(): BelongsTo
+    /**
+     * Gibt den primären verknüpften Kontakt zurück (über Interface)
+     */
+    public function getContact(): ?ContactInterface
     {
-        return $this->belongsTo(\Platform\Crm\Models\CrmContact::class);
+        return $this->crmContactLinks()->first()?->contact;
     }
 
     /**
