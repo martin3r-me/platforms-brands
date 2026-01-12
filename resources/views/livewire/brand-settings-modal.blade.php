@@ -27,11 +27,55 @@
                     placeholder="Beschreibung der Marke eingeben..."
                     :errorKey="'brand.description'"
                 />
+
+                {{-- Company --}}
+                <x-ui-input-select
+                    name="brand.company_id"
+                    label="Unternehmen (CRM)"
+                    :options="$this->companyOptions"
+                    optionValue="id"
+                    optionLabel="name"
+                    :nullable="true"
+                    nullLabel="Kein Unternehmen"
+                    wire:model.live="brand.company_id"
+                    placeholder="Unternehmen wählen..."
+                    :errorKey="'brand.company_id'"
+                />
+
+                {{-- Contact --}}
+                <x-ui-input-select
+                    name="brand.contact_id"
+                    label="Kontaktperson (CRM)"
+                    :options="$this->contactOptions"
+                    optionValue="id"
+                    optionLabel="display_name"
+                    :nullable="true"
+                    nullLabel="Keine Kontaktperson"
+                    wire:model.live="brand.contact_id"
+                    placeholder="Kontaktperson wählen..."
+                    :errorKey="'brand.contact_id'"
+                />
             @else
                 <div class="flex items-start justify-between text-sm p-2 rounded border border-[var(--ui-border)] bg-white">
                     <span class="text-[var(--ui-muted)] mr-3">Beschreibung</span>
                     <span class="font-medium text-[var(--ui-body-color)] text-right">{{ $brand->description ?? '–' }}</span>
                 </div>
+                @if($brand->company)
+                    <div class="flex items-center justify-between text-sm p-2 rounded border border-[var(--ui-border)] bg-white">
+                        <span class="text-[var(--ui-muted)]">Unternehmen</span>
+                        <a href="{{ route('crm.companies.show', $brand->company) }}" class="font-medium text-[var(--ui-primary)] hover:underline">
+                            {{ $brand->company->name }}
+                        </a>
+                    </div>
+                @endif
+                @if($brand->contact)
+                    <div class="flex items-center justify-between text-sm p-2 rounded border border-[var(--ui-border)] bg-white">
+                        <span class="text-[var(--ui-muted)]">Kontaktperson</span>
+                        <a href="{{ route('crm.contacts.show', $brand->contact) }}" class="font-medium text-[var(--ui-primary)] hover:underline">
+                            {{ $brand->contact->display_name }}
+                        </a>
+                    </div>
+                @endif
             @endcan
         </x-ui-form-grid>
         

@@ -54,6 +54,22 @@
                                 </span>
                             </div>
                         @endif
+                        @if($brand->company)
+                            <div class="flex justify-between items-center py-2 px-3 bg-[var(--ui-muted-5)] border border-[var(--ui-border)]/40">
+                                <span class="text-sm text-[var(--ui-muted)]">Unternehmen</span>
+                                <a href="{{ route('crm.companies.show', $brand->company) }}" class="text-sm text-[var(--ui-primary)] font-medium hover:underline">
+                                    {{ $brand->company->name }}
+                                </a>
+                            </div>
+                        @endif
+                        @if($brand->contact)
+                            <div class="flex justify-between items-center py-2 px-3 bg-[var(--ui-muted-5)] border border-[var(--ui-border)]/40">
+                                <span class="text-sm text-[var(--ui-muted)]">Kontaktperson</span>
+                                <a href="{{ route('crm.contacts.show', $brand->contact) }}" class="text-sm text-[var(--ui-primary)] font-medium hover:underline">
+                                    {{ $brand->contact->display_name }}
+                                </a>
+                            </div>
+                        @endif
                     </div>
                 </div>
             </div>

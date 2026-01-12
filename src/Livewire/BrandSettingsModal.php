@@ -6,6 +6,8 @@ use Livewire\Component;
 use Platform\Brands\Models\BrandsBrand;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\On;
+use Platform\Core\Contracts\CrmCompanyOptionsProviderInterface;
+use Platform\Core\Contracts\CrmContactOptionsProviderInterface;
 
 class BrandSettingsModal extends Component
 {
@@ -33,7 +35,19 @@ class BrandSettingsModal extends Component
         return [
             'brand.name' => 'required|string|max:255',
             'brand.description' => 'nullable|string',
+            'brand.company_id' => 'nullable|integer|exists:crm_companies,id',
+            'brand.contact_id' => 'nullable|integer|exists:crm_contacts,id',
         ];
+    }
+
+    public function getCompanyOptionsProperty()
+    {
+        return app(CrmCompanyOptionsProviderInterface::class)->getOptions(Auth::user()->currentTeam);
+    }
+
+    public function getContactOptionsProperty()
+    {
+        return app(CrmContactOptionsProviderInterface::class)->getOptions(Auth::user()->currentTeam);
     }
 
     public function save()

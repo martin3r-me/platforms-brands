@@ -28,6 +28,8 @@ class BrandsBrand extends Model implements HasTimeAncestors, HasKeyResultAncesto
         'order',
         'user_id',
         'team_id',
+        'company_id',
+        'contact_id',
         'done',
         'done_at',
     ];
@@ -57,6 +59,16 @@ class BrandsBrand extends Model implements HasTimeAncestors, HasKeyResultAncesto
     public function team(): BelongsTo
     {
         return $this->belongsTo(\Platform\Core\Models\Team::class);
+    }
+
+    public function company(): BelongsTo
+    {
+        return $this->belongsTo(\Platform\Crm\Models\CrmCompany::class);
+    }
+
+    public function contact(): BelongsTo
+    {
+        return $this->belongsTo(\Platform\Crm\Models\CrmContact::class);
     }
 
     /**
