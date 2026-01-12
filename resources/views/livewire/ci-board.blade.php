@@ -38,10 +38,10 @@
                                 <label class="block text-sm font-medium text-[var(--ui-secondary)] mb-2">Primärfarbe</label>
                                 <div class="flex items-center gap-3">
                                     <input type="color" 
-                                           wire:model.live="ciBoard.primary_color" 
+                                           wire:model="ciBoard.primary_color" 
                                            class="w-16 h-10 rounded border border-[var(--ui-border)] cursor-pointer">
                                     <input type="text" 
-                                           wire:model.live="ciBoard.primary_color" 
+                                           wire:model="ciBoard.primary_color" 
                                            placeholder="#000000"
                                            class="flex-1 px-3 py-2 border border-[var(--ui-border)] rounded-lg focus:ring-2 focus:ring-[var(--ui-primary)] focus:border-transparent">
                                 </div>
@@ -51,10 +51,10 @@
                                 <label class="block text-sm font-medium text-[var(--ui-secondary)] mb-2">Sekundärfarbe</label>
                                 <div class="flex items-center gap-3">
                                     <input type="color" 
-                                           wire:model.live="ciBoard.secondary_color" 
+                                           wire:model="ciBoard.secondary_color" 
                                            class="w-16 h-10 rounded border border-[var(--ui-border)] cursor-pointer">
                                     <input type="text" 
-                                           wire:model.live="ciBoard.secondary_color" 
+                                           wire:model="ciBoard.secondary_color" 
                                            placeholder="#000000"
                                            class="flex-1 px-3 py-2 border border-[var(--ui-border)] rounded-lg focus:ring-2 focus:ring-[var(--ui-primary)] focus:border-transparent">
                                 </div>
@@ -64,10 +64,10 @@
                                 <label class="block text-sm font-medium text-[var(--ui-secondary)] mb-2">Akzentfarbe</label>
                                 <div class="flex items-center gap-3">
                                     <input type="color" 
-                                           wire:model.live="ciBoard.accent_color" 
+                                           wire:model="ciBoard.accent_color" 
                                            class="w-16 h-10 rounded border border-[var(--ui-border)] cursor-pointer">
                                     <input type="text" 
-                                           wire:model.live="ciBoard.accent_color" 
+                                           wire:model="ciBoard.accent_color" 
                                            placeholder="#000000"
                                            class="flex-1 px-3 py-2 border border-[var(--ui-border)] rounded-lg focus:ring-2 focus:ring-[var(--ui-primary)] focus:border-transparent">
                                 </div>
@@ -81,7 +81,7 @@
                         <div class="space-y-4">
                             <div>
                                 <label class="block text-sm font-medium text-[var(--ui-secondary)] mb-2">Slogan</label>
-                                <textarea wire:model.live="ciBoard.slogan" 
+                                <textarea wire:model="ciBoard.slogan" 
                                           rows="3"
                                           placeholder="Dein Marken-Slogan..."
                                           class="w-full px-3 py-2 border border-[var(--ui-border)] rounded-lg focus:ring-2 focus:ring-[var(--ui-primary)] focus:border-transparent"></textarea>
@@ -89,7 +89,7 @@
                             
                             <div>
                                 <label class="block text-sm font-medium text-[var(--ui-secondary)] mb-2">Tagline</label>
-                                <textarea wire:model.live="ciBoard.tagline" 
+                                <textarea wire:model="ciBoard.tagline" 
                                           rows="2"
                                           placeholder="Kurze Beschreibung..."
                                           class="w-full px-3 py-2 border border-[var(--ui-border)] rounded-lg focus:ring-2 focus:ring-[var(--ui-primary)] focus:border-transparent"></textarea>
@@ -98,7 +98,7 @@
                             <div>
                                 <label class="block text-sm font-medium text-[var(--ui-secondary)] mb-2">Schriftart</label>
                                 <input type="text" 
-                                       wire:model.live="ciBoard.font_family" 
+                                       wire:model="ciBoard.font_family" 
                                        placeholder="z.B. Arial, Helvetica, ..."
                                        class="w-full px-3 py-2 border border-[var(--ui-border)] rounded-lg focus:ring-2 focus:ring-[var(--ui-primary)] focus:border-transparent">
                             </div>
@@ -130,6 +130,29 @@
     <x-slot name="sidebar">
         <x-ui-page-sidebar title="Board-Übersicht" width="w-80" :defaultOpen="true">
             <div class="p-6 space-y-6">
+                {{-- Aktionen --}}
+                <div>
+                    <h3 class="text-xs font-semibold uppercase tracking-wide text-[var(--ui-muted)] mb-3">Aktionen</h3>
+                    <div class="flex flex-col gap-2">
+                        @can('update', $ciBoard)
+                            @if($this->isDirty())
+                                <x-ui-button variant="primary" size="sm" wire:click="save" class="w-full">
+                                    <span class="inline-flex items-center gap-2">
+                                        @svg('heroicon-o-check','w-4 h-4')
+                                        <span>Speichern</span>
+                                    </span>
+                                </x-ui-button>
+                            @endif
+                            <x-ui-button variant="secondary-outline" size="sm" x-data @click="$dispatch('open-modal-ci-board-settings', { ciBoardId: {{ $ciBoard->id }} })" class="w-full">
+                                <span class="inline-flex items-center gap-2">
+                                    @svg('heroicon-o-cog-6-tooth','w-4 h-4')
+                                    <span>Einstellungen</span>
+                                </span>
+                            </x-ui-button>
+                        @endcan
+                    </div>
+                </div>
+
                 {{-- Board-Details --}}
                 <div>
                     <h3 class="text-xs font-semibold uppercase tracking-wide text-[var(--ui-muted)] mb-3">Details</h3>
@@ -151,4 +174,6 @@
             </div>
         </x-ui-page-sidebar>
     </x-slot>
+
+    <livewire:brands.ci-board-settings-modal/>
 </x-ui-page>
