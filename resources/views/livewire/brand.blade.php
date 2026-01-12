@@ -66,16 +66,20 @@
         </x-ui-page-sidebar>
     </x-slot>
 
-    {{-- Hauptinhalt --}}
-    <div class="p-6">
-        @if($brand->description)
-            <div class="mb-6">
-                <p class="text-[var(--ui-secondary)]">{{ $brand->description }}</p>
-            </div>
-        @endif
+    <x-ui-page-container spacing="space-y-6">
+        {{-- Header Section --}}
+        <div class="bg-white rounded-xl border border-[var(--ui-border)]/60 shadow-sm overflow-hidden">
+            <div class="p-6 lg:p-8">
+                @if($brand->description)
+                    <div class="mb-4">
+                        <p class="text-[var(--ui-secondary)]">{{ $brand->description }}</p>
+                    </div>
+                @endif
 
-        <div class="mt-8">
-            <p class="text-[var(--ui-muted)]">Die Marken-Ansicht wird hier implementiert.</p>
+                <div class="mt-8">
+                    <p class="text-[var(--ui-muted)]">Die Marken-Ansicht wird hier implementiert.</p>
+                </div>
+            </div>
         </div>
-    </div>
+    </x-ui-page-container>
 </x-ui-page>
