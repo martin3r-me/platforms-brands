@@ -31,10 +31,20 @@ class InstagramMediaService
      */
     public function fetchMedia(BrandsInstagramAccount $account, int $limit = 1000): array
     {
-        $accessToken = $account->access_token;
+        // Brand-Beziehung laden, falls nicht bereits geladen
+        if (!$account->relationLoaded('brand')) {
+            $account->load('brand.metaToken');
+        }
+        
+        // Access Token vom Meta Token der Brand holen
+        if (!$account->brand || !$account->brand->metaToken) {
+            throw new \Exception('Kein Meta Token für diese Brand gefunden.');
+        }
+        
+        $accessToken = $this->tokenService->getValidAccessToken($account->brand->metaToken);
         
         if (!$accessToken) {
-            throw new \Exception('Kein Access Token für diesen Instagram Account gefunden.');
+            throw new \Exception('Kein gültiger Access Token für diese Brand gefunden.');
         }
 
         $apiVersion = config('brands.meta.api_version', 'v21.0');

@@ -43,7 +43,7 @@ class SyncInstagramMedia extends Command
             $query->where('team_id', $teamId);
         }
 
-        $accounts = $query->with('brand.metaToken')->get();
+        $accounts = $query->with(['brand.metaToken', 'brand'])->get();
 
         if ($accounts->isEmpty()) {
             $this->warn('⚠️  Keine Instagram Accounts gefunden.');

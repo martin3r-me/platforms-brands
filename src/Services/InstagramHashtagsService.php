@@ -39,7 +39,19 @@ class InstagramHashtagsService
     public function fetchHashtagId(string $hashtag, BrandsInstagramAccount $account): ?string
     {
         $apiVersion = config('brands.meta.api_version', 'v21.0');
+        
+        // Access Token vom Account oder von der Brand holen
         $accessToken = $account->access_token;
+        if (!$accessToken && $account->brand && $account->brand->metaToken) {
+            $accessToken = $this->tokenService->getValidAccessToken($account->brand->metaToken);
+        }
+        
+        if (!$accessToken) {
+            Log::error('Kein Access Token für Instagram Account gefunden', [
+                'account_id' => $account->id,
+            ]);
+            return null;
+        }
 
         try {
             $response = Http::get("https://graph.facebook.com/{$apiVersion}/ig_hashtag_search", [

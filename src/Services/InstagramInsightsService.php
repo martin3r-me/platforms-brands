@@ -47,7 +47,16 @@ class InstagramInsightsService
     {
         $metrics = ['follower_demographics', 'engaged_audience_demographics', 'reached_audience_demographics'];
         $apiVersion = config('brands.meta.api_version', 'v21.0');
+        
+        // Access Token vom Account oder von der Brand holen
         $accessToken = $account->access_token;
+        if (!$accessToken && $account->brand && $account->brand->metaToken) {
+            $accessToken = $this->tokenService->getValidAccessToken($account->brand->metaToken);
+        }
+        
+        if (!$accessToken) {
+            throw new \Exception('Kein Access Token für diesen Instagram Account gefunden.');
+        }
         $allData = [];
 
         foreach ($metrics as $metric) {
