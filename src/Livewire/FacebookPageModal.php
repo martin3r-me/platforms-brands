@@ -6,7 +6,8 @@ use Livewire\Component;
 use Platform\Brands\Models\BrandsBrand;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\On;
-use Platform\MetaOAuth\Services\MetaOAuthService;
+use Illuminate\Support\Str;
+use Laravel\Socialite\Facades\Socialite;
 
 class FacebookPageModal extends Component
 {
@@ -73,17 +74,62 @@ class FacebookPageModal extends Component
             'brands_oauth_team_id' => $team->id,
         ]);
 
-        // OAuth-Flow starten
-        $metaOAuthService = app(MetaOAuthService::class);
-        $redirectUrl = $metaOAuthService->getRedirectUrl([
-            'business_management',
-            'pages_read_engagement',
-            'pages_read_user_content',
-            'pages_manage_posts',
-            'pages_show_list',
-            'instagram_basic',
-            'instagram_manage_insights',
-        ], null, route('brands.facebook-pages.oauth.callback'));
+        // OAuth-Flow starten - direkt über Socialite
+        $state = Str::random(32);
+        session(['meta_oauth_state' => $state]);
+        
+        $redirectUri = route('brands.facebook-pages.oauth.callback');
+        
+        // Redirect Domain aus Config verwenden, falls gesetzt
+        $redirectDomain = config('meta-oauth.redirect_domain');
+        if ($redirectDomain && !filter_var($redirectUri, FILTER_VALIDATE_URL)) {
+            $redirectUri = rtrim($redirectDomain, '/') . '/' . ltrim($redirectUri, '/');
+        } elseif (!filter_var($redirectUri, FILTER_VALIDATE_URL)) {
+            $redirectUri = url($redirectUri);
+        }
+        
+        try {
+            // Meta OAuth Credentials aus Config
+            $clientId = config('meta-oauth.app_id') ?? config('services.meta.client_id');
+            $clientSecret = config('meta-oauth.app_secret') ?? config('services.meta.client_secret');
+            
+            if (!$clientId || !$clientSecret) {
+                $this->dispatch('notifications:store', [
+                    'title' => 'OAuth-Fehler',
+                    'message' => 'Meta OAuth ist nicht konfiguriert. Bitte konfiguriere META_APP_ID und META_APP_SECRET in der .env Datei.',
+                    'notice_type' => 'error',
+                ]);
+                return;
+            }
+            
+            $redirectUrl = Socialite::buildProvider(
+                \Laravel\Socialite\Two\FacebookProvider::class,
+                [
+                    'client_id' => $clientId,
+                    'client_secret' => $clientSecret,
+                    'redirect' => $redirectUri,
+                ]
+            )
+            ->scopes([
+                'business_management',
+                'pages_read_engagement',
+                'pages_read_user_content',
+                'pages_manage_posts',
+                'pages_show_list',
+                'instagram_basic',
+                'instagram_manage_insights',
+            ])
+            ->with(['state' => $state])
+            ->redirect()
+            ->getTargetUrl();
+        } catch (\Exception $e) {
+            $this->dispatch('notifications:store', [
+                'title' => 'OAuth-Fehler',
+                'message' => 'Fehler beim Starten des OAuth-Flows: ' . $e->getMessage(),
+                'notice_type' => 'error',
+            ]);
+            return;
+        }
 
         // Modal schließen und zu OAuth weiterleiten
         $this->closeModal();

@@ -6,20 +6,12 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Http;
 use Platform\Brands\Models\BrandsBrand;
-use Platform\MetaOAuth\Services\MetaOAuthService;
-use Platform\MetaOAuth\Services\MetaGraphApiService;
+use Laravel\Socialite\Facades\Socialite;
 
 class FacebookPageOAuthController extends Controller
 {
-    protected MetaOAuthService $metaOAuthService;
-    protected MetaGraphApiService $graphApi;
-
-    public function __construct(MetaOAuthService $metaOAuthService, MetaGraphApiService $graphApi)
-    {
-        $this->metaOAuthService = $metaOAuthService;
-        $this->graphApi = $graphApi;
-    }
 
     /**
      * OAuth Callback für Facebook Page Verknüpfung
@@ -38,11 +30,13 @@ class FacebookPageOAuthController extends Controller
 
         // State verifizieren
         $requestState = $request->query('state');
-        if ($requestState && !$this->metaOAuthService->verifyState($requestState)) {
+        $sessionState = session('meta_oauth_state');
+        if ($requestState && (!$sessionState || $sessionState !== $requestState)) {
             Log::error('Brands OAuth state mismatch');
             return redirect()->route('brands.brands.show', ['brandsBrand' => $brandId])
                 ->with('error', 'Ungültiger OAuth-State. Bitte versuche es erneut.');
         }
+        session()->forget('meta_oauth_state');
 
         $code = $request->query('code');
         if (!$code) {
@@ -106,8 +100,17 @@ class FacebookPageOAuthController extends Controller
                     ->with('error', 'Team-Kontext stimmt nicht überein.');
             }
 
-            // Business Accounts holen
-            $businessAccounts = $this->metaOAuthService->getBusinessAccounts($accessToken);
+            // Business Accounts holen über Graph API
+            $apiVersion = config('meta-oauth.api_version', 'v21.0');
+            $businessResponse = Http::get("https://graph.facebook.com/{$apiVersion}/me/businesses", [
+                'access_token' => $accessToken,
+            ]);
+            
+            $businessAccounts = [];
+            if ($businessResponse->successful()) {
+                $businessData = $businessResponse->json();
+                $businessAccounts = $businessData['data'] ?? [];
+            }
             
             if (empty($businessAccounts)) {
                 session()->forget(['brands_oauth_brand_id', 'brands_oauth_team_id']);
@@ -124,8 +127,16 @@ class FacebookPageOAuthController extends Controller
                     ->with('error', 'Keine gültige Business Account ID gefunden.');
             }
 
-            // Facebook Pages holen
-            $pages = $this->metaOAuthService->getFacebookPages($accessToken, $businessId);
+            // Facebook Pages holen über Graph API
+            $pagesResponse = Http::get("https://graph.facebook.com/{$apiVersion}/{$businessId}/owned_pages", [
+                'access_token' => $accessToken,
+            ]);
+            
+            $pages = [];
+            if ($pagesResponse->successful()) {
+                $pagesData = $pagesResponse->json();
+                $pages = $pagesData['data'] ?? [];
+            }
             
             if (empty($pages)) {
                 session()->forget(['brands_oauth_brand_id', 'brands_oauth_team_id']);
@@ -154,8 +165,16 @@ class FacebookPageOAuthController extends Controller
                 'brand_id' => $brand->id,
             ]);
 
-            // Instagram Accounts holen
-            $instagramAccounts = $this->metaOAuthService->getInstagramAccounts($accessToken, $businessId);
+            // Instagram Accounts holen über Graph API
+            $instagramResponse = Http::get("https://graph.facebook.com/{$apiVersion}/{$businessId}/owned_instagram_accounts", [
+                'access_token' => $accessToken,
+            ]);
+            
+            $instagramAccounts = [];
+            if ($instagramResponse->successful()) {
+                $instagramData = $instagramResponse->json();
+                $instagramAccounts = $instagramData['data'] ?? [];
+            }
             
             // Automatisch Instagram Account anlegen, wenn vorhanden
             if (!empty($instagramAccounts)) {
