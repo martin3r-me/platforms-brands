@@ -22,8 +22,8 @@
         </div>
 
         {{-- Sections Section --}}
-        <div>
-            <div class="flex items-center justify-between mb-4">
+        <div class="space-y-6">
+            <div class="flex items-center justify-between">
                 <h2 class="text-xl font-semibold text-[var(--ui-secondary)]">Sections</h2>
                 @can('update', $contentBoard)
                     <x-ui-button variant="primary" size="sm" wire:click="createSection">
@@ -36,32 +36,101 @@
             </div>
 
             @if($contentBoard->sections->count() > 0)
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                    @foreach($contentBoard->sections as $section)
-                        <a href="{{ route('brands.content-board-sections.show', $section) }}" class="block">
-                            <div class="flex items-start justify-between mb-3">
-                                <div class="flex-1">
-                                    <h3 class="text-lg font-semibold text-[var(--ui-secondary)] mb-1">{{ $section->name }}</h3>
-                                    @if($section->description)
-                                        <p class="text-sm text-[var(--ui-muted)] line-clamp-2">{{ $section->description }}</p>
-                                    @endif
-                                </div>
-                            </div>
-                            
-                            <div class="flex items-center gap-2 mt-4">
-                                <span class="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-[var(--ui-primary-5)] text-[var(--ui-primary)] text-xs font-medium">
-                                    @svg('heroicon-o-squares-2x2', 'w-3 h-3')
-                                    Section
-                                </span>
-                                @if($section->rows->count() > 0)
-                                    <span class="text-xs text-[var(--ui-muted)]">
-                                        {{ $section->rows->count() }} {{ $section->rows->count() === 1 ? 'Row' : 'Rows' }}
-                                    </span>
+                @foreach($contentBoard->sections as $section)
+                    {{-- Section (volle Breite) --}}
+                    <div class="bg-white rounded-xl border border-[var(--ui-border)]/60 shadow-sm overflow-hidden">
+                        <div class="p-4 border-b border-[var(--ui-border)]/40 flex items-center justify-between">
+                            <div>
+                                <h3 class="text-lg font-semibold text-[var(--ui-secondary)]">{{ $section->name }}</h3>
+                                @if($section->description)
+                                    <p class="text-sm text-[var(--ui-muted)] mt-1">{{ $section->description }}</p>
                                 @endif
                             </div>
-                        </a>
-                    @endforeach
-                </div>
+                        </div>
+                        
+                        {{-- Rows innerhalb der Section --}}
+                        <div class="p-4 space-y-4">
+                            @foreach($section->rows as $row)
+                                <div class="bg-[var(--ui-muted-5)] rounded-lg border border-[var(--ui-border)]/40 overflow-hidden">
+                                    <div class="p-3 border-b border-[var(--ui-border)]/40 flex items-center justify-between">
+                                        <div class="flex items-center gap-3">
+                                            <h4 class="text-sm font-semibold text-[var(--ui-secondary)]">{{ $row->name }}</h4>
+                                            @if($row->description)
+                                                <span class="text-xs text-[var(--ui-muted)]">{{ $row->description }}</span>
+                                            @endif
+                                        </div>
+                                        @can('update', $contentBoard)
+                                            <x-ui-button 
+                                                variant="primary" 
+                                                size="xs" 
+                                                wire:click="createBlock({{ $row->id }})"
+                                                :disabled="$row->blocks->count() >= 12"
+                                            >
+                                                <span class="inline-flex items-center gap-1">
+                                                    @svg('heroicon-o-plus', 'w-3 h-3')
+                                                    <span>Block</span>
+                                                </span>
+                                            </x-ui-button>
+                                        @endcan
+                                    </div>
+                                    
+                                    <div class="p-3">
+                                        @if($row->blocks->count() > 0)
+                                            <div class="grid grid-cols-12 gap-2">
+                                                @foreach($row->blocks as $block)
+                                                    <div 
+                                                        class="bg-white rounded-lg border border-[var(--ui-border)]/40 p-3 hover:border-[var(--ui-primary)]/40 transition-colors"
+                                                        style="grid-column: span {{ $block->span }};"
+                                                    >
+                                                        <div class="flex items-start justify-between mb-2">
+                                                            <div class="flex-1">
+                                                                <h5 class="text-xs font-semibold text-[var(--ui-secondary)]">{{ $block->name }}</h5>
+                                                                @if($block->description)
+                                                                    <p class="text-xs text-[var(--ui-muted)] mt-1">{{ $block->description }}</p>
+                                                                @endif
+                                                            </div>
+                                                            <span class="text-xs text-[var(--ui-muted)] bg-[var(--ui-muted-5)] px-1.5 py-0.5 rounded">
+                                                                {{ $block->span }}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                        @else
+                                            <div class="text-center py-4 border-2 border-dashed border-[var(--ui-border)]/40 rounded-lg">
+                                                <p class="text-xs text-[var(--ui-muted)] mb-2">Noch keine Blöcke</p>
+                                                @can('update', $contentBoard)
+                                                    <x-ui-button 
+                                                        variant="primary" 
+                                                        size="xs" 
+                                                        wire:click="createBlock({{ $row->id }})"
+                                                    >
+                                                        <span class="inline-flex items-center gap-1">
+                                                            @svg('heroicon-o-plus', 'w-3 h-3')
+                                                            <span>Block hinzufügen</span>
+                                                        </span>
+                                                    </x-ui-button>
+                                                @endcan
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
+                            @endforeach
+
+                            {{-- Neue Row hinzufügen --}}
+                            @can('update', $contentBoard)
+                                <div class="border-2 border-dashed border-[var(--ui-border)]/40 rounded-lg p-3 text-center">
+                                    <x-ui-button variant="secondary-outline" size="sm" wire:click="createRow({{ $section->id }})">
+                                        <span class="inline-flex items-center gap-2">
+                                            @svg('heroicon-o-plus', 'w-4 h-4')
+                                            <span>Row hinzufügen</span>
+                                        </span>
+                                    </x-ui-button>
+                                </div>
+                            @endcan
+                        </div>
+                    </div>
+                @endforeach
             @else
                 <div class="bg-white rounded-xl border border-[var(--ui-border)]/60 shadow-sm p-12 text-center">
                     <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[var(--ui-muted-5)] mb-4">

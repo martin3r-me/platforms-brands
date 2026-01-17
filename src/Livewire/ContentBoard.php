@@ -14,7 +14,7 @@ class ContentBoard extends Component
     public function mount(BrandsContentBoard $brandsContentBoard)
     {
         // Model neu laden, um sicherzustellen, dass alle Daten vorhanden sind
-        $this->contentBoard = $brandsContentBoard->fresh()->load('sections.rows');
+        $this->contentBoard = $brandsContentBoard->fresh()->load('sections.rows.blocks');
         
         // Berechtigung prüfen
         $this->authorize('view', $this->contentBoard);
@@ -24,7 +24,7 @@ class ContentBoard extends Component
     public function updateContentBoard()
     {
         $this->contentBoard->refresh();
-        $this->contentBoard->load('sections.rows');
+        $this->contentBoard->load('sections.rows.blocks');
     }
 
     public function rules(): array
@@ -56,7 +56,65 @@ class ContentBoard extends Component
         ]);
 
         $this->contentBoard->refresh();
-        $this->contentBoard->load('sections');
+        $this->contentBoard->load('sections.rows.blocks');
+    }
+
+    public function createRow($sectionId)
+    {
+        $this->authorize('update', $this->contentBoard);
+        
+        $user = Auth::user();
+        $team = $user->currentTeam;
+        
+        if (!$team) {
+            session()->flash('error', 'Kein Team ausgewählt.');
+            return;
+        }
+
+        $row = \Platform\Brands\Models\BrandsContentBoardRow::create([
+            'name' => 'Neue Row',
+            'description' => null,
+            'user_id' => $user->id,
+            'team_id' => $team->id,
+            'section_id' => $sectionId,
+        ]);
+
+        $this->contentBoard->refresh();
+        $this->contentBoard->load('sections.rows.blocks');
+    }
+
+    public function createBlock($rowId)
+    {
+        $this->authorize('update', $this->contentBoard);
+        
+        $user = Auth::user();
+        $team = $user->currentTeam;
+        
+        if (!$team) {
+            session()->flash('error', 'Kein Team ausgewählt.');
+            return;
+        }
+
+        $row = \Platform\Brands\Models\BrandsContentBoardRow::findOrFail($rowId);
+        
+        // Prüfe, ob bereits 12 Blöcke in dieser Row existieren
+        $existingBlocks = $row->blocks()->count();
+        if ($existingBlocks >= 12) {
+            session()->flash('error', 'Eine Row kann maximal 12 Blöcke enthalten.');
+            return;
+        }
+
+        $block = \Platform\Brands\Models\BrandsContentBoardBlock::create([
+            'name' => 'Neuer Block',
+            'description' => null,
+            'user_id' => $user->id,
+            'team_id' => $team->id,
+            'row_id' => $rowId,
+            'span' => 1,
+        ]);
+
+        $this->contentBoard->refresh();
+        $this->contentBoard->load('sections.rows.blocks');
     }
 
     public function render()
