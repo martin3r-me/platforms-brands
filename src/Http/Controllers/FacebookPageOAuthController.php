@@ -316,8 +316,20 @@ class FacebookPageOAuthController extends Controller
 
             // Business Accounts holen über Graph API
             $apiVersion = config('brands.meta.api_version', 'v21.0');
+            
+            Log::info('Brands OAuth callback: Hole Business Accounts', [
+                'api_version' => $apiVersion,
+                'has_access_token' => !empty($accessToken),
+            ]);
+            
             $businessResponse = Http::get("https://graph.facebook.com/{$apiVersion}/me/businesses", [
                 'access_token' => $accessToken,
+            ]);
+            
+            Log::info('Brands OAuth callback: Business Accounts Response', [
+                'status' => $businessResponse->status(),
+                'successful' => $businessResponse->successful(),
+                'body' => $businessResponse->json(),
             ]);
             
             $businessAccounts = [];
@@ -327,10 +339,19 @@ class FacebookPageOAuthController extends Controller
             }
             
             if (empty($businessAccounts)) {
+                Log::error('Brands OAuth callback: Keine Business Accounts gefunden', [
+                    'response_status' => $businessResponse->status(),
+                    'response_body' => $businessResponse->body(),
+                ]);
                 session()->forget(['brands_oauth_brand_id', 'brands_oauth_team_id']);
                 return redirect()->route('brands.brands.show', ['brandsBrand' => $brandId])
                     ->with('error', 'Keine Business Accounts gefunden. Bitte stelle sicher, dass dein Meta-Account Zugriff auf Business Accounts hat.');
             }
+            
+            Log::info('Brands OAuth callback: Business Accounts gefunden', [
+                'count' => count($businessAccounts),
+                'business_ids' => array_column($businessAccounts, 'id'),
+            ]);
 
             // Erste Business Account verwenden (später könnte man eine Auswahl-Seite einbauen)
             $businessId = $businessAccounts[0]['id'] ?? null;
@@ -342,8 +363,18 @@ class FacebookPageOAuthController extends Controller
             }
 
             // Facebook Pages holen über Graph API
+            Log::info('Brands OAuth callback: Hole Facebook Pages', [
+                'business_id' => $businessId,
+            ]);
+            
             $pagesResponse = Http::get("https://graph.facebook.com/{$apiVersion}/{$businessId}/owned_pages", [
                 'access_token' => $accessToken,
+            ]);
+            
+            Log::info('Brands OAuth callback: Facebook Pages Response', [
+                'status' => $pagesResponse->status(),
+                'successful' => $pagesResponse->successful(),
+                'body' => $pagesResponse->json(),
             ]);
             
             $pages = [];
@@ -353,10 +384,19 @@ class FacebookPageOAuthController extends Controller
             }
             
             if (empty($pages)) {
+                Log::error('Brands OAuth callback: Keine Facebook Pages gefunden', [
+                    'response_status' => $pagesResponse->status(),
+                    'response_body' => $pagesResponse->body(),
+                ]);
                 session()->forget(['brands_oauth_brand_id', 'brands_oauth_team_id']);
                 return redirect()->route('brands.brands.show', ['brandsBrand' => $brandId])
                     ->with('error', 'Keine Facebook Pages gefunden.');
             }
+            
+            Log::info('Brands OAuth callback: Facebook Pages gefunden', [
+                'count' => count($pages),
+                'page_ids' => array_column($pages, 'id'),
+            ]);
 
             // Erste Facebook Page verwenden (nur eine erlaubt)
             $page = $pages[0];
