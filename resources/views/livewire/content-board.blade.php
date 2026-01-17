@@ -38,7 +38,7 @@
             @if($contentBoard->sections->count() > 0)
                 @foreach($contentBoard->sections as $section)
                     {{-- Section (volle Breite) --}}
-                    <div class="bg-white rounded-xl border border-[var(--ui-border)]/60 shadow-sm overflow-hidden">
+                    <div class="bg-white rounded-xl border border-[var(--ui-border)]/60 shadow-sm overflow-visible">
                         <div class="p-4 border-b border-[var(--ui-border)]/40 flex items-center justify-between">
                             <div class="flex-1">
                                 @can('update', $contentBoard)
@@ -73,7 +73,7 @@
                         {{-- Rows innerhalb der Section --}}
                         <div class="p-4 space-y-4">
                             @foreach($section->rows as $row)
-                                <div class="bg-[var(--ui-muted-5)] rounded-lg border border-[var(--ui-border)]/40 overflow-hidden">
+                                <div class="bg-[var(--ui-muted-5)] rounded-lg border border-[var(--ui-border)]/40 overflow-visible">
                                     <div class="p-3 border-b border-[var(--ui-border)]/40 flex items-center justify-between">
                                         <div class="flex items-center gap-3 flex-1">
                                             @can('update', $contentBoard)
@@ -135,12 +135,12 @@
                                                     >
                                                         {{-- Block Header --}}
                                                         @can('update', $contentBoard)
-                                                            <div class="flex items-center justify-end p-1 border-b border-[var(--ui-border)]/40">
-                                                                <div class="relative">
+                                                            <div class="flex items-center justify-end p-1 border-b border-[var(--ui-border)]/40 relative" style="z-index: 10;">
+                                                                <div class="relative" style="z-index: 100;">
                                                                     <button 
                                                                         type="button"
                                                                         @click="settingsOpen = !settingsOpen"
-                                                                        class="p-1 rounded hover:bg-[var(--ui-muted-5)] transition-colors"
+                                                                        class="p-1 rounded hover:bg-[var(--ui-muted-5)] transition-colors relative z-10"
                                                                         title="Block-Einstellungen"
                                                                     >
                                                                         @svg('heroicon-o-cog-6-tooth', 'w-3 h-3 text-[var(--ui-muted)]')
@@ -151,7 +151,8 @@
                                                                         x-show="settingsOpen"
                                                                         x-cloak
                                                                         x-transition
-                                                                        class="absolute right-0 top-full mt-1 z-10 bg-white rounded-lg border border-[var(--ui-border)]/60 shadow-lg p-2 min-w-[140px]"
+                                                                        class="absolute right-0 top-full mt-1 bg-white rounded-lg border border-[var(--ui-border)]/60 shadow-xl p-2 min-w-[140px]"
+                                                                        style="z-index: 9999; position: absolute;"
                                                                     >
                                                                         <div class="space-y-2">
                                                                             <div>
