@@ -123,7 +123,8 @@ class InstagramAccountService
                                 $instagramId = $accountData['id'] ?? null;
 
                                 if ($instagramId) {
-                                    $username = $this->fetchInstagramUsername($instagramId, $pageAccessToken, $apiVersion);
+                                    // Verwende den accessToken für den Username-Abruf
+                                    $username = $this->fetchInstagramUsername($instagramId, $accessToken, $apiVersion);
                                     
                                     $instagramAccount = BrandsInstagramAccount::updateOrCreate(
                                         [
@@ -133,14 +134,14 @@ class InstagramAccountService
                                         [
                                             'username' => $username,
                                             'description' => null,
-                                            'access_token' => $pageAccessToken,
+                                            'access_token' => $accessToken,
                                             'refresh_token' => $metaToken->refresh_token,
                                             'expires_at' => $metaToken->expires_at,
                                             'token_type' => 'Bearer',
                                             'scopes' => $metaToken->scopes,
-                                            'user_id' => $user->id,
-                                            'team_id' => $team->id,
-                                            'facebook_page_id' => $facebookPage->id,
+                                            'user_id' => $userId,
+                                            'team_id' => $teamId,
+                                            'facebook_page_id' => $facebookPage->id ?? null,
                                         ]
                                     );
 
