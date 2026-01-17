@@ -58,8 +58,8 @@ class FacebookPageOAuthController extends Controller
         // Callback-Route generieren
         $callbackRoute = route('brands.facebook-pages.oauth.callback');
         
-        // Redirect Domain aus Config verwenden, falls gesetzt
-        $redirectDomain = config('meta-oauth.redirect_domain');
+        // Redirect Domain aus ENV verwenden, falls gesetzt
+        $redirectDomain = env('META_OAUTH_REDIRECT_DOMAIN');
         if ($redirectDomain) {
             // Wenn redirect_domain gesetzt ist, diese verwenden
             // Prüfen ob callbackRoute bereits eine absolute URL ist
@@ -87,17 +87,17 @@ class FacebookPageOAuthController extends Controller
         ]);
         
         try {
-            // Meta OAuth Credentials aus Config
-            $clientId = config('meta-oauth.app_id') ?? config('services.meta.client_id');
-            $clientSecret = config('meta-oauth.app_secret') ?? config('services.meta.client_secret');
+            // Meta OAuth Credentials aus services.meta Config (Standard Laravel)
+            $clientId = config('services.meta.client_id');
+            $clientSecret = config('services.meta.client_secret');
             
             if (!$clientId || !$clientSecret) {
                 Log::error('Brands OAuth: Missing credentials', [
-                    'has_app_id' => !empty(config('meta-oauth.app_id')),
-                    'has_client_id' => !empty(config('services.meta.client_id')),
+                    'has_client_id' => !empty($clientId),
+                    'has_client_secret' => !empty($clientSecret),
                 ]);
                 return redirect()->route('brands.brands.show', ['brandsBrand' => $brandId])
-                    ->with('error', 'Meta OAuth ist nicht konfiguriert. Bitte konfiguriere META_APP_ID und META_APP_SECRET in der .env Datei.');
+                    ->with('error', 'Meta OAuth ist nicht konfiguriert. Bitte konfiguriere META_CLIENT_ID und META_CLIENT_SECRET in der .env Datei und füge sie zu config/services.php hinzu.');
             }
             
             $redirectUrl = Socialite::buildProvider(
@@ -236,7 +236,7 @@ class FacebookPageOAuthController extends Controller
             }
 
             // Business Accounts holen über Graph API
-            $apiVersion = config('meta-oauth.api_version', 'v21.0');
+            $apiVersion = env('META_API_VERSION', 'v21.0');
             $businessResponse = Http::get("https://graph.facebook.com/{$apiVersion}/me/businesses", [
                 'access_token' => $accessToken,
             ]);
