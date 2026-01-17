@@ -134,7 +134,16 @@ class InstagramMediaService
             );
 
             // Bilder/Videos herunterladen und speichern
-            $this->downloadMediaFiles($instagramMedia, $data);
+            try {
+                $this->downloadMediaFiles($instagramMedia, $data);
+            } catch (\Exception $e) {
+                Log::error('Error downloading media files for Instagram Media', [
+                    'instagram_media_id' => $instagramMedia->id,
+                    'external_id' => $data['media_id'],
+                    'error' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString(),
+                ]);
+            }
 
             $syncedMedia[] = $instagramMedia;
         }
@@ -150,9 +159,18 @@ class InstagramMediaService
         $contextType = BrandsInstagramMedia::class;
         $contextId = $instagramMedia->id;
         
+        Log::info('Downloading media files for Instagram Media', [
+            'instagram_media_id' => $instagramMedia->id,
+            'external_id' => $mediaData['media_id'],
+            'media_type' => $mediaData['media_type'],
+            'has_media_url' => !empty($mediaData['media_url']),
+            'has_thumbnail_url' => !empty($mediaData['thumbnail_url']),
+            'has_children' => !empty($mediaData['children']),
+        ]);
+        
         // Hauptbild/Video herunterladen
         if (!empty($mediaData['media_url'])) {
-            $this->mediaDownloadService->downloadAndStore(
+            $result = $this->mediaDownloadService->downloadAndStore(
                 $mediaData['media_url'],
                 $contextType,
                 $contextId,
@@ -164,11 +182,28 @@ class InstagramMediaService
                     'generate_variants' => false, // Instagram-Bilder sind bereits optimiert
                 ]
             );
+            
+            if ($result) {
+                Log::info('Primary media downloaded successfully', [
+                    'instagram_media_id' => $instagramMedia->id,
+                    'context_file_id' => $result->id,
+                ]);
+            } else {
+                Log::warning('Failed to download primary media', [
+                    'instagram_media_id' => $instagramMedia->id,
+                    'media_url' => $mediaData['media_url'],
+                ]);
+            }
+        } else {
+            Log::warning('No media_url found for Instagram Media', [
+                'instagram_media_id' => $instagramMedia->id,
+                'media_type' => $mediaData['media_type'],
+            ]);
         }
 
         // Thumbnail herunterladen (falls vorhanden und unterschiedlich)
         if (!empty($mediaData['thumbnail_url']) && $mediaData['thumbnail_url'] !== $mediaData['media_url']) {
-            $this->mediaDownloadService->downloadAndStore(
+            $result = $this->mediaDownloadService->downloadAndStore(
                 $mediaData['thumbnail_url'],
                 $contextType,
                 $contextId,
@@ -179,13 +214,25 @@ class InstagramMediaService
                     'generate_variants' => false, // Instagram-Thumbnails sind bereits optimiert
                 ]
             );
+            
+            if ($result) {
+                Log::info('Thumbnail downloaded successfully', [
+                    'instagram_media_id' => $instagramMedia->id,
+                    'context_file_id' => $result->id,
+                ]);
+            }
         }
 
         // Children (Carousel) herunterladen
         if (!empty($mediaData['children'])) {
+            Log::info('Downloading carousel children', [
+                'instagram_media_id' => $instagramMedia->id,
+                'children_count' => count($mediaData['children']),
+            ]);
+            
             foreach ($mediaData['children'] as $index => $child) {
                 if (!empty($child['media_url'])) {
-                    $this->mediaDownloadService->downloadAndStore(
+                    $result = $this->mediaDownloadService->downloadAndStore(
                         $child['media_url'],
                         $contextType,
                         $contextId,
@@ -198,6 +245,14 @@ class InstagramMediaService
                             'generate_variants' => false, // Instagram-Carousel-Bilder sind bereits optimiert
                         ]
                     );
+                    
+                    if ($result) {
+                        Log::info('Carousel item downloaded successfully', [
+                            'instagram_media_id' => $instagramMedia->id,
+                            'carousel_index' => $index,
+                            'context_file_id' => $result->id,
+                        ]);
+                    }
                 }
             }
         }

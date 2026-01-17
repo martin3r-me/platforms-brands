@@ -13,7 +13,13 @@ class FacebookPage extends Component
 
     public function mount(BrandsFacebookPage $brandsFacebookPage)
     {
-        $this->facebookPage = $brandsFacebookPage->fresh();
+        $this->facebookPage = $brandsFacebookPage->fresh([
+            'brand',
+            'posts' => function ($query) {
+                $query->with('contextFiles')->orderBy('published_at', 'desc');
+            },
+            'instagramAccounts',
+        ]);
         
         // Berechtigung prüfen
         $this->authorize('view', $this->facebookPage);
@@ -28,9 +34,16 @@ class FacebookPage extends Component
     public function render()
     {
         $user = Auth::user();
+        
+        // Posts mit ContextFiles laden
+        $posts = $this->facebookPage->posts()
+            ->with('contextFiles')
+            ->orderBy('published_at', 'desc')
+            ->get();
 
         return view('brands::livewire.facebook-page', [
             'user' => $user,
+            'posts' => $posts,
         ])->layout('platform::layouts.app');
     }
 }

@@ -13,7 +13,14 @@ class InstagramAccount extends Component
 
     public function mount(BrandsInstagramAccount $brandsInstagramAccount)
     {
-        $this->instagramAccount = $brandsInstagramAccount->fresh();
+        $this->instagramAccount = $brandsInstagramAccount->fresh([
+            'brand',
+            'facebookPage',
+            'media' => function ($query) {
+                $query->with(['contextFiles', 'latestInsight', 'hashtags'])->orderBy('timestamp', 'desc');
+            },
+            'latestInsight',
+        ]);
         
         // Berechtigung prüfen
         $this->authorize('view', $this->instagramAccount);
@@ -28,9 +35,37 @@ class InstagramAccount extends Component
     public function render()
     {
         $user = Auth::user();
+        
+        // Media mit allen Beziehungen laden
+        $media = $this->instagramAccount->media()
+            ->with(['contextFiles', 'latestInsight', 'hashtags'])
+            ->orderBy('timestamp', 'desc')
+            ->get();
+        
+        // Top Hashtags laden
+        $topHashtags = $this->instagramAccount->media()
+            ->with('hashtags')
+            ->get()
+            ->pluck('hashtags')
+            ->flatten()
+            ->groupBy('id')
+            ->map(function ($hashtags) {
+                $first = $hashtags->first();
+                return [
+                    'id' => $first->id,
+                    'name' => $first->name,
+                    'usage_count' => $hashtags->sum('pivot.count'),
+                ];
+            })
+            ->sortByDesc('usage_count')
+            ->take(20)
+            ->values();
 
         return view('brands::livewire.instagram-account', [
             'user' => $user,
+            'media' => $media,
+            'topHashtags' => $topHashtags,
+            'latestInsights' => $this->instagramAccount->latestInsight,
         ])->layout('platform::layouts.app');
     }
 }

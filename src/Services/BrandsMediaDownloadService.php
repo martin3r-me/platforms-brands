@@ -76,6 +76,19 @@ class BrandsMediaDownloadService
                 true // test mode
             );
 
+            // Team-ID und User-ID aus dem Kontext-Model holen
+            $contextModel = $contextType::find($contextId);
+            $teamId = $contextModel?->team_id ?? null;
+            $userId = $contextModel?->user_id ?? null;
+            
+            if (!$teamId || !$userId) {
+                Log::error('BrandsMediaDownloadService: Keine team_id oder user_id im Kontext-Model gefunden', [
+                    'context_type' => $contextType,
+                    'context_id' => $contextId,
+                ]);
+                return null;
+            }
+
             // Über ContextFileService hochladen
             $result = $this->contextFileService->uploadForContext(
                 $uploadedFile,
@@ -84,6 +97,8 @@ class BrandsMediaDownloadService
                 [
                     'keep_original' => $meta['keep_original'] ?? false,
                     'generate_variants' => $meta['generate_variants'] ?? true,
+                    'user_id' => $userId,
+                    'team_id' => $teamId,
                 ]
             );
 
