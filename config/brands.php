@@ -26,5 +26,21 @@ return [
             ],
         ],
     ],
-    'billables' => []
+    'billables' => [],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Meta OAuth Configuration
+    |--------------------------------------------------------------------------
+    |
+    | Konfiguration für Facebook/Instagram OAuth über Socialite
+    |
+    */
+    'meta' => [
+        'client_id' => env('META_CLIENT_ID'),
+        'client_secret' => env('META_CLIENT_SECRET'),
+        'redirect' => env('META_OAUTH_REDIRECT_URI', '/brands/facebook-pages/oauth/callback'),
+        'redirect_domain' => env('META_OAUTH_REDIRECT_DOMAIN'),
+        'api_version' => env('META_API_VERSION', 'v21.0'),
+    ],
 ];

@@ -36,8 +36,8 @@ class FacebookPageModal extends Component
             // Callback-Route generieren
             $callbackRoute = route('brands.facebook-pages.oauth.callback');
             
-            // Redirect Domain aus ENV verwenden, falls gesetzt
-            $redirectDomain = env('META_OAUTH_REDIRECT_DOMAIN');
+            // Redirect Domain aus Brands Config verwenden
+            $redirectDomain = config('brands.meta.redirect_domain');
             if ($redirectDomain) {
                 // Wenn redirect_domain gesetzt ist, diese verwenden
                 if (filter_var($callbackRoute, FILTER_VALIDATE_URL)) {
@@ -57,12 +57,12 @@ class FacebookPageModal extends Component
                 }
             }
             
-            // Meta OAuth Credentials aus services.meta Config (Standard Laravel)
-            $clientId = config('services.meta.client_id');
-            $clientSecret = config('services.meta.client_secret');
+            // Meta OAuth Credentials aus Brands Config
+            $clientId = config('brands.meta.client_id');
+            $clientSecret = config('brands.meta.client_secret');
             
             if (!$clientId || !$clientSecret) {
-                return 'Fehler: Meta OAuth ist nicht konfiguriert. Bitte konfiguriere META_CLIENT_ID und META_CLIENT_SECRET in der .env Datei und füge sie zu config/services.php hinzu.';
+                return 'Fehler: Meta OAuth ist nicht konfiguriert. Bitte konfiguriere META_CLIENT_ID und META_CLIENT_SECRET in der .env Datei.';
             }
             
             // State generieren (nur für Anzeige, wird im Controller neu generiert)

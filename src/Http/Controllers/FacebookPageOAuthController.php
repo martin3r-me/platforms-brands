@@ -58,8 +58,8 @@ class FacebookPageOAuthController extends Controller
         // Callback-Route generieren
         $callbackRoute = route('brands.facebook-pages.oauth.callback');
         
-        // Redirect Domain aus ENV verwenden, falls gesetzt
-        $redirectDomain = env('META_OAUTH_REDIRECT_DOMAIN');
+        // Redirect Domain aus Brands Config verwenden
+        $redirectDomain = config('brands.meta.redirect_domain');
         if ($redirectDomain) {
             // Wenn redirect_domain gesetzt ist, diese verwenden
             // Prüfen ob callbackRoute bereits eine absolute URL ist
@@ -87,9 +87,9 @@ class FacebookPageOAuthController extends Controller
         ]);
         
         try {
-            // Meta OAuth Credentials aus services.meta Config (Standard Laravel)
-            $clientId = config('services.meta.client_id');
-            $clientSecret = config('services.meta.client_secret');
+            // Meta OAuth Credentials aus Brands Config
+            $clientId = config('brands.meta.client_id');
+            $clientSecret = config('brands.meta.client_secret');
             
             if (!$clientId || !$clientSecret) {
                 Log::error('Brands OAuth: Missing credentials', [
@@ -97,7 +97,7 @@ class FacebookPageOAuthController extends Controller
                     'has_client_secret' => !empty($clientSecret),
                 ]);
                 return redirect()->route('brands.brands.show', ['brandsBrand' => $brandId])
-                    ->with('error', 'Meta OAuth ist nicht konfiguriert. Bitte konfiguriere META_CLIENT_ID und META_CLIENT_SECRET in der .env Datei und füge sie zu config/services.php hinzu.');
+                    ->with('error', 'Meta OAuth ist nicht konfiguriert. Bitte konfiguriere META_CLIENT_ID und META_CLIENT_SECRET in der .env Datei.');
             }
             
             $redirectUrl = Socialite::buildProvider(
@@ -236,7 +236,7 @@ class FacebookPageOAuthController extends Controller
             }
 
             // Business Accounts holen über Graph API
-            $apiVersion = env('META_API_VERSION', 'v21.0');
+            $apiVersion = config('brands.meta.api_version', 'v21.0');
             $businessResponse = Http::get("https://graph.facebook.com/{$apiVersion}/me/businesses", [
                 'access_token' => $accessToken,
             ]);
