@@ -36,11 +36,10 @@
             </div>
 
             @if($contentBoard->sections->count() > 0)
-                <div class="space-y-6" wire:sortable="updateSectionOrder" wire:sortable.options="{ animation: 150 }">
+                <div class="space-y-6">
                 @foreach($contentBoard->sections as $section)
                     {{-- Section (volle Breite) --}}
                     <div 
-                        wire:sortable.item="{{ $section->id }}"
                         wire:key="section-{{ $section->id }}"
                         class="bg-white rounded-xl border border-[var(--ui-border)]/60 shadow-sm overflow-visible"
                     >
@@ -48,9 +47,10 @@
                             <div class="flex items-center gap-2 flex-1">
                                 @can('update', $contentBoard)
                                     <button 
-                                        wire:sortable.handle 
-                                        class="text-[var(--ui-muted)] hover:text-[var(--ui-primary)] cursor-grab p-1 rounded-md hover:bg-[var(--ui-muted-5)]"
-                                        title="Section verschieben"
+                                        type="button"
+                                        class="text-[var(--ui-muted)] hover:text-[var(--ui-primary)] p-1 rounded-md hover:bg-[var(--ui-muted-5)]"
+                                        title="Section verschieben (bald verfügbar)"
+                                        disabled
                                     >
                                         @svg('heroicon-o-bars-3', 'w-4 h-4')
                                     </button>
@@ -87,15 +87,9 @@
                         </div>
                         
                         {{-- Rows innerhalb der Section --}}
-                        <div 
-                            class="p-4 space-y-4"
-                            wire:sortable-group.item-group="{{ $section->id }}"
-                            wire:sortable-group="updateRowOrder"
-                            wire:sortable-group.options="{ animation: 150 }"
-                        >
+                        <div class="p-4 space-y-4">
                             @foreach($section->rows as $row)
                                 <div 
-                                    wire:sortable-group.item="{{ $row->id }}"
                                     wire:key="row-{{ $row->id }}"
                                     class="bg-[var(--ui-muted-5)] rounded-lg border border-[var(--ui-border)]/40 overflow-visible"
                                 >
@@ -103,9 +97,10 @@
                                         <div class="flex items-center gap-2 flex-1">
                                             @can('update', $contentBoard)
                                                 <button 
-                                                    wire:sortable.handle 
-                                                    class="text-[var(--ui-muted)] hover:text-[var(--ui-primary)] cursor-grab p-1 rounded-md hover:bg-white"
-                                                    title="Row verschieben"
+                                                    type="button"
+                                                    class="text-[var(--ui-muted)] hover:text-[var(--ui-primary)] p-1 rounded-md hover:bg-white"
+                                                    title="Row verschieben (bald verfügbar)"
+                                                    disabled
                                                 >
                                                     @svg('heroicon-o-bars-3', 'w-3 h-3')
                                                 </button>
@@ -158,19 +153,13 @@
                                         </div>
                                     </div>
                                     
-                                    <div 
-                                        class="p-3"
-                                        wire:sortable-group.item-group="{{ $row->id }}"
-                                        wire:sortable-group="updateBlockOrder"
-                                        wire:sortable-group.options="{ animation: 150 }"
-                                    >
+                                    <div class="p-3">
                                         @if($row->blocks->count() > 0)
                                             <div class="grid grid-cols-12 gap-2">
                                                 @foreach($row->blocks as $block)
                                                     <div 
-                                                        wire:sortable-group.item="{{ $block->id }}"
                                                         wire:key="block-{{ $block->id }}"
-                                                        class="bg-white rounded-lg border border-[var(--ui-border)]/40 hover:border-[var(--ui-primary)]/40 transition-colors relative cursor-move"
+                                                        class="bg-white rounded-lg border border-[var(--ui-border)]/40 hover:border-[var(--ui-primary)]/40 transition-colors relative"
                                                         style="grid-column: span {{ $block->span }};"
                                                         x-data="{ settingsOpen: false }"
                                                         @click.away="settingsOpen = false"

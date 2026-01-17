@@ -37,6 +37,8 @@ Route::get('/facebook-pages/{brandsFacebookPage}', FacebookPage::class)
     ->name('brands.facebook-pages.show');
 
 // Facebook Page OAuth Routes
+Route::get('/facebook-pages/oauth/redirect', [\Platform\Brands\Http\Controllers\FacebookPageOAuthController::class, 'redirect'])
+    ->name('brands.facebook-pages.oauth.redirect');
 Route::get('/facebook-pages/oauth/callback', [\Platform\Brands\Http\Controllers\FacebookPageOAuthController::class, 'callback'])
     ->name('brands.facebook-pages.oauth.callback');
 
