@@ -46,6 +46,19 @@
                                     <p class="text-sm text-[var(--ui-muted)] mt-1">{{ $section->description }}</p>
                                 @endif
                             </div>
+                            @can('update', $contentBoard)
+                                <x-ui-button 
+                                    variant="danger-outline" 
+                                    size="xs" 
+                                    wire:click="deleteSection({{ $section->id }})"
+                                    wire:confirm="Möchtest du diese Section wirklich löschen? Alle Rows und Blocks werden ebenfalls gelöscht."
+                                >
+                                    <span class="inline-flex items-center gap-1">
+                                        @svg('heroicon-o-trash', 'w-3 h-3')
+                                        <span>Löschen</span>
+                                    </span>
+                                </x-ui-button>
+                            @endcan
                         </div>
                         
                         {{-- Rows innerhalb der Section --}}
@@ -58,20 +71,38 @@
                                             @if($row->description)
                                                 <span class="text-xs text-[var(--ui-muted)]">{{ $row->description }}</span>
                                             @endif
+                                            @php
+                                                $totalSpan = $row->blocks->sum('span');
+                                            @endphp
+                                            <span class="text-xs px-2 py-0.5 rounded {{ $totalSpan > 12 ? 'bg-red-100 text-red-700' : ($totalSpan == 12 ? 'bg-green-100 text-green-700' : 'bg-[var(--ui-muted-5)] text-[var(--ui-muted)]') }}">
+                                                Span: {{ $totalSpan }}/12
+                                            </span>
                                         </div>
-                                        @can('update', $contentBoard)
-                                            <x-ui-button 
-                                                variant="primary" 
-                                                size="xs" 
-                                                wire:click="createBlock({{ $row->id }})"
-                                                :disabled="$row->blocks->count() >= 12"
-                                            >
-                                                <span class="inline-flex items-center gap-1">
-                                                    @svg('heroicon-o-plus', 'w-3 h-3')
-                                                    <span>Block</span>
-                                                </span>
-                                            </x-ui-button>
-                                        @endcan
+                                        <div class="flex items-center gap-2">
+                                            @can('update', $contentBoard)
+                                                <x-ui-button 
+                                                    variant="primary" 
+                                                    size="xs" 
+                                                    wire:click="createBlock({{ $row->id }})"
+                                                    :disabled="$row->blocks->count() >= 12"
+                                                >
+                                                    <span class="inline-flex items-center gap-1">
+                                                        @svg('heroicon-o-plus', 'w-3 h-3')
+                                                        <span>Block</span>
+                                                    </span>
+                                                </x-ui-button>
+                                                <x-ui-button 
+                                                    variant="danger-outline" 
+                                                    size="xs" 
+                                                    wire:click="deleteRow({{ $row->id }})"
+                                                    wire:confirm="Möchtest du diese Row wirklich löschen? Alle Blocks werden ebenfalls gelöscht."
+                                                >
+                                                    <span class="inline-flex items-center gap-1">
+                                                        @svg('heroicon-o-trash', 'w-3 h-3')
+                                                    </span>
+                                                </x-ui-button>
+                                            @endcan
+                                        </div>
                                     </div>
                                     
                                     <div class="p-3">
@@ -79,7 +110,7 @@
                                             <div class="grid grid-cols-12 gap-2">
                                                 @foreach($row->blocks as $block)
                                                     <div 
-                                                        class="bg-white rounded-lg border border-[var(--ui-border)]/40 p-3 hover:border-[var(--ui-primary)]/40 transition-colors"
+                                                        class="bg-white rounded-lg border border-[var(--ui-border)]/40 p-3 hover:border-[var(--ui-primary)]/40 transition-colors relative group"
                                                         style="grid-column: span {{ $block->span }};"
                                                     >
                                                         <div class="flex items-start justify-between mb-2">
@@ -89,9 +120,33 @@
                                                                     <p class="text-xs text-[var(--ui-muted)] mt-1">{{ $block->description }}</p>
                                                                 @endif
                                                             </div>
-                                                            <span class="text-xs text-[var(--ui-muted)] bg-[var(--ui-muted-5)] px-1.5 py-0.5 rounded">
-                                                                {{ $block->span }}
-                                                            </span>
+                                                            @can('update', $contentBoard)
+                                                                <div class="flex items-center gap-1">
+                                                                    <input 
+                                                                        type="number" 
+                                                                        min="1" 
+                                                                        max="12" 
+                                                                        value="{{ $block->span }}"
+                                                                        wire:change="updateBlockSpan({{ $block->id }}, $event.target.value)"
+                                                                        class="w-12 text-xs text-center border border-[var(--ui-border)] rounded px-1 py-0.5 focus:ring-2 focus:ring-[var(--ui-primary)] focus:border-transparent"
+                                                                    />
+                                                                    <x-ui-button 
+                                                                        variant="danger-outline" 
+                                                                        size="xs" 
+                                                                        wire:click="deleteBlock({{ $block->id }})"
+                                                                        wire:confirm="Möchtest du diesen Block wirklich löschen?"
+                                                                        class="opacity-0 group-hover:opacity-100 transition-opacity"
+                                                                    >
+                                                                        <span class="inline-flex items-center">
+                                                                            @svg('heroicon-o-trash', 'w-3 h-3')
+                                                                        </span>
+                                                                    </x-ui-button>
+                                                                </div>
+                                                            @else
+                                                                <span class="text-xs text-[var(--ui-muted)] bg-[var(--ui-muted-5)] px-1.5 py-0.5 rounded">
+                                                                    {{ $block->span }}
+                                                                </span>
+                                                            @endcan
                                                         </div>
                                                     </div>
                                                 @endforeach
