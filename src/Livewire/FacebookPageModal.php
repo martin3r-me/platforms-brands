@@ -31,7 +31,6 @@ class FacebookPageModal extends Component
             return;
         }
         
-        $this->resetForm();
         $this->modalShow = true;
     }
 
