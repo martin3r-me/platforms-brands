@@ -22,37 +22,71 @@
             <div class="flex items-center justify-between mb-4">
                 <h2 class="text-xl font-semibold text-[var(--ui-secondary)]">Boards</h2>
                 @can('update', $brand)
-                    <x-ui-button variant="primary" size="sm" wire:click="createCiBoard">
-                        <span class="inline-flex items-center gap-2">
-                            @svg('heroicon-o-plus', 'w-4 h-4')
-                            <span>CI Board erstellen</span>
-                        </span>
-                    </x-ui-button>
+                    <div class="flex items-center gap-2">
+                        <x-ui-button variant="primary" size="sm" wire:click="createContentBoard">
+                            <span class="inline-flex items-center gap-2">
+                                @svg('heroicon-o-plus', 'w-4 h-4')
+                                <span>Content Board erstellen</span>
+                            </span>
+                        </x-ui-button>
+                        <x-ui-button variant="primary" size="sm" wire:click="createCiBoard">
+                            <span class="inline-flex items-center gap-2">
+                                @svg('heroicon-o-plus', 'w-4 h-4')
+                                <span>CI Board erstellen</span>
+                            </span>
+                        </x-ui-button>
+                    </div>
                 @endcan
             </div>
 
-            @if($boards->count() > 0)
+            @php
+                $allBoards = $ciBoards->concat($contentBoards)->sortBy('order');
+            @endphp
+
+            @if($allBoards->count() > 0)
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                    @foreach($boards as $board)
-                        <a href="{{ route('brands.ci-boards.show', $board) }}" class="block">
-                            <div class="bg-white rounded-xl border border-[var(--ui-border)]/60 shadow-sm hover:shadow-md transition-shadow p-6 h-full">
-                                <div class="flex items-start justify-between mb-3">
-                                    <div class="flex-1">
-                                        <h3 class="text-lg font-semibold text-[var(--ui-secondary)] mb-1">{{ $board->name }}</h3>
-                                        @if($board->description)
-                                            <p class="text-sm text-[var(--ui-muted)] line-clamp-2">{{ $board->description }}</p>
-                                        @endif
+                    @foreach($allBoards as $board)
+                        @if($board instanceof \Platform\Brands\Models\BrandsCiBoard)
+                            <a href="{{ route('brands.ci-boards.show', $board) }}" class="block">
+                                <div class="bg-white rounded-xl border border-[var(--ui-border)]/60 shadow-sm hover:shadow-md transition-shadow p-6 h-full">
+                                    <div class="flex items-start justify-between mb-3">
+                                        <div class="flex-1">
+                                            <h3 class="text-lg font-semibold text-[var(--ui-secondary)] mb-1">{{ $board->name }}</h3>
+                                            @if($board->description)
+                                                <p class="text-sm text-[var(--ui-muted)] line-clamp-2">{{ $board->description }}</p>
+                                            @endif
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="flex items-center gap-2 mt-4">
+                                        <span class="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-[var(--ui-primary-5)] text-[var(--ui-primary)] text-xs font-medium">
+                                            @svg('heroicon-o-paint-brush', 'w-3 h-3')
+                                            CI Board
+                                        </span>
                                     </div>
                                 </div>
-                                
-                                <div class="flex items-center gap-2 mt-4">
-                                    <span class="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-[var(--ui-primary-5)] text-[var(--ui-primary)] text-xs font-medium">
-                                        @svg('heroicon-o-paint-brush', 'w-3 h-3')
-                                        CI Board
-                                    </span>
+                            </a>
+                        @else
+                            <a href="{{ route('brands.content-boards.show', $board) }}" class="block">
+                                <div class="bg-white rounded-xl border border-[var(--ui-border)]/60 shadow-sm hover:shadow-md transition-shadow p-6 h-full">
+                                    <div class="flex items-start justify-between mb-3">
+                                        <div class="flex-1">
+                                            <h3 class="text-lg font-semibold text-[var(--ui-secondary)] mb-1">{{ $board->name }}</h3>
+                                            @if($board->description)
+                                                <p class="text-sm text-[var(--ui-muted)] line-clamp-2">{{ $board->description }}</p>
+                                            @endif
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="flex items-center gap-2 mt-4">
+                                        <span class="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-[var(--ui-primary-5)] text-[var(--ui-primary)] text-xs font-medium">
+                                            @svg('heroicon-o-document-text', 'w-3 h-3')
+                                            Content Board
+                                        </span>
+                                    </div>
                                 </div>
-                            </div>
-                        </a>
+                            </a>
+                        @endif
                     @endforeach
                 </div>
             @else
@@ -63,12 +97,20 @@
                     <h3 class="text-lg font-semibold text-[var(--ui-secondary)] mb-2">Noch keine Boards</h3>
                     <p class="text-sm text-[var(--ui-muted)] mb-4">Erstelle dein erstes Board für diese Marke.</p>
                     @can('update', $brand)
-                        <x-ui-button variant="primary" size="sm" wire:click="createCiBoard">
-                            <span class="inline-flex items-center gap-2">
-                                @svg('heroicon-o-plus', 'w-4 h-4')
-                                <span>CI Board erstellen</span>
-                            </span>
-                        </x-ui-button>
+                        <div class="flex items-center justify-center gap-2">
+                            <x-ui-button variant="primary" size="sm" wire:click="createContentBoard">
+                                <span class="inline-flex items-center gap-2">
+                                    @svg('heroicon-o-plus', 'w-4 h-4')
+                                    <span>Content Board erstellen</span>
+                                </span>
+                            </x-ui-button>
+                            <x-ui-button variant="primary" size="sm" wire:click="createCiBoard">
+                                <span class="inline-flex items-center gap-2">
+                                    @svg('heroicon-o-plus', 'w-4 h-4')
+                                    <span>CI Board erstellen</span>
+                                </span>
+                            </x-ui-button>
+                        </div>
                     @endcan
                 </div>
             @endif

@@ -14,9 +14,11 @@ use Platform\Core\Routing\ModuleRouter;
 use Platform\Brands\Models\BrandsBrand;
 use Platform\Brands\Models\BrandsCiBoard;
 use Platform\Brands\Models\BrandsCiBoardColor;
+use Platform\Brands\Models\BrandsContentBoard;
 use Platform\Brands\Policies\BrandPolicy;
 use Platform\Brands\Policies\CiBoardPolicy;
 use Platform\Brands\Policies\CiBoardColorPolicy;
+use Platform\Brands\Policies\ContentBoardPolicy;
 
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
@@ -116,6 +118,7 @@ class BrandsServiceProvider extends ServiceProvider
             BrandsBrand::class => BrandPolicy::class,
             BrandsCiBoard::class => CiBoardPolicy::class,
             BrandsCiBoardColor::class => CiBoardColorPolicy::class,
+            BrandsContentBoard::class => ContentBoardPolicy::class,
         ];
 
         foreach ($policies as $model => $policy) {
@@ -157,6 +160,13 @@ class BrandsServiceProvider extends ServiceProvider
             $registry->register(new \Platform\Brands\Tools\GetCiBoardColorTool());
             $registry->register(new \Platform\Brands\Tools\UpdateCiBoardColorTool());
             $registry->register(new \Platform\Brands\Tools\DeleteCiBoardColorTool());
+            
+            // ContentBoard-Tools
+            $registry->register(new \Platform\Brands\Tools\CreateContentBoardTool());
+            $registry->register(new \Platform\Brands\Tools\ListContentBoardsTool());
+            $registry->register(new \Platform\Brands\Tools\GetContentBoardTool());
+            $registry->register(new \Platform\Brands\Tools\UpdateContentBoardTool());
+            $registry->register(new \Platform\Brands\Tools\DeleteContentBoardTool());
         } catch (\Throwable $e) {
             // Silent fail - Tool-Registry könnte nicht verfügbar sein
         }
