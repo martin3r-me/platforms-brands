@@ -3,28 +3,59 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('brands_meta_tokens', function (Blueprint $table) {
-            $table->id();
-            $table->string('uuid')->unique();
-            $table->foreignId('brand_id')->constrained('brands_brands')->onDelete('cascade');
-            $table->text('access_token');
-            $table->text('refresh_token')->nullable();
-            $table->timestamp('expires_at')->nullable();
-            $table->string('token_type')->nullable()->default('Bearer');
-            $table->json('scopes')->nullable();
-            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            $table->foreignId('team_id')->constrained('teams')->onDelete('cascade');
-            $table->timestamps();
+        $tableName = 'brands_meta_tokens';
+        
+        // Tabelle erstellen, falls sie nicht existiert
+        if (!Schema::hasTable($tableName)) {
+            Schema::create($tableName, function (Blueprint $table) {
+                $table->id();
+                $table->string('uuid')->unique();
+                $table->foreignId('brand_id')->constrained('brands_brands')->onDelete('cascade');
+                $table->text('access_token');
+                $table->text('refresh_token')->nullable();
+                $table->timestamp('expires_at')->nullable();
+                $table->string('token_type')->nullable()->default('Bearer');
+                $table->json('scopes')->nullable();
+                $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+                $table->foreignId('team_id')->constrained('teams')->onDelete('cascade');
+                $table->timestamps();
+                
+                $table->index(['brand_id'], 'bmt_brand_id_idx');
+                $table->index(['team_id'], 'bmt_team_id_idx');
+                $table->index(['expires_at'], 'bmt_expires_at_idx');
+            });
+        } else {
+            // Tabelle existiert bereits - nur Indizes hinzufügen, falls sie nicht existieren
+            $connection = Schema::getConnection();
+            $databaseName = $connection->getDatabaseName();
             
-            $table->index(['brand_id']);
-            $table->index(['team_id']);
-            $table->index(['expires_at']);
-        });
+            // Indizes hinzufügen, falls nicht vorhanden
+            $indexes = [
+                [['brand_id'], 'bmt_brand_id_idx'],
+                [['team_id'], 'bmt_team_id_idx'],
+                [['expires_at'], 'bmt_expires_at_idx'],
+            ];
+            
+            foreach ($indexes as [$columns, $indexName]) {
+                $indexExists = DB::select(
+                    "SELECT COUNT(*) as count FROM information_schema.statistics 
+                     WHERE table_schema = ? AND table_name = ? AND index_name = ?",
+                    [$databaseName, $tableName, $indexName]
+                );
+                
+                if ($indexExists[0]->count == 0) {
+                    Schema::table($tableName, function (Blueprint $table) use ($columns, $indexName) {
+                        $table->index($columns, $indexName);
+                    });
+                }
+            }
+        }
     }
 
     public function down(): void
