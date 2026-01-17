@@ -120,4 +120,20 @@ class BrandsBrand extends Model implements HasTimeAncestors, HasKeyResultAncesto
     {
         return $this->hasMany(BrandsContentBoard::class, 'brand_id')->orderBy('order');
     }
+
+    /**
+     * Facebook Pages dieser Marke
+     */
+    public function facebookPages()
+    {
+        return $this->hasMany(BrandsFacebookPage::class, 'brand_id');
+    }
+
+    /**
+     * Instagram Accounts dieser Marke
+     */
+    public function instagramAccounts()
+    {
+        return $this->hasMany(BrandsInstagramAccount::class, 'brand_id');
+    }
 }

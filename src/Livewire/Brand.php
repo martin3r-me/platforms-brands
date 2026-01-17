@@ -75,6 +75,7 @@ class Brand extends Component
         return $this->redirect(route('brands.content-boards.show', $contentBoard), navigate: true);
     }
 
+
     public function rendered()
     {
         $this->dispatch('comms', [
@@ -117,11 +118,17 @@ class Brand extends Component
         // CI Boards und Content Boards für diese Marke laden
         $ciBoards = $this->brand->ciBoards;
         $contentBoards = $this->brand->contentBoards;
+        
+        // Facebook Pages und Instagram Accounts für diese Marke laden
+        $facebookPages = $this->brand->facebookPages;
+        $instagramAccounts = $this->brand->instagramAccounts;
 
         return view('brands::livewire.brand', [
             'user' => $user,
             'ciBoards' => $ciBoards,
             'contentBoards' => $contentBoards,
+            'facebookPages' => $facebookPages,
+            'instagramAccounts' => $instagramAccounts,
         ])->layout('platform::layouts.app');
     }
 }

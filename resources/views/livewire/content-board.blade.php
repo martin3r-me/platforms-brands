@@ -22,7 +22,7 @@
         </div>
 
         {{-- Sections Section --}}
-        <div class="space-y-6">
+        <div class="space-y-6" wire:sortable="updateSectionOrder">
             <div class="flex items-center justify-between">
                 <h2 class="text-xl font-semibold text-[var(--ui-secondary)]">Sections</h2>
                 @can('update', $contentBoard)
@@ -38,22 +38,37 @@
             @if($contentBoard->sections->count() > 0)
                 @foreach($contentBoard->sections as $section)
                     {{-- Section (volle Breite) --}}
-                    <div class="bg-white rounded-xl border border-[var(--ui-border)]/60 shadow-sm overflow-visible">
+                    <div 
+                        wire:sortable.item="{{ $section->id }}"
+                        wire:key="section-{{ $section->id }}"
+                        class="bg-white rounded-xl border border-[var(--ui-border)]/60 shadow-sm overflow-visible"
+                    >
                         <div class="p-4 border-b border-[var(--ui-border)]/40 flex items-center justify-between">
-                            <div class="flex-1">
+                            <div class="flex items-center gap-2 flex-1">
                                 @can('update', $contentBoard)
-                                    <input 
-                                        type="text"
-                                        value="{{ $section->name }}"
-                                        wire:blur="updateSectionName({{ $section->id }}, $event.target.value)"
-                                        class="text-lg font-semibold text-[var(--ui-secondary)] bg-transparent border-none p-0 focus:outline-none focus:ring-2 focus:ring-[var(--ui-primary)] rounded px-1 -ml-1 w-full"
-                                    />
-                                @else
-                                    <h3 class="text-lg font-semibold text-[var(--ui-secondary)]">{{ $section->name }}</h3>
+                                    <button 
+                                        wire:sortable.handle 
+                                        class="text-[var(--ui-muted)] hover:text-[var(--ui-primary)] cursor-grab p-1 rounded-md hover:bg-[var(--ui-muted-5)]"
+                                        title="Section verschieben"
+                                    >
+                                        @svg('heroicon-o-bars-3', 'w-4 h-4')
+                                    </button>
                                 @endcan
-                                @if($section->description)
-                                    <p class="text-sm text-[var(--ui-muted)] mt-1">{{ $section->description }}</p>
-                                @endif
+                                <div class="flex-1">
+                                    @can('update', $contentBoard)
+                                        <input 
+                                            type="text"
+                                            value="{{ $section->name }}"
+                                            wire:blur="updateSectionName({{ $section->id }}, $event.target.value)"
+                                            class="text-lg font-semibold text-[var(--ui-secondary)] bg-transparent border-none p-0 focus:outline-none focus:ring-2 focus:ring-[var(--ui-primary)] rounded px-1 -ml-1 w-full"
+                                        />
+                                    @else
+                                        <h3 class="text-lg font-semibold text-[var(--ui-secondary)]">{{ $section->name }}</h3>
+                                    @endcan
+                                    @if($section->description)
+                                        <p class="text-sm text-[var(--ui-muted)] mt-1">{{ $section->description }}</p>
+                                    @endif
+                                </div>
                             </div>
                             @can('update', $contentBoard)
                                 <x-ui-button 
@@ -71,21 +86,39 @@
                         </div>
                         
                         {{-- Rows innerhalb der Section --}}
-                        <div class="p-4 space-y-4">
+                        <div 
+                            class="p-4 space-y-4"
+                            wire:sortable-group="updateRowOrder"
+                            wire:sortable-group.item-group="{{ $section->id }}"
+                        >
                             @foreach($section->rows as $row)
-                                <div class="bg-[var(--ui-muted-5)] rounded-lg border border-[var(--ui-border)]/40 overflow-visible">
+                                <div 
+                                    wire:sortable.item="{{ $row->id }}"
+                                    wire:key="row-{{ $row->id }}"
+                                    class="bg-[var(--ui-muted-5)] rounded-lg border border-[var(--ui-border)]/40 overflow-visible"
+                                >
                                     <div class="p-3 border-b border-[var(--ui-border)]/40 flex items-center justify-between">
-                                        <div class="flex items-center gap-3 flex-1">
+                                        <div class="flex items-center gap-2 flex-1">
                                             @can('update', $contentBoard)
-                                                <input 
-                                                    type="text"
-                                                    value="{{ $row->name }}"
-                                                    wire:blur="updateRowName({{ $row->id }}, $event.target.value)"
-                                                    class="text-sm font-semibold text-[var(--ui-secondary)] bg-transparent border-none p-0 focus:outline-none focus:ring-2 focus:ring-[var(--ui-primary)] rounded px-1 -ml-1"
-                                                />
-                                            @else
-                                                <h4 class="text-sm font-semibold text-[var(--ui-secondary)]">{{ $row->name }}</h4>
+                                                <button 
+                                                    wire:sortable.handle 
+                                                    class="text-[var(--ui-muted)] hover:text-[var(--ui-primary)] cursor-grab p-1 rounded-md hover:bg-white"
+                                                    title="Row verschieben"
+                                                >
+                                                    @svg('heroicon-o-bars-3', 'w-3 h-3')
+                                                </button>
                                             @endcan
+                                            <div class="flex items-center gap-3 flex-1">
+                                                @can('update', $contentBoard)
+                                                    <input 
+                                                        type="text"
+                                                        value="{{ $row->name }}"
+                                                        wire:blur="updateRowName({{ $row->id }}, $event.target.value)"
+                                                        class="text-sm font-semibold text-[var(--ui-secondary)] bg-transparent border-none p-0 focus:outline-none focus:ring-2 focus:ring-[var(--ui-primary)] rounded px-1 -ml-1"
+                                                    />
+                                                @else
+                                                    <h4 class="text-sm font-semibold text-[var(--ui-secondary)]">{{ $row->name }}</h4>
+                                                @endcan
                                             @if($row->description)
                                                 <span class="text-xs text-[var(--ui-muted)]">{{ $row->description }}</span>
                                             @endif
@@ -123,12 +156,18 @@
                                         </div>
                                     </div>
                                     
-                                    <div class="p-3">
+                                    <div 
+                                        class="p-3"
+                                        wire:sortable-group="updateBlockOrder"
+                                        wire:sortable-group.item-group="{{ $row->id }}"
+                                    >
                                         @if($row->blocks->count() > 0)
                                             <div class="grid grid-cols-12 gap-2">
                                                 @foreach($row->blocks as $block)
                                                     <div 
-                                                        class="bg-white rounded-lg border border-[var(--ui-border)]/40 hover:border-[var(--ui-primary)]/40 transition-colors relative"
+                                                        wire:sortable.item="{{ $block->id }}"
+                                                        wire:key="block-{{ $block->id }}"
+                                                        class="bg-white rounded-lg border border-[var(--ui-border)]/40 hover:border-[var(--ui-primary)]/40 transition-colors relative cursor-move"
                                                         style="grid-column: span {{ $block->span }};"
                                                         x-data="{ settingsOpen: false }"
                                                         @click.away="settingsOpen = false"

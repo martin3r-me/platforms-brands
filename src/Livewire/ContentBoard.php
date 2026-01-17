@@ -214,6 +214,83 @@ class ContentBoard extends Component
         $this->contentBoard->load('sections.rows.blocks');
     }
 
+    /**
+     * Aktualisiert die Reihenfolge der Sections nach Drag&Drop
+     */
+    public function updateSectionOrder($sections)
+    {
+        $this->authorize('update', $this->contentBoard);
+        
+        foreach ($sections as $section) {
+            $sectionDb = \Platform\Brands\Models\BrandsContentBoardSection::find($section['value']);
+            if ($sectionDb) {
+                $sectionDb->order = $section['order'];
+                $sectionDb->save();
+            }
+        }
+        
+        $this->contentBoard->refresh();
+        $this->contentBoard->load('sections.rows.blocks');
+    }
+
+    /**
+     * Aktualisiert die Reihenfolge der Rows innerhalb einer Section nach Drag&Drop
+     */
+    public function updateRowOrder($groups)
+    {
+        $this->authorize('update', $this->contentBoard);
+        
+        foreach ($groups as $group) {
+            $sectionId = ($group['value'] === 'null' || (int) $group['value'] === 0)
+                ? null
+                : (int) $group['value'];
+
+            foreach ($group['items'] as $item) {
+                $row = \Platform\Brands\Models\BrandsContentBoardRow::find($item['value']);
+
+                if (!$row) {
+                    continue;
+                }
+
+                $row->order = $item['order'];
+                $row->section_id = $sectionId;
+                $row->save();
+            }
+        }
+        
+        $this->contentBoard->refresh();
+        $this->contentBoard->load('sections.rows.blocks');
+    }
+
+    /**
+     * Aktualisiert die Reihenfolge der Blocks innerhalb einer Row nach Drag&Drop
+     */
+    public function updateBlockOrder($groups)
+    {
+        $this->authorize('update', $this->contentBoard);
+        
+        foreach ($groups as $group) {
+            $rowId = ($group['value'] === 'null' || (int) $group['value'] === 0)
+                ? null
+                : (int) $group['value'];
+
+            foreach ($group['items'] as $item) {
+                $block = \Platform\Brands\Models\BrandsContentBoardBlock::find($item['value']);
+
+                if (!$block) {
+                    continue;
+                }
+
+                $block->order = $item['order'];
+                $block->row_id = $rowId;
+                $block->save();
+            }
+        }
+        
+        $this->contentBoard->refresh();
+        $this->contentBoard->load('sections.rows.blocks');
+    }
+
     public function render()
     {
         $user = Auth::user();
