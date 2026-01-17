@@ -110,43 +110,82 @@
                                             <div class="grid grid-cols-12 gap-2">
                                                 @foreach($row->blocks as $block)
                                                     <div 
-                                                        class="bg-white rounded-lg border border-[var(--ui-border)]/40 p-3 hover:border-[var(--ui-primary)]/40 transition-colors relative group"
+                                                        class="bg-white rounded-lg border border-[var(--ui-border)]/40 hover:border-[var(--ui-primary)]/40 transition-colors relative"
                                                         style="grid-column: span {{ $block->span }};"
+                                                        x-data="{ settingsOpen: false }"
+                                                        @click.away="settingsOpen = false"
                                                     >
-                                                        <div class="flex items-start justify-between mb-2">
-                                                            <div class="flex-1">
-                                                                <h5 class="text-xs font-semibold text-[var(--ui-secondary)]">{{ $block->name }}</h5>
-                                                                @if($block->description)
-                                                                    <p class="text-xs text-[var(--ui-muted)] mt-1">{{ $block->description }}</p>
+                                                        {{-- Block Header --}}
+                                                        @can('update', $contentBoard)
+                                                            <div class="flex items-center justify-between p-1.5 border-b border-[var(--ui-border)]/40 bg-[var(--ui-muted-5)]">
+                                                                <div class="flex items-center gap-2">
+                                                                    <span class="text-xs font-medium text-[var(--ui-secondary)]">Block</span>
+                                                                    <span class="text-xs text-[var(--ui-muted)] bg-white px-1.5 py-0.5 rounded border border-[var(--ui-border)]/40">
+                                                                        {{ $block->span }}/12
+                                                                    </span>
+                                                                </div>
+                                                                <div class="relative">
+                                                                    <button 
+                                                                        type="button"
+                                                                        @click="settingsOpen = !settingsOpen"
+                                                                        class="p-1 rounded hover:bg-white transition-colors"
+                                                                        title="Block-Einstellungen"
+                                                                    >
+                                                                        @svg('heroicon-o-cog-6-tooth', 'w-3 h-3 text-[var(--ui-muted)]')
+                                                                    </button>
+                                                                    
+                                                                    {{-- Settings Dropdown --}}
+                                                                    <div 
+                                                                        x-show="settingsOpen"
+                                                                        x-cloak
+                                                                        x-transition
+                                                                        class="absolute right-0 top-full mt-1 z-10 bg-white rounded-lg border border-[var(--ui-border)]/60 shadow-lg p-2 min-w-[140px]"
+                                                                    >
+                                                                        <div class="space-y-2">
+                                                                            <div>
+                                                                                <label class="text-xs font-medium text-[var(--ui-secondary)] mb-1 block">Span (1-12)</label>
+                                                                                <input 
+                                                                                    type="number" 
+                                                                                    min="1" 
+                                                                                    max="12" 
+                                                                                    value="{{ $block->span }}"
+                                                                                    wire:change="updateBlockSpan({{ $block->id }}, $event.target.value); settingsOpen = false"
+                                                                                    class="w-full text-xs text-center border border-[var(--ui-border)] rounded px-2 py-1 focus:ring-2 focus:ring-[var(--ui-primary)] focus:border-transparent"
+                                                                                />
+                                                                            </div>
+                                                                            <div class="pt-2 border-t border-[var(--ui-border)]/40">
+                                                                                <button
+                                                                                    type="button"
+                                                                                    wire:click="deleteBlock({{ $block->id }})"
+                                                                                    wire:confirm="Möchtest du diesen Block wirklich löschen?"
+                                                                                    @click="settingsOpen = false"
+                                                                                    class="w-full text-xs text-red-600 hover:text-red-700 hover:bg-red-50 px-2 py-1.5 rounded transition-colors flex items-center justify-center gap-1"
+                                                                                >
+                                                                                    @svg('heroicon-o-trash', 'w-3 h-3')
+                                                                                    <span>Löschen</span>
+                                                                                </button>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        @endcan
+                                                        
+                                                        {{-- Block Content --}}
+                                                        <div class="p-3">
+                                                            <div class="flex items-start justify-between">
+                                                                <div class="flex-1">
+                                                                    <h5 class="text-xs font-semibold text-[var(--ui-secondary)]">{{ $block->name }}</h5>
+                                                                    @if($block->description)
+                                                                        <p class="text-xs text-[var(--ui-muted)] mt-1">{{ $block->description }}</p>
+                                                                    @endif
+                                                                </div>
+                                                                @if(!auth()->user()->can('update', $contentBoard))
+                                                                    <span class="text-xs text-[var(--ui-muted)] bg-[var(--ui-muted-5)] px-1.5 py-0.5 rounded">
+                                                                        {{ $block->span }}/12
+                                                                    </span>
                                                                 @endif
                                                             </div>
-                                                            @can('update', $contentBoard)
-                                                                <div class="flex items-center gap-1">
-                                                                    <input 
-                                                                        type="number" 
-                                                                        min="1" 
-                                                                        max="12" 
-                                                                        value="{{ $block->span }}"
-                                                                        wire:change="updateBlockSpan({{ $block->id }}, $event.target.value)"
-                                                                        class="w-12 text-xs text-center border border-[var(--ui-border)] rounded px-1 py-0.5 focus:ring-2 focus:ring-[var(--ui-primary)] focus:border-transparent"
-                                                                    />
-                                                                    <x-ui-button 
-                                                                        variant="danger-outline" 
-                                                                        size="xs" 
-                                                                        wire:click="deleteBlock({{ $block->id }})"
-                                                                        wire:confirm="Möchtest du diesen Block wirklich löschen?"
-                                                                        class="opacity-0 group-hover:opacity-100 transition-opacity"
-                                                                    >
-                                                                        <span class="inline-flex items-center">
-                                                                            @svg('heroicon-o-trash', 'w-3 h-3')
-                                                                        </span>
-                                                                    </x-ui-button>
-                                                                </div>
-                                                            @else
-                                                                <span class="text-xs text-[var(--ui-muted)] bg-[var(--ui-muted-5)] px-1.5 py-0.5 rounded">
-                                                                    {{ $block->span }}
-                                                                </span>
-                                                            @endcan
                                                         </div>
                                                     </div>
                                                 @endforeach
