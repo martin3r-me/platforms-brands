@@ -122,6 +122,14 @@ class BrandsBrand extends Model implements HasTimeAncestors, HasKeyResultAncesto
     }
 
     /**
+     * Meta OAuth Token dieser Marke
+     */
+    public function metaToken()
+    {
+        return $this->hasOne(BrandsMetaToken::class, 'brand_id');
+    }
+
+    /**
      * Facebook Pages dieser Marke
      */
     public function facebookPages()
