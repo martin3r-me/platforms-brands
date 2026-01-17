@@ -4,6 +4,7 @@ namespace Platform\Brands\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Crypt;
 use Symfony\Component\Uid\UuidV7;
 use Platform\Core\Contracts\HasDisplayName;
@@ -73,6 +74,21 @@ class BrandsInstagramAccount extends Model implements HasDisplayName
     public function team(): BelongsTo
     {
         return $this->belongsTo(\Platform\Core\Models\Team::class);
+    }
+
+    public function media(): HasMany
+    {
+        return $this->hasMany(BrandsInstagramMedia::class, 'instagram_account_id');
+    }
+
+    public function insights(): HasMany
+    {
+        return $this->hasMany(BrandsInstagramAccountInsight::class, 'instagram_account_id');
+    }
+
+    public function latestInsight()
+    {
+        return $this->hasOne(BrandsInstagramAccountInsight::class, 'instagram_account_id')->latestOfMany('insight_date');
     }
 
     public function getDisplayName(): ?string

@@ -1,0 +1,96 @@
+<?php
+
+namespace Platform\Brands\Services;
+
+use Platform\Brands\Models\BrandsMetaToken;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+
+/**
+ * Service für Meta OAuth Token Management
+ */
+class MetaTokenService
+{
+    /**
+     * Prüft und aktualisiert Token, falls nötig
+     */
+    public function refreshTokenIfNeeded(BrandsMetaToken $token): ?string
+    {
+        if (!$token->isExpired() && !$token->isExpiringSoon()) {
+            return null; // Token ist noch gültig
+        }
+
+        return $this->refreshToken($token);
+    }
+
+    /**
+     * Aktualisiert den Access Token
+     */
+    public function refreshToken(BrandsMetaToken $token): ?string
+    {
+        $apiVersion = config('brands.meta.api_version', 'v21.0');
+        
+        try {
+            $response = Http::get("https://graph.facebook.com/debug_token", [
+                'input_token' => $token->access_token,
+                'access_token' => $token->access_token,
+            ]);
+
+            $data = $response->json();
+
+            if (isset($data['data']['expires_at'])) {
+                $expiresAt = $data['data']['expires_at'];
+                $expiresIn = $expiresAt - time();
+                
+                if ($expiresIn < 86400) { // Weniger als 24 Stunden
+                    $clientId = config('brands.meta.client_id');
+                    $clientSecret = config('brands.meta.client_secret');
+                    
+                    $refreshResponse = Http::get("https://graph.facebook.com/{$apiVersion}/oauth/access_token", [
+                        'grant_type' => 'fb_exchange_token',
+                        'client_id' => $clientId,
+                        'client_secret' => $clientSecret,
+                        'fb_exchange_token' => $token->access_token,
+                    ]);
+
+                    $refreshData = $refreshResponse->json();
+
+                    if (isset($refreshData['access_token'])) {
+                        $token->access_token = $refreshData['access_token'];
+                        $token->expires_at = now()->addSeconds($refreshData['expires_in'] ?? 0);
+                        $token->save();
+                        
+                        Log::info('Meta Token refreshed', [
+                            'token_id' => $token->id,
+                            'brand_id' => $token->brand_id,
+                        ]);
+                        
+                        return $refreshData['access_token'];
+                    }
+                }
+            }
+        } catch (\Exception $e) {
+            Log::error('Failed to refresh Meta token', [
+                'token_id' => $token->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
+
+        return null;
+    }
+
+    /**
+     * Gibt den gültigen Access Token zurück (refresht automatisch, falls nötig)
+     */
+    public function getValidAccessToken(BrandsMetaToken $token): ?string
+    {
+        if ($token->isExpired() || $token->isExpiringSoon()) {
+            $newToken = $this->refreshTokenIfNeeded($token);
+            if ($newToken) {
+                return $newToken;
+            }
+        }
+
+        return $token->access_token;
+    }
+}

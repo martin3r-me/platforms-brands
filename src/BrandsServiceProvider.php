@@ -31,7 +31,17 @@ class BrandsServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        // Commands können später hinzugefügt werden
+        // Commands registrieren
+        if ($this->app->runningInConsole()) {
+            $this->commands([
+                \Platform\Brands\Console\Commands\SyncFacebookPages::class,
+                \Platform\Brands\Console\Commands\SyncFacebookPosts::class,
+                \Platform\Brands\Console\Commands\SyncInstagramAccounts::class,
+                \Platform\Brands\Console\Commands\SyncInstagramMedia::class,
+                \Platform\Brands\Console\Commands\SyncInstagramInsights::class,
+                \Platform\Brands\Console\Commands\SyncAll::class,
+            ]);
+        }
     }
 
     public function boot(): void

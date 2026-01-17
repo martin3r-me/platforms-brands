@@ -75,6 +75,11 @@ class BrandsFacebookPage extends Model implements HasDisplayName
         return $this->hasMany(BrandsInstagramAccount::class, 'facebook_page_id');
     }
 
+    public function posts(): HasMany
+    {
+        return $this->hasMany(BrandsFacebookPost::class, 'facebook_page_id');
+    }
+
     public function getDisplayName(): ?string
     {
         return $this->name;
