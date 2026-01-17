@@ -3,6 +3,9 @@
 namespace Platform\Brands\Services;
 
 use Platform\Brands\Models\BrandsInstagramAccount;
+use Platform\Brands\Models\BrandsInstagramAccountInsight;
+use Platform\Brands\Models\BrandsInstagramMedia;
+use Platform\Brands\Models\BrandsInstagramMediaInsight;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
@@ -85,12 +88,17 @@ class InstagramInsightsService
     }
 
     /**
-     * Ruft aktuelle Account-Details ab
+     * Ruft aktuelle Account-Details ab und speichert sie
      */
     public function fetchAccountDetails(BrandsInstagramAccount $account): array
     {
         $apiVersion = config('brands.meta.api_version', 'v21.0');
-        $accessToken = $account->access_token;
+        $accessToken = $this->tokenService->getValidAccessToken($account->brand->metaToken);
+
+        if (!$accessToken) {
+            Log::error('No valid access token for account', ['account_id' => $account->id]);
+            return [];
+        }
 
         $response = Http::get("https://graph.facebook.com/{$apiVersion}/{$account->external_id}", [
             'fields' => 'name,username,biography,profile_picture_url,website,followers_count,follows_count',
@@ -106,15 +114,199 @@ class InstagramInsightsService
             return [];
         }
 
-        return $response->json();
+        $data = $response->json();
+        
+        // Account Details in Insights speichern
+        BrandsInstagramAccountInsight::updateOrCreate(
+            [
+                'instagram_account_id' => $account->id,
+                'insight_date' => Carbon::now()->format('Y-m-d'),
+            ],
+            [
+                'current_name' => $data['name'] ?? null,
+                'current_username' => $data['username'] ?? null,
+                'current_biography' => $data['biography'] ?? null,
+                'current_profile_picture_url' => $data['profile_picture_url'] ?? null,
+                'current_website' => $data['website'] ?? null,
+                'current_followers' => $data['followers_count'] ?? null,
+                'current_follows' => $data['follows_count'] ?? null,
+            ]
+        );
+
+        Log::info('Account details fetched and saved', [
+            'account_id' => $account->id,
+            'followers' => $data['followers_count'] ?? 0,
+            'follows' => $data['follows_count'] ?? 0,
+        ]);
+
+        return $data;
+    }
+
+    /**
+     * Synchronisiert Account Insights (tägliche Metriken, Total-Value-Metriken, Account-Details)
+     */
+    public function syncAccountInsights(BrandsInstagramAccount $account): array
+    {
+        $insights = [];
+        
+        // Account Details (Follower/Following) holen
+        $accountDetails = $this->fetchAccountDetails($account);
+        if (!empty($accountDetails)) {
+            $insights['account_details'] = $accountDetails;
+        }
+
+        // Tägliche Metriken holen
+        $dailyMetrics = $this->fetchDailyMetrics($account);
+        if (!empty($dailyMetrics)) {
+            $this->saveDailyMetrics($account, $dailyMetrics);
+            $insights['daily_metrics'] = $dailyMetrics;
+        }
+
+        // Total-Value-Metriken holen
+        $totalValueMetrics = $this->fetchTotalValueMetrics($account);
+        if (!empty($totalValueMetrics)) {
+            $this->saveTotalValueMetrics($account, $totalValueMetrics);
+            $insights['total_value_metrics'] = $totalValueMetrics;
+        }
+
+        return $insights;
+    }
+
+    /**
+     * Speichert tägliche Metriken in der Datenbank
+     */
+    protected function saveDailyMetrics(BrandsInstagramAccount $account, array $metrics): void
+    {
+        $insightDate = Carbon::now()->format('Y-m-d');
+        
+        foreach ($metrics as $metricName => $values) {
+            if (empty($values) || !is_array($values)) {
+                continue;
+            }
+
+            // Für tägliche Metriken speichern wir jeden Tag-Wert
+            foreach ($values as $valueData) {
+                $value = is_array($valueData) ? ($valueData['value'] ?? 0) : $valueData;
+                $endTime = is_array($valueData) && isset($valueData['end_time']) 
+                    ? Carbon::parse($valueData['end_time'])->format('Y-m-d')
+                    : $insightDate;
+
+                BrandsInstagramAccountInsight::updateOrCreate(
+                    [
+                        'instagram_account_id' => $account->id,
+                        'insight_date' => $endTime,
+                    ],
+                    [
+                        $metricName => $value,
+                    ]
+                );
+            }
+        }
+    }
+
+    /**
+     * Speichert Total-Value-Metriken in der Datenbank
+     */
+    protected function saveTotalValueMetrics(BrandsInstagramAccount $account, array $metrics): void
+    {
+        $insightDate = Carbon::now()->format('Y-m-d');
+        
+        foreach ($metrics as $metricName => $values) {
+            if (empty($values) || !is_array($values)) {
+                continue;
+            }
+
+            // Für Total-Value-Metriken nehmen wir den ersten Wert (total_value)
+            $totalValue = isset($values[0]) && is_array($values[0]) 
+                ? ($values[0] ?? 0)
+                : (isset($values[0]) ? $values[0] : 0);
+
+            BrandsInstagramAccountInsight::updateOrCreate(
+                [
+                    'instagram_account_id' => $account->id,
+                    'insight_date' => $insightDate,
+                ],
+                [
+                    $metricName => $totalValue,
+                ]
+            );
+        }
+    }
+
+    /**
+     * Synchronisiert Media Insights für alle Media eines Accounts
+     */
+    public function syncMediaInsights(BrandsInstagramAccount $account): array
+    {
+        $mediaItems = BrandsInstagramMedia::where('instagram_account_id', $account->id)
+            ->where('insights_available', true)
+            ->get();
+
+        $syncedCount = 0;
+        $skippedCount = 0;
+
+        foreach ($mediaItems as $media) {
+            try {
+                $insights = $this->fetchMediaInsights(
+                    $media->external_id,
+                    $account,
+                    strtolower($media->media_type)
+                );
+
+                if (isset($insights['insights_available']) && !$insights['insights_available']) {
+                    $media->update(['insights_available' => false]);
+                    $skippedCount++;
+                    continue;
+                }
+
+                if (!empty($insights)) {
+                    $this->saveMediaInsights($media, $insights);
+                    $syncedCount++;
+                }
+            } catch (\Exception $e) {
+                Log::error('Error syncing media insights', [
+                    'media_id' => $media->id,
+                    'error' => $e->getMessage(),
+                ]);
+                $skippedCount++;
+            }
+        }
+
+        return [
+            'synced' => $syncedCount,
+            'skipped' => $skippedCount,
+        ];
+    }
+
+    /**
+     * Speichert Media Insights in der Datenbank
+     */
+    protected function saveMediaInsights(BrandsInstagramMedia $media, array $insights): void
+    {
+        $insightDate = Carbon::now()->format('Y-m-d');
+
+        BrandsInstagramMediaInsight::updateOrCreate(
+            [
+                'instagram_media_id' => $media->id,
+                'insight_date' => $insightDate,
+            ],
+            $insights
+        );
     }
 
     /**
      * Ruft Media-Insights für ein einzelnes Media ab
      */
-    public function fetchMediaInsights(string $mediaId, string $accessToken, string $mediaType = 'photo'): array
+    public function fetchMediaInsights(string $mediaId, BrandsInstagramAccount $account, string $mediaType = 'photo'): array
     {
         $apiVersion = config('brands.meta.api_version', 'v21.0');
+        $accessToken = $this->tokenService->getValidAccessToken($account->brand->metaToken);
+
+        if (!$accessToken) {
+            Log::error('No valid access token for account', ['account_id' => $account->id]);
+            return [];
+        }
+
         $metrics = [
             'impressions',
             'reach',
@@ -192,7 +384,12 @@ class InstagramInsightsService
     protected function fetchAccountInsights(BrandsInstagramAccount $account, array $metrics, string $period = 'day', ?string $metricType = null): array
     {
         $apiVersion = config('brands.meta.api_version', 'v21.0');
-        $accessToken = $account->access_token;
+        $accessToken = $this->tokenService->getValidAccessToken($account->brand->metaToken);
+
+        if (!$accessToken) {
+            Log::error('No valid access token for account', ['account_id' => $account->id]);
+            return [];
+        }
 
         $params = [
             'metric' => implode(',', $metrics),

@@ -78,13 +78,15 @@ class SyncInstagramInsights extends Command
                 // Account Insights
                 if (!$mediaOnly) {
                     $this->info("     📊 Synchronisiere Account Insights...");
-                    // TODO: Implementiere Account Insights Sync
+                    $accountInsights = $service->syncAccountInsights($account);
+                    $this->info("     ✅ Account Insights synchronisiert");
                 }
 
                 // Media Insights
                 if (!$accountOnly) {
                     $this->info("     📊 Synchronisiere Media Insights...");
-                    // TODO: Implementiere Media Insights Sync
+                    $mediaResults = $service->syncMediaInsights($account);
+                    $this->info("     ✅ {$mediaResults['synced']} Media Insights synchronisiert, {$mediaResults['skipped']} übersprungen");
                 }
 
                 $this->info("     ✅ Insights synchronisiert");
