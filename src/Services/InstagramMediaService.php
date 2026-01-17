@@ -101,8 +101,13 @@ class InstagramMediaService
 
     /**
      * Speichert Instagram Media in der Datenbank und lädt Bilder herunter
+     * 
+     * @param BrandsInstagramAccount $account
+     * @param int $limit
+     * @param \Illuminate\Console\Command|null $command Für Terminal-Ausgabe
+     * @return array
      */
-    public function syncMedia(BrandsInstagramAccount $account, int $limit = 1000): array
+    public function syncMedia(BrandsInstagramAccount $account, int $limit = 1000, ?\Illuminate\Console\Command $command = null): array
     {
         $mediaData = $this->fetchMedia($account, $limit);
         // Team-ID und User-ID direkt vom Instagram Account nehmen (für Commands)
