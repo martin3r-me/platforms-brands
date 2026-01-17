@@ -9,30 +9,24 @@ use Symfony\Component\Uid\UuidV7;
 use Platform\Core\Contracts\HasDisplayName;
 
 /**
- * Model für Content Boards
- * 
- * Vollständig unabhängiges Model - erbt direkt von Laravel Model
+ * Model für Content Board Sections
  */
-class BrandsContentBoard extends Model implements HasDisplayName
+class BrandsContentBoardSection extends Model implements HasDisplayName
 {
-    protected $table = 'brands_content_boards';
+    protected $table = 'brands_content_board_sections';
 
     protected $fillable = [
         'uuid',
-        'brand_id',
+        'content_board_id',
         'name',
         'description',
         'order',
         'user_id',
         'team_id',
-        'done',
-        'done_at',
     ];
 
     protected $casts = [
         'uuid' => 'string',
-        'done' => 'boolean',
-        'done_at' => 'datetime',
         'order' => 'integer',
     ];
 
@@ -46,15 +40,15 @@ class BrandsContentBoard extends Model implements HasDisplayName
             $model->uuid = $uuid;
             
             if (!$model->order) {
-                $maxOrder = self::where('brand_id', $model->brand_id)->max('order') ?? 0;
+                $maxOrder = self::where('content_board_id', $model->content_board_id)->max('order') ?? 0;
                 $model->order = $maxOrder + 1;
             }
         });
     }
 
-    public function brand(): BelongsTo
+    public function contentBoard(): BelongsTo
     {
-        return $this->belongsTo(BrandsBrand::class, 'brand_id');
+        return $this->belongsTo(BrandsContentBoard::class, 'content_board_id');
     }
 
     public function user(): BelongsTo
@@ -67,9 +61,9 @@ class BrandsContentBoard extends Model implements HasDisplayName
         return $this->belongsTo(\Platform\Core\Models\Team::class);
     }
 
-    public function sections(): HasMany
+    public function rows(): HasMany
     {
-        return $this->hasMany(BrandsContentBoardSection::class, 'content_board_id')->orderBy('order');
+        return $this->hasMany(BrandsContentBoardRow::class, 'section_id')->orderBy('order');
     }
 
     public function getDisplayName(): ?string

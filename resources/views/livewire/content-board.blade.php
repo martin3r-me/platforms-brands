@@ -21,27 +21,64 @@
             </div>
         </div>
 
-        {{-- Content Section --}}
-        <div class="bg-white rounded-2xl border border-[var(--ui-border)]/60 shadow-sm overflow-hidden">
-            <div class="p-6 lg:p-8">
-                <div class="flex items-center gap-3 mb-6">
-                    <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-[var(--ui-primary)]/10 to-[var(--ui-primary)]/5 flex items-center justify-center">
-                        @svg('heroicon-o-document-text', 'w-5 h-5 text-[var(--ui-primary)]')
-                    </div>
-                    <div>
-                        <h2 class="text-2xl font-bold text-[var(--ui-secondary)]">Content</h2>
-                        <p class="text-sm text-[var(--ui-muted)]">Inhalte werden hier angezeigt</p>
-                    </div>
-                </div>
-                
-                <div class="text-center py-12 border-2 border-dashed border-[var(--ui-border)]/40 rounded-xl bg-[var(--ui-muted-5)]">
-                    <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[var(--ui-muted)] mb-4">
-                        @svg('heroicon-o-document-text', 'w-8 h-8 text-[var(--ui-muted)]')
-                    </div>
-                    <p class="text-sm font-medium text-[var(--ui-secondary)] mb-1">Noch keine Inhalte</p>
-                    <p class="text-xs text-[var(--ui-muted)]">Inhalte werden hier später hinzugefügt</p>
-                </div>
+        {{-- Sections Section --}}
+        <div>
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-xl font-semibold text-[var(--ui-secondary)]">Sections</h2>
+                @can('update', $contentBoard)
+                    <x-ui-button variant="primary" size="sm" wire:click="createSection">
+                        <span class="inline-flex items-center gap-2">
+                            @svg('heroicon-o-plus', 'w-4 h-4')
+                            <span>Section erstellen</span>
+                        </span>
+                    </x-ui-button>
+                @endcan
             </div>
+
+            @if($contentBoard->sections->count() > 0)
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                    @foreach($contentBoard->sections as $section)
+                        <div class="bg-white rounded-xl border border-[var(--ui-border)]/60 shadow-sm hover:shadow-md transition-shadow p-6 h-full cursor-pointer" wire:click="$dispatch('open-section', { sectionId: {{ $section->id }} })">
+                            <div class="flex items-start justify-between mb-3">
+                                <div class="flex-1">
+                                    <h3 class="text-lg font-semibold text-[var(--ui-secondary)] mb-1">{{ $section->name }}</h3>
+                                    @if($section->description)
+                                        <p class="text-sm text-[var(--ui-muted)] line-clamp-2">{{ $section->description }}</p>
+                                    @endif
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center gap-2 mt-4">
+                                <span class="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-[var(--ui-primary-5)] text-[var(--ui-primary)] text-xs font-medium">
+                                    @svg('heroicon-o-squares-2x2', 'w-3 h-3')
+                                    Section
+                                </span>
+                                @if($section->rows->count() > 0)
+                                    <span class="text-xs text-[var(--ui-muted)]">
+                                        {{ $section->rows->count() }} {{ $section->rows->count() === 1 ? 'Row' : 'Rows' }}
+                                    </span>
+                                @endif
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            @else
+                <div class="bg-white rounded-xl border border-[var(--ui-border)]/60 shadow-sm p-12 text-center">
+                    <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[var(--ui-muted-5)] mb-4">
+                        @svg('heroicon-o-squares-2x2', 'w-8 h-8 text-[var(--ui-muted)]')
+                    </div>
+                    <h3 class="text-lg font-semibold text-[var(--ui-secondary)] mb-2">Noch keine Sections</h3>
+                    <p class="text-sm text-[var(--ui-muted)] mb-4">Erstelle deine erste Section für dieses Content Board.</p>
+                    @can('update', $contentBoard)
+                        <x-ui-button variant="primary" size="sm" wire:click="createSection">
+                            <span class="inline-flex items-center gap-2">
+                                @svg('heroicon-o-plus', 'w-4 h-4')
+                                <span>Section erstellen</span>
+                            </span>
+                        </x-ui-button>
+                    @endcan
+                </div>
+            @endif
         </div>
     </x-ui-page-container>
 

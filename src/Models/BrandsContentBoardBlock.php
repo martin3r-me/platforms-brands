@@ -4,36 +4,31 @@ namespace Platform\Brands\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Symfony\Component\Uid\UuidV7;
 use Platform\Core\Contracts\HasDisplayName;
 
 /**
- * Model für Content Boards
- * 
- * Vollständig unabhängiges Model - erbt direkt von Laravel Model
+ * Model für Content Board Blocks
  */
-class BrandsContentBoard extends Model implements HasDisplayName
+class BrandsContentBoardBlock extends Model implements HasDisplayName
 {
-    protected $table = 'brands_content_boards';
+    protected $table = 'brands_content_board_blocks';
 
     protected $fillable = [
         'uuid',
-        'brand_id',
+        'row_id',
         'name',
         'description',
         'order',
+        'span',
         'user_id',
         'team_id',
-        'done',
-        'done_at',
     ];
 
     protected $casts = [
         'uuid' => 'string',
-        'done' => 'boolean',
-        'done_at' => 'datetime',
         'order' => 'integer',
+        'span' => 'integer',
     ];
 
     protected static function booted(): void
@@ -46,15 +41,32 @@ class BrandsContentBoard extends Model implements HasDisplayName
             $model->uuid = $uuid;
             
             if (!$model->order) {
-                $maxOrder = self::where('brand_id', $model->brand_id)->max('order') ?? 0;
+                $maxOrder = self::where('row_id', $model->row_id)->max('order') ?? 0;
                 $model->order = $maxOrder + 1;
+            }
+            
+            // Span Standardwert setzen, falls nicht gesetzt
+            if (!$model->span) {
+                $model->span = 1;
+            }
+            
+            // Span validieren: muss zwischen 1 und 12 sein
+            if ($model->span < 1 || $model->span > 12) {
+                $model->span = max(1, min(12, $model->span));
+            }
+        });
+        
+        static::updating(function (self $model) {
+            // Span validieren: muss zwischen 1 und 12 sein
+            if (isset($model->span) && ($model->span < 1 || $model->span > 12)) {
+                $model->span = max(1, min(12, $model->span));
             }
         });
     }
 
-    public function brand(): BelongsTo
+    public function row(): BelongsTo
     {
-        return $this->belongsTo(BrandsBrand::class, 'brand_id');
+        return $this->belongsTo(BrandsContentBoardRow::class, 'row_id');
     }
 
     public function user(): BelongsTo
@@ -65,11 +77,6 @@ class BrandsContentBoard extends Model implements HasDisplayName
     public function team(): BelongsTo
     {
         return $this->belongsTo(\Platform\Core\Models\Team::class);
-    }
-
-    public function sections(): HasMany
-    {
-        return $this->hasMany(BrandsContentBoardSection::class, 'content_board_id')->orderBy('order');
     }
 
     public function getDisplayName(): ?string

@@ -9,30 +9,24 @@ use Symfony\Component\Uid\UuidV7;
 use Platform\Core\Contracts\HasDisplayName;
 
 /**
- * Model für Content Boards
- * 
- * Vollständig unabhängiges Model - erbt direkt von Laravel Model
+ * Model für Content Board Rows
  */
-class BrandsContentBoard extends Model implements HasDisplayName
+class BrandsContentBoardRow extends Model implements HasDisplayName
 {
-    protected $table = 'brands_content_boards';
+    protected $table = 'brands_content_board_rows';
 
     protected $fillable = [
         'uuid',
-        'brand_id',
+        'section_id',
         'name',
         'description',
         'order',
         'user_id',
         'team_id',
-        'done',
-        'done_at',
     ];
 
     protected $casts = [
         'uuid' => 'string',
-        'done' => 'boolean',
-        'done_at' => 'datetime',
         'order' => 'integer',
     ];
 
@@ -46,15 +40,15 @@ class BrandsContentBoard extends Model implements HasDisplayName
             $model->uuid = $uuid;
             
             if (!$model->order) {
-                $maxOrder = self::where('brand_id', $model->brand_id)->max('order') ?? 0;
+                $maxOrder = self::where('section_id', $model->section_id)->max('order') ?? 0;
                 $model->order = $maxOrder + 1;
             }
         });
     }
 
-    public function brand(): BelongsTo
+    public function section(): BelongsTo
     {
-        return $this->belongsTo(BrandsBrand::class, 'brand_id');
+        return $this->belongsTo(BrandsContentBoardSection::class, 'section_id');
     }
 
     public function user(): BelongsTo
@@ -67,9 +61,9 @@ class BrandsContentBoard extends Model implements HasDisplayName
         return $this->belongsTo(\Platform\Core\Models\Team::class);
     }
 
-    public function sections(): HasMany
+    public function blocks(): HasMany
     {
-        return $this->hasMany(BrandsContentBoardSection::class, 'content_board_id')->orderBy('order');
+        return $this->hasMany(BrandsContentBoardBlock::class, 'row_id')->orderBy('order');
     }
 
     public function getDisplayName(): ?string
