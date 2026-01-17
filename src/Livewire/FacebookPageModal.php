@@ -28,6 +28,8 @@ class FacebookPageModal extends Component
                 'title' => 'Facebook Page bereits verknüpft',
                 'message' => 'Es ist bereits eine Facebook Page mit dieser Marke verknüpft.',
                 'notice_type' => 'error',
+                'noticable_type' => get_class($this->brand),
+                'noticable_id' => $this->brand->getKey(),
             ]);
             return;
         }
@@ -51,6 +53,8 @@ class FacebookPageModal extends Component
                 'title' => 'Facebook Page bereits verknüpft',
                 'message' => 'Es ist bereits eine Facebook Page mit dieser Marke verknüpft.',
                 'notice_type' => 'error',
+                'noticable_type' => get_class($this->brand),
+                'noticable_id' => $this->brand->getKey(),
             ]);
             $this->closeModal();
             return;
@@ -64,6 +68,8 @@ class FacebookPageModal extends Component
                 'title' => 'Fehler',
                 'message' => 'Kein Team ausgewählt.',
                 'notice_type' => 'error',
+                'noticable_type' => get_class($this->brand),
+                'noticable_id' => $this->brand->getKey(),
             ]);
             return;
         }
@@ -98,6 +104,8 @@ class FacebookPageModal extends Component
                     'title' => 'OAuth-Fehler',
                     'message' => 'Meta OAuth ist nicht konfiguriert. Bitte konfiguriere META_APP_ID und META_APP_SECRET in der .env Datei.',
                     'notice_type' => 'error',
+                    'noticable_type' => get_class($this->brand),
+                    'noticable_id' => $this->brand->getKey(),
                 ]);
                 return;
             }
@@ -127,6 +135,8 @@ class FacebookPageModal extends Component
                 'title' => 'OAuth-Fehler',
                 'message' => 'Fehler beim Starten des OAuth-Flows: ' . $e->getMessage(),
                 'notice_type' => 'error',
+                'noticable_type' => get_class($this->brand),
+                'noticable_id' => $this->brand->getKey(),
             ]);
             return;
         }
