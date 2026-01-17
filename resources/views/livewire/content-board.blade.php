@@ -40,8 +40,17 @@
                     {{-- Section (volle Breite) --}}
                     <div class="bg-white rounded-xl border border-[var(--ui-border)]/60 shadow-sm overflow-hidden">
                         <div class="p-4 border-b border-[var(--ui-border)]/40 flex items-center justify-between">
-                            <div>
-                                <h3 class="text-lg font-semibold text-[var(--ui-secondary)]">{{ $section->name }}</h3>
+                            <div class="flex-1">
+                                @can('update', $contentBoard)
+                                    <input 
+                                        type="text"
+                                        value="{{ $section->name }}"
+                                        wire:blur="updateSectionName({{ $section->id }}, $event.target.value)"
+                                        class="text-lg font-semibold text-[var(--ui-secondary)] bg-transparent border-none p-0 focus:outline-none focus:ring-2 focus:ring-[var(--ui-primary)] rounded px-1 -ml-1 w-full"
+                                    />
+                                @else
+                                    <h3 class="text-lg font-semibold text-[var(--ui-secondary)]">{{ $section->name }}</h3>
+                                @endcan
                                 @if($section->description)
                                     <p class="text-sm text-[var(--ui-muted)] mt-1">{{ $section->description }}</p>
                                 @endif
@@ -66,8 +75,17 @@
                             @foreach($section->rows as $row)
                                 <div class="bg-[var(--ui-muted-5)] rounded-lg border border-[var(--ui-border)]/40 overflow-hidden">
                                     <div class="p-3 border-b border-[var(--ui-border)]/40 flex items-center justify-between">
-                                        <div class="flex items-center gap-3">
-                                            <h4 class="text-sm font-semibold text-[var(--ui-secondary)]">{{ $row->name }}</h4>
+                                        <div class="flex items-center gap-3 flex-1">
+                                            @can('update', $contentBoard)
+                                                <input 
+                                                    type="text"
+                                                    value="{{ $row->name }}"
+                                                    wire:blur="updateRowName({{ $row->id }}, $event.target.value)"
+                                                    class="text-sm font-semibold text-[var(--ui-secondary)] bg-transparent border-none p-0 focus:outline-none focus:ring-2 focus:ring-[var(--ui-primary)] rounded px-1 -ml-1"
+                                                />
+                                            @else
+                                                <h4 class="text-sm font-semibold text-[var(--ui-secondary)]">{{ $row->name }}</h4>
+                                            @endcan
                                             @if($row->description)
                                                 <span class="text-xs text-[var(--ui-muted)]">{{ $row->description }}</span>
                                             @endif
@@ -117,18 +135,12 @@
                                                     >
                                                         {{-- Block Header --}}
                                                         @can('update', $contentBoard)
-                                                            <div class="flex items-center justify-between p-1.5 border-b border-[var(--ui-border)]/40 bg-[var(--ui-muted-5)]">
-                                                                <div class="flex items-center gap-2">
-                                                                    <span class="text-xs font-medium text-[var(--ui-secondary)]">Block</span>
-                                                                    <span class="text-xs text-[var(--ui-muted)] bg-white px-1.5 py-0.5 rounded border border-[var(--ui-border)]/40">
-                                                                        {{ $block->span }}/12
-                                                                    </span>
-                                                                </div>
+                                                            <div class="flex items-center justify-end p-1 border-b border-[var(--ui-border)]/40">
                                                                 <div class="relative">
                                                                     <button 
                                                                         type="button"
                                                                         @click="settingsOpen = !settingsOpen"
-                                                                        class="p-1 rounded hover:bg-white transition-colors"
+                                                                        class="p-1 rounded hover:bg-[var(--ui-muted-5)] transition-colors"
                                                                         title="Block-Einstellungen"
                                                                     >
                                                                         @svg('heroicon-o-cog-6-tooth', 'w-3 h-3 text-[var(--ui-muted)]')
@@ -175,7 +187,16 @@
                                                         <div class="p-3">
                                                             <div class="flex items-start justify-between">
                                                                 <div class="flex-1">
-                                                                    <h5 class="text-xs font-semibold text-[var(--ui-secondary)]">{{ $block->name }}</h5>
+                                                                    @can('update', $contentBoard)
+                                                                        <input 
+                                                                            type="text"
+                                                                            value="{{ $block->name }}"
+                                                                            wire:blur="updateBlockName({{ $block->id }}, $event.target.value)"
+                                                                            class="text-xs font-semibold text-[var(--ui-secondary)] bg-transparent border-none p-0 focus:outline-none focus:ring-2 focus:ring-[var(--ui-primary)] rounded px-1 -ml-1 w-full"
+                                                                        />
+                                                                    @else
+                                                                        <h5 class="text-xs font-semibold text-[var(--ui-secondary)]">{{ $block->name }}</h5>
+                                                                    @endcan
                                                                     @if($block->description)
                                                                         <p class="text-xs text-[var(--ui-muted)] mt-1">{{ $block->description }}</p>
                                                                     @endif

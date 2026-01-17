@@ -178,6 +178,42 @@ class ContentBoard extends Component
         $this->contentBoard->load('sections.rows.blocks');
     }
 
+    public function updateSectionName($sectionId, $newName)
+    {
+        $this->authorize('update', $this->contentBoard);
+        
+        $section = \Platform\Brands\Models\BrandsContentBoardSection::findOrFail($sectionId);
+        $section->name = trim($newName);
+        $section->save();
+        
+        $this->contentBoard->refresh();
+        $this->contentBoard->load('sections.rows.blocks');
+    }
+
+    public function updateRowName($rowId, $newName)
+    {
+        $this->authorize('update', $this->contentBoard);
+        
+        $row = \Platform\Brands\Models\BrandsContentBoardRow::findOrFail($rowId);
+        $row->name = trim($newName);
+        $row->save();
+        
+        $this->contentBoard->refresh();
+        $this->contentBoard->load('sections.rows.blocks');
+    }
+
+    public function updateBlockName($blockId, $newName)
+    {
+        $this->authorize('update', $this->contentBoard);
+        
+        $block = \Platform\Brands\Models\BrandsContentBoardBlock::findOrFail($blockId);
+        $block->name = trim($newName);
+        $block->save();
+        
+        $this->contentBoard->refresh();
+        $this->contentBoard->load('sections.rows.blocks');
+    }
+
     public function render()
     {
         $user = Auth::user();
