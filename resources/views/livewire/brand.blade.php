@@ -116,20 +116,103 @@
             @endif
         </div>
 
-        {{-- Social Media Section --}}
+        {{-- Meta Verknüpfung Section --}}
         <div>
             <div class="flex items-center justify-between mb-4">
-                <h2 class="text-xl font-semibold text-[var(--ui-secondary)]">Social Media</h2>
+                <h2 class="text-xl font-semibold text-[var(--ui-secondary)]">Meta Verknüpfung</h2>
                 @can('update', $brand)
-                    @if($facebookPages->isEmpty())
+                    @if($metaToken)
+                        <div class="flex items-center gap-2">
+                            <x-ui-button variant="secondary" size="sm" wire:click="deleteMetaToken" wire:confirm="Möchtest du die Meta-Verknüpfung wirklich löschen?">
+                                <span class="inline-flex items-center gap-2">
+                                    @svg('heroicon-o-trash', 'w-4 h-4')
+                                    <span>Verknüpfung löschen</span>
+                                </span>
+                            </x-ui-button>
+                            <x-ui-button variant="primary" size="sm" x-data @click="$dispatch('open-modal-facebook-page', { brandId: {{ $brand->id }} })">
+                                <span class="inline-flex items-center gap-2">
+                                    @svg('heroicon-o-arrow-path', 'w-4 h-4')
+                                    <span>Erneut verknüpfen</span>
+                                </span>
+                            </x-ui-button>
+                        </div>
+                    @else
                         <x-ui-button variant="primary" size="sm" x-data @click="$dispatch('open-modal-facebook-page', { brandId: {{ $brand->id }} })">
                             <span class="inline-flex items-center gap-2">
-                                @svg('heroicon-o-plus', 'w-4 h-4')
-                                <span>Facebook Page anfügen</span>
+                                @svg('heroicon-o-link', 'w-4 h-4')
+                                <span>Mit Meta verknüpfen</span>
                             </span>
                         </x-ui-button>
                     @endif
                 @endcan
+            </div>
+
+            @if($metaToken)
+                <div class="bg-white rounded-xl border border-[var(--ui-border)]/60 shadow-sm p-6">
+                    <div class="flex items-start justify-between">
+                        <div class="flex-1">
+                            <div class="flex items-center gap-3 mb-2">
+                                <div class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-[var(--ui-success-5)]">
+                                    @svg('heroicon-o-check-circle', 'w-6 h-6 text-[var(--ui-success)]')
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-semibold text-[var(--ui-secondary)]">Mit Meta verknüpft</h3>
+                                    <p class="text-sm text-[var(--ui-muted)]">Token wurde erfolgreich gespeichert</p>
+                                </div>
+                            </div>
+                            <div class="mt-4 space-y-2 text-sm">
+                                <div class="flex items-center justify-between py-2 px-3 bg-[var(--ui-muted-5)] border border-[var(--ui-border)]/40 rounded">
+                                    <span class="text-[var(--ui-muted)]">Verknüpft am</span>
+                                    <span class="text-[var(--ui-secondary)] font-medium">
+                                        {{ $metaToken->created_at->format('d.m.Y H:i') }}
+                                    </span>
+                                </div>
+                                @if($metaToken->expires_at)
+                                    <div class="flex items-center justify-between py-2 px-3 bg-[var(--ui-muted-5)] border border-[var(--ui-border)]/40 rounded">
+                                        <span class="text-[var(--ui-muted)]">Läuft ab am</span>
+                                        <span class="text-[var(--ui-secondary)] font-medium">
+                                            {{ $metaToken->expires_at->format('d.m.Y H:i') }}
+                                        </span>
+                                    </div>
+                                @endif
+                                @if($metaToken->isExpired())
+                                    <div class="flex items-center gap-2 py-2 px-3 bg-[var(--ui-error-5)] border border-[var(--ui-error)]/40 rounded">
+                                        @svg('heroicon-o-exclamation-triangle', 'w-4 h-4 text-[var(--ui-error)]')
+                                        <span class="text-[var(--ui-error)] text-sm font-medium">Token ist abgelaufen</span>
+                                    </div>
+                                @elseif($metaToken->isExpiringSoon())
+                                    <div class="flex items-center gap-2 py-2 px-3 bg-[var(--ui-warning-5)] border border-[var(--ui-warning)]/40 rounded">
+                                        @svg('heroicon-o-exclamation-triangle', 'w-4 h-4 text-[var(--ui-warning)]')
+                                        <span class="text-[var(--ui-warning)] text-sm font-medium">Token läuft bald ab</span>
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @else
+                <div class="bg-white rounded-xl border border-[var(--ui-border)]/60 shadow-sm p-12 text-center">
+                    <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[var(--ui-muted-5)] mb-4">
+                        @svg('heroicon-o-link-slash', 'w-8 h-8 text-[var(--ui-muted)]')
+                    </div>
+                    <h3 class="text-lg font-semibold text-[var(--ui-secondary)] mb-2">Nicht mit Meta verknüpft</h3>
+                    <p class="text-sm text-[var(--ui-muted)] mb-4">Verknüpfe diese Marke mit Meta, um Facebook Pages und Instagram Accounts abzurufen.</p>
+                    @can('update', $brand)
+                        <x-ui-button variant="primary" size="sm" x-data @click="$dispatch('open-modal-facebook-page', { brandId: {{ $brand->id }} })">
+                            <span class="inline-flex items-center gap-2">
+                                @svg('heroicon-o-link', 'w-4 h-4')
+                                <span>Mit Meta verknüpfen</span>
+                            </span>
+                        </x-ui-button>
+                    @endcan
+                </div>
+            @endif
+        </div>
+
+        {{-- Social Media Section --}}
+        <div>
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-xl font-semibold text-[var(--ui-secondary)]">Social Media</h2>
             </div>
 
             @if($facebookPages->count() > 0 || $instagramAccounts->count() > 0)
@@ -184,15 +267,13 @@
                         @svg('heroicon-o-share', 'w-8 h-8 text-[var(--ui-muted)]')
                     </div>
                     <h3 class="text-lg font-semibold text-[var(--ui-secondary)] mb-2">Noch keine Social Media Accounts</h3>
-                    <p class="text-sm text-[var(--ui-muted)] mb-4">Füge eine Facebook Page hinzu, um zu beginnen.</p>
-                    @can('update', $brand)
-                        <x-ui-button variant="primary" size="sm" x-data @click="$dispatch('open-modal-facebook-page', { brandId: {{ $brand->id }} })">
-                            <span class="inline-flex items-center gap-2">
-                                @svg('heroicon-o-plus', 'w-4 h-4')
-                                <span>Facebook Page anfügen</span>
-                            </span>
-                        </x-ui-button>
-                    @endcan
+                    <p class="text-sm text-[var(--ui-muted)] mb-4">
+                        @if($metaToken)
+                            Verwende den gespeicherten Meta-Token, um Facebook Pages und Instagram Accounts abzurufen.
+                        @else
+                            Verknüpfe zuerst die Marke mit Meta, um Facebook Pages und Instagram Accounts abzurufen.
+                        @endif
+                    </p>
                 </div>
             @endif
         </div>

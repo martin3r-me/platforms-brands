@@ -1,17 +1,28 @@
-<x-ui-modal size="md" model="modalShow" header="Facebook Page verknüpfen">
+<x-ui-modal size="md" model="modalShow" header="{{ $brand && $brand->metaToken ? 'Meta erneut verknüpfen' : 'Mit Meta verknüpfen' }}">
     @if($brand)
         <div class="space-y-4">
+            @if($brand->metaToken)
+                <div class="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                    <div class="flex items-start gap-3">
+                        @svg('heroicon-o-exclamation-triangle', 'w-5 h-5 text-yellow-600 mt-0.5 flex-shrink-0')
+                        <div class="text-sm text-yellow-800">
+                            <p class="font-medium mb-2">Bereits verknüpft</p>
+                            <p>Es existiert bereits eine Meta-Verknüpfung für diese Marke. Durch erneutes Verknüpfen wird der bestehende Token aktualisiert.</p>
+                        </div>
+                    </div>
+                </div>
+            @endif
+            
             <div class="p-4 bg-blue-50 border border-blue-200 rounded-lg">
                 <div class="flex items-start gap-3">
                     @svg('heroicon-o-information-circle', 'w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0')
                     <div class="text-sm text-blue-700">
                         <p class="font-medium mb-2">OAuth-Verbindung</p>
-                        <p class="mb-2">Du wirst zu Meta (Facebook) weitergeleitet, um deine Facebook Page und Instagram Account zu verbinden.</p>
-                        <p>Nach der erfolgreichen Authentifizierung werden automatisch:</p>
+                        <p class="mb-2">Du wirst zu Meta (Facebook) weitergeleitet, um deinen OAuth-Token zu erhalten.</p>
+                        <p>Nach der erfolgreichen Authentifizierung wird:</p>
                         <ul class="list-disc list-inside mt-2 space-y-1">
-                            <li>Die Facebook Page mit dieser Marke verknüpft</li>
-                            <li>Der zugehörige Instagram Account (falls vorhanden) angelegt</li>
-                            <li>Access Tokens und Refresh Tokens sicher gespeichert</li>
+                            <li>Der OAuth-Token gespeichert</li>
+                            <li>Später können Facebook Pages und Instagram Accounts abgerufen werden</li>
                         </ul>
                     </div>
                 </div>

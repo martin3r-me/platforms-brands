@@ -122,18 +122,6 @@ class FacebookPageModal extends Component
         // Policy-Berechtigung prüfen
         $this->authorize('update', $this->brand);
         
-        // Prüfen, ob bereits eine Facebook Page existiert (nur eine erlaubt)
-        if ($this->brand->facebookPages()->exists()) {
-            $this->dispatch('notifications:store', [
-                'title' => 'Facebook Page bereits verknüpft',
-                'message' => 'Es ist bereits eine Facebook Page mit dieser Marke verknüpft.',
-                'notice_type' => 'error',
-                'noticable_type' => get_class($this->brand),
-                'noticable_id' => $this->brand->getKey(),
-            ]);
-            return;
-        }
-        
         $this->modalShow = true;
     }
 

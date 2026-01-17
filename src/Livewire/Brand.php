@@ -111,6 +111,20 @@ class Brand extends Component
         ]);
     }
 
+    public function deleteMetaToken()
+    {
+        $this->authorize('update', $this->brand);
+        
+        $metaToken = $this->brand->metaToken;
+        
+        if ($metaToken) {
+            $metaToken->delete();
+            $this->brand->refresh();
+            
+            session()->flash('success', 'Meta-Verknüpfung wurde erfolgreich entfernt.');
+        }
+    }
+
     public function render()
     {
         $user = Auth::user();
@@ -122,6 +136,9 @@ class Brand extends Component
         // Facebook Pages und Instagram Accounts für diese Marke laden
         $facebookPages = $this->brand->facebookPages;
         $instagramAccounts = $this->brand->instagramAccounts;
+        
+        // Meta Token laden
+        $metaToken = $this->brand->metaToken;
 
         return view('brands::livewire.brand', [
             'user' => $user,
@@ -129,6 +146,7 @@ class Brand extends Component
             'contentBoards' => $contentBoards,
             'facebookPages' => $facebookPages,
             'instagramAccounts' => $instagramAccounts,
+            'metaToken' => $metaToken,
         ])->layout('platform::layouts.app');
     }
 }
