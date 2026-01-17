@@ -55,17 +55,36 @@ class FacebookPageOAuthController extends Controller
         $state = \Illuminate\Support\Str::random(32);
         session(['meta_oauth_state' => $state]);
         
-        $redirectUri = route('brands.facebook-pages.oauth.callback');
+        // Callback-Route generieren
+        $callbackRoute = route('brands.facebook-pages.oauth.callback');
         
         // Redirect Domain aus Config verwenden, falls gesetzt
         $redirectDomain = config('meta-oauth.redirect_domain');
         if ($redirectDomain) {
             // Wenn redirect_domain gesetzt ist, diese verwenden
-            $redirectUri = rtrim($redirectDomain, '/') . '/' . ltrim(parse_url($redirectUri, PHP_URL_PATH) ?: $redirectUri, '/');
+            // Prüfen ob callbackRoute bereits eine absolute URL ist
+            if (filter_var($callbackRoute, FILTER_VALIDATE_URL)) {
+                // Absolute URL: nur den Pfad extrahieren
+                $path = parse_url($callbackRoute, PHP_URL_PATH);
+                $redirectUri = rtrim($redirectDomain, '/') . $path;
+            } else {
+                // Relative URL: direkt anhängen
+                $redirectUri = rtrim($redirectDomain, '/') . '/' . ltrim($callbackRoute, '/');
+            }
         } else {
             // Fallback: absolute URL erstellen
-            $redirectUri = url($redirectUri);
+            if (filter_var($callbackRoute, FILTER_VALIDATE_URL)) {
+                $redirectUri = $callbackRoute;
+            } else {
+                $redirectUri = url($callbackRoute);
+            }
         }
+        
+        Log::info('Brands OAuth redirect start', [
+            'brand_id' => $brandId,
+            'redirect_uri' => $redirectUri,
+            'redirect_domain' => $redirectDomain,
+        ]);
         
         try {
             // Meta OAuth Credentials aus Config
@@ -73,6 +92,10 @@ class FacebookPageOAuthController extends Controller
             $clientSecret = config('meta-oauth.app_secret') ?? config('services.meta.client_secret');
             
             if (!$clientId || !$clientSecret) {
+                Log::error('Brands OAuth: Missing credentials', [
+                    'has_app_id' => !empty(config('meta-oauth.app_id')),
+                    'has_client_id' => !empty(config('services.meta.client_id')),
+                ]);
                 return redirect()->route('brands.brands.show', ['brandsBrand' => $brandId])
                     ->with('error', 'Meta OAuth ist nicht konfiguriert. Bitte konfiguriere META_APP_ID und META_APP_SECRET in der .env Datei.');
             }
@@ -98,6 +121,17 @@ class FacebookPageOAuthController extends Controller
             ->redirect()
             ->getTargetUrl();
             
+            Log::info('Brands OAuth redirect URL generated', [
+                'redirect_url' => $redirectUrl,
+                'redirect_url_length' => strlen($redirectUrl),
+            ]);
+            
+            if (empty($redirectUrl)) {
+                Log::error('Brands OAuth: Empty redirect URL');
+                return redirect()->route('brands.brands.show', ['brandsBrand' => $brandId])
+                    ->with('error', 'Fehler: OAuth Redirect-URL konnte nicht generiert werden.');
+            }
+            
             // Externer Redirect zu Facebook
             return redirect()->away($redirectUrl);
             
@@ -105,6 +139,8 @@ class FacebookPageOAuthController extends Controller
             Log::error('Brands OAuth redirect error', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
             ]);
             
             return redirect()->route('brands.brands.show', ['brandsBrand' => $brandId])

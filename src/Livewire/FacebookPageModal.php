@@ -6,11 +6,22 @@ use Livewire\Component;
 use Platform\Brands\Models\BrandsBrand;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\On;
+use Livewire\Attributes\Computed;
 
 class FacebookPageModal extends Component
 {
     public $modalShow = false;
     public $brand;
+
+    #[Computed]
+    public function oauthRedirectUrl()
+    {
+        if (!$this->brand) {
+            return null;
+        }
+        
+        return route('brands.facebook-pages.oauth.redirect', ['brand_id' => $this->brand->id]);
+    }
 
     #[On('open-modal-facebook-page')] 
     public function openModalFacebookPage($brandId)

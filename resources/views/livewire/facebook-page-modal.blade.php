@@ -16,6 +16,13 @@
                     </div>
                 </div>
             </div>
+            
+            @if($this->oauthRedirectUrl)
+                <div class="p-3 bg-gray-50 border border-gray-200 rounded-lg">
+                    <p class="text-xs font-medium text-gray-600 mb-1">Ziel-URL (Debug):</p>
+                    <p class="text-xs text-gray-800 font-mono break-all">{{ $this->oauthRedirectUrl }}</p>
+                </div>
+            @endif
         </div>
     @endif
 
