@@ -35,9 +35,17 @@ class BrandsMediaDownloadService
      * @param array $meta Zusätzliche Meta-Daten
      * @return ContextFile|null
      */
-    public function downloadAndStore(string $url, string $contextType, int $contextId, array $meta = []): ?ContextFile
+    public function downloadAndStore(string $url, string $contextType, int $contextId, array $meta = [], ?\Illuminate\Console\Command $command = null): ?ContextFile
     {
+        Log::info('BrandsMediaDownloadService::downloadAndStore called', [
+            'url' => $url,
+            'context_type' => $contextType,
+            'context_id' => $contextId,
+            'meta' => $meta,
+        ]);
+
         if (empty($url)) {
+            Log::warning('BrandsMediaDownloadService: Empty URL provided');
             return null;
         }
 
@@ -78,18 +86,55 @@ class BrandsMediaDownloadService
 
             // Team-ID und User-ID aus dem Kontext-Model holen
             $contextModel = $contextType::find($contextId);
-            $teamId = $contextModel?->team_id ?? null;
-            $userId = $contextModel?->user_id ?? null;
             
-            if (!$teamId || !$userId) {
-                Log::error('BrandsMediaDownloadService: Keine team_id oder user_id im Kontext-Model gefunden', [
+            if (!$contextModel) {
+                Log::error('BrandsMediaDownloadService: Context model not found', [
                     'context_type' => $contextType,
                     'context_id' => $contextId,
                 ]);
                 return null;
             }
+            
+            $teamId = $contextModel->team_id ?? null;
+            $userId = $contextModel->user_id ?? null;
+            
+            // Falls team_id oder user_id fehlen, von der Brand holen
+            if (!$teamId || !$userId) {
+                // Prüfe ob das Model eine Beziehung zur Brand hat
+                if (method_exists($contextModel, 'instagramAccount') && $contextModel->instagramAccount) {
+                    $brand = $contextModel->instagramAccount->brand;
+                    if ($brand) {
+                        $teamId = $teamId ?? $brand->team_id;
+                        $userId = $userId ?? $brand->user_id;
+                    }
+                } elseif (method_exists($contextModel, 'brand')) {
+                    $brand = $contextModel->brand;
+                    if ($brand) {
+                        $teamId = $teamId ?? $brand->team_id;
+                        $userId = $userId ?? $brand->user_id;
+                    }
+                }
+            }
+            
+            if (!$teamId || !$userId) {
+                Log::error('BrandsMediaDownloadService: Keine team_id oder user_id gefunden (weder im Model noch in der Brand)', [
+                    'context_type' => $contextType,
+                    'context_id' => $contextId,
+                    'model_team_id' => $contextModel->team_id,
+                    'model_user_id' => $contextModel->user_id,
+                ]);
+                return null;
+            }
 
             // Über ContextFileService hochladen
+            Log::info('BrandsMediaDownloadService: Calling ContextFileService::uploadForContext', [
+                'context_type' => $contextType,
+                'context_id' => $contextId,
+                'user_id' => $userId,
+                'team_id' => $teamId,
+                'generate_variants' => $meta['generate_variants'] ?? true,
+            ]);
+            
             $result = $this->contextFileService->uploadForContext(
                 $uploadedFile,
                 $contextType,
@@ -102,11 +147,24 @@ class BrandsMediaDownloadService
                 ]
             );
 
+            Log::info('BrandsMediaDownloadService: ContextFileService returned result', [
+                'result_id' => $result['id'] ?? null,
+                'result_keys' => array_keys($result),
+            ]);
+
             // Temporäre Datei löschen
             @unlink($tempPath);
 
             // ContextFile aus DB laden
-            $contextFile = ContextFile::find($result['id']);
+            $contextFile = ContextFile::find($result['id'] ?? null);
+            
+            if (!$contextFile) {
+                Log::error('BrandsMediaDownloadService: ContextFile not found after upload', [
+                    'result_id' => $result['id'] ?? null,
+                    'context_type' => $contextType,
+                    'context_id' => $contextId,
+                ]);
+            }
 
             // Zusätzliche Meta-Daten hinzufügen
             if ($contextFile && !empty($meta)) {
@@ -119,12 +177,11 @@ class BrandsMediaDownloadService
                 ]);
             }
 
-            Log::info('Media downloaded and stored as ContextFile', [
-                'url' => $url,
-                'context_file_id' => $contextFile?->id,
-                'context_type' => $contextType,
-                'context_id' => $contextId,
-            ]);
+            if ($contextFile && $command) {
+                $command->line("         ✅ ContextFile ID {$contextFile->id} erstellt");
+            } elseif (!$contextFile && $command) {
+                $command->warn("         ⚠️  ContextFile konnte nicht erstellt werden");
+            }
 
             return $contextFile;
 

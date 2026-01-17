@@ -216,10 +216,11 @@ class InstagramInsightsService
                 continue;
             }
 
-            // Für Total-Value-Metriken nehmen wir den ersten Wert (total_value)
-            $totalValue = isset($values[0]) && is_array($values[0]) 
-                ? ($values[0] ?? 0)
-                : (isset($values[0]) ? $values[0] : 0);
+            // Für Total-Value-Metriken ist der Wert bereits ein Integer (aus fetchAccountInsights)
+            // Wir nehmen den ersten Wert, falls es ein Array ist
+            $totalValue = is_array($values) && isset($values[0]) 
+                ? (is_numeric($values[0]) ? (int)$values[0] : 0)
+                : (is_numeric($values) ? (int)$values : 0);
 
             BrandsInstagramAccountInsight::updateOrCreate(
                 [

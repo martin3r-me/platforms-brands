@@ -73,12 +73,13 @@ class SyncInstagramMedia extends Command
             }
 
             try {
-                $result = $service->syncMedia($account, $limit);
+                $result = $service->syncMedia($account, $limit, $this);
                 $mediaCount = count($result);
                 $this->info("     ✅ {$mediaCount} Media-Item(s) synchronisiert");
                 $syncedCount++;
             } catch (\Exception $e) {
                 $this->error("     ❌ Fehler: {$e->getMessage()}");
+                $this->error("     Stack: " . $e->getTraceAsString());
                 $skippedCount++;
             }
         }
