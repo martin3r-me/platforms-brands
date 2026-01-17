@@ -171,12 +171,22 @@ class FacebookPageOAuthController extends Controller
      */
     public function callback(Request $request)
     {
+        Log::info('Brands OAuth callback: Start', [
+            'query_params' => $request->query(),
+            'session_brand_id' => session('brands_oauth_brand_id'),
+            'session_team_id' => session('brands_oauth_team_id'),
+        ]);
+        
         // Brand ID und Team ID aus Session holen
         $brandId = session('brands_oauth_brand_id');
         $teamId = session('brands_oauth_team_id');
 
         if (!$brandId || !$teamId) {
-            Log::error('Brands OAuth callback: Missing brand_id or team_id in session');
+            Log::error('Brands OAuth callback: Missing brand_id or team_id in session', [
+                'brand_id' => $brandId,
+                'team_id' => $teamId,
+                'all_session_keys' => array_keys(session()->all()),
+            ]);
             return redirect()->route('brands.brands.show', ['brandsBrand' => $brandId ?? 1])
                 ->with('error', 'OAuth-Fehler: Kontext verloren. Bitte versuche es erneut.');
         }
@@ -199,13 +209,52 @@ class FacebookPageOAuthController extends Controller
         }
 
         try {
-            // Access Token holen - direkt über Socialite, um auch Refresh Token zu bekommen
+            // Access Token holen - direkt über Socialite mit FacebookProvider
             $refreshToken = null;
             $expiresIn = null;
             $scopes = [];
+            $accessToken = null;
             
             try {
-                $user = \Laravel\Socialite\Facades\Socialite::driver('meta')->stateless()->user();
+                // Callback-Route für Socialite
+                $callbackRoute = route('brands.facebook-pages.oauth.callback');
+                
+                // Redirect Domain aus Brands Config verwenden
+                $redirectDomain = config('brands.meta.redirect_domain');
+                if ($redirectDomain) {
+                    if (filter_var($callbackRoute, FILTER_VALIDATE_URL)) {
+                        $path = parse_url($callbackRoute, PHP_URL_PATH);
+                        $redirectUri = rtrim($redirectDomain, '/') . $path;
+                    } else {
+                        $redirectUri = rtrim($redirectDomain, '/') . '/' . ltrim($callbackRoute, '/');
+                    }
+                } else {
+                    if (filter_var($callbackRoute, FILTER_VALIDATE_URL)) {
+                        $redirectUri = $callbackRoute;
+                    } else {
+                        $redirectUri = url($callbackRoute);
+                    }
+                }
+                
+                // Meta OAuth Credentials aus Brands Config
+                $clientId = config('brands.meta.client_id');
+                $clientSecret = config('brands.meta.client_secret');
+                
+                if (!$clientId || !$clientSecret) {
+                    throw new \Exception('Meta OAuth Credentials nicht konfiguriert.');
+                }
+                
+                // Socialite Provider mit gleichen Credentials wie im redirect()
+                $provider = Socialite::buildProvider(
+                    \Laravel\Socialite\Two\FacebookProvider::class,
+                    [
+                        'client_id' => $clientId,
+                        'client_secret' => $clientSecret,
+                        'redirect' => $redirectUri,
+                    ]
+                );
+                
+                $user = $provider->stateless()->user();
                 $accessToken = $user->token;
                 $expiresIn = $user->expiresIn ?? null;
                 
@@ -227,11 +276,23 @@ class FacebookPageOAuthController extends Controller
                 } elseif (isset($user->scopes)) {
                     $scopes = $user->scopes;
                 }
+                
+                Log::info('Brands OAuth callback: Token erhalten', [
+                    'has_access_token' => !empty($accessToken),
+                    'has_refresh_token' => !empty($refreshToken),
+                    'expires_in' => $expiresIn,
+                    'scopes_count' => count($scopes),
+                ]);
             } catch (\Exception $e) {
                 Log::error('Failed to get user from Socialite', [
                     'error' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString(),
                 ]);
                 throw new \Exception('Fehler beim Abrufen des Access Tokens: ' . $e->getMessage(), 0, $e);
+            }
+            
+            if (!$accessToken) {
+                throw new \Exception('Access Token konnte nicht abgerufen werden.');
             }
 
             // Brand laden
@@ -304,39 +365,105 @@ class FacebookPageOAuthController extends Controller
             $pageAccessToken = $page['access_token'] ?? $accessToken;
 
             // Facebook Page erstellen
-            $facebookPage = \Platform\Brands\Models\BrandsFacebookPage::create([
-                'external_id' => $pageId,
-                'name' => $pageName,
-                'description' => null,
-                'access_token' => $pageAccessToken,
-                'refresh_token' => $refreshToken,
-                'expires_at' => $expiresIn ? now()->addSeconds($expiresIn) : null,
-                'token_type' => 'Bearer',
-                'scopes' => $scopes,
+            Log::info('Brands OAuth callback: Erstelle Facebook Page', [
+                'page_id' => $pageId,
+                'page_name' => $pageName,
+                'brand_id' => $brand->id,
                 'user_id' => $user->id,
                 'team_id' => $team->id,
-                'brand_id' => $brand->id,
+                'has_access_token' => !empty($pageAccessToken),
+                'has_refresh_token' => !empty($refreshToken),
             ]);
+            
+            try {
+                $facebookPage = \Platform\Brands\Models\BrandsFacebookPage::create([
+                    'external_id' => $pageId,
+                    'name' => $pageName,
+                    'description' => null,
+                    'access_token' => $pageAccessToken,
+                    'refresh_token' => $refreshToken,
+                    'expires_at' => $expiresIn ? now()->addSeconds($expiresIn) : null,
+                    'token_type' => 'Bearer',
+                    'scopes' => $scopes,
+                    'user_id' => $user->id,
+                    'team_id' => $team->id,
+                    'brand_id' => $brand->id,
+                ]);
+                
+                Log::info('Brands OAuth callback: Facebook Page erstellt', [
+                    'facebook_page_id' => $facebookPage->id,
+                    'uuid' => $facebookPage->uuid,
+                    'external_id' => $facebookPage->external_id,
+                ]);
+            } catch (\Exception $e) {
+                Log::error('Brands OAuth callback: Fehler beim Erstellen der Facebook Page', [
+                    'error' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString(),
+                    'page_id' => $pageId,
+                    'page_name' => $pageName,
+                ]);
+                throw $e;
+            }
 
-            // Instagram Accounts holen über Graph API
-            $instagramResponse = Http::get("https://graph.facebook.com/{$apiVersion}/{$businessId}/owned_instagram_accounts", [
-                'access_token' => $accessToken,
+            // Instagram Accounts holen über Graph API - über die Facebook Page
+            // Instagram Business Accounts sind mit Facebook Pages verknüpft
+            $instagramResponse = Http::get("https://graph.facebook.com/{$apiVersion}/{$pageId}", [
+                'fields' => 'instagram_business_account',
+                'access_token' => $pageAccessToken,
             ]);
             
             $instagramAccounts = [];
             if ($instagramResponse->successful()) {
                 $instagramData = $instagramResponse->json();
-                $instagramAccounts = $instagramData['data'] ?? [];
+                if (isset($instagramData['instagram_business_account'])) {
+                    $instagramAccounts[] = $instagramData['instagram_business_account'];
+                }
             }
+            
+            // Fallback: Versuche über Business Account
+            if (empty($instagramAccounts)) {
+                $instagramResponse = Http::get("https://graph.facebook.com/{$apiVersion}/{$businessId}/owned_instagram_accounts", [
+                    'access_token' => $accessToken,
+                ]);
+                
+                if ($instagramResponse->successful()) {
+                    $instagramData = $instagramResponse->json();
+                    $instagramAccounts = $instagramData['data'] ?? [];
+                }
+            }
+            
+            Log::info('Brands OAuth callback: Instagram Accounts gefunden', [
+                'count' => count($instagramAccounts),
+                'accounts' => $instagramAccounts,
+            ]);
             
             // Automatisch Instagram Account anlegen, wenn vorhanden
             if (!empty($instagramAccounts)) {
                 $instagramAccount = $instagramAccounts[0];
                 $instagramId = $instagramAccount['id'] ?? null;
-                $instagramUsername = $instagramAccount['username'] ?? 'instagram_account';
+                
+                // Instagram Username holen
+                $instagramUsername = 'instagram_account';
+                if ($instagramId) {
+                    $instagramUserResponse = Http::get("https://graph.facebook.com/{$apiVersion}/{$instagramId}", [
+                        'fields' => 'username',
+                        'access_token' => $pageAccessToken,
+                    ]);
+                    
+                    if ($instagramUserResponse->successful()) {
+                        $instagramUserData = $instagramUserResponse->json();
+                        $instagramUsername = $instagramUserData['username'] ?? 'instagram_account';
+                    }
+                }
 
                 if ($instagramId) {
-                    \Platform\Brands\Models\BrandsInstagramAccount::create([
+                    Log::info('Brands OAuth callback: Erstelle Instagram Account', [
+                        'instagram_id' => $instagramId,
+                        'username' => $instagramUsername,
+                        'facebook_page_id' => $facebookPage->id,
+                    ]);
+                    
+                    $instagramAccountModel = \Platform\Brands\Models\BrandsInstagramAccount::create([
                         'external_id' => $instagramId,
                         'username' => $instagramUsername,
                         'description' => null,
@@ -349,6 +476,11 @@ class FacebookPageOAuthController extends Controller
                         'team_id' => $team->id,
                         'brand_id' => $brand->id,
                         'facebook_page_id' => $facebookPage->id,
+                    ]);
+                    
+                    Log::info('Brands OAuth callback: Instagram Account erstellt', [
+                        'instagram_account_id' => $instagramAccountModel->id,
+                        'uuid' => $instagramAccountModel->uuid,
                     ]);
                 }
             }
