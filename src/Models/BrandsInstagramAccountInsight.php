@@ -62,6 +62,6 @@ class BrandsInstagramAccountInsight extends Model
 
     public function instagramAccount(): BelongsTo
     {
-        return $this->belongsTo(BrandsInstagramAccount::class, 'instagram_account_id');
+        return $this->belongsTo(InstagramAccount::class, 'instagram_account_id');
     }
 }

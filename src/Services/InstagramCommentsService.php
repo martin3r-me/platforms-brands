@@ -2,7 +2,7 @@
 
 namespace Platform\Brands\Services;
 
-use Platform\Brands\Models\BrandsInstagramAccount;
+use Platform\Brands\Models\InstagramAccount;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;

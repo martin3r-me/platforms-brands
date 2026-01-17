@@ -3,7 +3,7 @@
 namespace Platform\Brands\Console\Commands;
 
 use Illuminate\Console\Command;
-use Platform\Brands\Models\BrandsInstagramAccount;
+use Platform\Brands\Models\InstagramAccount;
 use Platform\Brands\Services\InstagramMediaService;
 
 class SyncInstagramMedia extends Command
@@ -33,17 +33,21 @@ class SyncInstagramMedia extends Command
         $this->newLine();
 
         // Accounts finden
-        $query = BrandsInstagramAccount::query();
+        $query = InstagramAccount::query();
 
         if ($accountId) {
             $query->where('id', $accountId);
         } elseif ($brandId) {
-            $query->where('brand_id', $brandId);
+            // Accounts über core_service_assets Pivot-Tabelle finden
+            $query->whereHas('services', function ($q) use ($brandId) {
+                $q->where('service_type', \Platform\Brands\Models\BrandsBrand::class)
+                  ->where('service_id', $brandId);
+            });
         } elseif ($teamId) {
             $query->where('team_id', $teamId);
         }
 
-        $accounts = $query->with(['brand.metaToken', 'brand'])->get();
+        $accounts = $query->with(['user', 'team'])->get();
 
         if ($accounts->isEmpty()) {
             $this->warn('⚠️  Keine Instagram Accounts gefunden.');
@@ -59,9 +63,13 @@ class SyncInstagramMedia extends Command
         foreach ($accounts as $account) {
             $this->info("  📝 Verarbeite Account: '{$account->username}' (ID: {$account->id})");
 
-            // Prüfe ob Meta Token vorhanden
-            if (!$account->brand->metaToken) {
-                $this->warn("     ⚠️  Übersprungen: Kein Meta Token für Brand vorhanden");
+            // Prüfe ob Meta Token vorhanden (vom User/Team)
+            $metaToken = \Platform\Brands\Models\MetaToken::where('user_id', $account->user_id)
+                ->where('team_id', $account->team_id)
+                ->first();
+            
+            if (!$metaToken) {
+                $this->warn("     ⚠️  Übersprungen: Kein Meta Token für User/Team vorhanden");
                 $skippedCount++;
                 continue;
             }

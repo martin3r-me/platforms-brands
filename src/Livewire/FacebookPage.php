@@ -4,17 +4,16 @@ namespace Platform\Brands\Livewire;
 
 use Livewire\Component;
 use Illuminate\Support\Facades\Auth;
-use Platform\Brands\Models\BrandsFacebookPage;
+use Platform\Brands\Models\FacebookPage;
 use Livewire\Attributes\On;
 
 class FacebookPage extends Component
 {
-    public BrandsFacebookPage $facebookPage;
+    public FacebookPage $facebookPage;
 
-    public function mount(BrandsFacebookPage $brandsFacebookPage)
+    public function mount(FacebookPage $facebookPage)
     {
-        $this->facebookPage = $brandsFacebookPage->fresh([
-            'brand',
+        $this->facebookPage = $facebookPage->fresh([
             'posts' => function ($query) {
                 $query->with('contextFiles')->orderBy('published_at', 'desc');
             },

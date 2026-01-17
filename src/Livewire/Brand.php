@@ -111,23 +111,85 @@ class Brand extends Component
         ]);
     }
 
-    public function deleteMetaToken()
+
+    /**
+     * Facebook Page mit Brand verknüpfen
+     */
+    public function attachFacebookPage($facebookPageId)
     {
         $this->authorize('update', $this->brand);
         
-        $metaToken = $this->brand->metaToken;
+        $user = Auth::user();
+        $facebookPage = \Platform\Brands\Models\FacebookPage::where('id', $facebookPageId)
+            ->where('user_id', $user->id)
+            ->where('team_id', $user->currentTeam?->id)
+            ->firstOrFail();
         
-        if ($metaToken) {
-            $metaToken->delete();
+        // Prüfen ob bereits verknüpft
+        if (!$this->brand->facebookPages()->where('facebook_pages.id', $facebookPageId)->exists()) {
+            $this->brand->facebookPages()->attach($facebookPageId);
             $this->brand->refresh();
             
-            session()->flash('success', 'Meta-Verknüpfung wurde erfolgreich entfernt.');
+            session()->flash('success', 'Facebook Page wurde erfolgreich mit der Marke verknüpft.');
+        } else {
+            session()->flash('info', 'Facebook Page ist bereits mit dieser Marke verknüpft.');
         }
+    }
+
+    /**
+     * Facebook Page von Brand trennen
+     */
+    public function detachFacebookPage($facebookPageId)
+    {
+        $this->authorize('update', $this->brand);
+        
+        $this->brand->facebookPages()->detach($facebookPageId);
+        $this->brand->refresh();
+        
+        session()->flash('success', 'Facebook Page wurde erfolgreich von der Marke getrennt.');
+    }
+
+    /**
+     * Instagram Account mit Brand verknüpfen
+     */
+    public function attachInstagramAccount($instagramAccountId)
+    {
+        $this->authorize('update', $this->brand);
+        
+        $user = Auth::user();
+        $instagramAccount = \Platform\Brands\Models\InstagramAccount::where('id', $instagramAccountId)
+            ->where('user_id', $user->id)
+            ->where('team_id', $user->currentTeam?->id)
+            ->firstOrFail();
+        
+        // Prüfen ob bereits verknüpft
+        if (!$this->brand->instagramAccounts()->where('instagram_accounts.id', $instagramAccountId)->exists()) {
+            $this->brand->instagramAccounts()->attach($instagramAccountId);
+            $this->brand->refresh();
+            
+            session()->flash('success', 'Instagram Account wurde erfolgreich mit der Marke verknüpft.');
+        } else {
+            session()->flash('info', 'Instagram Account ist bereits mit dieser Marke verknüpft.');
+        }
+    }
+
+    /**
+     * Instagram Account von Brand trennen
+     */
+    public function detachInstagramAccount($instagramAccountId)
+    {
+        $this->authorize('update', $this->brand);
+        
+        $this->brand->instagramAccounts()->detach($instagramAccountId);
+        $this->brand->refresh();
+        
+        session()->flash('success', 'Instagram Account wurde erfolgreich von der Marke getrennt.');
     }
 
     public function render()
     {
         $user = Auth::user();
+        $team = $user->currentTeam;
         
         // CI Boards und Content Boards für diese Marke laden
         $ciBoards = $this->brand->ciBoards;
@@ -140,12 +202,40 @@ class Brand extends Component
         // Meta Token laden
         $metaToken = $this->brand->metaToken;
 
+        // Verfügbare Facebook Pages und Instagram Accounts des Users (noch nicht verknüpft)
+        $availableFacebookPages = collect();
+        $availableInstagramAccounts = collect();
+        
+        if ($team && $metaToken) {
+            // Alle Facebook Pages des Users im aktuellen Team
+            $allUserFacebookPages = \Platform\Brands\Models\FacebookPage::where('user_id', $user->id)
+                ->where('team_id', $team->id)
+                ->get();
+            
+            // Nur die, die noch nicht mit dieser Brand verknüpft sind
+            $availableFacebookPages = $allUserFacebookPages->reject(function ($page) use ($facebookPages) {
+                return $facebookPages->contains('id', $page->id);
+            });
+            
+            // Alle Instagram Accounts des Users im aktuellen Team
+            $allUserInstagramAccounts = \Platform\Brands\Models\InstagramAccount::where('user_id', $user->id)
+                ->where('team_id', $team->id)
+                ->get();
+            
+            // Nur die, die noch nicht mit dieser Brand verknüpft sind
+            $availableInstagramAccounts = $allUserInstagramAccounts->reject(function ($account) use ($instagramAccounts) {
+                return $instagramAccounts->contains('id', $account->id);
+            });
+        }
+
         return view('brands::livewire.brand', [
             'user' => $user,
             'ciBoards' => $ciBoards,
             'contentBoards' => $contentBoards,
             'facebookPages' => $facebookPages,
             'instagramAccounts' => $instagramAccounts,
+            'availableFacebookPages' => $availableFacebookPages,
+            'availableInstagramAccounts' => $availableInstagramAccounts,
             'metaToken' => $metaToken,
         ])->layout('platform::layouts.app');
     }

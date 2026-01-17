@@ -22,12 +22,10 @@ return new class extends Migration
                 $table->integer('like_count')->default(0);
                 $table->timestamp('timestamp')->nullable(); // Instagram Timestamp
                 $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-                $table->foreignId('team_id')->constrained('teams')->onDelete('cascade');
                 $table->timestamps();
                 
                 $table->index(['instagram_media_id'], 'bimc_media_id_idx');
                 $table->index(['external_id'], 'bimc_external_id_idx');
-                $table->index(['team_id'], 'bimc_team_id_idx');
                 $table->unique(['external_id'], 'bimc_external_id_uniq');
             });
         } else {
@@ -39,7 +37,6 @@ return new class extends Migration
             $indexes = [
                 [['instagram_media_id'], 'bimc_media_id_idx'],
                 [['external_id'], 'bimc_external_id_idx'],
-                [['team_id'], 'bimc_team_id_idx'],
             ];
             
             foreach ($indexes as [$columns, $indexName]) {

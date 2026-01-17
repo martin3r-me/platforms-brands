@@ -20,11 +20,9 @@ return new class extends Migration
                 $table->string('instagram_hashtag_id')->nullable(); // Instagram Hashtag ID
                 $table->integer('usage_count')->default(0); // Wie oft wurde dieser Hashtag verwendet
                 $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-                $table->foreignId('team_id')->constrained('teams')->onDelete('cascade');
                 $table->timestamps();
                 
                 $table->index(['name'], 'bih_name_idx');
-                $table->index(['team_id'], 'bih_team_id_idx');
                 $table->index(['instagram_hashtag_id'], 'bih_hashtag_id_idx');
             });
         } else {
@@ -35,7 +33,6 @@ return new class extends Migration
             // Indizes hinzufügen, falls nicht vorhanden
             $indexes = [
                 [['name'], 'bih_name_idx'],
-                [['team_id'], 'bih_team_id_idx'],
                 [['instagram_hashtag_id'], 'bih_hashtag_id_idx'],
             ];
             

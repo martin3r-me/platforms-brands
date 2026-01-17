@@ -2,7 +2,7 @@
 
 namespace Platform\Brands\Services;
 
-use Platform\Brands\Models\BrandsInstagramAccount;
+use Platform\Brands\Models\InstagramAccount;
 use Platform\Brands\Models\BrandsInstagramMedia;
 use Platform\Brands\Services\BrandsMediaDownloadService;
 use Platform\Core\Models\ContextFile;
@@ -29,19 +29,16 @@ class InstagramMediaService
      * 
      * @return array Array mit Media-Daten
      */
-    public function fetchMedia(BrandsInstagramAccount $account, int $limit = 1000): array
+    public function fetchMedia(InstagramAccount $account, int $limit = 1000): array
     {
-        // Brand-Beziehung laden, falls nicht bereits geladen
-        if (!$account->relationLoaded('brand')) {
-            $account->load('brand.metaToken');
+        // MetaToken vom User holen (nicht mehr über Brand)
+        $metaToken = MetaToken::where('user_id', $account->user_id)->first();
+        
+        if (!$metaToken) {
+            throw new \Exception('Kein Meta Token für diesen User gefunden.');
         }
         
-        // Access Token vom Meta Token der Brand holen
-        if (!$account->brand || !$account->brand->metaToken) {
-            throw new \Exception('Kein Meta Token für diese Brand gefunden.');
-        }
-        
-        $accessToken = $this->tokenService->getValidAccessToken($account->brand->metaToken);
+        $accessToken = $this->tokenService->getValidAccessToken($metaToken);
         
         if (!$accessToken) {
             throw new \Exception('Kein gültiger Access Token für diese Brand gefunden.');
@@ -112,18 +109,18 @@ class InstagramMediaService
     /**
      * Speichert Instagram Media in der Datenbank und lädt Bilder herunter
      * 
-     * @param BrandsInstagramAccount $account
+     * @param InstagramAccount $account
      * @param int $limit
      * @param \Illuminate\Console\Command|null $command Für Terminal-Ausgabe
      * @return array
      */
-    public function syncMedia(BrandsInstagramAccount $account, int $limit = 1000, ?\Illuminate\Console\Command $command = null): array
+    public function syncMedia(InstagramAccount $account, int $limit = 1000, ?\Illuminate\Console\Command $command = null): array
     {
         $mediaData = $this->fetchMedia($account, $limit);
-        // Team-ID und User-ID direkt vom Instagram Account nehmen (für Commands)
-        $teamId = $account->team_id ?? $account->brand->team_id;
-        $userId = $account->user_id ?? $account->brand->user_id;
+        // User-ID direkt vom Instagram Account nehmen (für Commands)
+        $userId = $account->user_id;
         $syncedMedia = [];
+        $retrievedMediaIds = [];
         
         $totalCount = count($mediaData);
         if ($command) {
@@ -131,6 +128,7 @@ class InstagramMediaService
         }
 
         foreach ($mediaData as $index => $data) {
+            $retrievedMediaIds[] = $data['media_id'];
             // Media in DB speichern
             $instagramMedia = BrandsInstagramMedia::updateOrCreate(
                 [
@@ -149,7 +147,6 @@ class InstagramMediaService
                     'is_story' => $data['is_story'],
                     'insights_available' => true,
                     'user_id' => $userId,
-                    'team_id' => $teamId,
                 ]
             );
 
@@ -182,6 +179,29 @@ class InstagramMediaService
             $syncedMedia[] = $instagramMedia;
         }
 
+        // Media löschen, die nicht mehr existieren
+        $existingMediaIds = BrandsInstagramMedia::where('instagram_account_id', $account->id)
+            ->pluck('external_id')
+            ->toArray();
+        
+        $deletedMediaIds = array_diff($existingMediaIds, $retrievedMediaIds);
+        
+        if (!empty($deletedMediaIds)) {
+            $deletedCount = BrandsInstagramMedia::where('instagram_account_id', $account->id)
+                ->whereIn('external_id', $deletedMediaIds)
+                ->delete();
+            
+            if ($command) {
+                $command->info("     🗑️  {$deletedCount} gelöschte Media-Item(s) entfernt");
+            }
+            
+            Log::info('Instagram Media deleted', [
+                'instagram_account_id' => $account->id,
+                'deleted_count' => $deletedCount,
+                'deleted_ids' => $deletedMediaIds,
+            ]);
+        }
+
         return $syncedMedia;
     }
 
@@ -195,41 +215,61 @@ class InstagramMediaService
         
         // Hauptbild/Video herunterladen
         if (!empty($mediaData['media_url'])) {
-            $result = $this->mediaDownloadService->downloadAndStore(
-                $mediaData['media_url'],
-                $contextType,
-                $contextId,
-                [
-                    'instagram_media_id' => $instagramMedia->id,
-                    'media_type' => $mediaData['media_type'],
-                    'role' => 'primary',
-                    'is_primary' => true,
-                    'generate_variants' => false, // Instagram-Bilder sind bereits optimiert
-                ],
-                $command
-            );
+            // Prüfen, ob bereits ein ContextFile mit dieser Rolle existiert
+            $existingContextFile = ContextFile::where('context_type', $contextType)
+                ->where('context_id', $contextId)
+                ->whereJsonContains('meta->role', 'primary')
+                ->first();
             
-            if ($result && $command) {
-                $command->line("       📁 ContextFile erstellt: ID {$result->id}");
-            } elseif (!$result && $command) {
-                $command->warn("       ⚠️  Konnte ContextFile nicht erstellen");
+            if ($existingContextFile) {
+                if ($command) {
+                    $command->line("       ⏭️  Media bereits heruntergeladen (ContextFile ID: {$existingContextFile->id})");
+                }
+            } else {
+                $result = $this->mediaDownloadService->downloadAndStore(
+                    $mediaData['media_url'],
+                    $contextType,
+                    $contextId,
+                    [
+                        'instagram_media_id' => $instagramMedia->id,
+                        'media_type' => $mediaData['media_type'],
+                        'role' => 'primary',
+                        'is_primary' => true,
+                        'generate_variants' => false, // Instagram-Bilder sind bereits optimiert
+                    ],
+                    $command
+                );
+                
+                if ($result && $command) {
+                    $command->line("       📁 ContextFile erstellt: ID {$result->id}");
+                } elseif (!$result && $command) {
+                    $command->warn("       ⚠️  Konnte ContextFile nicht erstellen");
+                }
             }
         }
 
         // Thumbnail herunterladen (falls vorhanden und unterschiedlich)
         if (!empty($mediaData['thumbnail_url']) && $mediaData['thumbnail_url'] !== $mediaData['media_url']) {
-            $this->mediaDownloadService->downloadAndStore(
-                $mediaData['thumbnail_url'],
-                $contextType,
-                $contextId,
-                [
-                    'instagram_media_id' => $instagramMedia->id,
-                    'media_type' => 'thumbnail',
-                    'role' => 'thumbnail',
-                    'generate_variants' => false, // Instagram-Thumbnails sind bereits optimiert
-                ],
-                $command
-            );
+            // Prüfen, ob bereits ein Thumbnail existiert
+            $existingThumbnail = ContextFile::where('context_type', $contextType)
+                ->where('context_id', $contextId)
+                ->whereJsonContains('meta->role', 'thumbnail')
+                ->first();
+            
+            if (!$existingThumbnail) {
+                $this->mediaDownloadService->downloadAndStore(
+                    $mediaData['thumbnail_url'],
+                    $contextType,
+                    $contextId,
+                    [
+                        'instagram_media_id' => $instagramMedia->id,
+                        'media_type' => 'thumbnail',
+                        'role' => 'thumbnail',
+                        'generate_variants' => false, // Instagram-Thumbnails sind bereits optimiert
+                    ],
+                    $command
+                );
+            }
         }
 
         // Children (Carousel) herunterladen
@@ -240,20 +280,29 @@ class InstagramMediaService
             
             foreach ($mediaData['children'] as $index => $child) {
                 if (!empty($child['media_url'])) {
-                    $this->mediaDownloadService->downloadAndStore(
-                        $child['media_url'],
-                        $contextType,
-                        $contextId,
-                        [
-                            'instagram_media_id' => $instagramMedia->id,
-                            'media_type' => $child['media_type'] ?? 'image',
-                            'role' => 'carousel',
-                            'is_carousel_item' => true,
-                            'carousel_index' => $index,
-                            'generate_variants' => false, // Instagram-Carousel-Bilder sind bereits optimiert
-                        ],
-                        $command
-                    );
+                    // Prüfen, ob bereits ein Carousel-Item mit diesem Index existiert
+                    $existingCarouselItem = ContextFile::where('context_type', $contextType)
+                        ->where('context_id', $contextId)
+                        ->whereJsonContains('meta->role', 'carousel')
+                        ->whereJsonContains('meta->carousel_index', $index)
+                        ->first();
+                    
+                    if (!$existingCarouselItem) {
+                        $this->mediaDownloadService->downloadAndStore(
+                            $child['media_url'],
+                            $contextType,
+                            $contextId,
+                            [
+                                'instagram_media_id' => $instagramMedia->id,
+                                'media_type' => $child['media_type'] ?? 'image',
+                                'role' => 'carousel',
+                                'is_carousel_item' => true,
+                                'carousel_index' => $index,
+                                'generate_variants' => false, // Instagram-Carousel-Bilder sind bereits optimiert
+                            ],
+                            $command
+                        );
+                    }
                 }
             }
         }

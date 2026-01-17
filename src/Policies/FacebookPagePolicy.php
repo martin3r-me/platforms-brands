@@ -3,14 +3,14 @@
 namespace Platform\Brands\Policies;
 
 use Platform\Core\Models\User;
-use Platform\Brands\Models\BrandsFacebookPage;
+use Platform\Brands\Models\FacebookPage;
 
 class FacebookPagePolicy
 {
     /**
      * Darf der User diese Facebook Page sehen?
      */
-    public function view(User $user, BrandsFacebookPage $facebookPage): bool
+    public function view(User $user, FacebookPage $facebookPage): bool
     {
         // User muss im selben Team sein
         return $facebookPage->team_id === $user->currentTeam?->id;
@@ -19,7 +19,7 @@ class FacebookPagePolicy
     /**
      * Darf der User diese Facebook Page bearbeiten?
      */
-    public function update(User $user, BrandsFacebookPage $facebookPage): bool
+    public function update(User $user, FacebookPage $facebookPage): bool
     {
         // User muss im selben Team sein
         return $facebookPage->team_id === $user->currentTeam?->id;
@@ -28,7 +28,7 @@ class FacebookPagePolicy
     /**
      * Darf der User diese Facebook Page löschen?
      */
-    public function delete(User $user, BrandsFacebookPage $facebookPage): bool
+    public function delete(User $user, FacebookPage $facebookPage): bool
     {
         // Nur Team-Mitglied im selben Team darf löschen
         return $facebookPage->team_id === $user->currentTeam?->id;

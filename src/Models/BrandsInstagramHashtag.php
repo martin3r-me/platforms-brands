@@ -20,7 +20,6 @@ class BrandsInstagramHashtag extends Model
         'instagram_hashtag_id',
         'usage_count',
         'user_id',
-        'team_id',
     ];
 
     protected $casts = [
@@ -42,11 +41,6 @@ class BrandsInstagramHashtag extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(\Platform\Core\Models\User::class);
-    }
-
-    public function team(): BelongsTo
-    {
-        return $this->belongsTo(\Platform\Core\Models\Team::class);
     }
 
     public function media()

@@ -122,26 +122,65 @@ class BrandsBrand extends Model implements HasTimeAncestors, HasKeyResultAncesto
     }
 
     /**
-     * Meta OAuth Token dieser Marke
+     * Meta OAuth Token dieser Marke (über User)
+     * Ein Brand verwendet den Meta Token des Users
      */
     public function metaToken()
     {
-        return $this->hasOne(BrandsMetaToken::class, 'brand_id');
+        $user = $this->user;
+        
+        if ($user) {
+            return \Platform\Brands\Models\MetaToken::where('user_id', $user->id)->first();
+        }
+        
+        return null;
     }
 
     /**
-     * Facebook Pages dieser Marke
+     * Facebook Pages dieser Marke (Many-to-Many über core_service_assets)
      */
     public function facebookPages()
     {
-        return $this->hasMany(BrandsFacebookPage::class, 'brand_id');
+        return $this->morphToMany(
+            \Platform\Brands\Models\FacebookPage::class,
+            'service',
+            'core_service_assets',
+            'service_id',
+            'asset_id'
+        )->where('core_service_assets.service_type', static::class)
+         ->where('core_service_assets.asset_type', \Platform\Brands\Models\FacebookPage::class)
+         ->withTimestamps();
     }
 
     /**
-     * Instagram Accounts dieser Marke
+     * Instagram Accounts dieser Marke (Many-to-Many über core_service_assets)
      */
     public function instagramAccounts()
     {
-        return $this->hasMany(BrandsInstagramAccount::class, 'brand_id');
+        return $this->morphToMany(
+            \Platform\Brands\Models\InstagramAccount::class,
+            'service',
+            'core_service_assets',
+            'service_id',
+            'asset_id'
+        )         ->where('core_service_assets.service_type', static::class)
+         ->where('core_service_assets.asset_type', \Platform\Brands\Models\InstagramAccount::class)
+         ->withTimestamps();
+    }
+
+    /**
+     * WhatsApp Accounts dieser Marke (Many-to-Many über core_service_assets)
+     */
+    public function whatsappAccounts()
+    {
+        return $this->morphToMany(
+            \Platform\Brands\Models\WhatsAppAccount::class,
+            'service',
+            'core_service_assets',
+            'service_id',
+            'asset_id'
+        )         ->where('core_service_assets.service_type', static::class)
+         ->where('core_service_assets.asset_type', \Platform\Brands\Models\WhatsAppAccount::class)
+         ->withTimestamps();
     }
 }

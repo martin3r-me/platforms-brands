@@ -10,17 +10,16 @@ use Symfony\Component\Uid\UuidV7;
 use Platform\Core\Contracts\HasDisplayName;
 
 /**
- * Model für Facebook Pages
+ * Model für Facebook Pages (übergeordnet auf User/Team-Ebene)
  * 
- * Vollständig unabhängiges Model - erbt direkt von Laravel Model
+ * Ein User/Team kann Facebook Pages haben, die dann mit Brands verknüpft werden können
  */
-class BrandsFacebookPage extends Model implements HasDisplayName
+class FacebookPage extends Model implements HasDisplayName
 {
-    protected $table = 'brands_facebook_pages';
+    protected $table = 'facebook_pages';
 
     protected $fillable = [
         'uuid',
-        'brand_id',
         'external_id',
         'name',
         'description',
@@ -30,7 +29,6 @@ class BrandsFacebookPage extends Model implements HasDisplayName
         'token_type',
         'scopes',
         'user_id',
-        'team_id',
     ];
 
     protected $casts = [
@@ -55,26 +53,38 @@ class BrandsFacebookPage extends Model implements HasDisplayName
         });
     }
 
-    public function brand(): BelongsTo
-    {
-        return $this->belongsTo(BrandsBrand::class, 'brand_id');
-    }
-
     public function user(): BelongsTo
     {
         return $this->belongsTo(\Platform\Core\Models\User::class);
     }
 
-    public function team(): BelongsTo
+    /**
+     * Services, die diese Facebook Page verwenden (Many-to-Many über core_service_assets)
+     * z.B. BrandsBrand, CommsChannel, etc.
+     */
+    public function services()
     {
-        return $this->belongsTo(\Platform\Core\Models\Team::class);
+        return $this->morphedByMany(
+            Model::class,
+            'asset',
+            'core_service_assets',
+            'asset_id',
+            'service_id'
+        )->where('core_service_assets.asset_type', static::class)
+         ->withTimestamps();
     }
 
+    /**
+     * Instagram Accounts, die mit dieser Facebook Page verknüpft sind
+     */
     public function instagramAccounts(): HasMany
     {
-        return $this->hasMany(BrandsInstagramAccount::class, 'facebook_page_id');
+        return $this->hasMany(InstagramAccount::class, 'facebook_page_id');
     }
 
+    /**
+     * Facebook Posts dieser Page
+     */
     public function posts(): HasMany
     {
         return $this->hasMany(BrandsFacebookPost::class, 'facebook_page_id');

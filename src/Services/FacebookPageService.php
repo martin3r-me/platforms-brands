@@ -3,9 +3,9 @@
 namespace Platform\Brands\Services;
 
 use Platform\Brands\Models\BrandsBrand;
-use Platform\Brands\Models\BrandsFacebookPage;
+use Platform\Brands\Models\FacebookPage;
 use Platform\Brands\Models\BrandsFacebookPost;
-use Platform\Brands\Models\BrandsMetaToken;
+use Platform\Brands\Models\MetaToken;
 use Platform\Brands\Services\BrandsMediaDownloadService;
 use Platform\Core\Models\ContextFile;
 use Illuminate\Support\Facades\Http;
@@ -27,14 +27,15 @@ class FacebookPageService
     }
 
     /**
-     * Ruft alle Facebook Pages für eine Brand ab und speichert sie
+     * Ruft alle Facebook Pages für einen User/Team ab und speichert sie
+     * Verknüpft sie dann mit der angegebenen Brand
      */
     public function syncFacebookPages(BrandsBrand $brand): array
     {
         $metaToken = $brand->metaToken;
         
         if (!$metaToken) {
-            throw new \Exception('Kein Meta-Token für diese Marke gefunden. Bitte verknüpfe zuerst die Marke mit Meta.');
+            throw new \Exception('Kein Meta-Token für diesen User/Team gefunden. Bitte verknüpfe zuerst mit Meta.');
         }
 
         $accessToken = $this->tokenService->getValidAccessToken($metaToken);
@@ -44,9 +45,8 @@ class FacebookPageService
         }
 
         $apiVersion = config('brands.meta.api_version', 'v21.0');
-        // Team-ID und User-ID direkt von der Brand nehmen (für Commands)
-        $teamId = $brand->team_id;
-        $userId = $brand->user_id ?? $metaToken->user_id;
+        // User-ID vom MetaToken nehmen (Token gehört User)
+        $userId = $metaToken->user_id;
 
         // Business Accounts holen
         $businessResponse = Http::get("https://graph.facebook.com/{$apiVersion}/me/businesses", [
@@ -92,11 +92,11 @@ class FacebookPageService
                 $pageName = $pageData['name'] ?? 'Facebook Page';
                 $pageAccessToken = $pageData['access_token'] ?? $accessToken;
 
-                // Page erstellen oder aktualisieren
-                $facebookPage = BrandsFacebookPage::updateOrCreate(
+                // Page auf User-Ebene erstellen oder aktualisieren (ohne team_id)
+                $facebookPage = FacebookPage::updateOrCreate(
                     [
                         'external_id' => $pageId,
-                        'brand_id' => $brand->id,
+                        'user_id' => $userId,
                     ],
                     [
                         'name' => $pageName,
@@ -106,10 +106,24 @@ class FacebookPageService
                         'expires_at' => $metaToken->expires_at,
                         'token_type' => 'Bearer',
                         'scopes' => $metaToken->scopes,
-                        'user_id' => $userId,
-                        'team_id' => $teamId,
                     ]
                 );
+
+                // Verknüpfung zur Brand über core_service_assets (falls noch nicht verknüpft)
+                $serviceAsset = \Platform\Core\Models\CoreServiceAsset::where('service_type', BrandsBrand::class)
+                    ->where('service_id', $brand->id)
+                    ->where('asset_type', FacebookPage::class)
+                    ->where('asset_id', $facebookPage->id)
+                    ->first();
+                
+                if (!$serviceAsset) {
+                    \Platform\Core\Models\CoreServiceAsset::create([
+                        'service_type' => BrandsBrand::class,
+                        'service_id' => $brand->id,
+                        'asset_type' => FacebookPage::class,
+                        'asset_id' => $facebookPage->id,
+                    ]);
+                }
 
                 $syncedPages[] = $facebookPage;
 
@@ -117,6 +131,7 @@ class FacebookPageService
                     'page_id' => $facebookPage->id,
                     'external_id' => $pageId,
                     'brand_id' => $brand->id,
+                    'user_id' => $userId,
                 ]);
             }
         }
@@ -127,7 +142,7 @@ class FacebookPageService
     /**
      * Ruft alle Facebook Posts für eine Facebook Page ab und speichert sie
      */
-    public function syncFacebookPosts(BrandsFacebookPage $facebookPage, int $limit = 100): array
+    public function syncFacebookPosts(FacebookPage $facebookPage, int $limit = 100): array
     {
         $accessToken = $facebookPage->access_token;
         
@@ -136,8 +151,7 @@ class FacebookPageService
         }
 
         $apiVersion = config('brands.meta.api_version', 'v21.0');
-        // Team-ID und User-ID direkt von der Facebook Page nehmen (für Commands)
-        $teamId = $facebookPage->team_id;
+        // User-ID direkt von der Facebook Page nehmen (für Commands)
         $userId = $facebookPage->user_id;
 
         $params = [
@@ -194,7 +208,6 @@ class FacebookPageService
                         'permalink_url' => $postData['permalink_url'] ?? null,
                         'published_at' => $createdTime,
                         'user_id' => $userId,
-                        'team_id' => $teamId,
                     ]
                 );
 

@@ -3,7 +3,7 @@
 namespace Platform\Brands\Console\Commands;
 
 use Illuminate\Console\Command;
-use Platform\Brands\Models\BrandsFacebookPage;
+use Platform\Brands\Models\FacebookPage;
 use Platform\Brands\Services\FacebookPageService;
 
 class SyncFacebookPosts extends Command
@@ -31,17 +31,21 @@ class SyncFacebookPosts extends Command
         $this->newLine();
 
         // Pages finden
-        $query = BrandsFacebookPage::query();
+        $query = FacebookPage::query();
 
         if ($pageId) {
             $query->where('id', $pageId);
         } elseif ($brandId) {
-            $query->where('brand_id', $brandId);
+            // Pages über core_service_assets Pivot-Tabelle finden
+            $query->whereHas('services', function ($q) use ($brandId) {
+                $q->where('service_type', \Platform\Brands\Models\BrandsBrand::class)
+                  ->where('service_id', $brandId);
+            });
         } elseif ($teamId) {
             $query->where('team_id', $teamId);
         }
 
-        $pages = $query->with('brand.metaToken')->get();
+        $pages = $query->with(['user', 'team'])->get();
 
         if ($pages->isEmpty()) {
             $this->warn('⚠️  Keine Facebook Pages gefunden.');
@@ -57,9 +61,13 @@ class SyncFacebookPosts extends Command
         foreach ($pages as $page) {
             $this->info("  📝 Verarbeite Page: '{$page->name}' (ID: {$page->id})");
 
-            // Prüfe ob Meta Token vorhanden
-            if (!$page->brand->metaToken) {
-                $this->warn("     ⚠️  Übersprungen: Kein Meta Token für Brand vorhanden");
+            // Prüfe ob Meta Token vorhanden (vom User/Team)
+            $metaToken = \Platform\Brands\Models\MetaToken::where('user_id', $page->user_id)
+                ->where('team_id', $page->team_id)
+                ->first();
+            
+            if (!$metaToken) {
+                $this->warn("     ⚠️  Übersprungen: Kein Meta Token für User/Team vorhanden");
                 $skippedCount++;
                 continue;
             }

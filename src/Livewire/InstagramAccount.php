@@ -4,17 +4,16 @@ namespace Platform\Brands\Livewire;
 
 use Livewire\Component;
 use Illuminate\Support\Facades\Auth;
-use Platform\Brands\Models\BrandsInstagramAccount;
+use Platform\Brands\Models\InstagramAccount;
 use Livewire\Attributes\On;
 
 class InstagramAccount extends Component
 {
-    public BrandsInstagramAccount $instagramAccount;
+    public InstagramAccount $instagramAccount;
 
-    public function mount(BrandsInstagramAccount $brandsInstagramAccount)
+    public function mount(InstagramAccount $instagramAccount)
     {
-        $this->instagramAccount = $brandsInstagramAccount->fresh([
-            'brand',
+        $this->instagramAccount = $instagramAccount->fresh([
             'facebookPage',
             'media' => function ($query) {
                 $query->with(['contextFiles', 'latestInsight', 'hashtags'])->orderBy('timestamp', 'desc');

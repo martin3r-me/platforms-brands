@@ -2,7 +2,7 @@
 
 namespace Platform\Brands\Services;
 
-use Platform\Brands\Models\BrandsInstagramAccount;
+use Platform\Brands\Models\InstagramAccount;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -36,14 +36,19 @@ class InstagramHashtagsService
     /**
      * Ruft die Instagram Hashtag ID für einen Hashtag ab
      */
-    public function fetchHashtagId(string $hashtag, BrandsInstagramAccount $account): ?string
+    public function fetchHashtagId(string $hashtag, InstagramAccount $account): ?string
     {
         $apiVersion = config('brands.meta.api_version', 'v21.0');
         
-        // Access Token vom Account oder von der Brand holen
+        // Access Token vom Account oder vom User/Team holen
         $accessToken = $account->access_token;
-        if (!$accessToken && $account->brand && $account->brand->metaToken) {
-            $accessToken = $this->tokenService->getValidAccessToken($account->brand->metaToken);
+        if (!$accessToken) {
+            $metaToken = \Platform\Brands\Models\MetaToken::where('user_id', $account->user_id)
+                ->where('team_id', $account->team_id)
+                ->first();
+            if ($metaToken) {
+                $accessToken = $this->tokenService->getValidAccessToken($metaToken);
+            }
         }
         
         if (!$accessToken) {
@@ -108,7 +113,7 @@ class InstagramHashtagsService
      * 
      * @return array Array mit Hashtag-Daten: ['hashtag' => '#tag', 'count' => 2, 'instagram_hashtag_id' => '123']
      */
-    public function processHashtags(string $caption, BrandsInstagramAccount $account, bool $fetchIds = true): array
+    public function processHashtags(string $caption, InstagramAccount $account, bool $fetchIds = true): array
     {
         $hashtags = $this->extractHashtags($caption);
         $processed = [];

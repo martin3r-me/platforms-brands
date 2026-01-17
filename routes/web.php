@@ -11,8 +11,8 @@ use Platform\Brands\Models\BrandsBrand;
 use Platform\Brands\Models\BrandsCiBoard;
 use Platform\Brands\Models\BrandsContentBoard;
 use Platform\Brands\Models\BrandsContentBoardSection;
-use Platform\Brands\Models\BrandsFacebookPage;
-use Platform\Brands\Models\BrandsInstagramAccount;
+use Platform\Brands\Models\FacebookPage;
+use Platform\Brands\Models\InstagramAccount;
 
 Route::get('/', Dashboard::class)->name('brands.dashboard');
 
@@ -33,15 +33,9 @@ Route::get('/content-board-sections/{brandsContentBoardSection}', ContentBoardSe
     ->name('brands.content-board-sections.show');
 
 // Facebook Page Routes
-Route::get('/facebook-pages/{brandsFacebookPage}', FacebookPage::class)
+Route::get('/facebook-pages/{facebookPage}', FacebookPage::class)
     ->name('brands.facebook-pages.show');
 
-// Facebook Page OAuth Routes
-Route::get('/facebook-pages/oauth/redirect', [\Platform\Brands\Http\Controllers\FacebookPageOAuthController::class, 'redirect'])
-    ->name('brands.facebook-pages.oauth.redirect');
-Route::get('/facebook-pages/oauth/callback', [\Platform\Brands\Http\Controllers\FacebookPageOAuthController::class, 'callback'])
-    ->name('brands.facebook-pages.oauth.callback');
-
 // Instagram Account Routes
-Route::get('/instagram-accounts/{brandsInstagramAccount}', InstagramAccount::class)
+Route::get('/instagram-accounts/{instagramAccount}', InstagramAccount::class)
     ->name('brands.instagram-accounts.show');

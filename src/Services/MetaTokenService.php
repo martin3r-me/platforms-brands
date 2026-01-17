@@ -2,7 +2,7 @@
 
 namespace Platform\Brands\Services;
 
-use Platform\Brands\Models\BrandsMetaToken;
+use Platform\Brands\Models\MetaToken;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -14,7 +14,7 @@ class MetaTokenService
     /**
      * Prüft und aktualisiert Token, falls nötig
      */
-    public function refreshTokenIfNeeded(BrandsMetaToken $token): ?string
+    public function refreshTokenIfNeeded(MetaToken $token): ?string
     {
         if (!$token->isExpired() && !$token->isExpiringSoon()) {
             return null; // Token ist noch gültig
@@ -26,7 +26,7 @@ class MetaTokenService
     /**
      * Aktualisiert den Access Token
      */
-    public function refreshToken(BrandsMetaToken $token): ?string
+    public function refreshToken(MetaToken $token): ?string
     {
         $apiVersion = config('brands.meta.api_version', 'v21.0');
         
@@ -62,7 +62,8 @@ class MetaTokenService
                         
                         Log::info('Meta Token refreshed', [
                             'token_id' => $token->id,
-                            'brand_id' => $token->brand_id,
+                            'user_id' => $token->user_id,
+                            'team_id' => $token->team_id,
                         ]);
                         
                         return $refreshData['access_token'];
@@ -82,7 +83,7 @@ class MetaTokenService
     /**
      * Gibt den gültigen Access Token zurück (refresht automatisch, falls nötig)
      */
-    public function getValidAccessToken(BrandsMetaToken $token): ?string
+    public function getValidAccessToken(MetaToken $token): ?string
     {
         if ($token->isExpired() || $token->isExpiringSoon()) {
             $newToken = $this->refreshTokenIfNeeded($token);

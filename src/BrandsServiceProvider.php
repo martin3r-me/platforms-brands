@@ -15,8 +15,8 @@ use Platform\Brands\Models\BrandsBrand;
 use Platform\Brands\Models\BrandsCiBoard;
 use Platform\Brands\Models\BrandsCiBoardColor;
 use Platform\Brands\Models\BrandsContentBoard;
-use Platform\Brands\Models\BrandsFacebookPage;
-use Platform\Brands\Models\BrandsInstagramAccount;
+use Platform\Brands\Models\FacebookPage;
+use Platform\Brands\Models\InstagramAccount;
 use Platform\Brands\Policies\BrandPolicy;
 use Platform\Brands\Policies\CiBoardPolicy;
 use Platform\Brands\Policies\CiBoardColorPolicy;
@@ -133,8 +133,8 @@ class BrandsServiceProvider extends ServiceProvider
             BrandsCiBoard::class => CiBoardPolicy::class,
             BrandsCiBoardColor::class => CiBoardColorPolicy::class,
             BrandsContentBoard::class => ContentBoardPolicy::class,
-            BrandsFacebookPage::class => FacebookPagePolicy::class,
-            BrandsInstagramAccount::class => InstagramAccountPolicy::class,
+            FacebookPage::class => FacebookPagePolicy::class,
+            InstagramAccount::class => InstagramAccountPolicy::class,
         ];
 
         foreach ($policies as $model => $policy) {

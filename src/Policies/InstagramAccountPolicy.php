@@ -3,14 +3,14 @@
 namespace Platform\Brands\Policies;
 
 use Platform\Core\Models\User;
-use Platform\Brands\Models\BrandsInstagramAccount;
+use Platform\Brands\Models\InstagramAccount;
 
 class InstagramAccountPolicy
 {
     /**
      * Darf der User diesen Instagram Account sehen?
      */
-    public function view(User $user, BrandsInstagramAccount $instagramAccount): bool
+    public function view(User $user, InstagramAccount $instagramAccount): bool
     {
         // User muss im selben Team sein
         return $instagramAccount->team_id === $user->currentTeam?->id;
@@ -19,7 +19,7 @@ class InstagramAccountPolicy
     /**
      * Darf der User diesen Instagram Account bearbeiten?
      */
-    public function update(User $user, BrandsInstagramAccount $instagramAccount): bool
+    public function update(User $user, InstagramAccount $instagramAccount): bool
     {
         // User muss im selben Team sein
         return $instagramAccount->team_id === $user->currentTeam?->id;
@@ -28,7 +28,7 @@ class InstagramAccountPolicy
     /**
      * Darf der User diesen Instagram Account löschen?
      */
-    public function delete(User $user, BrandsInstagramAccount $instagramAccount): bool
+    public function delete(User $user, InstagramAccount $instagramAccount): bool
     {
         // Nur Team-Mitglied im selben Team darf löschen
         return $instagramAccount->team_id === $user->currentTeam?->id;

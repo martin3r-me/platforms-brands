@@ -9,16 +9,16 @@ return new class extends Migration
 {
     public function up(): void
     {
-        $tableName = 'brands_facebook_pages';
+        $tableName = 'instagram_accounts';
         
         // Tabelle erstellen, falls sie nicht existiert
         if (!Schema::hasTable($tableName)) {
             Schema::create($tableName, function (Blueprint $table) {
                 $table->id();
                 $table->string('uuid')->unique();
-                $table->foreignId('brand_id')->constrained('brands_brands')->onDelete('cascade');
+                $table->foreignId('facebook_page_id')->nullable()->constrained('facebook_pages')->onDelete('set null');
                 $table->string('external_id');
-                $table->string('name');
+                $table->string('username');
                 $table->text('description')->nullable();
                 $table->text('access_token')->nullable();
                 $table->text('refresh_token')->nullable();
@@ -26,13 +26,14 @@ return new class extends Migration
                 $table->string('token_type')->nullable()->default('Bearer');
                 $table->json('scopes')->nullable();
                 $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-                $table->foreignId('team_id')->constrained('teams')->onDelete('cascade');
                 $table->timestamps();
                 
-                $table->index(['brand_id'], 'bfp_brand_id_idx');
-                $table->index(['team_id'], 'bfp_team_id_idx');
-                $table->index(['external_id'], 'bfp_external_id_idx');
-                $table->index(['expires_at'], 'bfp_expires_at_idx');
+                // Indizes mit expliziten, kurzen Namen
+                $table->index(['user_id'], 'ia_user_id_idx');
+                $table->index(['facebook_page_id'], 'ia_page_id_idx');
+                $table->index(['external_id'], 'ia_external_id_idx');
+                $table->index(['expires_at'], 'ia_expires_at_idx');
+                $table->unique(['external_id', 'user_id'], 'ia_external_user_uniq');
             });
         } else {
             // Tabelle existiert bereits - nur Indizes hinzufügen, falls sie nicht existieren
@@ -41,10 +42,10 @@ return new class extends Migration
             
             // Indizes hinzufügen, falls nicht vorhanden
             $indexes = [
-                [['brand_id'], 'bfp_brand_id_idx'],
-                [['team_id'], 'bfp_team_id_idx'],
-                [['external_id'], 'bfp_external_id_idx'],
-                [['expires_at'], 'bfp_expires_at_idx'],
+                [['user_id'], 'ia_user_id_idx'],
+                [['facebook_page_id'], 'ia_page_id_idx'],
+                [['external_id'], 'ia_external_id_idx'],
+                [['expires_at'], 'ia_expires_at_idx'],
             ];
             
             foreach ($indexes as [$columns, $indexName]) {
@@ -60,11 +61,24 @@ return new class extends Migration
                     });
                 }
             }
+            
+            // Unique Constraint hinzufügen, falls nicht vorhanden
+            $uniqueExists = DB::select(
+                "SELECT COUNT(*) as count FROM information_schema.table_constraints 
+                 WHERE table_schema = ? AND table_name = ? AND constraint_name = ?",
+                [$databaseName, $tableName, 'ia_external_user_uniq']
+            );
+            
+            if ($uniqueExists[0]->count == 0) {
+                Schema::table($tableName, function (Blueprint $table) {
+                    $table->unique(['external_id', 'user_id'], 'ia_external_user_uniq');
+                });
+            }
         }
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('brands_facebook_pages');
+        Schema::dropIfExists('instagram_accounts');
     }
 };

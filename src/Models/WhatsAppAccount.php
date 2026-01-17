@@ -6,32 +6,39 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\Crypt;
 use Symfony\Component\Uid\UuidV7;
+use Platform\Core\Contracts\HasDisplayName;
 
 /**
- * Model für Meta OAuth Tokens
+ * Model für WhatsApp Accounts (User-Ebene)
  * 
- * Speichert die OAuth-Tokens für eine Brand, um später Facebook Pages und Instagram Accounts abzurufen
+ * Ein User kann WhatsApp Accounts haben, die dann mit Services verknüpft werden können
  */
-class BrandsMetaToken extends Model
+class WhatsAppAccount extends Model implements HasDisplayName
 {
-    protected $table = 'brands_meta_tokens';
+    protected $table = 'whatsapp_accounts';
 
     protected $fillable = [
         'uuid',
-        'brand_id',
+        'external_id',
+        'phone_number_id',
+        'display_phone_number',
+        'name',
+        'description',
         'access_token',
         'refresh_token',
         'expires_at',
         'token_type',
         'scopes',
+        'is_verified',
+        'status',
         'user_id',
-        'team_id',
     ];
 
     protected $casts = [
         'uuid' => 'string',
         'expires_at' => 'datetime',
         'scopes' => 'array',
+        'is_verified' => 'boolean',
     ];
 
     protected $hidden = [
@@ -50,19 +57,30 @@ class BrandsMetaToken extends Model
         });
     }
 
-    public function brand(): BelongsTo
-    {
-        return $this->belongsTo(BrandsBrand::class, 'brand_id');
-    }
-
     public function user(): BelongsTo
     {
         return $this->belongsTo(\Platform\Core\Models\User::class);
     }
 
-    public function team(): BelongsTo
+    /**
+     * Services, die diesen WhatsApp Account verwenden (Many-to-Many über core_service_assets)
+     * z.B. BrandsBrand, CommsChannel, etc.
+     */
+    public function services()
     {
-        return $this->belongsTo(\Platform\Core\Models\Team::class);
+        return $this->morphedByMany(
+            Model::class,
+            'asset',
+            'core_service_assets',
+            'asset_id',
+            'service_id'
+        )->where('core_service_assets.asset_type', static::class)
+         ->withTimestamps();
+    }
+
+    public function getDisplayName(): ?string
+    {
+        return $this->name ?? $this->display_phone_number ?? $this->external_id;
     }
 
     /**

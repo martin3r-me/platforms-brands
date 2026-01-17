@@ -9,26 +9,25 @@ return new class extends Migration
 {
     public function up(): void
     {
-        $tableName = 'brands_meta_tokens';
+        $tableName = 'meta_tokens';
         
         // Tabelle erstellen, falls sie nicht existiert
         if (!Schema::hasTable($tableName)) {
             Schema::create($tableName, function (Blueprint $table) {
                 $table->id();
                 $table->string('uuid')->unique();
-                $table->foreignId('brand_id')->constrained('brands_brands')->onDelete('cascade');
                 $table->text('access_token');
                 $table->text('refresh_token')->nullable();
                 $table->timestamp('expires_at')->nullable();
                 $table->string('token_type')->nullable()->default('Bearer');
                 $table->json('scopes')->nullable();
                 $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-                $table->foreignId('team_id')->constrained('teams')->onDelete('cascade');
                 $table->timestamps();
                 
-                $table->index(['brand_id'], 'bmt_brand_id_idx');
-                $table->index(['team_id'], 'bmt_team_id_idx');
-                $table->index(['expires_at'], 'bmt_expires_at_idx');
+                // Indizes mit expliziten, kurzen Namen
+                $table->index(['user_id'], 'mt_user_id_idx');
+                $table->index(['expires_at'], 'mt_expires_at_idx');
+                $table->unique(['user_id'], 'mt_user_uniq');
             });
         } else {
             // Tabelle existiert bereits - nur Indizes hinzufügen, falls sie nicht existieren
@@ -37,9 +36,8 @@ return new class extends Migration
             
             // Indizes hinzufügen, falls nicht vorhanden
             $indexes = [
-                [['brand_id'], 'bmt_brand_id_idx'],
-                [['team_id'], 'bmt_team_id_idx'],
-                [['expires_at'], 'bmt_expires_at_idx'],
+                [['user_id'], 'mt_user_id_idx'],
+                [['expires_at'], 'mt_expires_at_idx'],
             ];
             
             foreach ($indexes as [$columns, $indexName]) {
@@ -55,11 +53,24 @@ return new class extends Migration
                     });
                 }
             }
+            
+            // Unique Constraint hinzufügen, falls nicht vorhanden
+            $uniqueExists = DB::select(
+                "SELECT COUNT(*) as count FROM information_schema.table_constraints 
+                 WHERE table_schema = ? AND table_name = ? AND constraint_name = ?",
+                [$databaseName, $tableName, 'mt_user_uniq']
+            );
+            
+            if ($uniqueExists[0]->count == 0) {
+                Schema::table($tableName, function (Blueprint $table) {
+                    $table->unique(['user_id'], 'mt_user_uniq');
+                });
+            }
         }
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('brands_meta_tokens');
+        Schema::dropIfExists('meta_tokens');
     }
 };

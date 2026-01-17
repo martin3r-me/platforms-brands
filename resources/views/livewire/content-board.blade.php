@@ -37,24 +37,10 @@
 
             @if($contentBoard->sections->count() > 0)
                 <div class="space-y-6">
-                @foreach($contentBoard->sections as $section)
-                    {{-- Section (volle Breite) --}}
-                    <div 
-                        wire:key="section-{{ $section->id }}"
-                        class="bg-white rounded-xl border border-[var(--ui-border)]/60 shadow-sm overflow-visible"
-                    >
-                        <div class="p-4 border-b border-[var(--ui-border)]/40 flex items-center justify-between">
-                            <div class="flex items-center gap-2 flex-1">
-                                @can('update', $contentBoard)
-                                    <button 
-                                        type="button"
-                                        class="text-[var(--ui-muted)] hover:text-[var(--ui-primary)] p-1 rounded-md hover:bg-[var(--ui-muted-5)]"
-                                        title="Section verschieben (bald verfügbar)"
-                                        disabled
-                                    >
-                                        @svg('heroicon-o-bars-3', 'w-4 h-4')
-                                    </button>
-                                @endcan
+                    @foreach($contentBoard->sections as $section)
+                        {{-- Section (volle Breite) --}}
+                        <div class="bg-white rounded-xl border border-[var(--ui-border)]/60 shadow-sm overflow-hidden">
+                            <div class="p-4 border-b border-[var(--ui-border)]/40 flex items-center justify-between">
                                 <div class="flex-1">
                                     @can('update', $contentBoard)
                                         <input 
@@ -70,41 +56,26 @@
                                         <p class="text-sm text-[var(--ui-muted)] mt-1">{{ $section->description }}</p>
                                     @endif
                                 </div>
+                                @can('update', $contentBoard)
+                                    <x-ui-button 
+                                        variant="danger-outline" 
+                                        size="xs" 
+                                        wire:click="deleteSection({{ $section->id }})"
+                                        wire:confirm="Möchtest du diese Section wirklich löschen? Alle Rows und Blocks werden ebenfalls gelöscht."
+                                    >
+                                        <span class="inline-flex items-center gap-1">
+                                            @svg('heroicon-o-trash', 'w-3 h-3')
+                                            <span>Löschen</span>
+                                        </span>
+                                    </x-ui-button>
+                                @endcan
                             </div>
-                            @can('update', $contentBoard)
-                                <x-ui-button 
-                                    variant="danger-outline" 
-                                    size="xs" 
-                                    wire:click="deleteSection({{ $section->id }})"
-                                    wire:confirm="Möchtest du diese Section wirklich löschen? Alle Rows und Blocks werden ebenfalls gelöscht."
-                                >
-                                    <span class="inline-flex items-center gap-1">
-                                        @svg('heroicon-o-trash', 'w-3 h-3')
-                                        <span>Löschen</span>
-                                    </span>
-                                </x-ui-button>
-                            @endcan
-                        </div>
-                        
-                        {{-- Rows innerhalb der Section --}}
-                        <div class="p-4 space-y-4">
-                            @foreach($section->rows as $row)
-                                <div 
-                                    wire:key="row-{{ $row->id }}"
-                                    class="bg-[var(--ui-muted-5)] rounded-lg border border-[var(--ui-border)]/40 overflow-visible"
-                                >
-                                    <div class="p-3 border-b border-[var(--ui-border)]/40 flex items-center justify-between">
-                                        <div class="flex items-center gap-2 flex-1">
-                                            @can('update', $contentBoard)
-                                                <button 
-                                                    type="button"
-                                                    class="text-[var(--ui-muted)] hover:text-[var(--ui-primary)] p-1 rounded-md hover:bg-white"
-                                                    title="Row verschieben (bald verfügbar)"
-                                                    disabled
-                                                >
-                                                    @svg('heroicon-o-bars-3', 'w-3 h-3')
-                                                </button>
-                                            @endcan
+                            
+                            {{-- Rows innerhalb der Section --}}
+                            <div class="p-4 space-y-4">
+                                @foreach($section->rows as $row)
+                                    <div class="bg-[var(--ui-muted-5)] rounded-lg border border-[var(--ui-border)]/40 overflow-hidden">
+                                        <div class="p-3 border-b border-[var(--ui-border)]/40 flex items-center justify-between">
                                             <div class="flex items-center gap-3 flex-1">
                                                 @can('update', $contentBoard)
                                                     <input 
@@ -116,168 +87,161 @@
                                                 @else
                                                     <h4 class="text-sm font-semibold text-[var(--ui-secondary)]">{{ $row->name }}</h4>
                                                 @endcan
-                                            @if($row->description)
-                                                <span class="text-xs text-[var(--ui-muted)]">{{ $row->description }}</span>
-                                            @endif
-                                            @php
-                                                $totalSpan = $row->blocks->sum('span');
-                                            @endphp
-                                            <span class="text-xs px-2 py-0.5 rounded {{ $totalSpan > 12 ? 'bg-red-100 text-red-700' : ($totalSpan == 12 ? 'bg-green-100 text-green-700' : 'bg-[var(--ui-muted-5)] text-[var(--ui-muted)]') }}">
-                                                Span: {{ $totalSpan }}/12
-                                            </span>
-                                        </div>
-                                        <div class="flex items-center gap-2">
-                                            @can('update', $contentBoard)
-                                                <x-ui-button 
-                                                    variant="primary" 
-                                                    size="xs" 
-                                                    wire:click="createBlock({{ $row->id }})"
-                                                    :disabled="$row->blocks->count() >= 12"
-                                                >
-                                                    <span class="inline-flex items-center gap-1">
-                                                        @svg('heroicon-o-plus', 'w-3 h-3')
-                                                        <span>Block</span>
-                                                    </span>
-                                                </x-ui-button>
-                                                <x-ui-button 
-                                                    variant="danger-outline" 
-                                                    size="xs" 
-                                                    wire:click="deleteRow({{ $row->id }})"
-                                                    wire:confirm="Möchtest du diese Row wirklich löschen? Alle Blocks werden ebenfalls gelöscht."
-                                                >
-                                                    <span class="inline-flex items-center gap-1">
-                                                        @svg('heroicon-o-trash', 'w-3 h-3')
-                                                    </span>
-                                                </x-ui-button>
-                                            @endcan
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="p-3">
-                                        @if($row->blocks->count() > 0)
-                                            <div class="grid grid-cols-12 gap-2">
-                                                @foreach($row->blocks as $block)
-                                                    <div 
-                                                        wire:key="block-{{ $block->id }}"
-                                                        class="bg-white rounded-lg border border-[var(--ui-border)]/40 hover:border-[var(--ui-primary)]/40 transition-colors relative"
-                                                        style="grid-column: span {{ $block->span }};"
-                                                        x-data="{ settingsOpen: false }"
-                                                        @click.away="settingsOpen = false"
-                                                    >
-                                                        {{-- Block Header --}}
-                                                        @can('update', $contentBoard)
-                                                            <div class="flex items-center justify-end p-1 border-b border-[var(--ui-border)]/40 relative" style="z-index: 10;">
-                                                                <div class="relative" style="z-index: 100;">
-                                                                    <button 
-                                                                        type="button"
-                                                                        @click="settingsOpen = !settingsOpen"
-                                                                        class="p-1 rounded hover:bg-[var(--ui-muted-5)] transition-colors relative z-10"
-                                                                        title="Block-Einstellungen"
-                                                                    >
-                                                                        @svg('heroicon-o-cog-6-tooth', 'w-3 h-3 text-[var(--ui-muted)]')
-                                                                    </button>
-                                                                    
-                                                                    {{-- Settings Dropdown --}}
-                                                                    <div 
-                                                                        x-show="settingsOpen"
-                                                                        x-cloak
-                                                                        x-transition
-                                                                        class="absolute right-0 top-full mt-1 bg-white rounded-lg border border-[var(--ui-border)]/60 shadow-xl p-2 min-w-[140px]"
-                                                                        style="z-index: 9999; position: absolute;"
-                                                                    >
-                                                                        <div class="space-y-2">
-                                                                            <div>
-                                                                                <label class="text-xs font-medium text-[var(--ui-secondary)] mb-1 block">Span (1-12)</label>
-                                                                                <input 
-                                                                                    type="number" 
-                                                                                    min="1" 
-                                                                                    max="12" 
-                                                                                    value="{{ $block->span }}"
-                                                                                    wire:change="updateBlockSpan({{ $block->id }}, $event.target.value); settingsOpen = false"
-                                                                                    class="w-full text-xs text-center border border-[var(--ui-border)] rounded px-2 py-1 focus:ring-2 focus:ring-[var(--ui-primary)] focus:border-transparent"
-                                                                                />
-                                                                            </div>
-                                                                            <div class="pt-2 border-t border-[var(--ui-border)]/40">
-                                                                                <button
-                                                                                    type="button"
-                                                                                    wire:click="deleteBlock({{ $block->id }})"
-                                                                                    wire:confirm="Möchtest du diesen Block wirklich löschen?"
-                                                                                    @click="settingsOpen = false"
-                                                                                    class="w-full text-xs text-red-600 hover:text-red-700 hover:bg-red-50 px-2 py-1.5 rounded transition-colors flex items-center justify-center gap-1"
-                                                                                >
-                                                                                    @svg('heroicon-o-trash', 'w-3 h-3')
-                                                                                    <span>Löschen</span>
-                                                                                </button>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        @endcan
-                                                        
-                                                        {{-- Block Content --}}
-                                                        <div class="p-3">
-                                                            <div class="flex items-start justify-between">
-                                                                <div class="flex-1">
-                                                                    @can('update', $contentBoard)
-                                                                        <input 
-                                                                            type="text"
-                                                                            value="{{ $block->name }}"
-                                                                            wire:blur="updateBlockName({{ $block->id }}, $event.target.value)"
-                                                                            class="text-xs font-semibold text-[var(--ui-secondary)] bg-transparent border-none p-0 focus:outline-none focus:ring-2 focus:ring-[var(--ui-primary)] rounded px-1 -ml-1 w-full"
-                                                                        />
-                                                                    @else
-                                                                        <h5 class="text-xs font-semibold text-[var(--ui-secondary)]">{{ $block->name }}</h5>
-                                                                    @endcan
-                                                                    @if($block->description)
-                                                                        <p class="text-xs text-[var(--ui-muted)] mt-1">{{ $block->description }}</p>
-                                                                    @endif
-                                                                </div>
-                                                                @if(!auth()->user()->can('update', $contentBoard))
-                                                                    <span class="text-xs text-[var(--ui-muted)] bg-[var(--ui-muted-5)] px-1.5 py-0.5 rounded">
-                                                                        {{ $block->span }}/12
-                                                                    </span>
-                                                                @endif
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                @endforeach
+                                                @if($row->description)
+                                                    <span class="text-xs text-[var(--ui-muted)]">{{ $row->description }}</span>
+                                                @endif
+                                                @php
+                                                    $totalSpan = $row->blocks->sum('span');
+                                                @endphp
+                                                <span class="text-xs px-2 py-0.5 rounded {{ $totalSpan > 12 ? 'bg-red-100 text-red-700' : ($totalSpan == 12 ? 'bg-green-100 text-green-700' : 'bg-[var(--ui-muted-5)] text-[var(--ui-muted)]') }}">
+                                                    Span: {{ $totalSpan }}/12
+                                                </span>
                                             </div>
-                                        @else
-                                            <div class="text-center py-4 border-2 border-dashed border-[var(--ui-border)]/40 rounded-lg">
-                                                <p class="text-xs text-[var(--ui-muted)] mb-2">Noch keine Blöcke</p>
+                                            <div class="flex items-center gap-2">
                                                 @can('update', $contentBoard)
                                                     <x-ui-button 
                                                         variant="primary" 
                                                         size="xs" 
                                                         wire:click="createBlock({{ $row->id }})"
+                                                        :disabled="$row->blocks->count() >= 12"
                                                     >
                                                         <span class="inline-flex items-center gap-1">
                                                             @svg('heroicon-o-plus', 'w-3 h-3')
-                                                            <span>Block hinzufügen</span>
+                                                            <span>Block</span>
+                                                        </span>
+                                                    </x-ui-button>
+                                                    <x-ui-button 
+                                                        variant="danger-outline" 
+                                                        size="xs" 
+                                                        wire:click="deleteRow({{ $row->id }})"
+                                                        wire:confirm="Möchtest du diese Row wirklich löschen? Alle Blocks werden ebenfalls gelöscht."
+                                                    >
+                                                        <span class="inline-flex items-center gap-1">
+                                                            @svg('heroicon-o-trash', 'w-3 h-3')
                                                         </span>
                                                     </x-ui-button>
                                                 @endcan
                                             </div>
-                                        @endif
+                                        </div>
+                                        
+                                        <div class="p-3">
+                                            @if($row->blocks->count() > 0)
+                                                <div class="grid grid-cols-12 gap-2">
+                                                    @foreach($row->blocks as $block)
+                                                        <div 
+                                                            class="bg-white rounded-lg border border-[var(--ui-border)]/40 hover:border-[var(--ui-primary)]/40 transition-colors relative"
+                                                            style="grid-column: span {{ $block->span }};"
+                                                            x-data="{ settingsOpen: false }"
+                                                            @click.away="settingsOpen = false"
+                                                        >
+                                                            {{-- Block Header --}}
+                                                            @can('update', $contentBoard)
+                                                                <div class="flex items-center justify-end p-1 border-b border-[var(--ui-border)]/40">
+                                                                    <div class="relative">
+                                                                        <button 
+                                                                            type="button"
+                                                                            @click="settingsOpen = !settingsOpen"
+                                                                            class="p-1 rounded hover:bg-[var(--ui-muted-5)] transition-colors"
+                                                                            title="Block-Einstellungen"
+                                                                        >
+                                                                            @svg('heroicon-o-cog-6-tooth', 'w-3 h-3 text-[var(--ui-muted)]')
+                                                                        </button>
+                                                                        
+                                                                        {{-- Settings Dropdown --}}
+                                                                        <div 
+                                                                            x-show="settingsOpen"
+                                                                            x-cloak
+                                                                            x-transition
+                                                                            class="absolute right-0 top-full mt-1 z-50 bg-white rounded-lg border border-[var(--ui-border)]/60 shadow-xl p-2 min-w-[140px]"
+                                                                        >
+                                                                            <div class="space-y-2">
+                                                                                <div>
+                                                                                    <label class="text-xs font-medium text-[var(--ui-secondary)] mb-1 block">Span (1-12)</label>
+                                                                                    <input 
+                                                                                        type="number" 
+                                                                                        min="1" 
+                                                                                        max="12" 
+                                                                                        value="{{ $block->span }}"
+                                                                                        wire:change="updateBlockSpan({{ $block->id }}, $event.target.value); settingsOpen = false"
+                                                                                        class="w-full text-xs text-center border border-[var(--ui-border)] rounded px-2 py-1 focus:ring-2 focus:ring-[var(--ui-primary)] focus:border-transparent"
+                                                                                    />
+                                                                                </div>
+                                                                                <div class="pt-2 border-t border-[var(--ui-border)]/40">
+                                                                                    <button
+                                                                                        type="button"
+                                                                                        wire:click="deleteBlock({{ $block->id }})"
+                                                                                        wire:confirm="Möchtest du diesen Block wirklich löschen?"
+                                                                                        @click="settingsOpen = false"
+                                                                                        class="w-full text-xs text-red-600 hover:text-red-700 hover:bg-red-50 px-2 py-1.5 rounded transition-colors flex items-center justify-center gap-1"
+                                                                                    >
+                                                                                        @svg('heroicon-o-trash', 'w-3 h-3')
+                                                                                        <span>Löschen</span>
+                                                                                    </button>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            @endcan
+                                                            
+                                                            {{-- Block Content --}}
+                                                            <div class="p-3">
+                                                                <div class="flex items-start justify-between">
+                                                                    <div class="flex-1">
+                                                                        @can('update', $contentBoard)
+                                                                            <input 
+                                                                                type="text"
+                                                                                value="{{ $block->name }}"
+                                                                                wire:blur="updateBlockName({{ $block->id }}, $event.target.value)"
+                                                                                class="text-xs font-semibold text-[var(--ui-secondary)] bg-transparent border-none p-0 focus:outline-none focus:ring-2 focus:ring-[var(--ui-primary)] rounded px-1 -ml-1 w-full"
+                                                                            />
+                                                                        @else
+                                                                            <h5 class="text-xs font-semibold text-[var(--ui-secondary)]">{{ $block->name }}</h5>
+                                                                        @endcan
+                                                                        @if($block->description)
+                                                                            <p class="text-xs text-[var(--ui-muted)] mt-1">{{ $block->description }}</p>
+                                                                        @endif
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    @endforeach
+                                                </div>
+                                            @else
+                                                <div class="text-center py-4 border-2 border-dashed border-[var(--ui-border)]/40 rounded-lg">
+                                                    <p class="text-xs text-[var(--ui-muted)] mb-2">Noch keine Blöcke</p>
+                                                    @can('update', $contentBoard)
+                                                        <x-ui-button 
+                                                            variant="primary" 
+                                                            size="xs" 
+                                                            wire:click="createBlock({{ $row->id }})"
+                                                        >
+                                                            <span class="inline-flex items-center gap-1">
+                                                                @svg('heroicon-o-plus', 'w-3 h-3')
+                                                                <span>Block hinzufügen</span>
+                                                            </span>
+                                                        </x-ui-button>
+                                                    @endcan
+                                                </div>
+                                            @endif
+                                        </div>
                                     </div>
-                                </div>
-                            @endforeach
+                                @endforeach
 
-                            {{-- Neue Row hinzufügen --}}
-                            @can('update', $contentBoard)
-                                <div class="border-2 border-dashed border-[var(--ui-border)]/40 rounded-lg p-3 text-center">
-                                    <x-ui-button variant="secondary-outline" size="sm" wire:click="createRow({{ $section->id }})">
-                                        <span class="inline-flex items-center gap-2">
-                                            @svg('heroicon-o-plus', 'w-4 h-4')
-                                            <span>Row hinzufügen</span>
-                                        </span>
-                                    </x-ui-button>
-                                </div>
-                            @endcan
+                                {{-- Neue Row hinzufügen --}}
+                                @can('update', $contentBoard)
+                                    <div class="border-2 border-dashed border-[var(--ui-border)]/40 rounded-lg p-3 text-center">
+                                        <x-ui-button variant="secondary-outline" size="sm" wire:click="createRow({{ $section->id }})">
+                                            <span class="inline-flex items-center gap-2">
+                                                @svg('heroicon-o-plus', 'w-4 h-4')
+                                                <span>Row hinzufügen</span>
+                                            </span>
+                                        </x-ui-button>
+                                    </div>
+                                @endcan
+                            </div>
                         </div>
-                    </div>
-                @endforeach
+                    @endforeach
                 </div>
             @else
                 <div class="bg-white rounded-xl border border-[var(--ui-border)]/60 shadow-sm p-12 text-center">

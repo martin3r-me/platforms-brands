@@ -7,75 +7,43 @@ use Illuminate\Routing\Controller;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
-use Platform\Brands\Models\BrandsBrand;
-use Platform\Brands\Models\BrandsMetaToken;
+use Platform\Brands\Models\MetaToken;
 use Laravel\Socialite\Facades\Socialite;
 
 class FacebookPageOAuthController extends Controller
 {
     use AuthorizesRequests;
     /**
-     * Startet den OAuth-Flow für Facebook Page Verknüpfung
+     * Startet den OAuth-Flow für Meta-Verbindung (User-Ebene)
      */
     public function redirect(Request $request)
     {
-        $brandId = $request->query('brand_id');
-        
-        if (!$brandId) {
-            return redirect()->route('brands.dashboard')
-                ->with('error', 'Keine Marke angegeben.');
-        }
-
-        $brand = BrandsBrand::findOrFail($brandId);
-        
-        // Policy-Berechtigung prüfen
-        $this->authorize('update', $brand);
-        
         $user = Auth::user();
-        $team = $user->currentTeam;
         
-        if (!$team) {
-            return redirect()->route('brands.brands.show', ['brandsBrand' => $brandId])
-                ->with('error', 'Kein Team ausgewählt.');
+        if (!$user) {
+            return redirect()->route('dashboard')
+                ->with('error', 'Nicht angemeldet.');
         }
-
-        // Brand ID und Team ID in Session speichern für Callback
-        session([
-            'brands_oauth_brand_id' => $brand->id,
-            'brands_oauth_team_id' => $team->id,
-        ]);
 
         // OAuth-Flow starten - direkt über Socialite
         $state = \Illuminate\Support\Str::random(32);
         session(['meta_oauth_state' => $state]);
         
-        // Callback-Route generieren
-        $callbackRoute = route('brands.facebook-pages.oauth.callback');
+        // Callback-Route generieren (nur Pfad, keine absolute URL)
+        $callbackPath = '/meta/oauth/callback';
         
         // Redirect Domain aus Brands Config verwenden
         $redirectDomain = config('brands.meta.redirect_domain');
         if ($redirectDomain) {
-            // Wenn redirect_domain gesetzt ist, diese verwenden
-            // Prüfen ob callbackRoute bereits eine absolute URL ist
-            if (filter_var($callbackRoute, FILTER_VALIDATE_URL)) {
-                // Absolute URL: nur den Pfad extrahieren
-                $path = parse_url($callbackRoute, PHP_URL_PATH);
-                $redirectUri = rtrim($redirectDomain, '/') . $path;
-            } else {
-                // Relative URL: direkt anhängen
-                $redirectUri = rtrim($redirectDomain, '/') . '/' . ltrim($callbackRoute, '/');
-            }
+            // Domain + Pfad kombinieren
+            $redirectUri = rtrim($redirectDomain, '/') . $callbackPath;
         } else {
-            // Fallback: absolute URL erstellen
-            if (filter_var($callbackRoute, FILTER_VALIDATE_URL)) {
-                $redirectUri = $callbackRoute;
-            } else {
-                $redirectUri = url($callbackRoute);
-            }
+            // Fallback: absolute URL aus route() generieren
+            $redirectUri = url($callbackPath);
         }
         
         Log::info('Brands OAuth redirect start', [
-            'brand_id' => $brandId,
+            'user_id' => $user->id,
             'redirect_uri' => $redirectUri,
             'redirect_domain' => $redirectDomain,
         ]);
@@ -90,7 +58,7 @@ class FacebookPageOAuthController extends Controller
                     'has_client_id' => !empty($clientId),
                     'has_client_secret' => !empty($clientSecret),
                 ]);
-                return redirect()->route('brands.brands.show', ['brandsBrand' => $brandId])
+                return redirect()->back()
                     ->with('error', 'Meta OAuth ist nicht konfiguriert. Bitte konfiguriere META_CLIENT_ID und META_CLIENT_SECRET in der .env Datei.');
             }
             
@@ -140,7 +108,7 @@ class FacebookPageOAuthController extends Controller
             
             if (empty($redirectUrl)) {
                 Log::error('Brands OAuth: Empty redirect URL');
-                return redirect()->route('brands.brands.show', ['brandsBrand' => $brandId])
+                return redirect()->back()
                     ->with('error', 'Fehler: OAuth Redirect-URL konnte nicht generiert werden.');
             }
             
@@ -155,34 +123,26 @@ class FacebookPageOAuthController extends Controller
                 'line' => $e->getLine(),
             ]);
             
-            return redirect()->route('brands.brands.show', ['brandsBrand' => $brandId])
+            return redirect()->back()
                 ->with('error', 'Fehler beim Starten des OAuth-Flows: ' . $e->getMessage());
         }
     }
 
     /**
-     * OAuth Callback für Facebook Page Verknüpfung
+     * OAuth Callback für Meta-Verbindung (User-Ebene)
      */
     public function callback(Request $request)
     {
         Log::info('Brands OAuth callback: Start', [
             'query_params' => $request->query(),
-            'session_brand_id' => session('brands_oauth_brand_id'),
-            'session_team_id' => session('brands_oauth_team_id'),
         ]);
         
-        // Brand ID und Team ID aus Session holen
-        $brandId = session('brands_oauth_brand_id');
-        $teamId = session('brands_oauth_team_id');
-
-        if (!$brandId || !$teamId) {
-            Log::error('Brands OAuth callback: Missing brand_id or team_id in session', [
-                'brand_id' => $brandId,
-                'team_id' => $teamId,
-                'all_session_keys' => array_keys(session()->all()),
-            ]);
-            return redirect()->route('brands.brands.show', ['brandsBrand' => $brandId ?? 1])
-                ->with('error', 'OAuth-Fehler: Kontext verloren. Bitte versuche es erneut.');
+        $user = Auth::user();
+        
+        if (!$user) {
+            Log::error('Brands OAuth callback: User not authenticated');
+            return redirect()->route('dashboard')
+                ->with('error', 'OAuth-Fehler: Nicht angemeldet.');
         }
 
         // State verifizieren
@@ -190,7 +150,7 @@ class FacebookPageOAuthController extends Controller
         $sessionState = session('meta_oauth_state');
         if ($requestState && (!$sessionState || $sessionState !== $requestState)) {
             Log::error('Brands OAuth state mismatch');
-            return redirect()->route('brands.brands.show', ['brandsBrand' => $brandId])
+            return redirect()->back()
                 ->with('error', 'Ungültiger OAuth-State. Bitte versuche es erneut.');
         }
         session()->forget('meta_oauth_state');
@@ -198,7 +158,7 @@ class FacebookPageOAuthController extends Controller
         $code = $request->query('code');
         if (!$code) {
             $error = $request->query('error');
-            return redirect()->route('brands.brands.show', ['brandsBrand' => $brandId])
+            return redirect()->back()
                 ->with('error', $error ?? 'OAuth-Fehler: Kein Code erhalten.');
         }
 
@@ -210,24 +170,17 @@ class FacebookPageOAuthController extends Controller
             $accessToken = null;
             
             try {
-                // Callback-Route für Socialite
-                $callbackRoute = route('brands.facebook-pages.oauth.callback');
+                // Callback-Route für Socialite (nur Pfad, keine absolute URL)
+                $callbackPath = '/meta/oauth/callback';
                 
                 // Redirect Domain aus Brands Config verwenden
                 $redirectDomain = config('brands.meta.redirect_domain');
                 if ($redirectDomain) {
-                    if (filter_var($callbackRoute, FILTER_VALIDATE_URL)) {
-                        $path = parse_url($callbackRoute, PHP_URL_PATH);
-                        $redirectUri = rtrim($redirectDomain, '/') . $path;
-                    } else {
-                        $redirectUri = rtrim($redirectDomain, '/') . '/' . ltrim($callbackRoute, '/');
-                    }
+                    // Domain + Pfad kombinieren
+                    $redirectUri = rtrim($redirectDomain, '/') . $callbackPath;
                 } else {
-                    if (filter_var($callbackRoute, FILTER_VALIDATE_URL)) {
-                        $redirectUri = $callbackRoute;
-                    } else {
-                        $redirectUri = url($callbackRoute);
-                    }
+                    // Fallback: absolute URL generieren
+                    $redirectUri = url($callbackPath);
                 }
                 
                 // Meta OAuth Credentials aus Brands Config
@@ -289,21 +242,14 @@ class FacebookPageOAuthController extends Controller
                 throw new \Exception('Access Token konnte nicht abgerufen werden.');
             }
 
-            // Brand laden
-            $brand = BrandsBrand::findOrFail($brandId);
-            
-            $user = Auth::user();
+            // Token speichern auf User/Team-Ebene
             $team = $user->currentTeam;
-
-            if (!$team || $team->id !== $teamId) {
-                session()->forget(['brands_oauth_brand_id', 'brands_oauth_team_id']);
-                return redirect()->route('brands.brands.show', ['brandsBrand' => $brandId])
-                    ->with('error', 'Team-Kontext stimmt nicht überein.');
+            
+            if (!$team) {
+                throw new \Exception('Kein Team gefunden. Bitte wähle ein Team aus.');
             }
 
-            // Token speichern (updateOrCreate, falls bereits vorhanden)
             Log::info('Brands OAuth callback: Speichere Token', [
-                'brand_id' => $brand->id,
                 'user_id' => $user->id,
                 'team_id' => $team->id,
                 'has_access_token' => !empty($accessToken),
@@ -311,9 +257,10 @@ class FacebookPageOAuthController extends Controller
                 'expires_in' => $expiresIn,
             ]);
 
-            $metaToken = BrandsMetaToken::updateOrCreate(
+            $metaToken = MetaToken::updateOrCreate(
                 [
-                    'brand_id' => $brand->id,
+                    'user_id' => $user->id,
+                    'team_id' => $team->id,
                 ],
                 [
                     'access_token' => $accessToken,
@@ -321,8 +268,6 @@ class FacebookPageOAuthController extends Controller
                     'expires_at' => $expiresIn ? now()->addSeconds($expiresIn) : null,
                     'token_type' => 'Bearer',
                     'scopes' => $scopes,
-                    'user_id' => $user->id,
-                    'team_id' => $team->id,
                 ]
             );
 
@@ -331,10 +276,7 @@ class FacebookPageOAuthController extends Controller
                 'uuid' => $metaToken->uuid,
             ]);
 
-            // Session aufräumen
-            session()->forget(['brands_oauth_brand_id', 'brands_oauth_team_id']);
-
-            return redirect()->route('brands.brands.show', ['brandsBrand' => $brandId])
+            return redirect()->back()
                 ->with('success', 'Meta OAuth Token wurde erfolgreich gespeichert. Du kannst nun Facebook Pages und Instagram Accounts abrufen.');
 
         } catch (\Exception $e) {
@@ -343,10 +285,8 @@ class FacebookPageOAuthController extends Controller
                 'trace' => $e->getTraceAsString(),
             ]);
 
-            session()->forget(['brands_oauth_brand_id', 'brands_oauth_team_id']);
-
-            return redirect()->route('brands.brands.show', ['brandsBrand' => $brandId ?? 1])
-                ->with('error', 'Fehler beim Verknüpfen der Facebook Page: ' . $e->getMessage());
+            return redirect()->back()
+                ->with('error', 'Fehler beim Verknüpfen der Meta-Verbindung: ' . $e->getMessage());
         }
     }
 }

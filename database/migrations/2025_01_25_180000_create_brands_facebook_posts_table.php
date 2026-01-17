@@ -16,7 +16,7 @@ return new class extends Migration
             Schema::create($tableName, function (Blueprint $table) {
                 $table->id();
                 $table->string('uuid')->unique();
-                $table->foreignId('facebook_page_id')->constrained('brands_facebook_pages')->onDelete('cascade');
+                $table->foreignId('facebook_page_id')->constrained('facebook_pages')->onDelete('cascade');
                 $table->string('external_id'); // Facebook Post ID
                 $table->text('message')->nullable(); // Post-Text
                 $table->text('story')->nullable(); // Story-Text
@@ -30,12 +30,10 @@ return new class extends Migration
                 $table->integer('comment_count')->default(0);
                 $table->integer('share_count')->default(0);
                 $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-                $table->foreignId('team_id')->constrained('teams')->onDelete('cascade');
                 $table->timestamps();
                 
                 $table->index(['facebook_page_id'], 'bfp_page_id_idx');
                 $table->index(['external_id'], 'bfp_external_id_idx');
-                $table->index(['team_id'], 'bfp_team_id_idx');
                 $table->index(['published_at'], 'bfp_published_at_idx');
                 $table->index(['status'], 'bfp_status_idx');
                 $table->unique(['external_id'], 'bfp_external_id_uniq');
@@ -49,7 +47,6 @@ return new class extends Migration
             $indexes = [
                 [['facebook_page_id'], 'bfp_page_id_idx'],
                 [['external_id'], 'bfp_external_id_idx'],
-                [['team_id'], 'bfp_team_id_idx'],
                 [['published_at'], 'bfp_published_at_idx'],
                 [['status'], 'bfp_status_idx'],
             ];

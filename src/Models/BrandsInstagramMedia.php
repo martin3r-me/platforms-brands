@@ -30,7 +30,6 @@ class BrandsInstagramMedia extends Model implements HasDisplayName
         'is_story',
         'insights_available',
         'user_id',
-        'team_id',
     ];
 
     protected $casts = [
@@ -55,17 +54,12 @@ class BrandsInstagramMedia extends Model implements HasDisplayName
 
     public function instagramAccount(): BelongsTo
     {
-        return $this->belongsTo(BrandsInstagramAccount::class, 'instagram_account_id');
+        return $this->belongsTo(InstagramAccount::class, 'instagram_account_id');
     }
 
     public function user(): BelongsTo
     {
         return $this->belongsTo(\Platform\Core\Models\User::class);
-    }
-
-    public function team(): BelongsTo
-    {
-        return $this->belongsTo(\Platform\Core\Models\Team::class);
     }
 
     public function insights(): HasMany

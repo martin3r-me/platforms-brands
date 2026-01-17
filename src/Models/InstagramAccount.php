@@ -10,17 +10,16 @@ use Symfony\Component\Uid\UuidV7;
 use Platform\Core\Contracts\HasDisplayName;
 
 /**
- * Model für Instagram Accounts
+ * Model für Instagram Accounts (übergeordnet auf User/Team-Ebene)
  * 
- * Vollständig unabhängiges Model - erbt direkt von Laravel Model
+ * Ein User/Team kann Instagram Accounts haben, die dann mit Brands verknüpft werden können
  */
-class BrandsInstagramAccount extends Model implements HasDisplayName
+class InstagramAccount extends Model implements HasDisplayName
 {
-    protected $table = 'brands_instagram_accounts';
+    protected $table = 'instagram_accounts';
 
     protected $fillable = [
         'uuid',
-        'brand_id',
         'facebook_page_id',
         'external_id',
         'username',
@@ -31,7 +30,6 @@ class BrandsInstagramAccount extends Model implements HasDisplayName
         'token_type',
         'scopes',
         'user_id',
-        'team_id',
     ];
 
     protected $casts = [
@@ -56,36 +54,51 @@ class BrandsInstagramAccount extends Model implements HasDisplayName
         });
     }
 
-    public function brand(): BelongsTo
-    {
-        return $this->belongsTo(BrandsBrand::class, 'brand_id');
-    }
-
-    public function facebookPage(): BelongsTo
-    {
-        return $this->belongsTo(BrandsFacebookPage::class, 'facebook_page_id');
-    }
-
     public function user(): BelongsTo
     {
         return $this->belongsTo(\Platform\Core\Models\User::class);
     }
 
-    public function team(): BelongsTo
+    public function facebookPage(): BelongsTo
     {
-        return $this->belongsTo(\Platform\Core\Models\Team::class);
+        return $this->belongsTo(FacebookPage::class, 'facebook_page_id');
     }
 
+    /**
+     * Services, die diesen Instagram Account verwenden (Many-to-Many über core_service_assets)
+     * z.B. BrandsBrand, CommsChannel, etc.
+     */
+    public function services()
+    {
+        return $this->morphedByMany(
+            Model::class,
+            'asset',
+            'core_service_assets',
+            'asset_id',
+            'service_id'
+        )->where('core_service_assets.asset_type', static::class)
+         ->withTimestamps();
+    }
+
+    /**
+     * Instagram Media dieses Accounts
+     */
     public function media(): HasMany
     {
         return $this->hasMany(BrandsInstagramMedia::class, 'instagram_account_id');
     }
 
+    /**
+     * Instagram Account Insights
+     */
     public function insights(): HasMany
     {
         return $this->hasMany(BrandsInstagramAccountInsight::class, 'instagram_account_id');
     }
 
+    /**
+     * Neueste Insight
+     */
     public function latestInsight()
     {
         return $this->hasOne(BrandsInstagramAccountInsight::class, 'instagram_account_id')->latestOfMany('insight_date');

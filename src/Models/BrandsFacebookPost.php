@@ -30,7 +30,6 @@ class BrandsFacebookPost extends Model implements HasDisplayName
         'comment_count',
         'share_count',
         'user_id',
-        'team_id',
     ];
 
     protected $casts = [
@@ -55,17 +54,12 @@ class BrandsFacebookPost extends Model implements HasDisplayName
 
     public function facebookPage(): BelongsTo
     {
-        return $this->belongsTo(BrandsFacebookPage::class, 'facebook_page_id');
+        return $this->belongsTo(FacebookPage::class, 'facebook_page_id');
     }
 
     public function user(): BelongsTo
     {
         return $this->belongsTo(\Platform\Core\Models\User::class);
-    }
-
-    public function team(): BelongsTo
-    {
-        return $this->belongsTo(\Platform\Core\Models\Team::class);
     }
 
     /**

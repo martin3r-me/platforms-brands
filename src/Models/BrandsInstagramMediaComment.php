@@ -20,7 +20,6 @@ class BrandsInstagramMediaComment extends Model
         'like_count',
         'timestamp',
         'user_id',
-        'team_id',
     ];
 
     protected $casts = [
@@ -36,10 +35,5 @@ class BrandsInstagramMediaComment extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(\Platform\Core\Models\User::class);
-    }
-
-    public function team(): BelongsTo
-    {
-        return $this->belongsTo(\Platform\Core\Models\Team::class);
     }
 }

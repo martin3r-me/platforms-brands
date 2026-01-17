@@ -3,9 +3,9 @@
 namespace Platform\Brands\Services;
 
 use Platform\Brands\Models\BrandsBrand;
-use Platform\Brands\Models\BrandsFacebookPage;
-use Platform\Brands\Models\BrandsInstagramAccount;
-use Platform\Brands\Models\BrandsMetaToken;
+use Platform\Brands\Models\FacebookPage;
+use Platform\Brands\Models\InstagramAccount;
+use Platform\Brands\Models\MetaToken;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -39,12 +39,11 @@ class InstagramAccountService
         }
 
         $apiVersion = config('brands.meta.api_version', 'v21.0');
-        // Team-ID und User-ID direkt von der Brand nehmen (für Commands)
-        $teamId = $brand->team_id;
-        $userId = $brand->user_id ?? $metaToken->user_id;
+        // User-ID vom MetaToken nehmen (Token gehört User)
+        $userId = $metaToken->user_id;
 
-        // Instagram Accounts über Facebook Pages holen
-        $facebookPages = $brand->facebookPages;
+        // Instagram Accounts über Facebook Pages holen (alle Pages des Users)
+        $facebookPages = FacebookPage::where('user_id', $userId)->get();
         $syncedAccounts = [];
 
         foreach ($facebookPages as $facebookPage) {
@@ -67,10 +66,11 @@ class InstagramAccountService
                         // Instagram Username separat abrufen
                         $username = $this->fetchInstagramUsername($instagramId, $pageAccessToken, $apiVersion);
                         
-                        $instagramAccount = BrandsInstagramAccount::updateOrCreate(
+                        // Account auf User-Ebene erstellen oder aktualisieren (ohne team_id)
+                        $instagramAccount = InstagramAccount::updateOrCreate(
                             [
                                 'external_id' => $instagramId,
-                                'brand_id' => $brand->id,
+                                'user_id' => $userId,
                             ],
                             [
                                 'username' => $username,
@@ -80,11 +80,25 @@ class InstagramAccountService
                                 'expires_at' => $metaToken->expires_at,
                                 'token_type' => 'Bearer',
                                 'scopes' => $metaToken->scopes,
-                                'user_id' => $userId,
-                                'team_id' => $teamId,
                                 'facebook_page_id' => $facebookPage->id,
                             ]
                         );
+
+                        // Verknüpfung zur Brand über core_service_assets (falls noch nicht verknüpft)
+                        $serviceAsset = \Platform\Core\Models\CoreServiceAsset::where('service_type', BrandsBrand::class)
+                            ->where('service_id', $brand->id)
+                            ->where('asset_type', InstagramAccount::class)
+                            ->where('asset_id', $instagramAccount->id)
+                            ->first();
+                        
+                        if (!$serviceAsset) {
+                            \Platform\Core\Models\CoreServiceAsset::create([
+                                'service_type' => BrandsBrand::class,
+                                'service_id' => $brand->id,
+                                'asset_type' => InstagramAccount::class,
+                                'asset_id' => $instagramAccount->id,
+                            ]);
+                        }
 
                         $syncedAccounts[] = $instagramAccount;
 
@@ -93,6 +107,8 @@ class InstagramAccountService
                             'external_id' => $instagramId,
                             'facebook_page_id' => $facebookPage->id,
                             'brand_id' => $brand->id,
+                            'user_id' => $userId,
+                            'team_id' => $teamId,
                         ]);
                     }
                 }
@@ -126,10 +142,11 @@ class InstagramAccountService
                                     // Verwende den accessToken für den Username-Abruf
                                     $username = $this->fetchInstagramUsername($instagramId, $accessToken, $apiVersion);
                                     
-                                    $instagramAccount = BrandsInstagramAccount::updateOrCreate(
+                                    // Account auf User-Ebene erstellen oder aktualisieren (ohne team_id)
+                                    $instagramAccount = InstagramAccount::updateOrCreate(
                                         [
                                             'external_id' => $instagramId,
-                                            'brand_id' => $brand->id,
+                                            'user_id' => $userId,
                                         ],
                                         [
                                             'username' => $username,
@@ -139,11 +156,25 @@ class InstagramAccountService
                                             'expires_at' => $metaToken->expires_at,
                                             'token_type' => 'Bearer',
                                             'scopes' => $metaToken->scopes,
-                                            'user_id' => $userId,
-                                            'team_id' => $teamId,
                                             'facebook_page_id' => $facebookPage->id ?? null,
                                         ]
                                     );
+
+                                    // Verknüpfung zur Brand über core_service_assets (falls noch nicht verknüpft)
+                                    $serviceAsset = \Platform\Core\Models\CoreServiceAsset::where('service_type', BrandsBrand::class)
+                                        ->where('service_id', $brand->id)
+                                        ->where('asset_type', InstagramAccount::class)
+                                        ->where('asset_id', $instagramAccount->id)
+                                        ->first();
+                                    
+                                    if (!$serviceAsset) {
+                                        \Platform\Core\Models\CoreServiceAsset::create([
+                                            'service_type' => BrandsBrand::class,
+                                            'service_id' => $brand->id,
+                                            'asset_type' => InstagramAccount::class,
+                                            'asset_id' => $instagramAccount->id,
+                                        ]);
+                                    }
 
                                     $syncedAccounts[] = $instagramAccount;
 
@@ -151,6 +182,7 @@ class InstagramAccountService
                                         'instagram_account_id' => $instagramAccount->id,
                                         'external_id' => $instagramId,
                                         'brand_id' => $brand->id,
+                                        'user_id' => $userId,
                                     ]);
                                 }
                             }
