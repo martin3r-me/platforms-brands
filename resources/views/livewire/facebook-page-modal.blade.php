@@ -18,9 +18,17 @@
             </div>
             
             @if($this->oauthRedirectUrl)
-                <div class="p-3 bg-gray-50 border border-gray-200 rounded-lg">
-                    <p class="text-xs font-medium text-gray-600 mb-1">Ziel-URL (Debug):</p>
-                    <p class="text-xs text-gray-800 font-mono break-all">{{ $this->oauthRedirectUrl }}</p>
+                <div class="p-3 bg-gray-50 border border-gray-200 rounded-lg space-y-2">
+                    <div>
+                        <p class="text-xs font-medium text-gray-600 mb-1">Interne Redirect-URL:</p>
+                        <p class="text-xs text-gray-800 font-mono break-all">{{ $this->oauthRedirectUrl }}</p>
+                    </div>
+                    @if($this->facebookOAuthUrl)
+                        <div>
+                            <p class="text-xs font-medium text-gray-600 mb-1">Facebook OAuth URL (zu Facebook):</p>
+                            <p class="text-xs text-gray-800 font-mono break-all">{{ $this->facebookOAuthUrl }}</p>
+                        </div>
+                    @endif
                 </div>
             @endif
         </div>
