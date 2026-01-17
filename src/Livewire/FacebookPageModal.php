@@ -68,15 +68,27 @@ class FacebookPageModal extends Component
             // State generieren (nur für Anzeige, wird im Controller neu generiert)
             $state = Str::random(32);
             
+            // API Version für OAuth URL
+            $apiVersion = config('brands.meta.api_version', 'v21.0');
+            
             // Facebook OAuth URL generieren
-            $facebookUrl = Socialite::buildProvider(
+            $provider = Socialite::buildProvider(
                 \Laravel\Socialite\Two\FacebookProvider::class,
                 [
                     'client_id' => $clientId,
                     'client_secret' => $clientSecret,
                     'redirect' => $redirectUri,
                 ]
-            )
+            );
+            
+            // API Version setzen, falls die Methode existiert
+            if (method_exists($provider, 'setApiVersion')) {
+                $provider->setApiVersion($apiVersion);
+            } elseif (method_exists($provider, 'version')) {
+                $provider->version($apiVersion);
+            }
+            
+            $facebookUrl = $provider
             ->scopes([
                 'business_management',
                 'pages_read_engagement',
@@ -89,6 +101,12 @@ class FacebookPageModal extends Component
             ->with(['state' => $state])
             ->redirect()
             ->getTargetUrl();
+            
+            // Falls Socialite die Version nicht unterstützt, manuell in URL ersetzen
+            if (strpos($facebookUrl, '/v') !== false && strpos($facebookUrl, $apiVersion) === false) {
+                // Ersetze die Version in der URL
+                $facebookUrl = preg_replace('/\/v\d+\.\d+\//', '/' . $apiVersion . '/', $facebookUrl);
+            }
             
             return $facebookUrl;
         } catch (\Exception $e) {

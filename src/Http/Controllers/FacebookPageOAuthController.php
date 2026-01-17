@@ -100,14 +100,26 @@ class FacebookPageOAuthController extends Controller
                     ->with('error', 'Meta OAuth ist nicht konfiguriert. Bitte konfiguriere META_CLIENT_ID und META_CLIENT_SECRET in der .env Datei.');
             }
             
-            $redirectUrl = Socialite::buildProvider(
+            // API Version für OAuth URL
+            $apiVersion = config('brands.meta.api_version', 'v21.0');
+            
+            $provider = Socialite::buildProvider(
                 \Laravel\Socialite\Two\FacebookProvider::class,
                 [
                     'client_id' => $clientId,
                     'client_secret' => $clientSecret,
                     'redirect' => $redirectUri,
                 ]
-            )
+            );
+            
+            // API Version setzen, falls die Methode existiert
+            if (method_exists($provider, 'setApiVersion')) {
+                $provider->setApiVersion($apiVersion);
+            } elseif (method_exists($provider, 'version')) {
+                $provider->version($apiVersion);
+            }
+            
+            $redirectUrl = $provider
             ->scopes([
                 'business_management',
                 'pages_read_engagement',
@@ -120,6 +132,12 @@ class FacebookPageOAuthController extends Controller
             ->with(['state' => $state])
             ->redirect()
             ->getTargetUrl();
+            
+            // Falls Socialite die Version nicht unterstützt, manuell in URL ersetzen
+            if (strpos($redirectUrl, '/v') !== false && strpos($redirectUrl, $apiVersion) === false) {
+                // Ersetze die Version in der URL
+                $redirectUrl = preg_replace('/\/v\d+\.\d+\//', '/' . $apiVersion . '/', $redirectUrl);
+            }
             
             Log::info('Brands OAuth redirect URL generated', [
                 'redirect_url' => $redirectUrl,
