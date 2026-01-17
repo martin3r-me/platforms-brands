@@ -88,9 +88,11 @@ class FacebookPageModal extends Component
         
         // Redirect Domain aus Config verwenden, falls gesetzt
         $redirectDomain = config('meta-oauth.redirect_domain');
-        if ($redirectDomain && !filter_var($redirectUri, FILTER_VALIDATE_URL)) {
-            $redirectUri = rtrim($redirectDomain, '/') . '/' . ltrim($redirectUri, '/');
-        } elseif (!filter_var($redirectUri, FILTER_VALIDATE_URL)) {
+        if ($redirectDomain) {
+            // Wenn redirect_domain gesetzt ist, diese verwenden
+            $redirectUri = rtrim($redirectDomain, '/') . '/' . ltrim(parse_url($redirectUri, PHP_URL_PATH) ?: $redirectUri, '/');
+        } else {
+            // Fallback: absolute URL erstellen
             $redirectUri = url($redirectUri);
         }
         
@@ -144,7 +146,8 @@ class FacebookPageModal extends Component
         // Modal schließen und zu OAuth weiterleiten
         $this->closeModal();
         
-        return redirect($redirectUrl);
+        // Externen Redirect zu Facebook über JavaScript ausführen
+        $this->js("window.location.href = " . json_encode($redirectUrl));
     }
 
     public function closeModal()
