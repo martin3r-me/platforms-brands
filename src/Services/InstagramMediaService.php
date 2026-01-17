@@ -8,7 +8,6 @@ use Platform\Brands\Services\BrandsMediaDownloadService;
 use Platform\Core\Models\ContextFile;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 
 /**
@@ -106,8 +105,9 @@ class InstagramMediaService
     public function syncMedia(BrandsInstagramAccount $account, int $limit = 1000): array
     {
         $mediaData = $this->fetchMedia($account, $limit);
-        $user = Auth::user();
-        $team = $user->currentTeam;
+        // Team-ID und User-ID direkt vom Instagram Account nehmen (für Commands)
+        $teamId = $account->team_id;
+        $userId = $account->user_id;
         $syncedMedia = [];
 
         foreach ($mediaData as $data) {
@@ -128,8 +128,8 @@ class InstagramMediaService
                     'comments_count' => $data['comments_count'],
                     'is_story' => $data['is_story'],
                     'insights_available' => true,
-                    'user_id' => $user->id,
-                    'team_id' => $team->id,
+                    'user_id' => $userId,
+                    'team_id' => $teamId,
                 ]
             );
 

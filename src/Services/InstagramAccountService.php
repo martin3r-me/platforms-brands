@@ -8,7 +8,6 @@ use Platform\Brands\Models\BrandsInstagramAccount;
 use Platform\Brands\Models\BrandsMetaToken;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Auth;
 
 /**
  * Service für Instagram Accounts Management
@@ -40,8 +39,9 @@ class InstagramAccountService
         }
 
         $apiVersion = config('brands.meta.api_version', 'v21.0');
-        $user = Auth::user();
-        $team = $user->currentTeam;
+        // Team-ID und User-ID direkt von der Brand nehmen (für Commands)
+        $teamId = $brand->team_id;
+        $userId = $brand->user_id ?? $metaToken->user_id;
 
         // Instagram Accounts über Facebook Pages holen
         $facebookPages = $brand->facebookPages;
@@ -80,8 +80,8 @@ class InstagramAccountService
                                 'expires_at' => $metaToken->expires_at,
                                 'token_type' => 'Bearer',
                                 'scopes' => $metaToken->scopes,
-                                'user_id' => $user->id,
-                                'team_id' => $team->id,
+                                'user_id' => $userId,
+                                'team_id' => $teamId,
                                 'facebook_page_id' => $facebookPage->id,
                             ]
                         );

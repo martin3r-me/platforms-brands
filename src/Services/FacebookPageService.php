@@ -10,7 +10,6 @@ use Platform\Brands\Services\BrandsMediaDownloadService;
 use Platform\Core\Models\ContextFile;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 
 /**
@@ -45,8 +44,9 @@ class FacebookPageService
         }
 
         $apiVersion = config('brands.meta.api_version', 'v21.0');
-        $user = Auth::user();
-        $team = $user->currentTeam;
+        // Team-ID und User-ID direkt von der Brand nehmen (für Commands)
+        $teamId = $brand->team_id;
+        $userId = $brand->user_id ?? $metaToken->user_id;
 
         // Business Accounts holen
         $businessResponse = Http::get("https://graph.facebook.com/{$apiVersion}/me/businesses", [
@@ -106,8 +106,8 @@ class FacebookPageService
                         'expires_at' => $metaToken->expires_at,
                         'token_type' => 'Bearer',
                         'scopes' => $metaToken->scopes,
-                        'user_id' => $user->id,
-                        'team_id' => $team->id,
+                        'user_id' => $userId,
+                        'team_id' => $teamId,
                     ]
                 );
 
@@ -136,8 +136,9 @@ class FacebookPageService
         }
 
         $apiVersion = config('brands.meta.api_version', 'v21.0');
-        $user = Auth::user();
-        $team = $user->currentTeam;
+        // Team-ID und User-ID direkt von der Facebook Page nehmen (für Commands)
+        $teamId = $facebookPage->team_id;
+        $userId = $facebookPage->user_id;
 
         $params = [
             'fields' => 'id,message,story,created_time,permalink_url,attachments,type,status_type',
@@ -192,8 +193,8 @@ class FacebookPageService
                         'media_url' => $mediaUrl,
                         'permalink_url' => $postData['permalink_url'] ?? null,
                         'published_at' => $createdTime,
-                        'user_id' => $user->id,
-                        'team_id' => $team->id,
+                        'user_id' => $userId,
+                        'team_id' => $teamId,
                     ]
                 );
 
