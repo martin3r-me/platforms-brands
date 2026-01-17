@@ -4,9 +4,11 @@ use Platform\Brands\Livewire\Brand;
 use Platform\Brands\Livewire\Dashboard;
 use Platform\Brands\Livewire\CiBoard;
 use Platform\Brands\Livewire\ContentBoard;
+use Platform\Brands\Livewire\ContentBoardSection;
 use Platform\Brands\Models\BrandsBrand;
 use Platform\Brands\Models\BrandsCiBoard;
 use Platform\Brands\Models\BrandsContentBoard;
+use Platform\Brands\Models\BrandsContentBoardSection;
 
 Route::get('/', Dashboard::class)->name('brands.dashboard');
 
@@ -21,3 +23,7 @@ Route::get('/ci-boards/{brandsCiBoard}', CiBoard::class)
 // Content Board Routes
 Route::get('/content-boards/{brandsContentBoard}', ContentBoard::class)
     ->name('brands.content-boards.show');
+
+// Content Board Section Routes
+Route::get('/content-board-sections/{brandsContentBoardSection}', ContentBoardSection::class)
+    ->name('brands.content-board-sections.show');

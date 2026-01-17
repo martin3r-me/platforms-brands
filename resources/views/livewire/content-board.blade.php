@@ -38,7 +38,7 @@
             @if($contentBoard->sections->count() > 0)
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                     @foreach($contentBoard->sections as $section)
-                        <div class="bg-white rounded-xl border border-[var(--ui-border)]/60 shadow-sm hover:shadow-md transition-shadow p-6 h-full cursor-pointer" wire:click="$dispatch('open-section', { sectionId: {{ $section->id }} })">
+                        <a href="{{ route('brands.content-board-sections.show', $section) }}" class="block">
                             <div class="flex items-start justify-between mb-3">
                                 <div class="flex-1">
                                     <h3 class="text-lg font-semibold text-[var(--ui-secondary)] mb-1">{{ $section->name }}</h3>
@@ -59,7 +59,7 @@
                                     </span>
                                 @endif
                             </div>
-                        </div>
+                        </a>
                     @endforeach
                 </div>
             @else
