@@ -33,6 +33,12 @@ class FacebookPageModal extends Component
         }
 
         try {
+            // Prüfen ob meta-oauth Config verfügbar ist
+            $metaOAuthConfig = config('meta-oauth');
+            if (!$metaOAuthConfig) {
+                return 'Fehler: meta-oauth Config nicht gefunden. Bitte stelle sicher, dass das meta-oauth Package registriert ist.';
+            }
+            
             // Callback-Route generieren
             $callbackRoute = route('brands.facebook-pages.oauth.callback');
             
@@ -58,11 +64,26 @@ class FacebookPageModal extends Component
             }
             
             // Meta OAuth Credentials aus Config
-            $clientId = config('meta-oauth.app_id') ?? config('services.meta.client_id');
-            $clientSecret = config('meta-oauth.app_secret') ?? config('services.meta.client_secret');
+            $appId = config('meta-oauth.app_id');
+            $appSecret = config('meta-oauth.app_secret');
+            $clientId = $appId ?? config('services.meta.client_id');
+            $clientSecret = $appSecret ?? config('services.meta.client_secret');
             
             if (!$clientId || !$clientSecret) {
-                return 'Fehler: Meta OAuth ist nicht konfiguriert.';
+                $missing = [];
+                if (!$appId && !config('services.meta.client_id')) {
+                    $missing[] = 'META_APP_ID (oder services.meta.client_id)';
+                }
+                if (!$appSecret && !config('services.meta.client_secret')) {
+                    $missing[] = 'META_APP_SECRET (oder services.meta.client_secret)';
+                }
+                $debug = [
+                    'meta-oauth.app_id' => $appId ? 'gesetzt' : 'nicht gesetzt',
+                    'meta-oauth.app_secret' => $appSecret ? 'gesetzt' : 'nicht gesetzt',
+                    'services.meta.client_id' => config('services.meta.client_id') ? 'gesetzt' : 'nicht gesetzt',
+                    'services.meta.client_secret' => config('services.meta.client_secret') ? 'gesetzt' : 'nicht gesetzt',
+                ];
+                return 'Fehler: Meta OAuth ist nicht konfiguriert. Fehlende Werte: ' . implode(', ', $missing) . ' | Debug: ' . json_encode($debug);
             }
             
             // State generieren (nur für Anzeige, wird im Controller neu generiert)
