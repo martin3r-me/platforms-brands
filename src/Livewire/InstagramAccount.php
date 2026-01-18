@@ -4,14 +4,14 @@ namespace Platform\Brands\Livewire;
 
 use Livewire\Component;
 use Illuminate\Support\Facades\Auth;
-use Platform\Brands\Models\InstagramAccount;
+use Platform\Integrations\Models\IntegrationsInstagramAccount;
 use Livewire\Attributes\On;
 
 class InstagramAccount extends Component
 {
-    public InstagramAccount $instagramAccount;
+    public IntegrationsInstagramAccount $instagramAccount;
 
-    public function mount(InstagramAccount $instagramAccount)
+    public function mount(IntegrationsInstagramAccount $instagramAccount)
     {
         $this->instagramAccount = $instagramAccount->fresh([
             'facebookPage',

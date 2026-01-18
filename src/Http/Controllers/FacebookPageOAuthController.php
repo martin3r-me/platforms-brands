@@ -7,7 +7,7 @@ use Illuminate\Routing\Controller;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
-use Platform\Brands\Models\MetaToken;
+use Platform\Integrations\Models\IntegrationsMetaToken;
 use Laravel\Socialite\Facades\Socialite;
 
 class FacebookPageOAuthController extends Controller
@@ -242,25 +242,17 @@ class FacebookPageOAuthController extends Controller
                 throw new \Exception('Access Token konnte nicht abgerufen werden.');
             }
 
-            // Token speichern auf User/Team-Ebene
-            $team = $user->currentTeam;
-            
-            if (!$team) {
-                throw new \Exception('Kein Team gefunden. Bitte wähle ein Team aus.');
-            }
-
+            // Token speichern auf User-Ebene (user-zentriert)
             Log::info('Brands OAuth callback: Speichere Token', [
                 'user_id' => $user->id,
-                'team_id' => $team->id,
                 'has_access_token' => !empty($accessToken),
                 'has_refresh_token' => !empty($refreshToken),
                 'expires_in' => $expiresIn,
             ]);
 
-            $metaToken = MetaToken::updateOrCreate(
+            $metaToken = IntegrationsMetaToken::updateOrCreate(
                 [
                     'user_id' => $user->id,
-                    'team_id' => $team->id,
                 ],
                 [
                     'access_token' => $accessToken,

@@ -2,10 +2,11 @@
 
 namespace Platform\Brands\Services;
 
-use Platform\Brands\Models\InstagramAccount;
+use Platform\Integrations\Models\IntegrationsInstagramAccount;
 use Platform\Brands\Models\BrandsInstagramAccountInsight;
 use Platform\Brands\Models\BrandsInstagramMedia;
 use Platform\Brands\Models\BrandsInstagramMediaInsight;
+use Platform\Integrations\Services\IntegrationsMetaTokenService;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
@@ -15,9 +16,9 @@ use Carbon\Carbon;
  */
 class InstagramInsightsService
 {
-    protected MetaTokenService $tokenService;
+    protected IntegrationsMetaTokenService $tokenService;
 
-    public function __construct(MetaTokenService $tokenService)
+    public function __construct(IntegrationsMetaTokenService $tokenService)
     {
         $this->tokenService = $tokenService;
     }
@@ -25,7 +26,7 @@ class InstagramInsightsService
     /**
      * Ruft tägliche Metriken für einen Account ab
      */
-    public function fetchDailyMetrics(InstagramAccount $account): array
+    public function fetchDailyMetrics(IntegrationsInstagramAccount $account): array
     {
         $metrics = ['follower_count', 'impressions', 'reach'];
         return $this->fetchAccountInsights($account, $metrics, 'day');
@@ -34,7 +35,7 @@ class InstagramInsightsService
     /**
      * Ruft Total-Value-Metriken für einen Account ab
      */
-    public function fetchTotalValueMetrics(InstagramAccount $account): array
+    public function fetchTotalValueMetrics(IntegrationsInstagramAccount $account): array
     {
         $metrics = ['accounts_engaged', 'total_interactions', 'likes', 'comments', 'shares', 'saves', 'replies'];
         return $this->fetchAccountInsights($account, $metrics, 'day', 'total_value');
@@ -43,16 +44,15 @@ class InstagramInsightsService
     /**
      * Ruft demografische Metriken für einen Account ab
      */
-    public function fetchDemographics(InstagramAccount $account, array $breakdowns = ['age', 'city', 'country', 'gender']): array
+    public function fetchDemographics(IntegrationsInstagramAccount $account, array $breakdowns = ['age', 'city', 'country', 'gender']): array
     {
         $metrics = ['follower_demographics', 'engaged_audience_demographics', 'reached_audience_demographics'];
         $apiVersion = config('brands.meta.api_version', 'v21.0');
         
-        // Access Token vom Account oder von der Brand holen
+        // Access Token vom Account oder vom User holen
         $accessToken = $account->access_token;
         if (!$accessToken) {
-            $metaToken = \Platform\Brands\Models\MetaToken::where('user_id', $account->user_id)
-                ->where('team_id', $account->team_id)
+            $metaToken = \Platform\Integrations\Models\IntegrationsMetaToken::where('user_id', $account->user_id)
                 ->first();
             if ($metaToken) {
                 $accessToken = $this->tokenService->getValidAccessToken($metaToken);
@@ -104,11 +104,10 @@ class InstagramInsightsService
     /**
      * Ruft aktuelle Account-Details ab und speichert sie
      */
-    public function fetchAccountDetails(InstagramAccount $account): array
+    public function fetchAccountDetails(IntegrationsInstagramAccount $account): array
     {
-        $apiVersion = config('brands.meta.api_version', 'v21.0');
-        $metaToken = \Platform\Brands\Models\MetaToken::where('user_id', $account->user_id)
-            ->where('team_id', $account->team_id)
+        $apiVersion = config('integrations.oauth2.providers.meta.api_version', config('brands.meta.api_version', 'v21.0'));
+        $metaToken = \Platform\Integrations\Models\IntegrationsMetaToken::where('user_id', $account->user_id)
             ->first();
         if (!$metaToken) {
             Log::error('No Meta Token for account', ['account_id' => $account->id]);
@@ -166,7 +165,7 @@ class InstagramInsightsService
     /**
      * Synchronisiert Account Insights (tägliche Metriken, Total-Value-Metriken, Account-Details)
      */
-    public function syncAccountInsights(InstagramAccount $account): array
+    public function syncAccountInsights(IntegrationsInstagramAccount $account): array
     {
         $insights = [];
         
@@ -196,7 +195,7 @@ class InstagramInsightsService
     /**
      * Speichert tägliche Metriken in der Datenbank
      */
-    protected function saveDailyMetrics(InstagramAccount $account, array $metrics): void
+    protected function saveDailyMetrics(IntegrationsInstagramAccount $account, array $metrics): void
     {
         $insightDate = Carbon::now()->format('Y-m-d');
         
@@ -228,7 +227,7 @@ class InstagramInsightsService
     /**
      * Speichert Total-Value-Metriken in der Datenbank
      */
-    protected function saveTotalValueMetrics(InstagramAccount $account, array $metrics): void
+    protected function saveTotalValueMetrics(IntegrationsInstagramAccount $account, array $metrics): void
     {
         $insightDate = Carbon::now()->format('Y-m-d');
         
@@ -258,7 +257,7 @@ class InstagramInsightsService
     /**
      * Synchronisiert Media Insights für alle Media eines Accounts
      */
-    public function syncMediaInsights(InstagramAccount $account): array
+    public function syncMediaInsights(IntegrationsInstagramAccount $account): array
     {
         $mediaItems = BrandsInstagramMedia::where('instagram_account_id', $account->id)
             ->where('insights_available', true)
@@ -319,11 +318,10 @@ class InstagramInsightsService
     /**
      * Ruft Media-Insights für ein einzelnes Media ab
      */
-    public function fetchMediaInsights(string $mediaId, InstagramAccount $account, string $mediaType = 'photo'): array
+    public function fetchMediaInsights(string $mediaId, IntegrationsInstagramAccount $account, string $mediaType = 'photo'): array
     {
-        $apiVersion = config('brands.meta.api_version', 'v21.0');
-        $metaToken = \Platform\Brands\Models\MetaToken::where('user_id', $account->user_id)
-            ->where('team_id', $account->team_id)
+        $apiVersion = config('integrations.oauth2.providers.meta.api_version', config('brands.meta.api_version', 'v21.0'));
+        $metaToken = \Platform\Integrations\Models\IntegrationsMetaToken::where('user_id', $account->user_id)
             ->first();
         if (!$metaToken) {
             Log::error('No Meta Token for account', ['account_id' => $account->id]);
@@ -410,11 +408,10 @@ class InstagramInsightsService
     /**
      * Generische Methode zum Abrufen von Account-Insights
      */
-    protected function fetchAccountInsights(InstagramAccount $account, array $metrics, string $period = 'day', ?string $metricType = null): array
+    protected function fetchAccountInsights(IntegrationsInstagramAccount $account, array $metrics, string $period = 'day', ?string $metricType = null): array
     {
-        $apiVersion = config('brands.meta.api_version', 'v21.0');
-        $metaToken = \Platform\Brands\Models\MetaToken::where('user_id', $account->user_id)
-            ->where('team_id', $account->team_id)
+        $apiVersion = config('integrations.oauth2.providers.meta.api_version', config('brands.meta.api_version', 'v21.0'));
+        $metaToken = \Platform\Integrations\Models\IntegrationsMetaToken::where('user_id', $account->user_id)
             ->first();
         if (!$metaToken) {
             Log::error('No Meta Token for account', ['account_id' => $account->id]);

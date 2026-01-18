@@ -15,7 +15,7 @@ return new class extends Migration
         if (!Schema::hasTable($tableName)) {
             Schema::create($tableName, function (Blueprint $table) {
                 $table->id();
-                $table->foreignId('instagram_account_id')->constrained('instagram_accounts')->onDelete('cascade');
+                $table->foreignId('instagram_account_id')->constrained('integrations_instagram_accounts')->onDelete('cascade');
                 $table->date('insight_date');
                 
                 // Account-Details

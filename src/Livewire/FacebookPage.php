@@ -4,14 +4,14 @@ namespace Platform\Brands\Livewire;
 
 use Livewire\Component;
 use Illuminate\Support\Facades\Auth;
-use Platform\Brands\Models\FacebookPage;
+use Platform\Integrations\Models\IntegrationsFacebookPage;
 use Livewire\Attributes\On;
 
 class FacebookPage extends Component
 {
-    public FacebookPage $facebookPage;
+    public IntegrationsFacebookPage $facebookPage;
 
-    public function mount(FacebookPage $facebookPage)
+    public function mount(IntegrationsFacebookPage $facebookPage)
     {
         $this->facebookPage = $facebookPage->fresh([
             'posts' => function ($query) {

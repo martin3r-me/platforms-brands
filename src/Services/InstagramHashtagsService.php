@@ -2,7 +2,8 @@
 
 namespace Platform\Brands\Services;
 
-use Platform\Brands\Models\InstagramAccount;
+use Platform\Integrations\Models\IntegrationsInstagramAccount;
+use Platform\Integrations\Services\IntegrationsMetaTokenService;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -11,9 +12,9 @@ use Illuminate\Support\Facades\Log;
  */
 class InstagramHashtagsService
 {
-    protected MetaTokenService $tokenService;
+    protected IntegrationsMetaTokenService $tokenService;
 
-    public function __construct(MetaTokenService $tokenService)
+    public function __construct(IntegrationsMetaTokenService $tokenService)
     {
         $this->tokenService = $tokenService;
     }
@@ -36,15 +37,14 @@ class InstagramHashtagsService
     /**
      * Ruft die Instagram Hashtag ID für einen Hashtag ab
      */
-    public function fetchHashtagId(string $hashtag, InstagramAccount $account): ?string
+    public function fetchHashtagId(string $hashtag, IntegrationsInstagramAccount $account): ?string
     {
-        $apiVersion = config('brands.meta.api_version', 'v21.0');
+        $apiVersion = config('integrations.oauth2.providers.meta.api_version', config('brands.meta.api_version', 'v21.0'));
         
-        // Access Token vom Account oder vom User/Team holen
+        // Access Token vom Account oder vom User holen
         $accessToken = $account->access_token;
         if (!$accessToken) {
-            $metaToken = \Platform\Brands\Models\MetaToken::where('user_id', $account->user_id)
-                ->where('team_id', $account->team_id)
+            $metaToken = \Platform\Integrations\Models\IntegrationsMetaToken::where('user_id', $account->user_id)
                 ->first();
             if ($metaToken) {
                 $accessToken = $this->tokenService->getValidAccessToken($metaToken);
@@ -113,7 +113,7 @@ class InstagramHashtagsService
      * 
      * @return array Array mit Hashtag-Daten: ['hashtag' => '#tag', 'count' => 2, 'instagram_hashtag_id' => '123']
      */
-    public function processHashtags(string $caption, InstagramAccount $account, bool $fetchIds = true): array
+    public function processHashtags(string $caption, IntegrationsInstagramAccount $account, bool $fetchIds = true): array
     {
         $hashtags = $this->extractHashtags($caption);
         $processed = [];

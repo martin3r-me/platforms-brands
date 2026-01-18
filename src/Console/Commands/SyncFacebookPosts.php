@@ -3,7 +3,7 @@
 namespace Platform\Brands\Console\Commands;
 
 use Illuminate\Console\Command;
-use Platform\Brands\Models\FacebookPage;
+use Platform\Integrations\Models\IntegrationsFacebookPage;
 use Platform\Brands\Services\FacebookPageService;
 
 class SyncFacebookPosts extends Command
@@ -11,7 +11,6 @@ class SyncFacebookPosts extends Command
     protected $signature = 'brands:sync-facebook-posts 
                             {--page-id= : Specific Facebook Page ID to sync}
                             {--brand-id= : Sync for all pages of a specific brand}
-                            {--team-id= : Sync for all pages in a specific team}
                             {--dry-run : Show what would be synced without actually doing it}';
 
     protected $description = 'Synchronize Facebook Posts for pages';
@@ -21,7 +20,6 @@ class SyncFacebookPosts extends Command
         $isDryRun = $this->option('dry-run');
         $pageId = $this->option('page-id');
         $brandId = $this->option('brand-id');
-        $teamId = $this->option('team-id');
 
         if ($isDryRun) {
             $this->info('🔍 DRY-RUN Modus - keine Daten werden synchronisiert');
@@ -31,21 +29,17 @@ class SyncFacebookPosts extends Command
         $this->newLine();
 
         // Pages finden
-        $query = FacebookPage::query();
+        $query = IntegrationsFacebookPage::query();
 
         if ($pageId) {
             $query->where('id', $pageId);
         } elseif ($brandId) {
-            // Pages über core_service_assets Pivot-Tabelle finden
-            $query->whereHas('services', function ($q) use ($brandId) {
-                $q->where('service_type', \Platform\Brands\Models\BrandsBrand::class)
-                  ->where('service_id', $brandId);
-            });
-        } elseif ($teamId) {
-            $query->where('team_id', $teamId);
+            // TODO: Pages über Brand-Verknüpfung finden, wenn implementiert
+            $this->warn('⚠️  --brand-id Option wird aktuell nicht unterstützt (Verknüpfung noch nicht implementiert)');
+            return Command::SUCCESS;
         }
 
-        $pages = $query->with(['user', 'team'])->get();
+        $pages = $query->with(['user'])->get();
 
         if ($pages->isEmpty()) {
             $this->warn('⚠️  Keine Facebook Pages gefunden.');
@@ -61,13 +55,12 @@ class SyncFacebookPosts extends Command
         foreach ($pages as $page) {
             $this->info("  📝 Verarbeite Page: '{$page->name}' (ID: {$page->id})");
 
-            // Prüfe ob Meta Token vorhanden (vom User/Team)
-            $metaToken = \Platform\Brands\Models\MetaToken::where('user_id', $page->user_id)
-                ->where('team_id', $page->team_id)
+            // Prüfe ob Meta Token vorhanden (vom User)
+            $metaToken = \Platform\Integrations\Models\IntegrationsMetaToken::where('user_id', $page->user_id)
                 ->first();
             
             if (!$metaToken) {
-                $this->warn("     ⚠️  Übersprungen: Kein Meta Token für User/Team vorhanden");
+                $this->warn("     ⚠️  Übersprungen: Kein Meta Token für User vorhanden");
                 $skippedCount++;
                 continue;
             }

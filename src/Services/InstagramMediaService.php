@@ -2,10 +2,11 @@
 
 namespace Platform\Brands\Services;
 
-use Platform\Brands\Models\InstagramAccount;
+use Platform\Integrations\Models\IntegrationsInstagramAccount;
 use Platform\Brands\Models\BrandsInstagramMedia;
 use Platform\Brands\Services\BrandsMediaDownloadService;
 use Platform\Core\Models\ContextFile;
+use Platform\Integrations\Services\IntegrationsMetaTokenService;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
@@ -15,10 +16,10 @@ use Carbon\Carbon;
  */
 class InstagramMediaService
 {
-    protected MetaTokenService $tokenService;
+    protected IntegrationsMetaTokenService $tokenService;
     protected BrandsMediaDownloadService $mediaDownloadService;
 
-    public function __construct(MetaTokenService $tokenService, BrandsMediaDownloadService $mediaDownloadService)
+    public function __construct(IntegrationsMetaTokenService $tokenService, BrandsMediaDownloadService $mediaDownloadService)
     {
         $this->tokenService = $tokenService;
         $this->mediaDownloadService = $mediaDownloadService;
@@ -29,10 +30,11 @@ class InstagramMediaService
      * 
      * @return array Array mit Media-Daten
      */
-    public function fetchMedia(InstagramAccount $account, int $limit = 1000): array
+    public function fetchMedia(IntegrationsInstagramAccount $account, int $limit = 1000): array
     {
-        // MetaToken vom User holen (nicht mehr über Brand)
-        $metaToken = MetaToken::where('user_id', $account->user_id)->first();
+        // MetaToken vom User holen (user-zentriert)
+        $metaToken = \Platform\Integrations\Models\IntegrationsMetaToken::where('user_id', $account->user_id)
+            ->first();
         
         if (!$metaToken) {
             throw new \Exception('Kein Meta Token für diesen User gefunden.');
@@ -109,12 +111,12 @@ class InstagramMediaService
     /**
      * Speichert Instagram Media in der Datenbank und lädt Bilder herunter
      * 
-     * @param InstagramAccount $account
+     * @param IntegrationsInstagramAccount $account
      * @param int $limit
      * @param \Illuminate\Console\Command|null $command Für Terminal-Ausgabe
      * @return array
      */
-    public function syncMedia(InstagramAccount $account, int $limit = 1000, ?\Illuminate\Console\Command $command = null): array
+    public function syncMedia(IntegrationsInstagramAccount $account, int $limit = 1000, ?\Illuminate\Console\Command $command = null): array
     {
         $mediaData = $this->fetchMedia($account, $limit);
         // User-ID direkt vom Instagram Account nehmen (für Commands)

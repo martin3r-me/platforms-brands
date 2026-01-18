@@ -114,76 +114,50 @@ class Brand extends Component
 
     /**
      * Facebook Page mit Brand verknüpfen
+     * TODO: Implementieren, wenn Verknüpfung verfügbar ist
      */
     public function attachFacebookPage($facebookPageId)
     {
         $this->authorize('update', $this->brand);
         
-        $user = Auth::user();
-        $facebookPage = \Platform\Brands\Models\FacebookPage::where('id', $facebookPageId)
-            ->where('user_id', $user->id)
-            ->where('team_id', $user->currentTeam?->id)
-            ->firstOrFail();
-        
-        // Prüfen ob bereits verknüpft
-        if (!$this->brand->facebookPages()->where('facebook_pages.id', $facebookPageId)->exists()) {
-            $this->brand->facebookPages()->attach($facebookPageId);
-            $this->brand->refresh();
-            
-            session()->flash('success', 'Facebook Page wurde erfolgreich mit der Marke verknüpft.');
-        } else {
-            session()->flash('info', 'Facebook Page ist bereits mit dieser Marke verknüpft.');
-        }
+        // TODO: Verknüpfung implementieren
+        session()->flash('info', 'Verknüpfung von Facebook Pages mit Brands ist noch nicht implementiert.');
     }
 
     /**
      * Facebook Page von Brand trennen
+     * TODO: Implementieren, wenn Verknüpfung verfügbar ist
      */
     public function detachFacebookPage($facebookPageId)
     {
         $this->authorize('update', $this->brand);
         
-        $this->brand->facebookPages()->detach($facebookPageId);
-        $this->brand->refresh();
-        
-        session()->flash('success', 'Facebook Page wurde erfolgreich von der Marke getrennt.');
+        // TODO: Verknüpfung implementieren
+        session()->flash('info', 'Verknüpfung von Facebook Pages mit Brands ist noch nicht implementiert.');
     }
 
     /**
      * Instagram Account mit Brand verknüpfen
+     * TODO: Implementieren, wenn Verknüpfung verfügbar ist
      */
     public function attachInstagramAccount($instagramAccountId)
     {
         $this->authorize('update', $this->brand);
         
-        $user = Auth::user();
-        $instagramAccount = \Platform\Brands\Models\InstagramAccount::where('id', $instagramAccountId)
-            ->where('user_id', $user->id)
-            ->where('team_id', $user->currentTeam?->id)
-            ->firstOrFail();
-        
-        // Prüfen ob bereits verknüpft
-        if (!$this->brand->instagramAccounts()->where('instagram_accounts.id', $instagramAccountId)->exists()) {
-            $this->brand->instagramAccounts()->attach($instagramAccountId);
-            $this->brand->refresh();
-            
-            session()->flash('success', 'Instagram Account wurde erfolgreich mit der Marke verknüpft.');
-        } else {
-            session()->flash('info', 'Instagram Account ist bereits mit dieser Marke verknüpft.');
-        }
+        // TODO: Verknüpfung implementieren
+        session()->flash('info', 'Verknüpfung von Instagram Accounts mit Brands ist noch nicht implementiert.');
     }
 
     /**
      * Instagram Account von Brand trennen
+     * TODO: Implementieren, wenn Verknüpfung verfügbar ist
      */
     public function detachInstagramAccount($instagramAccountId)
     {
         $this->authorize('update', $this->brand);
         
-        $this->brand->instagramAccounts()->detach($instagramAccountId);
-        $this->brand->refresh();
-        
-        session()->flash('success', 'Instagram Account wurde erfolgreich von der Marke getrennt.');
+        // TODO: Verknüpfung implementieren
+        session()->flash('info', 'Verknüpfung von Instagram Accounts mit Brands ist noch nicht implementiert.');
     }
 
     public function render()
@@ -195,37 +169,23 @@ class Brand extends Component
         $ciBoards = $this->brand->ciBoards;
         $contentBoards = $this->brand->contentBoards;
         
-        // Facebook Pages und Instagram Accounts für diese Marke laden
-        $facebookPages = $this->brand->facebookPages;
-        $instagramAccounts = $this->brand->instagramAccounts;
-        
         // Meta Token laden
         $metaToken = $this->brand->metaToken;
 
-        // Verfügbare Facebook Pages und Instagram Accounts des Users (noch nicht verknüpft)
+        // Verfügbare Facebook Pages und Instagram Accounts des Users
         $availableFacebookPages = collect();
         $availableInstagramAccounts = collect();
+        $facebookPages = collect(); // TODO: Verknüpfung implementieren
+        $instagramAccounts = collect(); // TODO: Verknüpfung implementieren
         
-        if ($team && $metaToken) {
-            // Alle Facebook Pages des Users im aktuellen Team
-            $allUserFacebookPages = \Platform\Brands\Models\FacebookPage::where('user_id', $user->id)
-                ->where('team_id', $team->id)
+        if ($metaToken) {
+            // Alle Facebook Pages des Users
+            $availableFacebookPages = \Platform\Integrations\Models\IntegrationsFacebookPage::where('user_id', $user->id)
                 ->get();
             
-            // Nur die, die noch nicht mit dieser Brand verknüpft sind
-            $availableFacebookPages = $allUserFacebookPages->reject(function ($page) use ($facebookPages) {
-                return $facebookPages->contains('id', $page->id);
-            });
-            
-            // Alle Instagram Accounts des Users im aktuellen Team
-            $allUserInstagramAccounts = \Platform\Brands\Models\InstagramAccount::where('user_id', $user->id)
-                ->where('team_id', $team->id)
+            // Alle Instagram Accounts des Users
+            $availableInstagramAccounts = \Platform\Integrations\Models\IntegrationsInstagramAccount::where('user_id', $user->id)
                 ->get();
-            
-            // Nur die, die noch nicht mit dieser Brand verknüpft sind
-            $availableInstagramAccounts = $allUserInstagramAccounts->reject(function ($account) use ($instagramAccounts) {
-                return $instagramAccounts->contains('id', $account->id);
-            });
         }
 
         return view('brands::livewire.brand', [

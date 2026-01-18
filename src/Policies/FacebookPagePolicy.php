@@ -3,35 +3,35 @@
 namespace Platform\Brands\Policies;
 
 use Platform\Core\Models\User;
-use Platform\Brands\Models\FacebookPage;
+use Platform\Integrations\Models\IntegrationsFacebookPage;
 
 class FacebookPagePolicy
 {
     /**
      * Darf der User diese Facebook Page sehen?
      */
-    public function view(User $user, FacebookPage $facebookPage): bool
+    public function view(User $user, IntegrationsFacebookPage $facebookPage): bool
     {
-        // User muss im selben Team sein
-        return $facebookPage->team_id === $user->currentTeam?->id;
+        // User muss Owner sein
+        return $facebookPage->user_id === $user->id;
     }
 
     /**
      * Darf der User diese Facebook Page bearbeiten?
      */
-    public function update(User $user, FacebookPage $facebookPage): bool
+    public function update(User $user, IntegrationsFacebookPage $facebookPage): bool
     {
-        // User muss im selben Team sein
-        return $facebookPage->team_id === $user->currentTeam?->id;
+        // User muss Owner sein
+        return $facebookPage->user_id === $user->id;
     }
 
     /**
      * Darf der User diese Facebook Page löschen?
      */
-    public function delete(User $user, FacebookPage $facebookPage): bool
+    public function delete(User $user, IntegrationsFacebookPage $facebookPage): bool
     {
-        // Nur Team-Mitglied im selben Team darf löschen
-        return $facebookPage->team_id === $user->currentTeam?->id;
+        // User muss Owner sein
+        return $facebookPage->user_id === $user->id;
     }
 
     /**
@@ -39,7 +39,7 @@ class FacebookPagePolicy
      */
     public function create(User $user): bool
     {
-        // Jeder Team-Mitglied kann Facebook Pages erstellen
-        return $user->currentTeam !== null;
+        // Jeder User kann Facebook Pages erstellen
+        return true;
     }
 }

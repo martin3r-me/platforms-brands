@@ -16,7 +16,7 @@ return new class extends Migration
             Schema::create($tableName, function (Blueprint $table) {
                 $table->id();
                 $table->string('uuid')->unique();
-                $table->foreignId('instagram_account_id')->constrained('instagram_accounts')->onDelete('cascade');
+                $table->foreignId('instagram_account_id')->constrained('integrations_instagram_accounts')->onDelete('cascade');
                 $table->string('external_id'); // Instagram Media ID
                 $table->text('caption')->nullable();
                 $table->string('media_type'); // IMAGE, VIDEO, CAROUSEL_ALBUM, STORY, REEL

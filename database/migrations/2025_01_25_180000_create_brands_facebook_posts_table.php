@@ -16,7 +16,7 @@ return new class extends Migration
             Schema::create($tableName, function (Blueprint $table) {
                 $table->id();
                 $table->string('uuid')->unique();
-                $table->foreignId('facebook_page_id')->constrained('facebook_pages')->onDelete('cascade');
+                $table->foreignId('facebook_page_id')->constrained('integrations_facebook_pages')->onDelete('cascade');
                 $table->string('external_id'); // Facebook Post ID
                 $table->text('message')->nullable(); // Post-Text
                 $table->text('story')->nullable(); // Story-Text

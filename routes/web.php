@@ -11,8 +11,8 @@ use Platform\Brands\Models\BrandsBrand;
 use Platform\Brands\Models\BrandsCiBoard;
 use Platform\Brands\Models\BrandsContentBoard;
 use Platform\Brands\Models\BrandsContentBoardSection;
-use Platform\Brands\Models\FacebookPage;
-use Platform\Brands\Models\InstagramAccount;
+use Platform\Integrations\Models\IntegrationsFacebookPage;
+use Platform\Integrations\Models\IntegrationsInstagramAccount;
 
 Route::get('/', Dashboard::class)->name('brands.dashboard');
 

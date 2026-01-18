@@ -54,7 +54,7 @@ class BrandsInstagramMedia extends Model implements HasDisplayName
 
     public function instagramAccount(): BelongsTo
     {
-        return $this->belongsTo(InstagramAccount::class, 'instagram_account_id');
+        return $this->belongsTo(\Platform\Integrations\Models\IntegrationsInstagramAccount::class, 'instagram_account_id');
     }
 
     public function user(): BelongsTo

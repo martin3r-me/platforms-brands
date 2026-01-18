@@ -130,57 +130,40 @@ class BrandsBrand extends Model implements HasTimeAncestors, HasKeyResultAncesto
         $user = $this->user;
         
         if ($user) {
-            return \Platform\Brands\Models\MetaToken::where('user_id', $user->id)->first();
+            return \Platform\Integrations\Models\IntegrationsMetaToken::where('user_id', $user->id)
+                ->first();
         }
         
         return null;
     }
 
     /**
-     * Facebook Pages dieser Marke (Many-to-Many über core_service_assets)
+     * Facebook Pages dieser Marke
+     * TODO: Verknüpfung implementieren, wenn benötigt
      */
     public function facebookPages()
     {
-        return $this->morphToMany(
-            \Platform\Brands\Models\FacebookPage::class,
-            'service',
-            'core_service_assets',
-            'service_id',
-            'asset_id'
-        )->where('core_service_assets.service_type', static::class)
-         ->where('core_service_assets.asset_type', \Platform\Brands\Models\FacebookPage::class)
-         ->withTimestamps();
+        // TODO: Verknüpfung implementieren
+        return collect();
     }
 
     /**
-     * Instagram Accounts dieser Marke (Many-to-Many über core_service_assets)
+     * Instagram Accounts dieser Marke
+     * TODO: Verknüpfung implementieren, wenn benötigt
      */
     public function instagramAccounts()
     {
-        return $this->morphToMany(
-            \Platform\Brands\Models\InstagramAccount::class,
-            'service',
-            'core_service_assets',
-            'service_id',
-            'asset_id'
-        )         ->where('core_service_assets.service_type', static::class)
-         ->where('core_service_assets.asset_type', \Platform\Brands\Models\InstagramAccount::class)
-         ->withTimestamps();
+        // TODO: Verknüpfung implementieren
+        return collect();
     }
 
     /**
-     * WhatsApp Accounts dieser Marke (Many-to-Many über core_service_assets)
+     * WhatsApp Accounts dieser Marke
+     * TODO: Verknüpfung implementieren, wenn benötigt
      */
     public function whatsappAccounts()
     {
-        return $this->morphToMany(
-            \Platform\Brands\Models\WhatsAppAccount::class,
-            'service',
-            'core_service_assets',
-            'service_id',
-            'asset_id'
-        )         ->where('core_service_assets.service_type', static::class)
-         ->where('core_service_assets.asset_type', \Platform\Brands\Models\WhatsAppAccount::class)
-         ->withTimestamps();
+        // TODO: Verknüpfung implementieren
+        return collect();
     }
 }

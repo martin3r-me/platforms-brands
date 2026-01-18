@@ -2,7 +2,8 @@
 
 namespace Platform\Brands\Services;
 
-use Platform\Brands\Models\InstagramAccount;
+use Platform\Integrations\Models\IntegrationsInstagramAccount;
+use Platform\Integrations\Services\IntegrationsMetaTokenService;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
@@ -12,9 +13,9 @@ use Carbon\Carbon;
  */
 class InstagramCommentsService
 {
-    protected MetaTokenService $tokenService;
+    protected IntegrationsMetaTokenService $tokenService;
 
-    public function __construct(MetaTokenService $tokenService)
+    public function __construct(IntegrationsMetaTokenService $tokenService)
     {
         $this->tokenService = $tokenService;
     }
@@ -28,7 +29,7 @@ class InstagramCommentsService
      */
     public function fetchComments(string $mediaId, string $accessToken): array
     {
-        $apiVersion = config('brands.meta.api_version', 'v21.0');
+        $apiVersion = config('integrations.oauth2.providers.meta.api_version', config('brands.meta.api_version', 'v21.0'));
         $allComments = [];
 
         try {

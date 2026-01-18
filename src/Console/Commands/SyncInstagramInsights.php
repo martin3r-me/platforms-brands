@@ -3,7 +3,7 @@
 namespace Platform\Brands\Console\Commands;
 
 use Illuminate\Console\Command;
-use Platform\Brands\Models\InstagramAccount;
+use Platform\Integrations\Models\IntegrationsInstagramAccount;
 use Platform\Brands\Services\InstagramInsightsService;
 
 class SyncInstagramInsights extends Command
@@ -11,7 +11,6 @@ class SyncInstagramInsights extends Command
     protected $signature = 'brands:sync-instagram-insights 
                             {--account-id= : Specific Instagram Account ID to sync}
                             {--brand-id= : Sync for all accounts of a specific brand}
-                            {--team-id= : Sync for all accounts in a specific team}
                             {--media-only : Only sync media insights}
                             {--account-only : Only sync account insights}
                             {--dry-run : Show what would be synced without actually doing it}';
@@ -23,7 +22,6 @@ class SyncInstagramInsights extends Command
         $isDryRun = $this->option('dry-run');
         $accountId = $this->option('account-id');
         $brandId = $this->option('brand-id');
-        $teamId = $this->option('team-id');
         $mediaOnly = $this->option('media-only');
         $accountOnly = $this->option('account-only');
 
@@ -35,21 +33,17 @@ class SyncInstagramInsights extends Command
         $this->newLine();
 
         // Accounts finden
-        $query = InstagramAccount::query();
+        $query = IntegrationsInstagramAccount::query();
 
         if ($accountId) {
             $query->where('id', $accountId);
         } elseif ($brandId) {
-            // Accounts über core_service_assets Pivot-Tabelle finden
-            $query->whereHas('services', function ($q) use ($brandId) {
-                $q->where('service_type', \Platform\Brands\Models\BrandsBrand::class)
-                  ->where('service_id', $brandId);
-            });
-        } elseif ($teamId) {
-            $query->where('team_id', $teamId);
+            // TODO: Accounts über Brand-Verknüpfung finden, wenn implementiert
+            $this->warn('⚠️  --brand-id Option wird aktuell nicht unterstützt (Verknüpfung noch nicht implementiert)');
+            return Command::SUCCESS;
         }
 
-        $accounts = $query->with(['user', 'team'])->get();
+        $accounts = $query->with(['user'])->get();
 
         if ($accounts->isEmpty()) {
             $this->warn('⚠️  Keine Instagram Accounts gefunden.');
@@ -65,13 +59,12 @@ class SyncInstagramInsights extends Command
         foreach ($accounts as $account) {
             $this->info("  📝 Verarbeite Account: '{$account->username}' (ID: {$account->id})");
 
-            // Prüfe ob Meta Token vorhanden (vom User/Team)
-            $metaToken = \Platform\Brands\Models\MetaToken::where('user_id', $account->user_id)
-                ->where('team_id', $account->team_id)
+            // Prüfe ob Meta Token vorhanden (vom User)
+            $metaToken = \Platform\Integrations\Models\IntegrationsMetaToken::where('user_id', $account->user_id)
                 ->first();
             
             if (!$metaToken) {
-                $this->warn("     ⚠️  Übersprungen: Kein Meta Token für User/Team vorhanden");
+                $this->warn("     ⚠️  Übersprungen: Kein Meta Token für User vorhanden");
                 $skippedCount++;
                 continue;
             }

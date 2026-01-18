@@ -54,7 +54,7 @@ class BrandsFacebookPost extends Model implements HasDisplayName
 
     public function facebookPage(): BelongsTo
     {
-        return $this->belongsTo(FacebookPage::class, 'facebook_page_id');
+        return $this->belongsTo(\Platform\Integrations\Models\IntegrationsFacebookPage::class, 'facebook_page_id');
     }
 
     public function user(): BelongsTo
