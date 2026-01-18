@@ -39,7 +39,7 @@ class InstagramHashtagsService
      */
     public function fetchHashtagId(string $hashtag, IntegrationsInstagramAccount $account): ?string
     {
-        $apiVersion = config('integrations.oauth2.providers.meta.api_version', config('brands.meta.api_version', 'v21.0'));
+        $apiVersion = config('integrations.oauth2.providers.meta.api_version', '21.0');
         
         // Access Token vom Account oder vom User holen
         $accessToken = $account->access_token;

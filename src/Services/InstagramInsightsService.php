@@ -47,7 +47,7 @@ class InstagramInsightsService
     public function fetchDemographics(IntegrationsInstagramAccount $account, array $breakdowns = ['age', 'city', 'country', 'gender']): array
     {
         $metrics = ['follower_demographics', 'engaged_audience_demographics', 'reached_audience_demographics'];
-        $apiVersion = config('brands.meta.api_version', 'v21.0');
+        $apiVersion = config('integrations.oauth2.providers.meta.api_version', '21.0');
         
         // Access Token vom Account oder vom User holen
         $accessToken = $account->access_token;
@@ -106,7 +106,7 @@ class InstagramInsightsService
      */
     public function fetchAccountDetails(IntegrationsInstagramAccount $account): array
     {
-        $apiVersion = config('integrations.oauth2.providers.meta.api_version', config('brands.meta.api_version', 'v21.0'));
+        $apiVersion = config('integrations.oauth2.providers.meta.api_version', '21.0');
         $metaToken = \Platform\Integrations\Models\IntegrationsMetaToken::where('user_id', $account->user_id)
             ->first();
         if (!$metaToken) {
@@ -320,7 +320,7 @@ class InstagramInsightsService
      */
     public function fetchMediaInsights(string $mediaId, IntegrationsInstagramAccount $account, string $mediaType = 'photo'): array
     {
-        $apiVersion = config('integrations.oauth2.providers.meta.api_version', config('brands.meta.api_version', 'v21.0'));
+        $apiVersion = config('integrations.oauth2.providers.meta.api_version', '21.0');
         $metaToken = \Platform\Integrations\Models\IntegrationsMetaToken::where('user_id', $account->user_id)
             ->first();
         if (!$metaToken) {
@@ -410,7 +410,7 @@ class InstagramInsightsService
      */
     protected function fetchAccountInsights(IntegrationsInstagramAccount $account, array $metrics, string $period = 'day', ?string $metricType = null): array
     {
-        $apiVersion = config('integrations.oauth2.providers.meta.api_version', config('brands.meta.api_version', 'v21.0'));
+        $apiVersion = config('integrations.oauth2.providers.meta.api_version', '21.0');
         $metaToken = \Platform\Integrations\Models\IntegrationsMetaToken::where('user_id', $account->user_id)
             ->first();
         if (!$metaToken) {

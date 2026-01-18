@@ -27,19 +27,4 @@ return [
         ],
     ],
     'billables' => [],
-
-    /*
-    |--------------------------------------------------------------------------
-    | Meta OAuth Configuration
-    |--------------------------------------------------------------------------
-    |
-    | Konfiguration für Facebook/Instagram OAuth über Socialite
-    |
-    */
-    'meta' => [
-        'client_id' => env('META_CLIENT_ID'),
-        'client_secret' => env('META_CLIENT_SECRET'),
-        'redirect_domain' => env('META_OAUTH_REDIRECT_DOMAIN'), // Nur Domain, URI wird automatisch generiert
-        'api_version' => env('META_API_VERSION', 'v21.0'),
-    ],
 ];

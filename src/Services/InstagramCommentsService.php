@@ -29,7 +29,7 @@ class InstagramCommentsService
      */
     public function fetchComments(string $mediaId, string $accessToken): array
     {
-        $apiVersion = config('integrations.oauth2.providers.meta.api_version', config('brands.meta.api_version', 'v21.0'));
+        $apiVersion = config('integrations.oauth2.providers.meta.api_version', '21.0');
         $allComments = [];
 
         try {

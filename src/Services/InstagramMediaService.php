@@ -46,7 +46,7 @@ class InstagramMediaService
             throw new \Exception('Kein gültiger Access Token für diese Brand gefunden.');
         }
 
-        $apiVersion = config('brands.meta.api_version', 'v21.0');
+        $apiVersion = config('integrations.oauth2.providers.meta.api_version', '21.0');
         $allMedia = [];
 
         // Reguläre Media abrufen
