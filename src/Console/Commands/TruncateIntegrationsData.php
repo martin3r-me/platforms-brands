@@ -14,13 +14,13 @@ use Illuminate\Support\Facades\Schema;
 class TruncateIntegrationsData extends Command
 {
     protected $signature = 'brands:truncate-integrations-data 
-                            {--force : Force truncate without confirmation}';
+                            {--confirm : Ask for confirmation before truncating}';
 
     protected $description = 'Truncate all integrations and brands data (Facebook, Instagram, WhatsApp) in correct order';
 
     public function handle()
     {
-        if (!$this->option('force')) {
+        if ($this->option('confirm')) {
             if (!$this->confirm('⚠️  WARNUNG: Dies wird ALLE Integrations- und Brands-Daten löschen. Fortfahren?')) {
                 $this->info('Abgebrochen.');
                 return Command::SUCCESS;
