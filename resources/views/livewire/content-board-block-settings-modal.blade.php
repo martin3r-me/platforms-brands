@@ -25,36 +25,43 @@
                 <label class="block text-sm font-medium text-[var(--ui-secondary)] mb-3">
                     Span (1-12)
                 </label>
-                <div class="grid grid-cols-6 gap-2">
-                    @for($i = 1; $i <= 12; $i++)
-                        <button
-                            type="button"
-                            wire:click="$set('span', {{ $i }})"
-                            class="px-3 py-2 text-sm font-medium rounded-lg border transition-all
-                                @if($span == $i)
-                                    bg-[var(--ui-primary)] text-white border-[var(--ui-primary)] shadow-sm
-                                @else
-                                    bg-white text-[var(--ui-secondary)] border-[var(--ui-border)]/40 hover:border-[var(--ui-primary)]/60 hover:bg-[var(--ui-muted-5)]
-                                @endif
-                            "
-                        >
-                            {{ $i }}
-                        </button>
-                    @endfor
-                </div>
-                @error('span')
-                    <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                @enderror
                 @if($block)
                     @php
                         $row = $block->row;
+                        $row->load('blocks');
                         $currentSum = $row->blocks->sum('span');
                         $currentBlockSpan = $block->span;
-                        $newSum = $currentSum - $currentBlockSpan + ($span ?? $currentBlockSpan);
+                        // Verfügbare Spans berechnen: 12 - (aktuelle Summe - aktueller Block-Span)
+                        $availableSpan = 12 - ($currentSum - $currentBlockSpan);
+                        // Maximal verfügbarer Wert ist 12
+                        $maxAvailable = min(12, $availableSpan);
                     @endphp
+                    <div class="grid grid-cols-6 gap-2">
+                        @for($i = 1; $i <= $maxAvailable; $i++)
+                            <button
+                                type="button"
+                                wire:click="$set('span', {{ $i }})"
+                                class="px-3 py-2 text-sm font-medium rounded-lg border transition-all
+                                    @if($span == $i)
+                                        bg-[var(--ui-primary)] text-white border-[var(--ui-primary)] shadow-sm
+                                    @else
+                                        bg-white text-[var(--ui-secondary)] border-[var(--ui-border)]/40 hover:border-[var(--ui-primary)]/60 hover:bg-[var(--ui-muted-5)]
+                                    @endif
+                                "
+                            >
+                                {{ $i }}
+                            </button>
+                        @endfor
+                    </div>
+                    @error('span')
+                        <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
                     <p class="mt-3 text-xs text-[var(--ui-muted)]">
-                        Aktuell: <span class="font-medium">{{ $currentSum }}/12</span> Spans in dieser Row
+                        Verfügbar: <span class="font-medium">{{ $availableSpan }}/12</span> Spans
                         @if($span && $span != $currentBlockSpan)
+                            @php
+                                $newSum = $currentSum - $currentBlockSpan + $span;
+                            @endphp
                             <br>Mit neuem Wert: <span class="font-medium {{ $newSum > 12 ? 'text-red-600' : '' }}">{{ $newSum }}/12</span> Spans
                         @endif
                     </p>

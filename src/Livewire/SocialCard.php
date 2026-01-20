@@ -63,12 +63,16 @@ class SocialCard extends Component
         ]);
         
         $this->card->refresh();
+        $this->title = $this->card->title ?? '';
 
         // Editor sync (wire:ignore) + UI can show "saved"
         $this->dispatch('brands-saved', [
             'cardId' => $this->card->id,
             'savedAt' => now()->toIso8601String(),
         ]);
+        
+        // Navbar Title aktualisieren
+        $this->dispatch('updateSidebar');
     }
 
     public function render()

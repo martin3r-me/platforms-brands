@@ -103,6 +103,10 @@ class ContentBoardBlockSettingsModal extends Component
         // Policy-Berechtigung prüfen
         $this->authorize('update', $this->block->row->section->contentBoard);
         
+        // Block-Informationen für Notification speichern, bevor delete()
+        $blockId = $this->block->id;
+        $blockClass = \Platform\Brands\Models\BrandsContentBoardBlock::class;
+        
         $this->block->delete();
         
         $this->dispatch('updateContentBoard');
@@ -112,6 +116,8 @@ class ContentBoardBlockSettingsModal extends Component
             'title' => 'Block gelöscht',
             'message' => 'Der Block wurde erfolgreich gelöscht.',
             'notice_type' => 'success',
+            'noticable_type' => $blockClass,
+            'noticable_id'   => $blockId,
         ]);
 
         $this->reset(['block', 'span', 'name', 'description']);

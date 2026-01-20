@@ -1,6 +1,6 @@
 <x-ui-page>
     <x-slot name="navbar">
-        <x-ui-page-navbar :title="$card->title" icon="heroicon-o-document-text">
+        <x-ui-page-navbar :title="$title ?: $card->title" icon="heroicon-o-document-text">
             <div class="mt-1 text-sm text-[var(--ui-muted)] flex items-center gap-2">
                 <a href="{{ route('brands.brands.show', $card->socialBoard->brand) }}" class="text-[var(--ui-secondary)] hover:text-[var(--ui-primary)] flex items-center gap-1">
                     @svg('heroicon-o-tag', 'w-4 h-4')
@@ -118,7 +118,7 @@
                 <div class="flex items-start justify-between gap-4 mb-6">
                     <input
                         type="text"
-                        wire:model.defer="title"
+                        wire:model.live="title"
                         placeholder="Titel…"
                         class="w-full text-4xl font-bold bg-transparent border-0 focus:ring-0 focus:outline-none text-[var(--ui-secondary)] placeholder:text-[var(--ui-muted)]"
                         style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;"

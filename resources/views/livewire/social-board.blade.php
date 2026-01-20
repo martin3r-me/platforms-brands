@@ -93,28 +93,35 @@
 
     {{-- Board-Container: füllt restliche Breite, Spalten scrollen intern --}}
     @if($slots->count() > 0)
-        <div class="flex-1 min-h-0 h-full overflow-hidden relative">
-            <div class="h-full w-full flex gap-4 overflow-x-auto overflow-y-hidden p-2" wire:sortable="updateSlotOrder" wire:sortable-group="updateCardOrder">
-            @foreach($slots as $slot)
-                <x-ui-kanban-column :title="$slot->name" :sortable-id="$slot->id" :scrollable="true">
-                    <x-slot name="headerActions">
-                        @can('update', $socialBoard)
-                            <button 
-                                wire:click="createCard({{ $slot->id }})" 
-                                class="text-[var(--ui-muted)] hover:text-[var(--ui-secondary)] transition-colors"
-                                title="Neue Card"
-                            >
-                                @svg('heroicon-o-plus-circle', 'w-4 h-4')
-                            </button>
-                        @endcan
-                    </x-slot>
+        <div class="social-board-kanban-container">
+            <x-ui-kanban-container sortable="updateSlotOrder" sortable-group="updateCardOrder">
+                @foreach($slots as $slot)
+                    <x-ui-kanban-column :title="$slot->name" :sortable-id="$slot->id" :scrollable="true">
+                        <x-slot name="headerActions">
+                            @can('update', $socialBoard)
+                                <button 
+                                    wire:click="createCard({{ $slot->id }})" 
+                                    class="text-[var(--ui-muted)] hover:text-[var(--ui-secondary)] transition-colors"
+                                    title="Neue Card"
+                                >
+                                    @svg('heroicon-o-plus-circle', 'w-4 h-4')
+                                </button>
+                                <button 
+                                    @click="$dispatch('open-modal-social-board-slot-settings', { slotId: {{ $slot->id }} })"
+                                    class="text-[var(--ui-muted)] hover:text-[var(--ui-secondary)] transition-colors"
+                                    title="Einstellungen"
+                                >
+                                    @svg('heroicon-o-cog-6-tooth', 'w-4 h-4')
+                                </button>
+                            @endcan
+                        </x-slot>
 
-                    @foreach($slot->cards as $card)
-                        @include('brands::livewire.social-card-preview-card', ['card' => $card])
-                    @endforeach
-                </x-ui-kanban-column>
-                    @endforeach
-            </div>
+                        @foreach($slot->cards as $card)
+                            @include('brands::livewire.social-card-preview-card', ['card' => $card])
+                        @endforeach
+                    </x-ui-kanban-column>
+                @endforeach
+            </x-ui-kanban-container>
         </div>
     @else
         <div class="flex items-center justify-center h-full">
@@ -138,4 +145,14 @@
 
     {{-- Modals innerhalb des Page-Roots halten (ein Root-Element) --}}
     <livewire:brands.social-board-settings-modal/>
+    <livewire:brands.social-board-slot-settings-modal/>
 </x-ui-page>
+
+@push('styles')
+<style>
+    /* Toggle-Button im Social Board verstecken */
+    .social-board-kanban-container .absolute.bottom-6 {
+        display: none !important;
+    }
+</style>
+@endpush
