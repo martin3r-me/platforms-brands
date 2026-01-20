@@ -61,6 +61,30 @@
         </x-ui-page-sidebar>
     </x-slot>
 
+    <x-slot name="activity">
+        <x-ui-page-sidebar title="Aktivitäten" width="w-80" :defaultOpen="false" storeKey="activityOpen" side="right">
+            <div class="p-4 space-y-4">
+                <div class="text-sm text-[var(--ui-muted)]">Letzte Aktivitäten</div>
+                <div class="space-y-3 text-sm">
+                    @forelse(($activities ?? []) as $activity)
+                        <div class="p-2 rounded border border-[var(--ui-border)]/60 bg-[var(--ui-muted-5)]">
+                            <div class="font-medium text-[var(--ui-secondary)] truncate">{{ $activity['title'] ?? 'Aktivität' }}</div>
+                            <div class="text-[var(--ui-muted)]">{{ $activity['time'] ?? '' }}</div>
+                        </div>
+                    @empty
+                        <div class="py-8 text-center">
+                            <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-[var(--ui-muted-5)] mb-3">
+                                @svg('heroicon-o-clock', 'w-6 h-6 text-[var(--ui-muted)]')
+                            </div>
+                            <p class="text-sm text-[var(--ui-muted)]">Noch keine Aktivitäten</p>
+                            <p class="text-xs text-[var(--ui-muted)] mt-1">Änderungen werden hier angezeigt</p>
+                        </div>
+                    @endforelse
+                </div>
+            </div>
+        </x-ui-page-sidebar>
+    </x-slot>
+
     {{-- Board-Container: füllt restliche Breite, Spalten scrollen intern --}}
     @if($slots->count() > 0)
         <div class="multi-content-board-kanban-container">
@@ -107,11 +131,18 @@
     @endif
 </x-ui-page>
 
+@push('styles')
 <style>
-    /* Kanban-Container für Multi-Content-Board */
+    /* Kanban-Container für Multi-Content-Board - volle Höhe wie Social Board */
     .multi-content-board-kanban-container {
-        height: calc(100vh - 8rem);
+        height: calc(100vh - 4rem);
         overflow-x: auto;
         overflow-y: hidden;
     }
+    
+    /* Toggle-Button im Multi-Content-Board verstecken */
+    .multi-content-board-kanban-container .absolute.bottom-6 {
+        display: none !important;
+    }
 </style>
+@endpush

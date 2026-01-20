@@ -333,284 +333,74 @@
             @endif
         </div>
 
-        {{-- Meta Verknüpfung Section --}}
-        <div>
-            <div class="flex items-center justify-between mb-4">
-                <h2 class="text-xl font-semibold text-[var(--ui-secondary)]">Meta Verknüpfung</h2>
-                @if($metaConnection)
-                    <div class="flex items-center gap-2">
-                        @can('update', $brand)
-                            <x-ui-button 
-                                variant="secondary-outline" 
-                                size="sm"
-                                wire:click="syncFacebookPages"
-                            >
-                                <span class="inline-flex items-center gap-2">
-                                    @svg('heroicon-o-globe-alt', 'w-4 h-4')
-                                    <span>Facebook Pages syncen</span>
-                                </span>
-                            </x-ui-button>
-                            <x-ui-button 
-                                variant="secondary-outline" 
-                                size="sm"
-                                wire:click="syncInstagramAccounts"
-                            >
-                                <span class="inline-flex items-center gap-2">
-                                    @svg('heroicon-o-camera', 'w-4 h-4')
-                                    <span>Instagram syncen</span>
-                                </span>
-                            </x-ui-button>
-                        @endcan
-                    </div>
-                @endif
-            </div>
-
-            @if($metaConnection)
-                @php
-                    $oauth = $metaConnection->credentials['oauth'] ?? [];
-                    $expiresAt = isset($oauth['expires_at']) ? \Carbon\Carbon::createFromTimestamp($oauth['expires_at']) : null;
-                    $isExpired = $expiresAt && $expiresAt->isPast();
-                    $isExpiringSoon = $expiresAt && $expiresAt->isBefore(now()->addHours(24));
-                @endphp
-                <div class="bg-white rounded-xl border border-[var(--ui-border)]/60 shadow-sm p-6">
-                    <div class="flex items-start justify-between">
-                        <div class="flex-1">
-                            <div class="flex items-center gap-3 mb-2">
-                                <div class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-[var(--ui-success-5)]">
-                                    @svg('heroicon-o-check-circle', 'w-6 h-6 text-[var(--ui-success)]')
-                                </div>
-                                <div>
-                                    <h3 class="text-lg font-semibold text-[var(--ui-secondary)]">Mit Meta verknüpft</h3>
-                                    <p class="text-sm text-[var(--ui-muted)]">Connection wurde erfolgreich gespeichert</p>
-                                </div>
-                            </div>
-                            <div class="mt-4 space-y-2 text-sm">
-                                <div class="flex items-center justify-between py-2 px-3 bg-[var(--ui-muted-5)] border border-[var(--ui-border)]/40 rounded">
-                                    <span class="text-[var(--ui-muted)]">Verknüpft am</span>
-                                    <span class="text-[var(--ui-secondary)] font-medium">
-                                        {{ $metaConnection->created_at->format('d.m.Y H:i') }}
-                                    </span>
-                                </div>
-                                @if($expiresAt)
-                                    <div class="flex items-center justify-between py-2 px-3 bg-[var(--ui-muted-5)] border border-[var(--ui-border)]/40 rounded">
-                                        <span class="text-[var(--ui-muted)]">Läuft ab am</span>
-                                        <span class="text-[var(--ui-secondary)] font-medium">
-                                            {{ $expiresAt->format('d.m.Y H:i') }}
-                                        </span>
-                                    </div>
-                                @endif
-                                @if($isExpired)
-                                    <div class="flex items-center gap-2 py-2 px-3 bg-[var(--ui-error-5)] border border-[var(--ui-error)]/40 rounded">
-                                        @svg('heroicon-o-exclamation-triangle', 'w-4 h-4 text-[var(--ui-error)]')
-                                        <span class="text-[var(--ui-error)] text-sm font-medium">Token ist abgelaufen</span>
-                                    </div>
-                                @elseif($isExpiringSoon)
-                                    <div class="flex items-center gap-2 py-2 px-3 bg-[var(--ui-warning-5)] border border-[var(--ui-warning)]/40 rounded">
-                                        @svg('heroicon-o-exclamation-triangle', 'w-4 h-4 text-[var(--ui-warning)]')
-                                        <span class="text-[var(--ui-warning)] text-sm font-medium">Token läuft bald ab</span>
-                                    </div>
-                                @endif
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            @else
-                <div class="bg-white rounded-xl border border-[var(--ui-border)]/60 shadow-sm p-12 text-center">
-                    <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[var(--ui-muted-5)] mb-4">
-                        @svg('heroicon-o-link-slash', 'w-8 h-8 text-[var(--ui-muted)]')
-                    </div>
-                    <h3 class="text-lg font-semibold text-[var(--ui-secondary)] mb-2">Nicht mit Meta verknüpft</h3>
-                    <p class="text-sm text-[var(--ui-muted)] mb-4">Verknüpfe dein Meta-Konto im User-Modal, um Facebook Pages und Instagram Accounts zu synchronisieren. Diese kannst du dann hier mit der Marke verknüpfen.</p>
-                    <p class="text-xs text-[var(--ui-muted)] mb-4">
-                        Hinweis: Die Meta-Verbindung erfolgt auf User-Ebene. Gehe zu den Benutzer-Einstellungen, um dein Meta-Konto zu verknüpfen.
-                    </p>
-                </div>
-            @endif
-        </div>
-
-        {{-- Social Media Section --}}
-        @if($metaConnection && ($availableFacebookPages->count() > 0 || $availableInstagramAccounts->count() > 0 || $facebookPages->count() > 0 || $instagramAccounts->count() > 0))
-            <div x-data="{ showSocialAccounts: false }">
+        {{-- Verknüpfte Social Accounts als Liste --}}
+        @if($facebookPages->count() > 0 || $instagramAccounts->count() > 0)
+            <div>
                 <div class="flex items-center justify-between mb-4">
-                    <h2 class="text-xl font-semibold text-[var(--ui-secondary)]">Social Media Accounts</h2>
-                    <button
-                        @click="showSocialAccounts = !showSocialAccounts"
-                        class="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-[var(--ui-secondary)] hover:text-[var(--ui-primary)] transition-colors rounded-lg hover:bg-[var(--ui-muted-5)]"
-                    >
-                        <span x-text="showSocialAccounts ? 'Ausblenden' : 'Accounts verwalten'"></span>
-                        <svg 
-                            x-show="!showSocialAccounts"
-                            class="w-4 h-4 transition-transform"
-                            fill="none" 
-                            stroke="currentColor" 
-                            viewBox="0 0 24 24"
-                        >
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                        </svg>
-                        <svg 
-                            x-show="showSocialAccounts"
-                            class="w-4 h-4 transition-transform"
-                            fill="none" 
-                            stroke="currentColor" 
-                            viewBox="0 0 24 24"
-                            style="display: none;"
-                        >
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path>
-                        </svg>
-                    </button>
+                    <h2 class="text-xl font-semibold text-[var(--ui-secondary)]">Verknüpfte Social Accounts</h2>
                 </div>
-
-                <div 
-                    x-show="showSocialAccounts"
-                    x-transition:enter="transition ease-out duration-200"
-                    x-transition:enter-start="opacity-0 transform -translate-y-2"
-                    x-transition:enter-end="opacity-100 transform translate-y-0"
-                    x-transition:leave="transition ease-in duration-150"
-                    x-transition:leave-start="opacity-100 transform translate-y-0"
-                    x-transition:leave-end="opacity-0 transform -translate-y-2"
-                    style="display: none;"
-                >
-                    {{-- Verknüpfte Accounts als Liste --}}
-                    @if($facebookPages->count() > 0 || $instagramAccounts->count() > 0)
-                        <div class="mb-6">
-                            <h3 class="text-sm font-semibold text-[var(--ui-secondary)] mb-3">Verknüpfte Accounts</h3>
-                            <div class="bg-white rounded-xl border border-[var(--ui-border)]/60 shadow-sm overflow-hidden">
-                                <div class="divide-y divide-[var(--ui-border)]/40">
-                                    @foreach($facebookPages as $facebookPage)
-                                        <div class="p-4 hover:bg-[var(--ui-muted-5)] transition-colors">
-                                            <div class="flex items-center justify-between">
-                                                <div class="flex items-center gap-3 flex-1 min-w-0">
-                                                    <div class="flex-shrink-0 flex items-center justify-center w-10 h-10 rounded-lg bg-blue-50">
-                                                        @svg('heroicon-o-globe-alt', 'w-5 h-5 text-blue-600')
-                                                    </div>
-                                                    <div class="flex-1 min-w-0">
-                                                        <a href="{{ route('brands.facebook-pages.show', $facebookPage) }}" class="block">
-                                                            <h4 class="text-sm font-semibold text-[var(--ui-secondary)] hover:text-blue-600 transition-colors truncate">{{ $facebookPage->name }}</h4>
-                                                        </a>
-                                                        @if($facebookPage->description)
-                                                            <p class="text-xs text-[var(--ui-muted)] mt-0.5 line-clamp-1">{{ $facebookPage->description }}</p>
-                                                        @endif
-                                                    </div>
-                                                </div>
-                                                @can('update', $brand)
-                                                    <button
-                                                        wire:click="detachFacebookPage({{ $facebookPage->id }})"
-                                                        wire:confirm="Facebook Page wirklich von dieser Marke trennen?"
-                                                        class="flex-shrink-0 ml-3 p-1.5 text-[var(--ui-muted)] hover:text-[var(--ui-error)] hover:bg-red-50 rounded transition-colors"
-                                                        title="Verknüpfung trennen"
-                                                    >
-                                                        @svg('heroicon-o-x-mark', 'w-4 h-4')
-                                                    </button>
-                                                @endcan
-                                            </div>
+                <div class="bg-white rounded-xl border border-[var(--ui-border)]/60 shadow-sm overflow-hidden">
+                    <div class="divide-y divide-[var(--ui-border)]/40">
+                        @foreach($facebookPages as $facebookPage)
+                            <div class="p-4 hover:bg-[var(--ui-muted-5)] transition-colors">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-3 flex-1 min-w-0">
+                                        <div class="flex-shrink-0 flex items-center justify-center w-10 h-10 rounded-lg bg-blue-50">
+                                            @svg('heroicon-o-globe-alt', 'w-5 h-5 text-blue-600')
                                         </div>
-                                    @endforeach
-
-                                    @foreach($instagramAccounts as $instagramAccount)
-                                        <div class="p-4 hover:bg-[var(--ui-muted-5)] transition-colors">
-                                            <div class="flex items-center justify-between">
-                                                <div class="flex items-center gap-3 flex-1 min-w-0">
-                                                    <div class="flex-shrink-0 flex items-center justify-center w-10 h-10 rounded-lg bg-pink-50">
-                                                        @svg('heroicon-o-camera', 'w-5 h-5 text-pink-600')
-                                                    </div>
-                                                    <div class="flex-1 min-w-0">
-                                                        <a href="{{ route('brands.instagram-accounts.show', $instagramAccount) }}" class="block">
-                                                            <h4 class="text-sm font-semibold text-[var(--ui-secondary)] hover:text-pink-600 transition-colors truncate">{{ '@' . $instagramAccount->username }}</h4>
-                                                        </a>
-                                                        @if($instagramAccount->description)
-                                                            <p class="text-xs text-[var(--ui-muted)] mt-0.5 line-clamp-1">{{ $instagramAccount->description }}</p>
-                                                        @endif
-                                                    </div>
-                                                </div>
-                                                @can('update', $brand)
-                                                    <button
-                                                        wire:click="detachInstagramAccount({{ $instagramAccount->id }})"
-                                                        wire:confirm="Instagram Account wirklich von dieser Marke trennen?"
-                                                        class="flex-shrink-0 ml-3 p-1.5 text-[var(--ui-muted)] hover:text-[var(--ui-error)] hover:bg-red-50 rounded transition-colors"
-                                                        title="Verknüpfung trennen"
-                                                    >
-                                                        @svg('heroicon-o-x-mark', 'w-4 h-4')
-                                                    </button>
-                                                @endcan
-                                            </div>
+                                        <div class="flex-1 min-w-0">
+                                            <a href="{{ route('brands.facebook-pages.show', $facebookPage) }}" class="block">
+                                                <h4 class="text-sm font-semibold text-[var(--ui-secondary)] hover:text-blue-600 transition-colors truncate">{{ $facebookPage->name }}</h4>
+                                            </a>
+                                            @if($facebookPage->description)
+                                                <p class="text-xs text-[var(--ui-muted)] mt-0.5 line-clamp-1">{{ $facebookPage->description }}</p>
+                                            @endif
                                         </div>
-                                    @endforeach
+                                    </div>
+                                    @can('update', $brand)
+                                        <button
+                                            wire:click="detachFacebookPage({{ $facebookPage->id }})"
+                                            wire:confirm="Facebook Page wirklich von dieser Marke trennen?"
+                                            class="flex-shrink-0 ml-3 p-1.5 text-[var(--ui-muted)] hover:text-[var(--ui-error)] hover:bg-red-50 rounded transition-colors"
+                                            title="Verknüpfung trennen"
+                                        >
+                                            @svg('heroicon-o-x-mark', 'w-4 h-4')
+                                        </button>
+                                    @endcan
                                 </div>
                             </div>
-                        </div>
-                    @endif
+                        @endforeach
 
-                    {{-- Verfügbare Accounts zum Verknüpfen als Liste --}}
-                    @if($availableFacebookPages->count() > 0 || $availableInstagramAccounts->count() > 0)
-                        <div>
-                            <h3 class="text-sm font-semibold text-[var(--ui-secondary)] mb-3">Verfügbare Accounts verknüpfen</h3>
-                            <div class="bg-white rounded-xl border border-[var(--ui-border)]/60 shadow-sm overflow-hidden">
-                                <div class="divide-y divide-[var(--ui-border)]/40">
-                                    @foreach($availableFacebookPages as $facebookPage)
-                                        <div class="p-4 hover:bg-[var(--ui-muted-5)] transition-colors">
-                                            <div class="flex items-center justify-between">
-                                                <div class="flex items-center gap-3 flex-1 min-w-0">
-                                                    <div class="flex-shrink-0 flex items-center justify-center w-10 h-10 rounded-lg bg-blue-50">
-                                                        @svg('heroicon-o-globe-alt', 'w-5 h-5 text-blue-600')
-                                                    </div>
-                                                    <div class="flex-1 min-w-0">
-                                                        <h4 class="text-sm font-semibold text-[var(--ui-secondary)] truncate">{{ $facebookPage->name }}</h4>
-                                                        @if($facebookPage->description)
-                                                            <p class="text-xs text-[var(--ui-muted)] mt-0.5 line-clamp-1">{{ $facebookPage->description }}</p>
-                                                        @endif
-                                                    </div>
-                                                </div>
-                                                @can('update', $brand)
-                                                    <x-ui-button
-                                                        variant="primary"
-                                                        size="sm"
-                                                        wire:click="attachFacebookPage({{ $facebookPage->id }})"
-                                                        class="ml-3 flex-shrink-0"
-                                                    >
-                                                        <span class="inline-flex items-center gap-1.5">
-                                                            @svg('heroicon-o-plus', 'w-3.5 h-3.5')
-                                                            <span>Verknüpfen</span>
-                                                        </span>
-                                                    </x-ui-button>
-                                                @endcan
-                                            </div>
+                        @foreach($instagramAccounts as $instagramAccount)
+                            <div class="p-4 hover:bg-[var(--ui-muted-5)] transition-colors">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-3 flex-1 min-w-0">
+                                        <div class="flex-shrink-0 flex items-center justify-center w-10 h-10 rounded-lg bg-pink-50">
+                                            @svg('heroicon-o-camera', 'w-5 h-5 text-pink-600')
                                         </div>
-                                    @endforeach
-
-                                    @foreach($availableInstagramAccounts as $instagramAccount)
-                                        <div class="p-4 hover:bg-[var(--ui-muted-5)] transition-colors">
-                                            <div class="flex items-center justify-between">
-                                                <div class="flex items-center gap-3 flex-1 min-w-0">
-                                                    <div class="flex-shrink-0 flex items-center justify-center w-10 h-10 rounded-lg bg-pink-50">
-                                                        @svg('heroicon-o-camera', 'w-5 h-5 text-pink-600')
-                                                    </div>
-                                                    <div class="flex-1 min-w-0">
-                                                        <h4 class="text-sm font-semibold text-[var(--ui-secondary)] truncate">{{ '@' . $instagramAccount->username }}</h4>
-                                                        @if($instagramAccount->description)
-                                                            <p class="text-xs text-[var(--ui-muted)] mt-0.5 line-clamp-1">{{ $instagramAccount->description }}</p>
-                                                        @endif
-                                                    </div>
-                                                </div>
-                                                @can('update', $brand)
-                                                    <x-ui-button
-                                                        variant="primary"
-                                                        size="sm"
-                                                        wire:click="attachInstagramAccount({{ $instagramAccount->id }})"
-                                                        class="ml-3 flex-shrink-0"
-                                                    >
-                                                        <span class="inline-flex items-center gap-1.5">
-                                                            @svg('heroicon-o-plus', 'w-3.5 h-3.5')
-                                                            <span>Verknüpfen</span>
-                                                        </span>
-                                                    </x-ui-button>
-                                                @endcan
-                                            </div>
+                                        <div class="flex-1 min-w-0">
+                                            <a href="{{ route('brands.instagram-accounts.show', $instagramAccount) }}" class="block">
+                                                <h4 class="text-sm font-semibold text-[var(--ui-secondary)] hover:text-pink-600 transition-colors truncate">{{ '@' . $instagramAccount->username }}</h4>
+                                            </a>
+                                            @if($instagramAccount->description)
+                                                <p class="text-xs text-[var(--ui-muted)] mt-0.5 line-clamp-1">{{ $instagramAccount->description }}</p>
+                                            @endif
                                         </div>
-                                    @endforeach
+                                    </div>
+                                    @can('update', $brand)
+                                        <button
+                                            wire:click="detachInstagramAccount({{ $instagramAccount->id }})"
+                                            wire:confirm="Instagram Account wirklich von dieser Marke trennen?"
+                                            class="flex-shrink-0 ml-3 p-1.5 text-[var(--ui-muted)] hover:text-[var(--ui-error)] hover:bg-red-50 rounded transition-colors"
+                                            title="Verknüpfung trennen"
+                                        >
+                                            @svg('heroicon-o-x-mark', 'w-4 h-4')
+                                        </button>
+                                    @endcan
                                 </div>
                             </div>
-                        </div>
-                    @endif
+                        @endforeach
+                    </div>
                 </div>
             </div>
         @endif
