@@ -40,6 +40,7 @@ class BrandsServiceProvider extends ServiceProvider
                 \Platform\Brands\Console\Commands\SyncInstagramMedia::class,
                 \Platform\Brands\Console\Commands\SyncInstagramInsights::class,
                 \Platform\Brands\Console\Commands\SyncAll::class,
+                \Platform\Brands\Console\Commands\TruncateIntegrationsData::class,
             ]);
         }
     }
