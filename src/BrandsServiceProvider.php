@@ -215,12 +215,20 @@ class BrandsServiceProvider extends ServiceProvider
             $registry->register(new \Platform\Brands\Tools\UpdateSocialCardTool());
             $registry->register(new \Platform\Brands\Tools\DeleteSocialCardTool());
             
+            // SocialCard Bulk-Tools
+            $registry->register(new \Platform\Brands\Tools\BulkCreateSocialCardsTool());
+            $registry->register(new \Platform\Brands\Tools\BulkUpdateSocialCardsTool());
+            
             // ContentBoardBlock-Tools
             $registry->register(new \Platform\Brands\Tools\CreateContentBoardBlockTool());
             $registry->register(new \Platform\Brands\Tools\ListContentBoardBlocksTool());
             $registry->register(new \Platform\Brands\Tools\GetContentBoardBlockTool());
             $registry->register(new \Platform\Brands\Tools\UpdateContentBoardBlockTool());
             $registry->register(new \Platform\Brands\Tools\DeleteContentBoardBlockTool());
+            
+            // ContentBoardBlock Bulk-Tools
+            $registry->register(new \Platform\Brands\Tools\BulkCreateContentBoardBlocksTool());
+            $registry->register(new \Platform\Brands\Tools\BulkUpdateContentBoardBlocksTool());
             
             // Facebook Pages-Tools
             $registry->register(new \Platform\Brands\Tools\ListFacebookPagesTool());
