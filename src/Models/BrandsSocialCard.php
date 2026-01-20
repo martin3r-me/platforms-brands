@@ -21,6 +21,7 @@ class BrandsSocialCard extends Model implements HasDisplayName
         'social_board_id',
         'social_board_slot_id',
         'title',
+        'body_md',
         'description',
         'order',
         'user_id',

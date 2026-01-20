@@ -109,13 +109,7 @@
                     </x-slot>
 
                     @foreach($slot->cards as $card)
-                        <x-ui-kanban-card :title="$card->title" :sortable-id="$card->id" wire:key="card-{{ $card->id }}">
-                            @if($card->description)
-                                <div class="text-xs text-[var(--ui-muted)] mt-1 line-clamp-2">
-                                    {{ $card->description }}
-                                </div>
-                            @endif
-                        </x-ui-kanban-card>
+                        @include('brands::livewire.social-card-preview-card', ['card' => $card])
                     @endforeach
                 </x-ui-kanban-column>
             @endforeach

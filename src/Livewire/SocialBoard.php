@@ -80,6 +80,7 @@ class SocialBoard extends Component
 
         BrandsSocialCard::create([
             'title' => 'Neue Card',
+            'body_md' => '',
             'description' => null,
             'order' => $maxOrder + 1,
             'user_id' => $user->id,
