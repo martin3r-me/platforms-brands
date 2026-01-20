@@ -4,19 +4,6 @@
     </x-slot>
 
     <x-ui-page-container spacing="space-y-6">
-        {{-- Header Section --}}
-        <div class="bg-white rounded-xl border border-[var(--ui-border)]/60 shadow-sm overflow-hidden">
-            <div class="p-6 lg:p-8">
-                <h1 class="text-3xl font-bold text-[var(--ui-secondary)] mb-4 tracking-tight leading-tight">{{ $brand->name }}</h1>
-                
-                @if($brand->description)
-                    <div class="mt-4">
-                        <p class="text-[var(--ui-secondary)]">{{ $brand->description }}</p>
-                    </div>
-                @endif
-            </div>
-        </div>
-
         {{-- Boards Section --}}
         <div>
             <div class="flex items-center justify-between mb-6">

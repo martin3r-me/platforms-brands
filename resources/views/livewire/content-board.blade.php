@@ -16,8 +16,31 @@
             <div class="p-6 lg:p-8">
                 <h1 class="text-3xl font-bold text-[var(--ui-secondary)] mb-4 tracking-tight leading-tight">{{ $contentBoard->name }}</h1>
                 @if($contentBoard->description)
-                    <p class="text-[var(--ui-secondary)]">{{ $contentBoard->description }}</p>
+                    <p class="text-[var(--ui-secondary)] mb-3">{{ $contentBoard->description }}</p>
                 @endif
+                <div 
+                    x-data="{ copied: false }"
+                    class="inline-flex items-center gap-2 px-3 py-1.5 bg-[var(--ui-muted-5)] border border-[var(--ui-border)]/40 rounded-lg"
+                >
+                    <span class="text-xs font-mono text-[var(--ui-muted)]">{{ $contentBoard->uuid }}</span>
+                    <button
+                        type="button"
+                        @click="
+                            navigator.clipboard.writeText('{{ $contentBoard->uuid }}');
+                            copied = true;
+                            setTimeout(() => copied = false, 2000);
+                        "
+                        class="p-1 rounded hover:bg-white transition-colors"
+                        title="UUID kopieren"
+                    >
+                        <span x-show="!copied">
+                            @svg('heroicon-o-clipboard', 'w-3.5 h-3.5 text-[var(--ui-muted)] hover:text-[var(--ui-primary)]')
+                        </span>
+                        <span x-show="copied" x-cloak>
+                            @svg('heroicon-o-check', 'w-3.5 h-3.5 text-green-600')
+                        </span>
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -55,6 +78,29 @@
                                     @if($section->description)
                                         <p class="text-sm text-[var(--ui-muted)] mt-1">{{ $section->description }}</p>
                                     @endif
+                                    <div 
+                                        x-data="{ copied: false }"
+                                        class="inline-flex items-center gap-2 px-2 py-1 mt-2 bg-[var(--ui-muted-5)] border border-[var(--ui-border)]/40 rounded text-xs"
+                                    >
+                                        <span class="font-mono text-[var(--ui-muted)]">{{ $section->uuid }}</span>
+                                        <button
+                                            type="button"
+                                            @click="
+                                                navigator.clipboard.writeText('{{ $section->uuid }}');
+                                                copied = true;
+                                                setTimeout(() => copied = false, 2000);
+                                            "
+                                            class="p-0.5 rounded hover:bg-white transition-colors"
+                                            title="UUID kopieren"
+                                        >
+                                            <span x-show="!copied">
+                                                @svg('heroicon-o-clipboard', 'w-3 h-3 text-[var(--ui-muted)] hover:text-[var(--ui-primary)]')
+                                            </span>
+                                            <span x-show="copied" x-cloak>
+                                                @svg('heroicon-o-check', 'w-3 h-3 text-green-600')
+                                            </span>
+                                        </button>
+                                    </div>
                                 </div>
                                 @can('update', $contentBoard)
                                     <x-ui-button 
@@ -76,7 +122,7 @@
                                 @foreach($section->rows as $row)
                                     <div class="bg-[var(--ui-muted-5)] rounded-lg border border-[var(--ui-border)]/40 overflow-hidden">
                                         <div class="p-3 border-b border-[var(--ui-border)]/40 flex items-center justify-between">
-                                            <div class="flex items-center gap-3 flex-1">
+                                            <div class="flex items-center gap-3 flex-1 flex-wrap">
                                                 @can('update', $contentBoard)
                                                     <input 
                                                         type="text"
@@ -96,6 +142,29 @@
                                                 <span class="text-xs px-2 py-0.5 rounded {{ $totalSpan > 12 ? 'bg-red-100 text-red-700' : ($totalSpan == 12 ? 'bg-green-100 text-green-700' : 'bg-[var(--ui-muted-5)] text-[var(--ui-muted)]') }}">
                                                     Span: {{ $totalSpan }}/12
                                                 </span>
+                                                <div 
+                                                    x-data="{ copied: false }"
+                                                    class="inline-flex items-center gap-1.5 px-2 py-0.5 bg-white border border-[var(--ui-border)]/40 rounded text-xs"
+                                                >
+                                                    <span class="font-mono text-[var(--ui-muted)] text-[10px]">{{ $row->uuid }}</span>
+                                                    <button
+                                                        type="button"
+                                                        @click="
+                                                            navigator.clipboard.writeText('{{ $row->uuid }}');
+                                                            copied = true;
+                                                            setTimeout(() => copied = false, 2000);
+                                                        "
+                                                        class="p-0.5 rounded hover:bg-[var(--ui-muted-5)] transition-colors"
+                                                        title="UUID kopieren"
+                                                    >
+                                                        <span x-show="!copied">
+                                                            @svg('heroicon-o-clipboard', 'w-2.5 h-2.5 text-[var(--ui-muted)] hover:text-[var(--ui-primary)]')
+                                                        </span>
+                                                        <span x-show="copied" x-cloak>
+                                                            @svg('heroicon-o-check', 'w-2.5 h-2.5 text-green-600')
+                                                        </span>
+                                                    </button>
+                                                </div>
                                             </div>
                                             <div class="flex items-center gap-2">
                                                 @can('update', $contentBoard)
