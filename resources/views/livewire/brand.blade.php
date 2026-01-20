@@ -404,6 +404,80 @@
                 </div>
             </div>
         @endif
+
+        {{-- Verfügbare Accounts zum Verknüpfen --}}
+        @if($metaConnection && ($availableFacebookPages->count() > 0 || $availableInstagramAccounts->count() > 0))
+            <div>
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-xl font-semibold text-[var(--ui-secondary)]">Accounts verknüpfen</h2>
+                </div>
+                <div class="bg-white rounded-xl border border-[var(--ui-border)]/60 shadow-sm overflow-hidden">
+                    <div class="divide-y divide-[var(--ui-border)]/40">
+                        @foreach($availableFacebookPages as $facebookPage)
+                            <div class="p-4 hover:bg-[var(--ui-muted-5)] transition-colors">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-3 flex-1 min-w-0">
+                                        <div class="flex-shrink-0 flex items-center justify-center w-10 h-10 rounded-lg bg-blue-50">
+                                            @svg('heroicon-o-globe-alt', 'w-5 h-5 text-blue-600')
+                                        </div>
+                                        <div class="flex-1 min-w-0">
+                                            <h4 class="text-sm font-semibold text-[var(--ui-secondary)] truncate">{{ $facebookPage->name }}</h4>
+                                            @if($facebookPage->description)
+                                                <p class="text-xs text-[var(--ui-muted)] mt-0.5 line-clamp-1">{{ $facebookPage->description }}</p>
+                                            @endif
+                                        </div>
+                                    </div>
+                                    @can('update', $brand)
+                                        <x-ui-button
+                                            variant="primary"
+                                            size="sm"
+                                            wire:click="attachFacebookPage({{ $facebookPage->id }})"
+                                            class="ml-3 flex-shrink-0"
+                                        >
+                                            <span class="inline-flex items-center gap-1.5">
+                                                @svg('heroicon-o-plus', 'w-3.5 h-3.5')
+                                                <span>Verknüpfen</span>
+                                            </span>
+                                        </x-ui-button>
+                                    @endcan
+                                </div>
+                            </div>
+                        @endforeach
+
+                        @foreach($availableInstagramAccounts as $instagramAccount)
+                            <div class="p-4 hover:bg-[var(--ui-muted-5)] transition-colors">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-3 flex-1 min-w-0">
+                                        <div class="flex-shrink-0 flex items-center justify-center w-10 h-10 rounded-lg bg-pink-50">
+                                            @svg('heroicon-o-camera', 'w-5 h-5 text-pink-600')
+                                        </div>
+                                        <div class="flex-1 min-w-0">
+                                            <h4 class="text-sm font-semibold text-[var(--ui-secondary)] truncate">{{ '@' . $instagramAccount->username }}</h4>
+                                            @if($instagramAccount->description)
+                                                <p class="text-xs text-[var(--ui-muted)] mt-0.5 line-clamp-1">{{ $instagramAccount->description }}</p>
+                                            @endif
+                                        </div>
+                                    </div>
+                                    @can('update', $brand)
+                                        <x-ui-button
+                                            variant="primary"
+                                            size="sm"
+                                            wire:click="attachInstagramAccount({{ $instagramAccount->id }})"
+                                            class="ml-3 flex-shrink-0"
+                                        >
+                                            <span class="inline-flex items-center gap-1.5">
+                                                @svg('heroicon-o-plus', 'w-3.5 h-3.5')
+                                                <span>Verknüpfen</span>
+                                            </span>
+                                        </x-ui-button>
+                                    @endcan
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+        @endif
     </x-ui-page-container>
 
     <x-slot name="sidebar">

@@ -193,6 +193,53 @@ class BrandsServiceProvider extends ServiceProvider
             $registry->register(new \Platform\Brands\Tools\GetContentBoardTool());
             $registry->register(new \Platform\Brands\Tools\UpdateContentBoardTool());
             $registry->register(new \Platform\Brands\Tools\DeleteContentBoardTool());
+            
+            // SocialBoard-Tools
+            $registry->register(new \Platform\Brands\Tools\CreateSocialBoardTool());
+            $registry->register(new \Platform\Brands\Tools\ListSocialBoardsTool());
+            $registry->register(new \Platform\Brands\Tools\GetSocialBoardTool());
+            $registry->register(new \Platform\Brands\Tools\UpdateSocialBoardTool());
+            $registry->register(new \Platform\Brands\Tools\DeleteSocialBoardTool());
+            
+            // MultiContentBoard-Tools
+            $registry->register(new \Platform\Brands\Tools\CreateMultiContentBoardTool());
+            $registry->register(new \Platform\Brands\Tools\ListMultiContentBoardsTool());
+            $registry->register(new \Platform\Brands\Tools\GetMultiContentBoardTool());
+            $registry->register(new \Platform\Brands\Tools\UpdateMultiContentBoardTool());
+            $registry->register(new \Platform\Brands\Tools\DeleteMultiContentBoardTool());
+            
+            // SocialCard-Tools
+            $registry->register(new \Platform\Brands\Tools\CreateSocialCardTool());
+            $registry->register(new \Platform\Brands\Tools\ListSocialCardsTool());
+            $registry->register(new \Platform\Brands\Tools\GetSocialCardTool());
+            $registry->register(new \Platform\Brands\Tools\UpdateSocialCardTool());
+            $registry->register(new \Platform\Brands\Tools\DeleteSocialCardTool());
+            
+            // ContentBoardBlock-Tools
+            $registry->register(new \Platform\Brands\Tools\CreateContentBoardBlockTool());
+            $registry->register(new \Platform\Brands\Tools\ListContentBoardBlocksTool());
+            $registry->register(new \Platform\Brands\Tools\GetContentBoardBlockTool());
+            $registry->register(new \Platform\Brands\Tools\UpdateContentBoardBlockTool());
+            $registry->register(new \Platform\Brands\Tools\DeleteContentBoardBlockTool());
+            
+            // Facebook Pages-Tools
+            $registry->register(new \Platform\Brands\Tools\ListFacebookPagesTool());
+            $registry->register(new \Platform\Brands\Tools\GetFacebookPageTool());
+            
+            // Instagram Accounts-Tools
+            $registry->register(new \Platform\Brands\Tools\ListInstagramAccountsTool());
+            $registry->register(new \Platform\Brands\Tools\GetInstagramAccountTool());
+            
+            // Facebook Posts-Tools
+            $registry->register(new \Platform\Brands\Tools\ListFacebookPostsTool());
+            $registry->register(new \Platform\Brands\Tools\GetFacebookPostTool());
+            
+            // Instagram Media-Tools
+            $registry->register(new \Platform\Brands\Tools\ListInstagramMediaTool());
+            $registry->register(new \Platform\Brands\Tools\GetInstagramMediaTool());
+            
+            // Content-Tool (generisch für Inhalte/Captions/Texte)
+            $registry->register(new \Platform\Brands\Tools\GetContentTool());
         } catch (\Throwable $e) {
             // Silent fail - Tool-Registry könnte nicht verfügbar sein
         }
