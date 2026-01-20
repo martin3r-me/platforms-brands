@@ -85,18 +85,19 @@ class TruncateIntegrationsData extends Command
                 $this->info("  ✅ integrations_facebook_pages: {$count} Einträge gelöscht");
             }
 
-            // 8. Integrations WhatsApp Accounts (optional, falls vorhanden)
-            if (Schema::hasTable('integrations_whatsapp_accounts')) {
-                $count = DB::table('integrations_whatsapp_accounts')->count();
-                DB::table('integrations_whatsapp_accounts')->truncate();
-                $this->info("  ✅ integrations_whatsapp_accounts: {$count} Einträge gelöscht");
-            }
-
-            // 9. Integrations Meta Business Accounts (optional, falls vorhanden)
+            // 8. Integrations Meta Business Accounts (optional, falls vorhanden)
+            // MUSS vor WhatsApp Accounts kommen, da WhatsApp Accounts FK zu Business Accounts haben
             if (Schema::hasTable('integrations_meta_business_accounts')) {
                 $count = DB::table('integrations_meta_business_accounts')->count();
                 DB::table('integrations_meta_business_accounts')->truncate();
                 $this->info("  ✅ integrations_meta_business_accounts: {$count} Einträge gelöscht");
+            }
+
+            // 9. Integrations WhatsApp Accounts (optional, falls vorhanden)
+            if (Schema::hasTable('integrations_whatsapp_accounts')) {
+                $count = DB::table('integrations_whatsapp_accounts')->count();
+                DB::table('integrations_whatsapp_accounts')->truncate();
+                $this->info("  ✅ integrations_whatsapp_accounts: {$count} Einträge gelöscht");
             }
 
             $this->newLine();
