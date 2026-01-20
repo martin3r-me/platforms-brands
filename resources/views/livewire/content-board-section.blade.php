@@ -33,11 +33,14 @@
                             @endif
                         </div>
                         @can('update', $section->contentBoard)
+                            @php
+                                $totalSpan = $row->blocks->sum('span');
+                            @endphp
                             <x-ui-button 
                                 variant="primary" 
                                 size="sm" 
                                 wire:click="createBlock({{ $row->id }})"
-                                :disabled="$row->blocks->count() >= 12"
+                                :disabled="$totalSpan >= 12"
                             >
                                 <span class="inline-flex items-center gap-2">
                                     @svg('heroicon-o-plus', 'w-4 h-4')

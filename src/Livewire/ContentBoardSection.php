@@ -65,10 +65,10 @@ class ContentBoardSection extends Component
 
         $row = \Platform\Brands\Models\BrandsContentBoardRow::findOrFail($rowId);
         
-        // Prüfe, ob bereits 12 Blöcke in dieser Row existieren
-        $existingBlocks = $row->blocks()->count();
-        if ($existingBlocks >= 12) {
-            session()->flash('error', 'Eine Row kann maximal 12 Blöcke enthalten.');
+        // Prüfe, ob die Summe der Spans bereits 12 erreicht hat
+        $currentSpanSum = $row->blocks()->sum('span');
+        if ($currentSpanSum >= 12) {
+            session()->flash('error', 'Die Summe aller Spans in einer Row darf maximal 12 betragen. Aktuell: ' . $currentSpanSum . '/12.');
             return;
         }
 

@@ -114,50 +114,74 @@ class Brand extends Component
 
     /**
      * Facebook Page mit Brand verknüpfen
-     * TODO: Implementieren, wenn Verknüpfung verfügbar ist
      */
     public function attachFacebookPage($facebookPageId)
     {
         $this->authorize('update', $this->brand);
         
-        // TODO: Verknüpfung implementieren
-        session()->flash('info', 'Verknüpfung von Facebook Pages mit Brands ist noch nicht implementiert.');
+        $facebookPage = \Platform\Integrations\Models\IntegrationsFacebookPage::findOrFail($facebookPageId);
+        $service = app(\Platform\Integrations\Services\IntegrationAccountLinkService::class);
+        
+        if ($service->linkFacebookPage($facebookPage, $this->brand)) {
+            $this->brand->refresh();
+            session()->flash('success', 'Facebook Page wurde erfolgreich mit der Marke verknüpft.');
+        } else {
+            session()->flash('error', 'Facebook Page konnte nicht verknüpft werden.');
+        }
     }
 
     /**
      * Facebook Page von Brand trennen
-     * TODO: Implementieren, wenn Verknüpfung verfügbar ist
      */
     public function detachFacebookPage($facebookPageId)
     {
         $this->authorize('update', $this->brand);
         
-        // TODO: Verknüpfung implementieren
-        session()->flash('info', 'Verknüpfung von Facebook Pages mit Brands ist noch nicht implementiert.');
+        $facebookPage = \Platform\Integrations\Models\IntegrationsFacebookPage::findOrFail($facebookPageId);
+        $service = app(\Platform\Integrations\Services\IntegrationAccountLinkService::class);
+        
+        if ($service->unlinkFacebookPage($facebookPage, $this->brand)) {
+            $this->brand->refresh();
+            session()->flash('success', 'Facebook Page wurde erfolgreich von der Marke getrennt.');
+        } else {
+            session()->flash('error', 'Facebook Page konnte nicht getrennt werden.');
+        }
     }
 
     /**
      * Instagram Account mit Brand verknüpfen
-     * TODO: Implementieren, wenn Verknüpfung verfügbar ist
      */
     public function attachInstagramAccount($instagramAccountId)
     {
         $this->authorize('update', $this->brand);
         
-        // TODO: Verknüpfung implementieren
-        session()->flash('info', 'Verknüpfung von Instagram Accounts mit Brands ist noch nicht implementiert.');
+        $instagramAccount = \Platform\Integrations\Models\IntegrationsInstagramAccount::findOrFail($instagramAccountId);
+        $service = app(\Platform\Integrations\Services\IntegrationAccountLinkService::class);
+        
+        if ($service->linkInstagramAccount($instagramAccount, $this->brand)) {
+            $this->brand->refresh();
+            session()->flash('success', 'Instagram Account wurde erfolgreich mit der Marke verknüpft.');
+        } else {
+            session()->flash('error', 'Instagram Account konnte nicht verknüpft werden.');
+        }
     }
 
     /**
      * Instagram Account von Brand trennen
-     * TODO: Implementieren, wenn Verknüpfung verfügbar ist
      */
     public function detachInstagramAccount($instagramAccountId)
     {
         $this->authorize('update', $this->brand);
         
-        // TODO: Verknüpfung implementieren
-        session()->flash('info', 'Verknüpfung von Instagram Accounts mit Brands ist noch nicht implementiert.');
+        $instagramAccount = \Platform\Integrations\Models\IntegrationsInstagramAccount::findOrFail($instagramAccountId);
+        $service = app(\Platform\Integrations\Services\IntegrationAccountLinkService::class);
+        
+        if ($service->unlinkInstagramAccount($instagramAccount, $this->brand)) {
+            $this->brand->refresh();
+            session()->flash('success', 'Instagram Account wurde erfolgreich von der Marke getrennt.');
+        } else {
+            session()->flash('error', 'Instagram Account konnte nicht getrennt werden.');
+        }
     }
 
     public function render()
@@ -172,20 +196,33 @@ class Brand extends Component
         // Meta Connection laden
         $metaConnection = $this->brand->metaConnection();
 
-        // Verfügbare Facebook Pages und Instagram Accounts des Users
+        // Verknüpfte Facebook Pages und Instagram Accounts dieser Marke (über Service)
+        $facebookPages = $this->brand->facebookPages();
+        $instagramAccounts = $this->brand->instagramAccounts();
+        
+        // Verfügbare Facebook Pages und Instagram Accounts des Users (noch nicht verknüpft)
         $availableFacebookPages = collect();
         $availableInstagramAccounts = collect();
-        $facebookPages = collect(); // TODO: Verknüpfung implementieren
-        $instagramAccounts = collect(); // TODO: Verknüpfung implementieren
+        $linkService = app(\Platform\Integrations\Services\IntegrationAccountLinkService::class);
         
         if ($metaConnection) {
             // Alle Facebook Pages des Users
-            $availableFacebookPages = \Platform\Integrations\Models\IntegrationsFacebookPage::where('user_id', $user->id)
+            $allFacebookPages = \Platform\Integrations\Models\IntegrationsFacebookPage::where('user_id', $user->id)
                 ->get();
             
+            // Nur die, die noch nicht verknüpft sind
+            $availableFacebookPages = $allFacebookPages->reject(function ($page) use ($linkService) {
+                return $linkService->isFacebookPageLinked($page);
+            });
+            
             // Alle Instagram Accounts des Users
-            $availableInstagramAccounts = \Platform\Integrations\Models\IntegrationsInstagramAccount::where('user_id', $user->id)
+            $allInstagramAccounts = \Platform\Integrations\Models\IntegrationsInstagramAccount::where('user_id', $user->id)
                 ->get();
+            
+            // Nur die, die noch nicht verknüpft sind
+            $availableInstagramAccounts = $allInstagramAccounts->reject(function ($account) use ($linkService) {
+                return $linkService->isInstagramAccountLinked($account);
+            });
         }
 
         return view('brands::livewire.brand', [

@@ -40,11 +40,13 @@
             </div>
 
             @php
+                // Alle Boards zusammenfassen: CI Boards, Content Boards, Facebook Pages und Instagram Accounts
                 $allBoards = $ciBoards->concat($contentBoards)->sortBy('order');
             @endphp
 
-            @if($allBoards->count() > 0)
+            @if($allBoards->count() > 0 || $facebookPages->count() > 0 || $instagramAccounts->count() > 0)
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                    {{-- CI Boards und Content Boards --}}
                     @foreach($allBoards as $board)
                         @if($board instanceof \Platform\Brands\Models\BrandsCiBoard)
                             <a href="{{ route('brands.ci-boards.show', $board) }}" class="block">
@@ -87,6 +89,52 @@
                                 </div>
                             </a>
                         @endif
+                    @endforeach
+
+                    {{-- Verknüpfte Facebook Pages als Boards --}}
+                    @foreach($facebookPages as $facebookPage)
+                        <a href="{{ route('brands.facebook-pages.show', $facebookPage) }}" class="block">
+                            <div class="bg-white rounded-xl border border-[var(--ui-border)]/60 shadow-sm hover:shadow-md transition-shadow p-6 h-full">
+                                <div class="flex items-start justify-between mb-3">
+                                    <div class="flex-1">
+                                        <h3 class="text-lg font-semibold text-[var(--ui-secondary)] mb-1">{{ $facebookPage->name }}</h3>
+                                        @if($facebookPage->description)
+                                            <p class="text-sm text-[var(--ui-muted)] line-clamp-2">{{ $facebookPage->description }}</p>
+                                        @endif
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-center gap-2 mt-4">
+                                    <span class="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-[var(--ui-primary-5)] text-[var(--ui-primary)] text-xs font-medium">
+                                        @svg('heroicon-o-globe-alt', 'w-3 h-3')
+                                        Facebook Page
+                                    </span>
+                                </div>
+                            </div>
+                        </a>
+                    @endforeach
+
+                    {{-- Verknüpfte Instagram Accounts als Boards --}}
+                    @foreach($instagramAccounts as $instagramAccount)
+                        <a href="{{ route('brands.instagram-accounts.show', $instagramAccount) }}" class="block">
+                            <div class="bg-white rounded-xl border border-[var(--ui-border)]/60 shadow-sm hover:shadow-md transition-shadow p-6 h-full">
+                                <div class="flex items-start justify-between mb-3">
+                                    <div class="flex-1">
+                                        <h3 class="text-lg font-semibold text-[var(--ui-secondary)] mb-1">@{{ $instagramAccount->username }}</h3>
+                                        @if($instagramAccount->description)
+                                            <p class="text-sm text-[var(--ui-muted)] line-clamp-2">{{ $instagramAccount->description }}</p>
+                                        @endif
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-center gap-2 mt-4">
+                                    <span class="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-[var(--ui-primary-5)] text-[var(--ui-primary)] text-xs font-medium">
+                                        @svg('heroicon-o-camera', 'w-3 h-3')
+                                        Instagram
+                                    </span>
+                                </div>
+                            </div>
+                        </a>
                     @endforeach
                 </div>
             @else

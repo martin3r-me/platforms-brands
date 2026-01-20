@@ -99,11 +99,14 @@
                                             </div>
                                             <div class="flex items-center gap-2">
                                                 @can('update', $contentBoard)
+                                                    @php
+                                                        $totalSpan = $row->blocks->sum('span');
+                                                    @endphp
                                                     <x-ui-button 
                                                         variant="primary" 
                                                         size="xs" 
                                                         wire:click="createBlock({{ $row->id }})"
-                                                        :disabled="$row->blocks->count() >= 12"
+                                                        :disabled="$totalSpan >= 12"
                                                     >
                                                         <span class="inline-flex items-center gap-1">
                                                             @svg('heroicon-o-plus', 'w-3 h-3')
@@ -131,56 +134,19 @@
                                                         <div 
                                                             class="bg-white rounded-lg border border-[var(--ui-border)]/40 hover:border-[var(--ui-primary)]/40 transition-colors relative"
                                                             style="grid-column: span {{ $block->span }};"
-                                                            x-data="{ settingsOpen: false }"
-                                                            @click.away="settingsOpen = false"
                                                         >
                                                             {{-- Block Header --}}
                                                             @can('update', $contentBoard)
                                                                 <div class="flex items-center justify-end p-1 border-b border-[var(--ui-border)]/40">
-                                                                    <div class="relative">
-                                                                        <button 
-                                                                            type="button"
-                                                                            @click="settingsOpen = !settingsOpen"
-                                                                            class="p-1 rounded hover:bg-[var(--ui-muted-5)] transition-colors"
-                                                                            title="Block-Einstellungen"
-                                                                        >
-                                                                            @svg('heroicon-o-cog-6-tooth', 'w-3 h-3 text-[var(--ui-muted)]')
-                                                                        </button>
-                                                                        
-                                                                        {{-- Settings Dropdown --}}
-                                                                        <div 
-                                                                            x-show="settingsOpen"
-                                                                            x-cloak
-                                                                            x-transition
-                                                                            class="absolute right-0 top-full mt-1 z-50 bg-white rounded-lg border border-[var(--ui-border)]/60 shadow-xl p-2 min-w-[140px]"
-                                                                        >
-                                                                            <div class="space-y-2">
-                                                                                <div>
-                                                                                    <label class="text-xs font-medium text-[var(--ui-secondary)] mb-1 block">Span (1-12)</label>
-                                                                                    <input 
-                                                                                        type="number" 
-                                                                                        min="1" 
-                                                                                        max="12" 
-                                                                                        value="{{ $block->span }}"
-                                                                                        wire:change="updateBlockSpan({{ $block->id }}, $event.target.value); settingsOpen = false"
-                                                                                        class="w-full text-xs text-center border border-[var(--ui-border)] rounded px-2 py-1 focus:ring-2 focus:ring-[var(--ui-primary)] focus:border-transparent"
-                                                                                    />
-                                                                                </div>
-                                                                                <div class="pt-2 border-t border-[var(--ui-border)]/40">
-                                                                                    <button
-                                                                                        type="button"
-                                                                                        wire:click="deleteBlock({{ $block->id }})"
-                                                                                        wire:confirm="Möchtest du diesen Block wirklich löschen?"
-                                                                                        @click="settingsOpen = false"
-                                                                                        class="w-full text-xs text-red-600 hover:text-red-700 hover:bg-red-50 px-2 py-1.5 rounded transition-colors flex items-center justify-center gap-1"
-                                                                                    >
-                                                                                        @svg('heroicon-o-trash', 'w-3 h-3')
-                                                                                        <span>Löschen</span>
-                                                                                    </button>
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
+                                                                    <button 
+                                                                        type="button"
+                                                                        x-data
+                                                                        @click="$dispatch('open-modal-content-board-block-settings', { blockId: {{ $block->id }} })"
+                                                                        class="p-1 rounded hover:bg-[var(--ui-muted-5)] transition-colors"
+                                                                        title="Block-Einstellungen"
+                                                                    >
+                                                                        @svg('heroicon-o-cog-6-tooth', 'w-3 h-3 text-[var(--ui-muted)]')
+                                                                    </button>
                                                                 </div>
                                                             @endcan
                                                             
@@ -356,4 +322,5 @@
     </x-slot>
 
     <livewire:brands.content-board-settings-modal/>
+    <livewire:brands.content-board-block-settings-modal/>
 </x-ui-page>

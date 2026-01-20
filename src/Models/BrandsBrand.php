@@ -15,11 +15,12 @@ use Platform\Crm\Traits\HasCompanyLinksTrait;
 use Platform\Hcm\Traits\HasEmployeeContact;
 use Platform\Crm\Contracts\CompanyInterface;
 use Platform\Crm\Contracts\ContactInterface;
+use Platform\Integrations\Contracts\SocialMediaAccountLinkableInterface;
 
 /**
  * @ai.description Marke dient als Container für Brand-Management im Team.
  */
-class BrandsBrand extends Model implements HasTimeAncestors, HasKeyResultAncestors, HasDisplayName
+class BrandsBrand extends Model implements HasTimeAncestors, HasKeyResultAncestors, HasDisplayName, SocialMediaAccountLinkableInterface
 {
     use HasOrganizationContexts, HasColors, HasCompanyLinksTrait, HasEmployeeContact;
 
@@ -150,23 +151,21 @@ class BrandsBrand extends Model implements HasTimeAncestors, HasKeyResultAncesto
     }
 
     /**
-     * Facebook Pages dieser Marke
-     * TODO: Verknüpfung implementieren, wenn benötigt
+     * Facebook Pages dieser Marke (über lose Verknüpfung)
      */
     public function facebookPages()
     {
-        // TODO: Verknüpfung implementieren
-        return collect();
+        $service = app(\Platform\Integrations\Services\IntegrationAccountLinkService::class);
+        return $service->getLinkedFacebookPages($this);
     }
 
     /**
-     * Instagram Accounts dieser Marke
-     * TODO: Verknüpfung implementieren, wenn benötigt
+     * Instagram Accounts dieser Marke (über lose Verknüpfung)
      */
     public function instagramAccounts()
     {
-        // TODO: Verknüpfung implementieren
-        return collect();
+        $service = app(\Platform\Integrations\Services\IntegrationAccountLinkService::class);
+        return $service->getLinkedInstagramAccounts($this);
     }
 
     /**
@@ -177,5 +176,23 @@ class BrandsBrand extends Model implements HasTimeAncestors, HasKeyResultAncesto
     {
         // TODO: Verknüpfung implementieren
         return collect();
+    }
+
+    /**
+     * SocialMediaAccountLinkableInterface Implementation
+     */
+    public function getSocialMediaAccountLinkableId(): int
+    {
+        return $this->id;
+    }
+
+    public function getSocialMediaAccountLinkableType(): string
+    {
+        return self::class;
+    }
+
+    public function getTeamId(): int
+    {
+        return $this->team_id ?? 0;
     }
 }
