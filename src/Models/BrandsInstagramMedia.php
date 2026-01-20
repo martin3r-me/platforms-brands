@@ -51,6 +51,24 @@ class BrandsInstagramMedia extends Model implements HasDisplayName
 
             $model->uuid = $uuid;
         });
+
+        static::deleting(function (self $model) {
+            // Lösche alle ContextFiles (inkl. Dateien vom Storage)
+            $contextFileService = app(\Platform\Core\Services\ContextFileService::class);
+            $contextFiles = $model->contextFiles()->get();
+            
+            foreach ($contextFiles as $contextFile) {
+                try {
+                    $contextFileService->delete($contextFile->id);
+                } catch (\Exception $e) {
+                    \Log::error('Error deleting ContextFile for Instagram Media', [
+                        'context_file_id' => $contextFile->id,
+                        'media_id' => $model->id,
+                        'error' => $e->getMessage(),
+                    ]);
+                }
+            }
+        });
     }
 
     public function instagramAccount(): BelongsTo

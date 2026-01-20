@@ -18,10 +18,10 @@ class ContentBoardBlockSettingsModal extends Component
     #[On('open-modal-content-board-block-settings')] 
     public function openModalContentBoardBlockSettings($blockId)
     {
-        $this->block = BrandsContentBoardBlock::with('row.contentBoard')->findOrFail($blockId);
+        $this->block = BrandsContentBoardBlock::with('row.section.contentBoard')->findOrFail($blockId);
         
         // Policy-Berechtigung prüfen
-        $this->authorize('update', $this->block->row->contentBoard);
+        $this->authorize('update', $this->block->row->section->contentBoard);
         
         $this->span = $this->block->span;
         $this->name = $this->block->name;
@@ -53,7 +53,7 @@ class ContentBoardBlockSettingsModal extends Component
         }
         
         // Policy-Berechtigung prüfen
-        $this->authorize('update', $this->block->row->contentBoard);
+        $this->authorize('update', $this->block->row->section->contentBoard);
 
         $row = $this->block->row;
         $row->load('blocks');
@@ -96,7 +96,7 @@ class ContentBoardBlockSettingsModal extends Component
         }
         
         // Policy-Berechtigung prüfen
-        $this->authorize('update', $this->block->row->contentBoard);
+        $this->authorize('update', $this->block->row->section->contentBoard);
         
         $this->block->delete();
         

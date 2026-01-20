@@ -50,6 +50,24 @@ class BrandsFacebookPost extends Model implements HasDisplayName
 
             $model->uuid = $uuid;
         });
+
+        static::deleting(function (self $model) {
+            // Lösche alle ContextFiles (inkl. Dateien vom Storage)
+            $contextFileService = app(\Platform\Core\Services\ContextFileService::class);
+            $contextFiles = $model->contextFiles()->get();
+            
+            foreach ($contextFiles as $contextFile) {
+                try {
+                    $contextFileService->delete($contextFile->id);
+                } catch (\Exception $e) {
+                    \Log::error('Error deleting ContextFile for Facebook Post', [
+                        'context_file_id' => $contextFile->id,
+                        'post_id' => $model->id,
+                        'error' => $e->getMessage(),
+                    ]);
+                }
+            }
+        });
     }
 
     public function facebookPage(): BelongsTo
