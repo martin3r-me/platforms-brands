@@ -120,7 +120,7 @@
                             <div class="bg-white rounded-xl border border-[var(--ui-border)]/60 shadow-sm hover:shadow-md transition-shadow p-6 h-full">
                                 <div class="flex items-start justify-between mb-3">
                                     <div class="flex-1">
-                                        <h3 class="text-lg font-semibold text-[var(--ui-secondary)] mb-1">@{{ $instagramAccount->username }}</h3>
+                                        <h3 class="text-lg font-semibold text-[var(--ui-secondary)] mb-1">{{ '@' . $instagramAccount->username }}</h3>
                                         @if($instagramAccount->description)
                                             <p class="text-sm text-[var(--ui-muted)] line-clamp-2">{{ $instagramAccount->description }}</p>
                                         @endif
@@ -170,7 +170,28 @@
                 <h2 class="text-xl font-semibold text-[var(--ui-secondary)]">Meta Verknüpfung</h2>
                 @if($metaConnection)
                     <div class="flex items-center gap-2">
-                        <span class="text-sm text-[var(--ui-muted)]">Verwaltet im User-Modal</span>
+                        @can('update', $brand)
+                            <x-ui-button 
+                                variant="secondary-outline" 
+                                size="sm"
+                                wire:click="syncFacebookPages"
+                            >
+                                <span class="inline-flex items-center gap-2">
+                                    @svg('heroicon-o-globe-alt', 'w-4 h-4')
+                                    <span>Facebook Pages syncen</span>
+                                </span>
+                            </x-ui-button>
+                            <x-ui-button 
+                                variant="secondary-outline" 
+                                size="sm"
+                                wire:click="syncInstagramAccounts"
+                            >
+                                <span class="inline-flex items-center gap-2">
+                                    @svg('heroicon-o-camera', 'w-4 h-4')
+                                    <span>Instagram syncen</span>
+                                </span>
+                            </x-ui-button>
+                        @endcan
                     </div>
                 @endif
             </div>
@@ -286,7 +307,7 @@
                                 <div class="flex items-start justify-between mb-3">
                                     <div class="flex-1">
                                         <a href="{{ route('brands.instagram-accounts.show', $instagramAccount) }}" class="block">
-                                            <h3 class="text-lg font-semibold text-[var(--ui-secondary)] mb-1 hover:text-[var(--ui-primary)] transition-colors">@{{ $instagramAccount->username }}</h3>
+                                            <h3 class="text-lg font-semibold text-[var(--ui-secondary)] mb-1 hover:text-[var(--ui-primary)] transition-colors">{{ '@' . $instagramAccount->username }}</h3>
                                         </a>
                                         @if($instagramAccount->description)
                                             <p class="text-sm text-[var(--ui-muted)] line-clamp-2">{{ $instagramAccount->description }}</p>
@@ -361,7 +382,7 @@
                             <div class="bg-white rounded-xl border-2 border-dashed border-[var(--ui-border)]/60 shadow-sm p-6 h-full">
                                 <div class="flex items-start justify-between mb-3">
                                     <div class="flex-1">
-                                        <h3 class="text-lg font-semibold text-[var(--ui-secondary)] mb-1">@{{ $instagramAccount->username }}</h3>
+                                        <h3 class="text-lg font-semibold text-[var(--ui-secondary)] mb-1">{{ '@' . $instagramAccount->username }}</h3>
                                         @if($instagramAccount->description)
                                             <p class="text-sm text-[var(--ui-muted)] line-clamp-2">{{ $instagramAccount->description }}</p>
                                         @endif

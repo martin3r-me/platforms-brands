@@ -31,6 +31,45 @@ class InstagramAccount extends Component
         $this->instagramAccount->refresh();
     }
 
+    /**
+     * Instagram Media synchronisieren
+     */
+    public function syncMedia()
+    {
+        $this->authorize('update', $this->instagramAccount);
+        
+        try {
+            $user = Auth::user();
+            $metaConnection = $this->instagramAccount->integrationConnection;
+            
+            if (!$metaConnection) {
+                session()->flash('error', 'Keine Meta-Connection gefunden.');
+                return;
+            }
+            
+            if ($metaConnection->status !== 'active') {
+                session()->flash('error', 'Meta-Connection ist nicht aktiv.');
+                return;
+            }
+            
+            $service = app(\Platform\Brands\Services\InstagramMediaService::class);
+            $result = $service->syncMedia($this->instagramAccount, 1000);
+            
+            $count = count($result);
+            session()->flash('success', "✅ {$count} Instagram Media-Item(s) synchronisiert.");
+            
+            // Refresh, damit neue Media angezeigt werden
+            $this->instagramAccount->refresh();
+        } catch (\Exception $e) {
+            \Log::error('Instagram Media Sync Error', [
+                'user_id' => auth()->id(),
+                'instagram_account_id' => $this->instagramAccount->id,
+                'error' => $e->getMessage(),
+            ]);
+            session()->flash('error', 'Fehler beim Synchronisieren: ' . $e->getMessage());
+        }
+    }
+
     public function render()
     {
         $user = Auth::user();

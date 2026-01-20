@@ -294,6 +294,26 @@
                     </div>
                 </div>
 
+                {{-- Aktionen --}}
+                @can('update', $facebookPage)
+                    <div>
+                        <h3 class="text-xs font-semibold uppercase tracking-wide text-[var(--ui-muted)] mb-3">Aktionen</h3>
+                        <div class="space-y-2">
+                            <x-ui-button 
+                                variant="primary" 
+                                size="sm"
+                                wire:click="syncPosts"
+                                class="w-full"
+                            >
+                                <span class="inline-flex items-center gap-2">
+                                    @svg('heroicon-o-arrow-path', 'w-4 h-4')
+                                    <span>Posts synchronisieren</span>
+                                </span>
+                            </x-ui-button>
+                        </div>
+                    </div>
+                @endcan
+
                 {{-- Instagram Accounts --}}
                 @if($facebookPage->instagramAccounts->count() > 0)
                     <div>
@@ -302,7 +322,7 @@
                             @foreach($facebookPage->instagramAccounts as $instagramAccount)
                                 <a href="{{ route('brands.instagram-accounts.show', $instagramAccount) }}" 
                                    class="block py-2 px-3 bg-[var(--ui-muted-5)] border border-[var(--ui-border)]/40 rounded-lg hover:bg-[var(--ui-primary-5)] transition-colors">
-                                    <span class="text-sm text-[var(--ui-secondary)] font-medium">@{{ $instagramAccount->username }}</span>
+                                    <span class="text-sm text-[var(--ui-secondary)] font-medium">{{ '@' . $instagramAccount->username }}</span>
                                 </a>
                             @endforeach
                         </div>

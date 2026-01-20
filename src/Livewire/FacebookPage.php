@@ -30,6 +30,45 @@ class FacebookPage extends Component
         $this->facebookPage->refresh();
     }
 
+    /**
+     * Facebook Page Posts synchronisieren
+     */
+    public function syncPosts()
+    {
+        $this->authorize('update', $this->facebookPage);
+        
+        try {
+            $user = Auth::user();
+            $metaConnection = $this->facebookPage->integrationConnection;
+            
+            if (!$metaConnection) {
+                session()->flash('error', 'Keine Meta-Connection gefunden.');
+                return;
+            }
+            
+            if ($metaConnection->status !== 'active') {
+                session()->flash('error', 'Meta-Connection ist nicht aktiv.');
+                return;
+            }
+            
+            $service = app(\Platform\Brands\Services\FacebookPageService::class);
+            $result = $service->syncFacebookPosts($this->facebookPage);
+            
+            $count = count($result);
+            session()->flash('success', "✅ {$count} Facebook Post(s) synchronisiert.");
+            
+            // Refresh, damit neue Posts angezeigt werden
+            $this->facebookPage->refresh();
+        } catch (\Exception $e) {
+            \Log::error('Facebook Posts Sync Error', [
+                'user_id' => auth()->id(),
+                'facebook_page_id' => $this->facebookPage->id,
+                'error' => $e->getMessage(),
+            ]);
+            session()->flash('error', 'Fehler beim Synchronisieren: ' . $e->getMessage());
+        }
+    }
+
     public function render()
     {
         $user = Auth::user();

@@ -184,6 +184,84 @@ class Brand extends Component
         }
     }
 
+    /**
+     * Facebook Pages synchronisieren
+     */
+    public function syncFacebookPages()
+    {
+        $this->authorize('update', $this->brand);
+        
+        try {
+            $user = Auth::user();
+            $metaConnection = $this->brand->metaConnection();
+            
+            if (!$metaConnection) {
+                session()->flash('error', 'Keine Meta-Connection gefunden. Bitte zuerst mit Meta verbinden.');
+                return;
+            }
+            
+            if ($metaConnection->status !== 'active') {
+                session()->flash('error', 'Meta-Connection ist nicht aktiv.');
+                return;
+            }
+            
+            $service = app(\Platform\Integrations\Services\IntegrationsFacebookPageService::class);
+            $result = $service->syncFacebookPagesForUser($metaConnection);
+            
+            $count = count($result);
+            session()->flash('success', "✅ {$count} Facebook Page(s) synchronisiert.");
+            
+            // Refresh, damit neue Pages angezeigt werden
+            $this->brand->refresh();
+        } catch (\Exception $e) {
+            \Log::error('Facebook Pages Sync Error', [
+                'user_id' => auth()->id(),
+                'brand_id' => $this->brand->id,
+                'error' => $e->getMessage(),
+            ]);
+            session()->flash('error', 'Fehler beim Synchronisieren: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Instagram Accounts synchronisieren
+     */
+    public function syncInstagramAccounts()
+    {
+        $this->authorize('update', $this->brand);
+        
+        try {
+            $user = Auth::user();
+            $metaConnection = $this->brand->metaConnection();
+            
+            if (!$metaConnection) {
+                session()->flash('error', 'Keine Meta-Connection gefunden. Bitte zuerst mit Meta verbinden.');
+                return;
+            }
+            
+            if ($metaConnection->status !== 'active') {
+                session()->flash('error', 'Meta-Connection ist nicht aktiv.');
+                return;
+            }
+            
+            $service = app(\Platform\Integrations\Services\IntegrationsInstagramAccountService::class);
+            $result = $service->syncInstagramAccountsForUser($metaConnection);
+            
+            $count = count($result);
+            session()->flash('success', "✅ {$count} Instagram Account(s) synchronisiert.");
+            
+            // Refresh, damit neue Accounts angezeigt werden
+            $this->brand->refresh();
+        } catch (\Exception $e) {
+            \Log::error('Instagram Accounts Sync Error', [
+                'user_id' => auth()->id(),
+                'brand_id' => $this->brand->id,
+                'error' => $e->getMessage(),
+            ]);
+            session()->flash('error', 'Fehler beim Synchronisieren: ' . $e->getMessage());
+        }
+    }
+
     public function render()
     {
         $user = Auth::user();
