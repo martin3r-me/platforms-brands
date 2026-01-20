@@ -74,6 +74,10 @@ class ContentBoardBlockSettingsModal extends Component
         $this->block->description = $this->description ? trim($this->description) : null;
         $this->block->save();
         
+        // Block-Informationen für Notification speichern, bevor reset()
+        $blockClass = get_class($this->block);
+        $blockId = $this->block->getKey();
+        
         $this->dispatch('updateContentBoard');
         $this->dispatch('updateSection');
 
@@ -81,8 +85,8 @@ class ContentBoardBlockSettingsModal extends Component
             'title' => 'Block gespeichert',
             'message' => 'Der Block wurde erfolgreich aktualisiert.',
             'notice_type' => 'success',
-            'noticable_type' => get_class($this->block),
-            'noticable_id'   => $this->block->getKey(),
+            'noticable_type' => $blockClass,
+            'noticable_id'   => $blockId,
         ]);
 
         $this->reset(['block', 'span', 'name', 'description']);
