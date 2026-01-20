@@ -73,6 +73,19 @@
                                         <div class="text-xs text-[var(--ui-muted)]">Für Corporate Identity</div>
                                     </div>
                                 </button>
+                                <button
+                                    wire:click="createMultiContentBoard"
+                                    @click="open = false"
+                                    class="w-full text-left px-4 py-2.5 text-sm text-[var(--ui-secondary)] hover:bg-[var(--ui-muted-5)] transition-colors flex items-center gap-3"
+                                >
+                                    <div class="flex items-center justify-center w-8 h-8 rounded-md bg-green-50">
+                                        @svg('heroicon-o-squares-2x2', 'w-4 h-4 text-green-600')
+                                    </div>
+                                    <div>
+                                        <div class="font-medium">Multi-Content-Board</div>
+                                        <div class="text-xs text-[var(--ui-muted)]">Kanban mit Content Boards</div>
+                                    </div>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -80,7 +93,7 @@
             </div>
 
             @php
-                $hasAnyBoards = $ciBoards->count() > 0 || $contentBoards->count() > 0 || $socialBoards->count() > 0 || $facebookPages->count() > 0 || $instagramAccounts->count() > 0;
+                $hasAnyBoards = $ciBoards->count() > 0 || $contentBoards->count() > 0 || $socialBoards->count() > 0 || $multiContentBoards->count() > 0 || $facebookPages->count() > 0 || $instagramAccounts->count() > 0;
             @endphp
 
             @if($hasAnyBoards)
@@ -189,6 +202,44 @@
                                                     <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-purple-50 text-purple-700 text-xs font-medium">
                                                         @svg('heroicon-o-share', 'w-3.5 h-3.5')
                                                         Social Board
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endif
+
+                    {{-- Multi-Content-Boards Gruppe --}}
+                    @if($multiContentBoards->count() > 0)
+                        <div>
+                            <div class="flex items-center gap-2 mb-4">
+                                <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-green-50">
+                                    @svg('heroicon-o-squares-2x2', 'w-5 h-5 text-green-600')
+                                </div>
+                                <h3 class="text-lg font-semibold text-[var(--ui-secondary)]">Multi-Content-Boards</h3>
+                                <span class="text-sm text-[var(--ui-muted)]">({{ $multiContentBoards->count() }})</span>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                                @foreach($multiContentBoards as $board)
+                                    <a href="{{ route('brands.multi-content-boards.show', $board) }}" class="group block">
+                                        <div class="bg-white rounded-xl border border-[var(--ui-border)]/60 shadow-sm hover:shadow-lg hover:border-green-200 transition-all duration-200 p-6 h-full flex flex-col">
+                                            <div class="flex items-start justify-between mb-3">
+                                                <div class="flex-1 min-w-0">
+                                                    <h4 class="text-lg font-semibold text-[var(--ui-secondary)] mb-2 group-hover:text-green-600 transition-colors truncate">{{ $board->name }}</h4>
+                                                    @if($board->description)
+                                                        <p class="text-sm text-[var(--ui-muted)] line-clamp-2">{{ $board->description }}</p>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="mt-auto pt-4 border-t border-[var(--ui-border)]/40">
+                                                <div class="flex items-center gap-2">
+                                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-green-50 text-green-700 text-xs font-medium">
+                                                        @svg('heroicon-o-squares-2x2', 'w-3.5 h-3.5')
+                                                        Multi-Content-Board
                                                     </span>
                                                 </div>
                                             </div>
@@ -580,9 +631,9 @@
                                     @svg('heroicon-o-squares-2x2', 'w-4 h-4 text-[var(--ui-primary)]')
                                     <span class="text-sm font-semibold text-[var(--ui-secondary)]">Boards</span>
                                 </div>
-                                <span class="text-lg font-bold text-[var(--ui-primary)]">{{ $ciBoards->count() + $contentBoards->count() + $socialBoards->count() }}</span>
+                                <span class="text-lg font-bold text-[var(--ui-primary)]">{{ $ciBoards->count() + $contentBoards->count() + $socialBoards->count() + $multiContentBoards->count() }}</span>
                             </div>
-                            <div class="grid grid-cols-3 gap-2 mt-2">
+                            <div class="grid grid-cols-4 gap-2 mt-2">
                                 @if($ciBoards->count() > 0)
                                     <div class="text-center">
                                         <div class="text-xs font-medium text-amber-600">{{ $ciBoards->count() }}</div>
@@ -599,6 +650,12 @@
                                     <div class="text-center">
                                         <div class="text-xs font-medium text-purple-600">{{ $socialBoards->count() }}</div>
                                         <div class="text-[10px] text-[var(--ui-muted)]">Social</div>
+                                    </div>
+                                @endif
+                                @if($multiContentBoards->count() > 0)
+                                    <div class="text-center">
+                                        <div class="text-xs font-medium text-green-600">{{ $multiContentBoards->count() }}</div>
+                                        <div class="text-[10px] text-[var(--ui-muted)]">Multi</div>
                                     </div>
                                 @endif
                             </div>

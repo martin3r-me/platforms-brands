@@ -176,22 +176,101 @@
                         {{-- Media Content --}}
                         <div class="relative bg-[var(--ui-muted-5)]">
                             <div class="aspect-w-1 aspect-h-1">
-                                @if($lastPost->contextFiles->where('meta.role', 'primary')->first())
+                                @if($lastPost->media_type === 'CAROUSEL_ALBUM' && $lastPost->contextFiles->where('meta.role', 'carousel')->count() > 0)
+                                    {{-- Carousel Album --}}
+                                    @php 
+                                        $carouselItems = $lastPost->contextFiles->where('meta.role', 'carousel')->sortBy(function($file) {
+                                            return $file->meta['carousel_index'] ?? 999;
+                                        });
+                                    @endphp
+                                    <div x-data="{ activeIndex: 0 }" class="absolute inset-0 h-full w-full">
+                                        @foreach($carouselItems as $index => $carouselFile)
+                                            <div x-show="activeIndex === {{ $index }}" 
+                                                 x-transition:enter="transition ease-out duration-300"
+                                                 x-transition:enter-start="opacity-0"
+                                                 x-transition:enter-end="opacity-100"
+                                                 x-transition:leave="transition ease-in duration-300"
+                                                 x-transition:leave-start="opacity-100"
+                                                 x-transition:leave-end="opacity-0"
+                                                 class="absolute inset-0 h-full w-full">
+                                                @if($carouselFile->isImage())
+                                                    <img src="{{ $carouselFile->url }}"
+                                                         alt="Instagram Carousel Image {{ $index + 1 }}"
+                                                         class="h-full w-full object-contain">
+                                                @else
+                                                    <video class="h-full w-full object-contain"
+                                                           playsinline controls>
+                                                        <source src="{{ $carouselFile->url }}" type="{{ $carouselFile->mime_type }}">
+                                                    </video>
+                                                @endif
+                                            </div>
+                                        @endforeach
+                                        
+                                        @if($carouselItems->count() > 1)
+                                            {{-- Navigation Arrows --}}
+                                            <button @click="activeIndex = activeIndex > 0 ? activeIndex - 1 : {{ $carouselItems->count() - 1 }}"
+                                                    class="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-2 transition-colors">
+                                                @svg('heroicon-o-chevron-left', 'w-5 h-5')
+                                            </button>
+                                            <button @click="activeIndex = activeIndex < {{ $carouselItems->count() - 1 }} ? activeIndex + 1 : 0"
+                                                    class="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-2 transition-colors">
+                                                @svg('heroicon-o-chevron-right', 'w-5 h-5')
+                                            </button>
+                                            
+                                            {{-- Dots Indicator --}}
+                                            <div class="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5">
+                                                @foreach($carouselItems as $index => $item)
+                                                    <button @click="activeIndex = {{ $index }}"
+                                                            class="w-1.5 h-1.5 rounded-full transition-all"
+                                                            :class="activeIndex === {{ $index }} ? 'bg-white w-4' : 'bg-white/50'">
+                                                    </button>
+                                                @endforeach
+                                            </div>
+                                        @endif
+                                    </div>
+                                @elseif($lastPost->media_type === 'VIDEO')
+                                    {{-- Video --}}
+                                    @if($lastPost->contextFiles->where('meta.role', 'primary')->first())
+                                        @php $primaryFile = $lastPost->contextFiles->where('meta.role', 'primary')->first(); @endphp
+                                        <video class="absolute inset-0 h-full w-full object-contain"
+                                               playsinline controls>
+                                            <source src="{{ $primaryFile->url }}" type="{{ $primaryFile->mime_type }}">
+                                        </video>
+                                    @elseif($lastPost->media_url)
+                                        <video class="absolute inset-0 h-full w-full object-contain"
+                                               playsinline controls>
+                                            <source src="{{ $lastPost->media_url }}" type="video/mp4">
+                                        </video>
+                                    @endif
+                                @elseif($lastPost->media_type === 'IMAGE')
+                                    {{-- Single Image --}}
+                                    @if($lastPost->contextFiles->where('meta.role', 'primary')->first())
+                                        @php $primaryFile = $lastPost->contextFiles->where('meta.role', 'primary')->first(); @endphp
+                                        <img src="{{ $primaryFile->url }}"
+                                             alt="Instagram Image"
+                                             class="absolute inset-0 h-full w-full object-contain">
+                                    @elseif($lastPost->media_url)
+                                        <img src="{{ $lastPost->media_url }}"
+                                             alt="Instagram Image"
+                                             class="absolute inset-0 h-full w-full object-contain">
+                                    @endif
+                                @elseif($lastPost->contextFiles->where('meta.role', 'primary')->first())
+                                    {{-- Fallback: Primary File --}}
                                     @php $primaryFile = $lastPost->contextFiles->where('meta.role', 'primary')->first(); @endphp
                                     @if($primaryFile->isImage())
-                                        <img src="{{ $primaryFile->thumbnail ? $primaryFile->thumbnail->url : $primaryFile->url }}"
+                                        <img src="{{ $primaryFile->url }}"
                                              alt="Instagram Image"
-                                             class="absolute inset-0 h-full w-full object-cover">
+                                             class="absolute inset-0 h-full w-full object-contain">
                                     @else
-                                        <video class="absolute inset-0 h-full w-full object-cover"
-                                               playsinline muted loop controlsList="nodownload">
+                                        <video class="absolute inset-0 h-full w-full object-contain"
+                                               playsinline controls>
                                             <source src="{{ $primaryFile->url }}" type="{{ $primaryFile->mime_type }}">
                                         </video>
                                     @endif
                                 @elseif($lastPost->media_url)
                                     <img src="{{ $lastPost->media_url }}"
                                          alt="Instagram Image"
-                                         class="absolute inset-0 h-full w-full object-cover">
+                                         class="absolute inset-0 h-full w-full object-contain">
                                 @endif
                             </div>
 
@@ -537,7 +616,7 @@
             <div x-show="viewMode === 'grid'" 
                  class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
                 @foreach($media as $mediaItem)
-                    <div class="border border-[var(--ui-border)]/60 rounded-lg overflow-hidden hover:border-[var(--ui-primary)]/60 transition-colors">
+                    <div class="group border border-[var(--ui-border)]/60 rounded-lg overflow-hidden hover:border-[var(--ui-primary)]/60 transition-colors">
                         {{-- Post Header --}}
                         <div class="p-2 flex items-center gap-2 border-b border-[var(--ui-border)]/60">
                             <div class="w-4 h-4 rounded-full bg-[var(--ui-primary-5)] flex items-center justify-center">
@@ -559,22 +638,101 @@
                         {{-- Media Content --}}
                         <div class="relative bg-[var(--ui-muted-5)]">
                             <div class="aspect-w-1 aspect-h-1">
-                                @if($mediaItem->contextFiles->where('meta.role', 'primary')->first())
+                                @if($mediaItem->media_type === 'CAROUSEL_ALBUM' && $mediaItem->contextFiles->where('meta.role', 'carousel')->count() > 0)
+                                    {{-- Carousel Album --}}
+                                    @php 
+                                        $carouselItems = $mediaItem->contextFiles->where('meta.role', 'carousel')->sortBy(function($file) {
+                                            return $file->meta['carousel_index'] ?? 999;
+                                        });
+                                    @endphp
+                                    <div x-data="{ activeIndex: 0 }" class="absolute inset-0 h-full w-full">
+                                        @foreach($carouselItems as $index => $carouselFile)
+                                            <div x-show="activeIndex === {{ $index }}" 
+                                                 x-transition:enter="transition ease-out duration-300"
+                                                 x-transition:enter-start="opacity-0"
+                                                 x-transition:enter-end="opacity-100"
+                                                 x-transition:leave="transition ease-in duration-300"
+                                                 x-transition:leave-start="opacity-100"
+                                                 x-transition:leave-end="opacity-0"
+                                                 class="absolute inset-0 h-full w-full">
+                                                @if($carouselFile->isImage())
+                                                    <img src="{{ $carouselFile->url }}"
+                                                         alt="Instagram Carousel Image {{ $index + 1 }}"
+                                                         class="h-full w-full object-contain">
+                                                @else
+                                                    <video class="h-full w-full object-contain"
+                                                           playsinline muted loop>
+                                                        <source src="{{ $carouselFile->url }}" type="{{ $carouselFile->mime_type }}">
+                                                    </video>
+                                                @endif
+                                            </div>
+                                        @endforeach
+                                        
+                                        @if($carouselItems->count() > 1)
+                                            {{-- Navigation Arrows --}}
+                                            <button @click="activeIndex = activeIndex > 0 ? activeIndex - 1 : {{ $carouselItems->count() - 1 }}"
+                                                    class="absolute left-1 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-1 transition-colors opacity-0 group-hover:opacity-100">
+                                                @svg('heroicon-o-chevron-left', 'w-4 h-4')
+                                            </button>
+                                            <button @click="activeIndex = activeIndex < {{ $carouselItems->count() - 1 }} ? activeIndex + 1 : 0"
+                                                    class="absolute right-1 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-1 transition-colors opacity-0 group-hover:opacity-100">
+                                                @svg('heroicon-o-chevron-right', 'w-4 h-4')
+                                            </button>
+                                            
+                                            {{-- Dots Indicator --}}
+                                            <div class="absolute bottom-1 left-1/2 -translate-x-1/2 flex gap-1">
+                                                @foreach($carouselItems as $index => $item)
+                                                    <button @click="activeIndex = {{ $index }}"
+                                                            class="w-1 h-1 rounded-full transition-all"
+                                                            :class="activeIndex === {{ $index }} ? 'bg-white w-2' : 'bg-white/50'">
+                                                    </button>
+                                                @endforeach
+                                            </div>
+                                        @endif
+                                    </div>
+                                @elseif($mediaItem->media_type === 'VIDEO')
+                                    {{-- Video --}}
+                                    @if($mediaItem->contextFiles->where('meta.role', 'primary')->first())
+                                        @php $primaryFile = $mediaItem->contextFiles->where('meta.role', 'primary')->first(); @endphp
+                                        <video class="absolute inset-0 h-full w-full object-contain"
+                                               playsinline muted loop>
+                                            <source src="{{ $primaryFile->url }}" type="{{ $primaryFile->mime_type }}">
+                                        </video>
+                                    @elseif($mediaItem->media_url)
+                                        <video class="absolute inset-0 h-full w-full object-contain"
+                                               playsinline muted loop>
+                                            <source src="{{ $mediaItem->media_url }}" type="video/mp4">
+                                        </video>
+                                    @endif
+                                @elseif($mediaItem->media_type === 'IMAGE')
+                                    {{-- Single Image --}}
+                                    @if($mediaItem->contextFiles->where('meta.role', 'primary')->first())
+                                        @php $primaryFile = $mediaItem->contextFiles->where('meta.role', 'primary')->first(); @endphp
+                                        <img src="{{ $primaryFile->url }}"
+                                             alt="Instagram Image"
+                                             class="absolute inset-0 h-full w-full object-contain">
+                                    @elseif($mediaItem->media_url)
+                                        <img src="{{ $mediaItem->media_url }}"
+                                             alt="Instagram Image"
+                                             class="absolute inset-0 h-full w-full object-contain">
+                                    @endif
+                                @elseif($mediaItem->contextFiles->where('meta.role', 'primary')->first())
+                                    {{-- Fallback: Primary File --}}
                                     @php $primaryFile = $mediaItem->contextFiles->where('meta.role', 'primary')->first(); @endphp
                                     @if($primaryFile->isImage())
-                                        <img src="{{ $primaryFile->thumbnail ? $primaryFile->thumbnail->url : $primaryFile->url }}"
+                                        <img src="{{ $primaryFile->url }}"
                                              alt="Instagram Image"
-                                             class="absolute inset-0 h-full w-full object-cover">
+                                             class="absolute inset-0 h-full w-full object-contain">
                                     @else
-                                        <video class="absolute inset-0 h-full w-full object-cover"
-                                               playsinline muted loop controlsList="nodownload">
+                                        <video class="absolute inset-0 h-full w-full object-contain"
+                                               playsinline muted loop>
                                             <source src="{{ $primaryFile->url }}" type="{{ $primaryFile->mime_type }}">
                                         </video>
                                     @endif
                                 @elseif($mediaItem->media_url)
                                     <img src="{{ $mediaItem->media_url }}"
                                          alt="Instagram Image"
-                                         class="absolute inset-0 h-full w-full object-cover">
+                                         class="absolute inset-0 h-full w-full object-contain">
                                 @endif
                             </div>
 
@@ -609,27 +767,106 @@
             {{-- List View --}}
             <div x-show="viewMode === 'list'" class="space-y-4">
                 @foreach($media as $mediaItem)
-                    <div class="border border-[var(--ui-border)]/60 rounded-lg overflow-hidden">
+                    <div class="group border border-[var(--ui-border)]/60 rounded-lg overflow-hidden">
                         <div class="grid grid-cols-3">
                             {{-- Media Preview --}}
                             <div class="relative bg-[var(--ui-muted-5)]">
                                 <div class="aspect-w-1 aspect-h-1">
-                                    @if($mediaItem->contextFiles->where('meta.role', 'primary')->first())
+                                    @if($mediaItem->media_type === 'CAROUSEL_ALBUM' && $mediaItem->contextFiles->where('meta.role', 'carousel')->count() > 0)
+                                        {{-- Carousel Album --}}
+                                        @php 
+                                            $carouselItems = $mediaItem->contextFiles->where('meta.role', 'carousel')->sortBy(function($file) {
+                                                return $file->meta['carousel_index'] ?? 999;
+                                            });
+                                        @endphp
+                                        <div x-data="{ activeIndex: 0 }" class="absolute inset-0 h-full w-full">
+                                            @foreach($carouselItems as $index => $carouselFile)
+                                                <div x-show="activeIndex === {{ $index }}" 
+                                                     x-transition:enter="transition ease-out duration-300"
+                                                     x-transition:enter-start="opacity-0"
+                                                     x-transition:enter-end="opacity-100"
+                                                     x-transition:leave="transition ease-in duration-300"
+                                                     x-transition:leave-start="opacity-100"
+                                                     x-transition:leave-end="opacity-0"
+                                                     class="absolute inset-0 h-full w-full">
+                                                    @if($carouselFile->isImage())
+                                                        <img src="{{ $carouselFile->url }}"
+                                                             alt="Instagram Carousel Image {{ $index + 1 }}"
+                                                             class="h-full w-full object-contain">
+                                                    @else
+                                                        <video class="h-full w-full object-contain"
+                                                               playsinline muted loop>
+                                                            <source src="{{ $carouselFile->url }}" type="{{ $carouselFile->mime_type }}">
+                                                        </video>
+                                                    @endif
+                                                </div>
+                                            @endforeach
+                                            
+                                            @if($carouselItems->count() > 1)
+                                                {{-- Navigation Arrows --}}
+                                                <button @click="activeIndex = activeIndex > 0 ? activeIndex - 1 : {{ $carouselItems->count() - 1 }}"
+                                                        class="absolute left-1 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-1 transition-colors opacity-0 group-hover:opacity-100">
+                                                    @svg('heroicon-o-chevron-left', 'w-4 h-4')
+                                                </button>
+                                                <button @click="activeIndex = activeIndex < {{ $carouselItems->count() - 1 }} ? activeIndex + 1 : 0"
+                                                        class="absolute right-1 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-1 transition-colors opacity-0 group-hover:opacity-100">
+                                                    @svg('heroicon-o-chevron-right', 'w-4 h-4')
+                                                </button>
+                                                
+                                                {{-- Dots Indicator --}}
+                                                <div class="absolute bottom-1 left-1/2 -translate-x-1/2 flex gap-1">
+                                                    @foreach($carouselItems as $index => $item)
+                                                        <button @click="activeIndex = {{ $index }}"
+                                                                class="w-1 h-1 rounded-full transition-all"
+                                                                :class="activeIndex === {{ $index }} ? 'bg-white w-2' : 'bg-white/50'">
+                                                        </button>
+                                                    @endforeach
+                                                </div>
+                                            @endif
+                                        </div>
+                                    @elseif($mediaItem->media_type === 'VIDEO')
+                                        {{-- Video --}}
+                                        @if($mediaItem->contextFiles->where('meta.role', 'primary')->first())
+                                            @php $primaryFile = $mediaItem->contextFiles->where('meta.role', 'primary')->first(); @endphp
+                                            <video class="absolute inset-0 h-full w-full object-contain"
+                                                   playsinline muted loop>
+                                                <source src="{{ $primaryFile->url }}" type="{{ $primaryFile->mime_type }}">
+                                            </video>
+                                        @elseif($mediaItem->media_url)
+                                            <video class="absolute inset-0 h-full w-full object-contain"
+                                                   playsinline muted loop>
+                                                <source src="{{ $mediaItem->media_url }}" type="video/mp4">
+                                            </video>
+                                        @endif
+                                    @elseif($mediaItem->media_type === 'IMAGE')
+                                        {{-- Single Image --}}
+                                        @if($mediaItem->contextFiles->where('meta.role', 'primary')->first())
+                                            @php $primaryFile = $mediaItem->contextFiles->where('meta.role', 'primary')->first(); @endphp
+                                            <img src="{{ $primaryFile->url }}"
+                                                 alt="Instagram Image"
+                                                 class="absolute inset-0 h-full w-full object-contain">
+                                        @elseif($mediaItem->media_url)
+                                            <img src="{{ $mediaItem->media_url }}"
+                                                 alt="Instagram Image"
+                                                 class="absolute inset-0 h-full w-full object-contain">
+                                        @endif
+                                    @elseif($mediaItem->contextFiles->where('meta.role', 'primary')->first())
+                                        {{-- Fallback: Primary File --}}
                                         @php $primaryFile = $mediaItem->contextFiles->where('meta.role', 'primary')->first(); @endphp
                                         @if($primaryFile->isImage())
-                                            <img src="{{ $primaryFile->thumbnail ? $primaryFile->thumbnail->url : $primaryFile->url }}"
+                                            <img src="{{ $primaryFile->url }}"
                                                  alt="Instagram Image"
-                                                 class="absolute inset-0 h-full w-full object-cover">
+                                                 class="absolute inset-0 h-full w-full object-contain">
                                         @else
-                                            <video class="absolute inset-0 h-full w-full object-cover"
-                                                   playsinline muted loop controlsList="nodownload">
+                                            <video class="absolute inset-0 h-full w-full object-contain"
+                                                   playsinline muted loop>
                                                 <source src="{{ $primaryFile->url }}" type="{{ $primaryFile->mime_type }}">
                                             </video>
                                         @endif
                                     @elseif($mediaItem->media_url)
                                         <img src="{{ $mediaItem->media_url }}"
                                              alt="Instagram Image"
-                                             class="absolute inset-0 h-full w-full object-cover">
+                                             class="absolute inset-0 h-full w-full object-contain">
                                     @endif
                                 </div>
                             </div>

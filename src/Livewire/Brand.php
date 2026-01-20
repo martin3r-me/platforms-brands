@@ -100,6 +100,31 @@ class Brand extends Component
         return $this->redirect(route('brands.social-boards.show', $socialBoard), navigate: true);
     }
 
+    public function createMultiContentBoard()
+    {
+        $this->authorize('update', $this->brand);
+        
+        $user = Auth::user();
+        $team = $user->currentTeam;
+        
+        if (!$team) {
+            session()->flash('error', 'Kein Team ausgewählt.');
+            return;
+        }
+
+        $multiContentBoard = \Platform\Brands\Models\BrandsMultiContentBoard::create([
+            'name' => 'Neues Multi-Content-Board',
+            'description' => null,
+            'user_id' => $user->id,
+            'team_id' => $team->id,
+            'brand_id' => $this->brand->id,
+        ]);
+
+        $this->brand->refresh();
+        
+        return $this->redirect(route('brands.multi-content-boards.show', $multiContentBoard), navigate: true);
+    }
+
 
     public function rendered()
     {
@@ -292,10 +317,11 @@ class Brand extends Component
         $user = Auth::user();
         $team = $user->currentTeam;
         
-        // CI Boards, Content Boards und Social Boards für diese Marke laden
+        // CI Boards, Content Boards, Social Boards und Multi-Content-Boards für diese Marke laden
         $ciBoards = $this->brand->ciBoards;
         $contentBoards = $this->brand->contentBoards;
         $socialBoards = $this->brand->socialBoards;
+        $multiContentBoards = $this->brand->multiContentBoards;
         
         // Meta Connection laden
         $metaConnection = $this->brand->metaConnection();
@@ -334,6 +360,7 @@ class Brand extends Component
             'ciBoards' => $ciBoards,
             'contentBoards' => $contentBoards,
             'socialBoards' => $socialBoards,
+            'multiContentBoards' => $multiContentBoards,
             'facebookPages' => $facebookPages,
             'instagramAccounts' => $instagramAccounts,
             'availableFacebookPages' => $availableFacebookPages,

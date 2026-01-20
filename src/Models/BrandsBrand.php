@@ -130,6 +130,11 @@ class BrandsBrand extends Model implements HasTimeAncestors, HasKeyResultAncesto
         return $this->hasMany(BrandsSocialBoard::class, 'brand_id')->orderBy('order');
     }
 
+    public function multiContentBoards()
+    {
+        return $this->hasMany(BrandsMultiContentBoard::class, 'brand_id')->orderBy('order');
+    }
+
     /**
      * Meta OAuth Token dieser Marke (über User)
      * Ein Brand verwendet den Meta Token des Users
