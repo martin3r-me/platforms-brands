@@ -22,18 +22,28 @@
 
             {{-- Span --}}
             <div>
-                <label class="block text-sm font-medium text-[var(--ui-secondary)] mb-2">
+                <label class="block text-sm font-medium text-[var(--ui-secondary)] mb-3">
                     Span (1-12)
                 </label>
-                <input 
-                    type="number" 
-                    min="1" 
-                    max="12" 
-                    wire:model="span"
-                    class="w-full text-sm border border-[var(--ui-border)] rounded-lg px-3 py-2 focus:ring-2 focus:ring-[var(--ui-primary)] focus:border-transparent @error('span') border-red-500 @enderror"
-                />
+                <div class="grid grid-cols-6 gap-2">
+                    @for($i = 1; $i <= 12; $i++)
+                        <button
+                            type="button"
+                            wire:click="$set('span', {{ $i }})"
+                            class="px-3 py-2 text-sm font-medium rounded-lg border transition-all
+                                @if($span == $i)
+                                    bg-[var(--ui-primary)] text-white border-[var(--ui-primary)] shadow-sm
+                                @else
+                                    bg-white text-[var(--ui-secondary)] border-[var(--ui-border)]/40 hover:border-[var(--ui-primary)]/60 hover:bg-[var(--ui-muted-5)]
+                                @endif
+                            "
+                        >
+                            {{ $i }}
+                        </button>
+                    @endfor
+                </div>
                 @error('span')
-                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                 @enderror
                 @if($block)
                     @php
@@ -42,10 +52,10 @@
                         $currentBlockSpan = $block->span;
                         $newSum = $currentSum - $currentBlockSpan + ($span ?? $currentBlockSpan);
                     @endphp
-                    <p class="mt-1 text-xs text-[var(--ui-muted)]">
-                        Aktuell: {{ $currentSum }}/12 Spans in dieser Row
+                    <p class="mt-3 text-xs text-[var(--ui-muted)]">
+                        Aktuell: <span class="font-medium">{{ $currentSum }}/12</span> Spans in dieser Row
                         @if($span && $span != $currentBlockSpan)
-                            <br>Mit neuem Wert: {{ $newSum }}/12 Spans
+                            <br>Mit neuem Wert: <span class="font-medium {{ $newSum > 12 ? 'text-red-600' : '' }}">{{ $newSum }}/12</span> Spans
                         @endif
                     </p>
                 @endif
