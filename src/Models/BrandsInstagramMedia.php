@@ -30,6 +30,7 @@ class BrandsInstagramMedia extends Model implements HasDisplayName
         'is_story',
         'insights_available',
         'user_id',
+        'team_id',
     ];
 
     protected $casts = [

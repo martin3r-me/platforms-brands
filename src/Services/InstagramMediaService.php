@@ -120,6 +120,22 @@ class InstagramMediaService
         $mediaData = $this->fetchMedia($account, $limit);
         // User-ID direkt vom Instagram Account nehmen (für Commands)
         $userId = $account->user_id;
+        
+        // Team-ID bestimmen: Versuche über verknüpfte Brand, sonst über User
+        $teamId = null;
+        $linkService = app(\Platform\Integrations\Services\IntegrationAccountLinkService::class);
+        $linkedObject = $linkService->getLinkedObjectForAccount('instagram_account', $account->id);
+        
+        if ($linkedObject && method_exists($linkedObject, 'team_id')) {
+            $teamId = $linkedObject->team_id;
+        } else {
+            // Fallback: Team vom User nehmen
+            $user = \Platform\Core\Models\User::find($userId);
+            if ($user && $user->currentTeam) {
+                $teamId = $user->currentTeam->id;
+            }
+        }
+        
         $syncedMedia = [];
         $retrievedMediaIds = [];
         
@@ -148,6 +164,7 @@ class InstagramMediaService
                     'is_story' => $data['is_story'],
                     'insights_available' => true,
                     'user_id' => $userId,
+                    'team_id' => $teamId,
                 ]
             );
 
