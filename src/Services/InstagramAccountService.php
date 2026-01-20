@@ -24,20 +24,20 @@ class InstagramAccountService
      */
     public function syncInstagramAccounts(BrandsBrand $brand): array
     {
-        $metaToken = $brand->metaToken;
+        $metaConnection = $brand->metaConnection();
         
-        if (!$metaToken) {
-            throw new \Exception('Kein Meta-Token für diese Marke gefunden. Bitte verknüpfe zuerst die Marke mit Meta.');
+        if (!$metaConnection) {
+            throw new \Exception('Keine Meta-Connection für diese Marke gefunden. Bitte verknüpfe zuerst die Marke mit Meta.');
         }
 
         // Core-Service aufrufen
-        $syncedAccounts = $this->coreService->syncInstagramAccountsForUser($metaToken);
+        $syncedAccounts = $this->coreService->syncInstagramAccountsForUser($metaConnection);
 
         // TODO: Verknüpfung zur Brand implementieren, wenn benötigt
         foreach ($syncedAccounts as $instagramAccount) {
             Log::info('Instagram Account synced for user', [
                 'instagram_account_id' => $instagramAccount->id,
-                'user_id' => $metaToken->user_id,
+                'user_id' => $metaConnection->owner_user_id,
             ]);
         }
 

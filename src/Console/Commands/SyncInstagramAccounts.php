@@ -37,7 +37,7 @@ class SyncInstagramAccounts extends Command
             $query->where('team_id', $teamId);
         }
 
-        $brands = $query->with('metaToken')->get();
+        $brands = $query->get();
 
         if ($brands->isEmpty()) {
             $this->warn('⚠️  Keine Brands gefunden.');
@@ -53,9 +53,10 @@ class SyncInstagramAccounts extends Command
         foreach ($brands as $brand) {
             $this->info("  📝 Verarbeite Brand: '{$brand->name}' (ID: {$brand->id})");
 
-            // Prüfe ob Meta Token vorhanden
-            if (!$brand->metaToken) {
-                $this->warn("     ⚠️  Übersprungen: Kein Meta Token vorhanden");
+            // Prüfe ob Meta Connection vorhanden
+            $metaConnection = $brand->metaConnection();
+            if (!$metaConnection) {
+                $this->warn("     ⚠️  Übersprungen: Keine Meta-Connection vorhanden");
                 $skippedCount++;
                 continue;
             }

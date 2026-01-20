@@ -29,20 +29,20 @@ class FacebookPageService
      */
     public function syncFacebookPages(BrandsBrand $brand): array
     {
-        $metaToken = $brand->metaToken;
+        $metaConnection = $brand->metaConnection();
         
-        if (!$metaToken) {
-            throw new \Exception('Kein Meta-Token für diesen User/Team gefunden. Bitte verknüpfe zuerst mit Meta.');
+        if (!$metaConnection) {
+            throw new \Exception('Keine Meta-Connection für diese Marke gefunden. Bitte verknüpfe zuerst mit Meta.');
         }
 
         // Core-Service aufrufen
-        $syncedPages = $this->coreService->syncFacebookPagesForUser($metaToken);
+        $syncedPages = $this->coreService->syncFacebookPagesForUser($metaConnection);
 
         // TODO: Verknüpfung zur Brand implementieren, wenn benötigt
         foreach ($syncedPages as $facebookPage) {
             Log::info('Facebook Page synced for user', [
                 'page_id' => $facebookPage->id,
-                'user_id' => $metaToken->user_id,
+                'user_id' => $metaConnection->owner_user_id,
             ]);
         }
 
