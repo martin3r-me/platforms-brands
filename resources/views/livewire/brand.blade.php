@@ -29,6 +29,12 @@
                                 <span>Content Board erstellen</span>
                             </span>
                         </x-ui-button>
+                        <x-ui-button variant="primary" size="sm" wire:click="createSocialBoard">
+                            <span class="inline-flex items-center gap-2">
+                                @svg('heroicon-o-plus', 'w-4 h-4')
+                                <span>Social Board erstellen</span>
+                            </span>
+                        </x-ui-button>
                         <x-ui-button variant="primary" size="sm" wire:click="createCiBoard">
                             <span class="inline-flex items-center gap-2">
                                 @svg('heroicon-o-plus', 'w-4 h-4')
@@ -40,13 +46,13 @@
             </div>
 
             @php
-                // Alle Boards zusammenfassen: CI Boards, Content Boards, Facebook Pages und Instagram Accounts
-                $allBoards = $ciBoards->concat($contentBoards)->sortBy('order');
+                // Alle Boards zusammenfassen: CI Boards, Content Boards, Social Boards, Facebook Pages und Instagram Accounts
+                $allBoards = $ciBoards->concat($contentBoards)->concat($socialBoards)->sortBy('order');
             @endphp
 
             @if($allBoards->count() > 0 || $facebookPages->count() > 0 || $instagramAccounts->count() > 0)
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                    {{-- CI Boards und Content Boards --}}
+                    {{-- CI Boards, Content Boards und Social Boards --}}
                     @foreach($allBoards as $board)
                         @if($board instanceof \Platform\Brands\Models\BrandsCiBoard)
                             <a href="{{ route('brands.ci-boards.show', $board) }}" class="block">
@@ -64,6 +70,26 @@
                                         <span class="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-[var(--ui-primary-5)] text-[var(--ui-primary)] text-xs font-medium">
                                             @svg('heroicon-o-paint-brush', 'w-3 h-3')
                                             CI Board
+                                        </span>
+                                    </div>
+                                </div>
+                            </a>
+                        @elseif($board instanceof \Platform\Brands\Models\BrandsSocialBoard)
+                            <a href="{{ route('brands.social-boards.show', $board) }}" class="block">
+                                <div class="bg-white rounded-xl border border-[var(--ui-border)]/60 shadow-sm hover:shadow-md transition-shadow p-6 h-full">
+                                    <div class="flex items-start justify-between mb-3">
+                                        <div class="flex-1">
+                                            <h3 class="text-lg font-semibold text-[var(--ui-secondary)] mb-1">{{ $board->name }}</h3>
+                                            @if($board->description)
+                                                <p class="text-sm text-[var(--ui-muted)] line-clamp-2">{{ $board->description }}</p>
+                                            @endif
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="flex items-center gap-2 mt-4">
+                                        <span class="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-[var(--ui-primary-5)] text-[var(--ui-primary)] text-xs font-medium">
+                                            @svg('heroicon-o-share', 'w-3 h-3')
+                                            Social Board
                                         </span>
                                     </div>
                                 </div>
@@ -150,6 +176,12 @@
                                 <span class="inline-flex items-center gap-2">
                                     @svg('heroicon-o-plus', 'w-4 h-4')
                                     <span>Content Board erstellen</span>
+                                </span>
+                            </x-ui-button>
+                            <x-ui-button variant="primary" size="sm" wire:click="createSocialBoard">
+                                <span class="inline-flex items-center gap-2">
+                                    @svg('heroicon-o-plus', 'w-4 h-4')
+                                    <span>Social Board erstellen</span>
                                 </span>
                             </x-ui-button>
                             <x-ui-button variant="primary" size="sm" wire:click="createCiBoard">

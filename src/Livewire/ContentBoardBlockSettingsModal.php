@@ -75,8 +75,9 @@ class ContentBoardBlockSettingsModal extends Component
         $this->block->save();
         
         // Block-Informationen für Notification speichern, bevor reset()
-        $blockClass = get_class($this->block);
-        $blockId = $this->block->getKey();
+        // Direkt die ID und Klasse verwenden, um sicherzustellen, dass sie gesetzt sind
+        $blockId = $this->block->id;
+        $blockClass = \Platform\Brands\Models\BrandsContentBoardBlock::class;
         
         $this->dispatch('updateContentBoard');
         $this->dispatch('updateSection');

@@ -75,6 +75,31 @@ class Brand extends Component
         return $this->redirect(route('brands.content-boards.show', $contentBoard), navigate: true);
     }
 
+    public function createSocialBoard()
+    {
+        $this->authorize('update', $this->brand);
+        
+        $user = Auth::user();
+        $team = $user->currentTeam;
+        
+        if (!$team) {
+            session()->flash('error', 'Kein Team ausgewählt.');
+            return;
+        }
+
+        $socialBoard = \Platform\Brands\Models\BrandsSocialBoard::create([
+            'name' => 'Neues Social Board',
+            'description' => null,
+            'user_id' => $user->id,
+            'team_id' => $team->id,
+            'brand_id' => $this->brand->id,
+        ]);
+
+        $this->brand->refresh();
+        
+        return $this->redirect(route('brands.social-boards.show', $socialBoard), navigate: true);
+    }
+
 
     public function rendered()
     {
@@ -267,9 +292,10 @@ class Brand extends Component
         $user = Auth::user();
         $team = $user->currentTeam;
         
-        // CI Boards und Content Boards für diese Marke laden
+        // CI Boards, Content Boards und Social Boards für diese Marke laden
         $ciBoards = $this->brand->ciBoards;
         $contentBoards = $this->brand->contentBoards;
+        $socialBoards = $this->brand->socialBoards;
         
         // Meta Connection laden
         $metaConnection = $this->brand->metaConnection();
@@ -307,6 +333,7 @@ class Brand extends Component
             'user' => $user,
             'ciBoards' => $ciBoards,
             'contentBoards' => $contentBoards,
+            'socialBoards' => $socialBoards,
             'facebookPages' => $facebookPages,
             'instagramAccounts' => $instagramAccounts,
             'availableFacebookPages' => $availableFacebookPages,
