@@ -4,35 +4,31 @@ namespace Platform\Brands\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Symfony\Component\Uid\UuidV7;
 use Platform\Core\Contracts\HasDisplayName;
 
 /**
- * Model für Social Boards
+ * Model für Social Cards
  * 
- * Vollständig unabhängiges Model - erbt direkt von Laravel Model
+ * Cards sind die einzelnen Einträge in einem Slot
  */
-class BrandsSocialBoard extends Model implements HasDisplayName
+class BrandsSocialCard extends Model implements HasDisplayName
 {
-    protected $table = 'brands_social_boards';
+    protected $table = 'brands_social_cards';
 
     protected $fillable = [
         'uuid',
-        'brand_id',
-        'name',
+        'social_board_id',
+        'social_board_slot_id',
+        'title',
         'description',
         'order',
         'user_id',
         'team_id',
-        'done',
-        'done_at',
     ];
 
     protected $casts = [
         'uuid' => 'string',
-        'done' => 'boolean',
-        'done_at' => 'datetime',
         'order' => 'integer',
     ];
 
@@ -46,15 +42,21 @@ class BrandsSocialBoard extends Model implements HasDisplayName
             $model->uuid = $uuid;
             
             if (!$model->order) {
-                $maxOrder = self::where('brand_id', $model->brand_id)->max('order') ?? 0;
+                $maxOrder = self::where('social_board_slot_id', $model->social_board_slot_id)
+                    ->max('order') ?? 0;
                 $model->order = $maxOrder + 1;
             }
         });
     }
 
-    public function brand(): BelongsTo
+    public function socialBoard(): BelongsTo
     {
-        return $this->belongsTo(BrandsBrand::class, 'brand_id');
+        return $this->belongsTo(BrandsSocialBoard::class, 'social_board_id');
+    }
+
+    public function slot(): BelongsTo
+    {
+        return $this->belongsTo(BrandsSocialBoardSlot::class, 'social_board_slot_id');
     }
 
     public function user(): BelongsTo
@@ -67,18 +69,8 @@ class BrandsSocialBoard extends Model implements HasDisplayName
         return $this->belongsTo(\Platform\Core\Models\Team::class);
     }
 
-    public function slots(): HasMany
-    {
-        return $this->hasMany(BrandsSocialBoardSlot::class, 'social_board_id')->orderBy('order');
-    }
-
-    public function cards(): HasMany
-    {
-        return $this->hasMany(BrandsSocialCard::class, 'social_board_id');
-    }
-
     public function getDisplayName(): ?string
     {
-        return $this->name;
+        return $this->title;
     }
 }

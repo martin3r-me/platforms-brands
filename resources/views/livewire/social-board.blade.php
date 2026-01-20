@@ -21,9 +21,64 @@
             </div>
         </div>
 
-        {{-- Content Section --}}
+        {{-- Kanban Board Section --}}
         <div>
-            {{-- Hier kommt später der Inhalt --}}
+            @if($slots->count() > 0)
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-xl font-semibold text-[var(--ui-secondary)]">Kanban Board</h2>
+                    @can('update', $socialBoard)
+                        <x-ui-button variant="primary" size="sm" wire:click="createSlot">
+                            <span class="inline-flex items-center gap-2">
+                                @svg('heroicon-o-plus', 'w-4 h-4')
+                                <span>Slot erstellen</span>
+                            </span>
+                        </x-ui-button>
+                    @endcan
+                </div>
+                <x-ui-kanban-container sortable="updateSlotOrder" sortable-group="updateCardOrder">
+                    @foreach($slots as $slot)
+                        <x-ui-kanban-column :title="$slot->name" :sortable-id="$slot->id" :scrollable="true">
+                            <x-slot name="headerActions">
+                                @can('update', $socialBoard)
+                                    <button 
+                                        wire:click="createCard({{ $slot->id }})" 
+                                        class="text-[var(--ui-muted)] hover:text-[var(--ui-secondary)] transition-colors"
+                                        title="Neue Card"
+                                    >
+                                        @svg('heroicon-o-plus-circle', 'w-4 h-4')
+                                    </button>
+                                @endcan
+                            </x-slot>
+
+                            @foreach($slot->cards as $card)
+                                <x-ui-kanban-card :title="$card->title" :sortable-id="$card->id" wire:key="card-{{ $card->id }}">
+                                    @if($card->description)
+                                        <div class="text-xs text-[var(--ui-muted)] mt-1 line-clamp-2">
+                                            {{ $card->description }}
+                                        </div>
+                                    @endif
+                                </x-ui-kanban-card>
+                            @endforeach
+                        </x-ui-kanban-column>
+                    @endforeach
+                </x-ui-kanban-container>
+            @else
+                <div class="bg-white rounded-xl border border-[var(--ui-border)]/60 shadow-sm p-12 text-center">
+                    <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[var(--ui-muted-5)] mb-4">
+                        @svg('heroicon-o-view-columns', 'w-8 h-8 text-[var(--ui-muted)]')
+                    </div>
+                    <h3 class="text-lg font-semibold text-[var(--ui-secondary)] mb-2">Noch keine Slots</h3>
+                    <p class="text-sm text-[var(--ui-muted)] mb-4">Erstelle deinen ersten Slot für dieses Social Board.</p>
+                    @can('update', $socialBoard)
+                        <x-ui-button variant="primary" size="sm" wire:click="createSlot">
+                            <span class="inline-flex items-center gap-2">
+                                @svg('heroicon-o-plus', 'w-4 h-4')
+                                <span>Slot erstellen</span>
+                            </span>
+                        </x-ui-button>
+                    @endcan
+                </div>
+            @endif
         </div>
     </x-ui-page-container>
 
@@ -118,4 +173,6 @@
             </div>
         </x-ui-page-sidebar>
     </x-slot>
+
+    <livewire:brands.social-board-settings-modal/>
 </x-ui-page>
