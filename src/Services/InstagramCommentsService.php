@@ -3,7 +3,6 @@
 namespace Platform\Brands\Services;
 
 use Platform\Integrations\Models\IntegrationsInstagramAccount;
-use Platform\Integrations\Services\IntegrationsMetaTokenService;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
@@ -13,12 +12,7 @@ use Carbon\Carbon;
  */
 class InstagramCommentsService
 {
-    protected IntegrationsMetaTokenService $tokenService;
-
-    public function __construct(IntegrationsMetaTokenService $tokenService)
-    {
-        $this->tokenService = $tokenService;
-    }
+    // Token wird als Parameter übergeben, kein Service nötig
 
     /**
      * Ruft alle Comments für ein Instagram Media ab

@@ -55,12 +55,20 @@ class SyncFacebookPosts extends Command
         foreach ($pages as $page) {
             $this->info("  📝 Verarbeite Page: '{$page->name}' (ID: {$page->id})");
 
-            // Prüfe ob Meta Token vorhanden (vom User)
-            $metaToken = \Platform\Integrations\Models\IntegrationsMetaToken::where('user_id', $page->user_id)
-                ->first();
+            // Prüfe ob Meta Connection vorhanden (vom User)
+            $user = \Platform\Core\Models\User::find($page->user_id);
             
-            if (!$metaToken) {
-                $this->warn("     ⚠️  Übersprungen: Kein Meta Token für User vorhanden");
+            if (!$user) {
+                $this->warn("     ⚠️  Übersprungen: Kein User für Page gefunden");
+                $skippedCount++;
+                continue;
+            }
+            
+            $metaService = app(\Platform\Integrations\Services\MetaIntegrationService::class);
+            $accessToken = $metaService->getValidAccessTokenForUser($user);
+            
+            if (!$accessToken) {
+                $this->warn("     ⚠️  Übersprungen: Kein Meta Token für User vorhanden. Bitte zuerst Meta über OAuth verbinden.");
                 $skippedCount++;
                 continue;
             }

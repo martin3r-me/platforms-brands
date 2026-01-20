@@ -169,8 +169,8 @@ class Brand extends Component
         $ciBoards = $this->brand->ciBoards;
         $contentBoards = $this->brand->contentBoards;
         
-        // Meta Token laden
-        $metaToken = $this->brand->metaToken;
+        // Meta Connection laden
+        $metaConnection = $this->brand->metaConnection();
 
         // Verfügbare Facebook Pages und Instagram Accounts des Users
         $availableFacebookPages = collect();
@@ -178,7 +178,7 @@ class Brand extends Component
         $facebookPages = collect(); // TODO: Verknüpfung implementieren
         $instagramAccounts = collect(); // TODO: Verknüpfung implementieren
         
-        if ($metaToken) {
+        if ($metaConnection) {
             // Alle Facebook Pages des Users
             $availableFacebookPages = \Platform\Integrations\Models\IntegrationsFacebookPage::where('user_id', $user->id)
                 ->get();
@@ -196,7 +196,7 @@ class Brand extends Component
             'instagramAccounts' => $instagramAccounts,
             'availableFacebookPages' => $availableFacebookPages,
             'availableInstagramAccounts' => $availableInstagramAccounts,
-            'metaToken' => $metaToken,
+            'metaConnection' => $metaConnection,
         ])->layout('platform::layouts.app');
     }
 }

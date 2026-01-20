@@ -120,14 +120,20 @@
         <div>
             <div class="flex items-center justify-between mb-4">
                 <h2 class="text-xl font-semibold text-[var(--ui-secondary)]">Meta Verknüpfung</h2>
-                @if($metaToken)
+                @if($metaConnection)
                     <div class="flex items-center gap-2">
                         <span class="text-sm text-[var(--ui-muted)]">Verwaltet im User-Modal</span>
                     </div>
                 @endif
             </div>
 
-            @if($metaToken)
+            @if($metaConnection)
+                @php
+                    $oauth = $metaConnection->credentials['oauth'] ?? [];
+                    $expiresAt = isset($oauth['expires_at']) ? \Carbon\Carbon::createFromTimestamp($oauth['expires_at']) : null;
+                    $isExpired = $expiresAt && $expiresAt->isPast();
+                    $isExpiringSoon = $expiresAt && $expiresAt->isBefore(now()->addHours(24));
+                @endphp
                 <div class="bg-white rounded-xl border border-[var(--ui-border)]/60 shadow-sm p-6">
                     <div class="flex items-start justify-between">
                         <div class="flex-1">
@@ -137,30 +143,30 @@
                                 </div>
                                 <div>
                                     <h3 class="text-lg font-semibold text-[var(--ui-secondary)]">Mit Meta verknüpft</h3>
-                                    <p class="text-sm text-[var(--ui-muted)]">Token wurde erfolgreich gespeichert</p>
+                                    <p class="text-sm text-[var(--ui-muted)]">Connection wurde erfolgreich gespeichert</p>
                                 </div>
                             </div>
                             <div class="mt-4 space-y-2 text-sm">
                                 <div class="flex items-center justify-between py-2 px-3 bg-[var(--ui-muted-5)] border border-[var(--ui-border)]/40 rounded">
                                     <span class="text-[var(--ui-muted)]">Verknüpft am</span>
                                     <span class="text-[var(--ui-secondary)] font-medium">
-                                        {{ $metaToken->created_at->format('d.m.Y H:i') }}
+                                        {{ $metaConnection->created_at->format('d.m.Y H:i') }}
                                     </span>
                                 </div>
-                                @if($metaToken->expires_at)
+                                @if($expiresAt)
                                     <div class="flex items-center justify-between py-2 px-3 bg-[var(--ui-muted-5)] border border-[var(--ui-border)]/40 rounded">
                                         <span class="text-[var(--ui-muted)]">Läuft ab am</span>
                                         <span class="text-[var(--ui-secondary)] font-medium">
-                                            {{ $metaToken->expires_at->format('d.m.Y H:i') }}
+                                            {{ $expiresAt->format('d.m.Y H:i') }}
                                         </span>
                                     </div>
                                 @endif
-                                @if($metaToken->isExpired())
+                                @if($isExpired)
                                     <div class="flex items-center gap-2 py-2 px-3 bg-[var(--ui-error-5)] border border-[var(--ui-error)]/40 rounded">
                                         @svg('heroicon-o-exclamation-triangle', 'w-4 h-4 text-[var(--ui-error)]')
                                         <span class="text-[var(--ui-error)] text-sm font-medium">Token ist abgelaufen</span>
                                     </div>
-                                @elseif($metaToken->isExpiringSoon())
+                                @elseif($isExpiringSoon)
                                     <div class="flex items-center gap-2 py-2 px-3 bg-[var(--ui-warning-5)] border border-[var(--ui-warning)]/40 rounded">
                                         @svg('heroicon-o-exclamation-triangle', 'w-4 h-4 text-[var(--ui-warning)]')
                                         <span class="text-[var(--ui-warning)] text-sm font-medium">Token läuft bald ab</span>
@@ -263,7 +269,7 @@
             @endif
 
             {{-- Verfügbare Accounts zum Verknüpfen --}}
-            @if($metaToken && ($availableFacebookPages->count() > 0 || $availableInstagramAccounts->count() > 0))
+            @if($metaConnection && ($availableFacebookPages->count() > 0 || $availableInstagramAccounts->count() > 0))
                 <div>
                     <h3 class="text-sm font-semibold text-[var(--ui-secondary)] mb-3">Verfügbare Accounts verknüpfen</h3>
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
@@ -343,14 +349,14 @@
             @endif
 
             {{-- Keine Accounts vorhanden --}}
-            @if($facebookPages->count() === 0 && $instagramAccounts->count() === 0 && (!$metaToken || ($availableFacebookPages->count() === 0 && $availableInstagramAccounts->count() === 0)))
+            @if($facebookPages->count() === 0 && $instagramAccounts->count() === 0 && (!$metaConnection || ($availableFacebookPages->count() === 0 && $availableInstagramAccounts->count() === 0)))
                 <div class="bg-white rounded-xl border border-[var(--ui-border)]/60 shadow-sm p-12 text-center">
                     <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[var(--ui-muted-5)] mb-4">
                         @svg('heroicon-o-share', 'w-8 h-8 text-[var(--ui-muted)]')
                     </div>
                     <h3 class="text-lg font-semibold text-[var(--ui-secondary)] mb-2">Noch keine Social Media Accounts</h3>
                     <p class="text-sm text-[var(--ui-muted)] mb-4">
-                        @if($metaToken)
+                        @if($metaConnection)
                             Verwende die Commands, um Facebook Pages und Instagram Accounts zu synchronisieren, dann kannst du sie hier verknüpfen.
                         @else
                             Verknüpfe zuerst dein Meta-Konto im User-Modal, dann synchronisiere die Accounts und verknüpfe sie hier mit der Marke.

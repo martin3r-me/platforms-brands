@@ -57,12 +57,20 @@ class SyncInstagramMedia extends Command
         foreach ($accounts as $account) {
             $this->info("  📝 Verarbeite Account: '{$account->username}' (ID: {$account->id})");
 
-            // Prüfe ob Meta Token vorhanden (vom User)
-            $metaToken = \Platform\Integrations\Models\IntegrationsMetaToken::where('user_id', $account->user_id)
-                ->first();
+            // Prüfe ob Meta Connection vorhanden (vom User)
+            $user = \Platform\Core\Models\User::find($account->user_id);
             
-            if (!$metaToken) {
-                $this->warn("     ⚠️  Übersprungen: Kein Meta Token für User vorhanden");
+            if (!$user) {
+                $this->warn("     ⚠️  Übersprungen: Kein User für Account gefunden");
+                $skippedCount++;
+                continue;
+            }
+            
+            $metaService = app(\Platform\Integrations\Services\MetaIntegrationService::class);
+            $accessToken = $metaService->getValidAccessTokenForUser($user);
+            
+            if (!$accessToken) {
+                $this->warn("     ⚠️  Übersprungen: Kein Meta Token für User vorhanden. Bitte zuerst Meta über OAuth verbinden.");
                 $skippedCount++;
                 continue;
             }

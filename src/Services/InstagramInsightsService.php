@@ -6,7 +6,8 @@ use Platform\Integrations\Models\IntegrationsInstagramAccount;
 use Platform\Brands\Models\BrandsInstagramAccountInsight;
 use Platform\Brands\Models\BrandsInstagramMedia;
 use Platform\Brands\Models\BrandsInstagramMediaInsight;
-use Platform\Integrations\Services\IntegrationsMetaTokenService;
+use Platform\Core\Models\User;
+use Platform\Integrations\Services\MetaIntegrationService;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
@@ -16,11 +17,11 @@ use Carbon\Carbon;
  */
 class InstagramInsightsService
 {
-    protected IntegrationsMetaTokenService $tokenService;
+    protected MetaIntegrationService $metaService;
 
-    public function __construct(IntegrationsMetaTokenService $tokenService)
+    public function __construct(MetaIntegrationService $metaService)
     {
-        $this->tokenService = $tokenService;
+        $this->metaService = $metaService;
     }
 
     /**
@@ -52,15 +53,14 @@ class InstagramInsightsService
         // Access Token vom Account oder vom User holen
         $accessToken = $account->access_token;
         if (!$accessToken) {
-            $metaToken = \Platform\Integrations\Models\IntegrationsMetaToken::where('user_id', $account->user_id)
-                ->first();
-            if ($metaToken) {
-                $accessToken = $this->tokenService->getValidAccessToken($metaToken);
+            $user = User::find($account->user_id);
+            if ($user) {
+                $accessToken = $this->metaService->getValidAccessTokenForUser($user);
             }
         }
         
         if (!$accessToken) {
-            throw new \Exception('Kein Access Token für diesen Instagram Account gefunden.');
+            throw new \Exception('Kein Access Token für diesen Instagram Account gefunden. Bitte zuerst Meta über OAuth verbinden.');
         }
         $allData = [];
 
@@ -107,13 +107,12 @@ class InstagramInsightsService
     public function fetchAccountDetails(IntegrationsInstagramAccount $account): array
     {
         $apiVersion = config('integrations.oauth2.providers.meta.api_version', '21.0');
-        $metaToken = \Platform\Integrations\Models\IntegrationsMetaToken::where('user_id', $account->user_id)
-            ->first();
-        if (!$metaToken) {
-            Log::error('No Meta Token for account', ['account_id' => $account->id]);
+        $user = User::find($account->user_id);
+        if (!$user) {
+            Log::error('No User for account', ['account_id' => $account->id]);
             return [];
         }
-        $accessToken = $this->tokenService->getValidAccessToken($metaToken);
+        $accessToken = $this->metaService->getValidAccessTokenForUser($user);
 
         if (!$accessToken) {
             Log::error('No valid access token for account', ['account_id' => $account->id]);
@@ -321,13 +320,12 @@ class InstagramInsightsService
     public function fetchMediaInsights(string $mediaId, IntegrationsInstagramAccount $account, string $mediaType = 'photo'): array
     {
         $apiVersion = config('integrations.oauth2.providers.meta.api_version', '21.0');
-        $metaToken = \Platform\Integrations\Models\IntegrationsMetaToken::where('user_id', $account->user_id)
-            ->first();
-        if (!$metaToken) {
-            Log::error('No Meta Token for account', ['account_id' => $account->id]);
+        $user = User::find($account->user_id);
+        if (!$user) {
+            Log::error('No User for account', ['account_id' => $account->id]);
             return [];
         }
-        $accessToken = $this->tokenService->getValidAccessToken($metaToken);
+        $accessToken = $this->metaService->getValidAccessTokenForUser($user);
 
         if (!$accessToken) {
             Log::error('No valid access token for account', ['account_id' => $account->id]);
@@ -411,13 +409,12 @@ class InstagramInsightsService
     protected function fetchAccountInsights(IntegrationsInstagramAccount $account, array $metrics, string $period = 'day', ?string $metricType = null): array
     {
         $apiVersion = config('integrations.oauth2.providers.meta.api_version', '21.0');
-        $metaToken = \Platform\Integrations\Models\IntegrationsMetaToken::where('user_id', $account->user_id)
-            ->first();
-        if (!$metaToken) {
-            Log::error('No Meta Token for account', ['account_id' => $account->id]);
+        $user = User::find($account->user_id);
+        if (!$user) {
+            Log::error('No User for account', ['account_id' => $account->id]);
             return [];
         }
-        $accessToken = $this->tokenService->getValidAccessToken($metaToken);
+        $accessToken = $this->metaService->getValidAccessTokenForUser($user);
 
         if (!$accessToken) {
             Log::error('No valid access token for account', ['account_id' => $account->id]);

@@ -1,7 +1,7 @@
-<x-ui-modal size="md" model="modalShow" header="{{ $brand && $brand->metaToken ? 'Meta erneut verknüpfen' : 'Mit Meta verknüpfen' }}">
+<x-ui-modal size="md" model="modalShow" header="{{ $brand && $brand->metaConnection() ? 'Meta erneut verknüpfen' : 'Mit Meta verknüpfen' }}">
     @if($brand)
         <div class="space-y-4">
-            @if($brand->metaToken)
+            @if($brand->metaConnection())
                 <div class="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
                     <div class="flex items-start gap-3">
                         @svg('heroicon-o-exclamation-triangle', 'w-5 h-5 text-yellow-600 mt-0.5 flex-shrink-0')

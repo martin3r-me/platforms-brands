@@ -125,16 +125,28 @@ class BrandsBrand extends Model implements HasTimeAncestors, HasKeyResultAncesto
      * Meta OAuth Token dieser Marke (über User)
      * Ein Brand verwendet den Meta Token des Users
      */
-    public function metaToken()
+    /**
+     * Ruft die Meta IntegrationConnection für den Brand-User ab
+     * @deprecated Verwende stattdessen MetaIntegrationService::getConnectionForUser()
+     */
+    public function metaConnection()
     {
         $user = $this->user;
         
         if ($user) {
-            return \Platform\Integrations\Models\IntegrationsMetaToken::where('user_id', $user->id)
-                ->first();
+            $metaService = app(\Platform\Integrations\Services\MetaIntegrationService::class);
+            return $metaService->getConnectionForUser($user);
         }
         
         return null;
+    }
+    
+    /**
+     * @deprecated Verwende stattdessen metaConnection()
+     */
+    public function metaToken()
+    {
+        return $this->metaConnection();
     }
 
     /**

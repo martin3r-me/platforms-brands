@@ -6,7 +6,8 @@ use Platform\Integrations\Models\IntegrationsInstagramAccount;
 use Platform\Brands\Models\BrandsInstagramMedia;
 use Platform\Brands\Services\BrandsMediaDownloadService;
 use Platform\Core\Models\ContextFile;
-use Platform\Integrations\Services\IntegrationsMetaTokenService;
+use Platform\Core\Models\User;
+use Platform\Integrations\Services\MetaIntegrationService;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
@@ -16,12 +17,12 @@ use Carbon\Carbon;
  */
 class InstagramMediaService
 {
-    protected IntegrationsMetaTokenService $tokenService;
+    protected MetaIntegrationService $metaService;
     protected BrandsMediaDownloadService $mediaDownloadService;
 
-    public function __construct(IntegrationsMetaTokenService $tokenService, BrandsMediaDownloadService $mediaDownloadService)
+    public function __construct(MetaIntegrationService $metaService, BrandsMediaDownloadService $mediaDownloadService)
     {
-        $this->tokenService = $tokenService;
+        $this->metaService = $metaService;
         $this->mediaDownloadService = $mediaDownloadService;
     }
 
@@ -32,18 +33,16 @@ class InstagramMediaService
      */
     public function fetchMedia(IntegrationsInstagramAccount $account, int $limit = 1000): array
     {
-        // MetaToken vom User holen (user-zentriert)
-        $metaToken = \Platform\Integrations\Models\IntegrationsMetaToken::where('user_id', $account->user_id)
-            ->first();
-        
-        if (!$metaToken) {
-            throw new \Exception('Kein Meta Token für diesen User gefunden.');
+        // User holen und Meta Connection prüfen
+        $user = User::find($account->user_id);
+        if (!$user) {
+            throw new \Exception('User nicht gefunden.');
         }
         
-        $accessToken = $this->tokenService->getValidAccessToken($metaToken);
+        $accessToken = $this->metaService->getValidAccessTokenForUser($user);
         
         if (!$accessToken) {
-            throw new \Exception('Kein gültiger Access Token für diese Brand gefunden.');
+            throw new \Exception('Kein gültiger Meta Access Token für diesen User gefunden. Bitte zuerst Meta über OAuth verbinden.');
         }
 
         $apiVersion = config('integrations.oauth2.providers.meta.api_version', '21.0');
