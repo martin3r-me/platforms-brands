@@ -196,23 +196,21 @@
                                 @endphp
                                 <div x-data="{ activeIndex: 0 }" class="absolute inset-0 h-full w-full">
                                     @foreach($carouselItems as $index => $carouselFile)
-                                        <div x-show="activeIndex === {{ $index }}"
+                                        <div @if($index === 0) x-show.immediate="activeIndex === {{ $index }}" @else x-show="activeIndex === {{ $index }}" @endif
                                              x-transition:enter="transition ease-out duration-300"
                                              x-transition:enter-start="opacity-0"
                                              x-transition:enter-end="opacity-100"
                                              x-transition:leave="transition ease-in duration-300"
                                              x-transition:leave-start="opacity-100"
                                              x-transition:leave-end="opacity-0"
-                                             x-cloak
-                                             class="absolute inset-0 h-full w-full"
-                                             style="display: {{ $index === 0 ? 'block' : 'none' }};">
+                                             class="absolute inset-0 h-full w-full">
                                             @if($carouselFile->isImage())
                                                 <img src="{{ route('core.context-files.show', ['token' => $carouselFile->token]) }}"
                                                      alt="Instagram Carousel Image {{ $index + 1 }}"
                                                      class="h-full w-full object-cover">
                                             @else
                                                 <video class="h-full w-full object-cover"
-                                                       playsinline autoplay muted loop>
+                                                       playsinline autoplay muted loop preload="auto">
                                                     <source src="{{ route('core.context-files.show', ['token' => $carouselFile->token]) }}" type="{{ $carouselFile->mime_type }}">
                                                 </video>
                                             @endif
@@ -246,10 +244,10 @@
                                 @if($lastPost->contextFiles->where('meta.role', 'primary')->first())
                                     @php $primaryFile = $lastPost->contextFiles->where('meta.role', 'primary')->first(); @endphp
                                     <video class="absolute inset-0 h-full w-full object-cover"
-                                           playsinline autoplay muted loop>
+                                           playsinline autoplay muted loop preload="auto">
                                         <source src="{{ route('core.context-files.show', ['token' => $primaryFile->token]) }}" type="{{ $primaryFile->mime_type }}">
                                     </video>
-                                @endif
+                                    @endif
                             @elseif($lastPost->media_type === 'IMAGE' || !$lastPost->media_type)
                                 {{-- Single Image --}}
                                 @if($lastPost->contextFiles->where('meta.role', 'primary')->first())
@@ -258,31 +256,31 @@
                                          alt="Instagram Image"
                                          class="absolute inset-0 h-full w-full object-cover">
                                 @endif
-                            @endif
-                        </div>
-
-                        {{-- Post Stats --}}
-                        <div class="border-t border-[var(--ui-border)]/60 bg-white">
-                            <div class="px-3 py-2 flex items-center justify-between">
-                                <div class="flex items-center gap-2">
-                                    <div class="flex items-center gap-1">
-                                        @svg('heroicon-o-heart', 'w-4 h-4 text-pink-500')
-                                        <span class="text-sm font-medium">{{ number_format($lastPost->like_count) }}</span>
-                                    </div>
-                                    <div class="flex items-center gap-1">
-                                        @svg('heroicon-o-chat-bubble-left', 'w-4 h-4 text-[var(--ui-muted)]')
-                                        <span class="text-sm font-medium text-[var(--ui-secondary)]">{{ number_format($lastPost->comments_count) }}</span>
-                                    </div>
-                                </div>
-                                @if($lastPost->timestamp)
-                                    <span class="text-xs text-[var(--ui-muted)]">{{ $lastPost->timestamp->format('d.m.Y') }}</span>
                                 @endif
                             </div>
-                            @if($lastPost->caption)
-                                <div class="px-3 py-2 border-t border-[var(--ui-border)]/40">
-                                    <p class="text-sm text-[var(--ui-secondary)] whitespace-pre-line line-clamp-2">{{ $lastPost->caption }}</p>
+
+                            {{-- Post Stats --}}
+                            <div class="border-t border-[var(--ui-border)]/60 bg-white">
+                                <div class="px-3 py-2 flex items-center justify-between">
+                                    <div class="flex items-center gap-2">
+                                        <div class="flex items-center gap-1">
+                                            @svg('heroicon-o-heart', 'w-4 h-4 text-pink-500')
+                                            <span class="text-sm font-medium">{{ number_format($lastPost->like_count) }}</span>
+                                        </div>
+                                        <div class="flex items-center gap-1">
+                                            @svg('heroicon-o-chat-bubble-left', 'w-4 h-4 text-[var(--ui-muted)]')
+                                            <span class="text-sm font-medium text-[var(--ui-secondary)]">{{ number_format($lastPost->comments_count) }}</span>
+                                        </div>
+                                    </div>
+                                    @if($lastPost->timestamp)
+                                        <span class="text-xs text-[var(--ui-muted)]">{{ $lastPost->timestamp->format('d.m.Y') }}</span>
+                                    @endif
                                 </div>
-                            @endif
+                                @if($lastPost->caption)
+                                    <div class="px-3 py-2 border-t border-[var(--ui-border)]/40">
+                                        <p class="text-sm text-[var(--ui-secondary)] whitespace-pre-line line-clamp-2">{{ $lastPost->caption }}</p>
+                                    </div>
+                                @endif
                         </div>
                     </div>
 
@@ -632,23 +630,21 @@
                                 @endphp
                                 <div x-data="{ activeIndex: 0 }" class="absolute inset-0 h-full w-full">
                                     @foreach($carouselItems as $index => $carouselFile)
-                                        <div x-show="activeIndex === {{ $index }}"
+                                        <div @if($index === 0) x-show.immediate="activeIndex === {{ $index }}" @else x-show="activeIndex === {{ $index }}" @endif
                                              x-transition:enter="transition ease-out duration-300"
                                              x-transition:enter-start="opacity-0"
                                              x-transition:enter-end="opacity-100"
                                              x-transition:leave="transition ease-in duration-300"
                                              x-transition:leave-start="opacity-100"
                                              x-transition:leave-end="opacity-0"
-                                             x-cloak
-                                             class="absolute inset-0 h-full w-full"
-                                             style="display: {{ $index === 0 ? 'block' : 'none' }};">
+                                             class="absolute inset-0 h-full w-full">
                                             @if($carouselFile->isImage())
                                                 <img src="{{ route('core.context-files.show', ['token' => $carouselFile->token]) }}"
                                                      alt="Instagram Carousel Image {{ $index + 1 }}"
                                                      class="h-full w-full object-cover">
                                             @else
                                                 <video class="h-full w-full object-cover"
-                                                       playsinline autoplay muted loop>
+                                                       playsinline autoplay muted loop preload="auto">
                                                     <source src="{{ route('core.context-files.show', ['token' => $carouselFile->token]) }}" type="{{ $carouselFile->mime_type }}">
                                                 </video>
                                             @endif
@@ -682,7 +678,7 @@
                                 @if($mediaItem->contextFiles->where('meta.role', 'primary')->first())
                                     @php $primaryFile = $mediaItem->contextFiles->where('meta.role', 'primary')->first(); @endphp
                                         <video class="absolute inset-0 h-full w-full object-cover"
-                                           playsinline autoplay muted loop>
+                                           playsinline autoplay muted loop preload="auto">
                                         <source src="{{ route('core.context-files.show', ['token' => $primaryFile->token]) }}" type="{{ $primaryFile->mime_type }}">
                                         </video>
                                     @endif
@@ -755,10 +751,10 @@
                                                          alt="Instagram Carousel Image {{ $index + 1 }}"
                                                          class="h-full w-full object-cover">
                                                 @else
-                                                    <video class="h-full w-full object-cover"
-                                                           playsinline autoplay muted loop>
-                                                        <source src="{{ route('core.context-files.show', ['token' => $carouselFile->token]) }}" type="{{ $carouselFile->mime_type }}">
-                                                    </video>
+                                                <video class="h-full w-full object-cover"
+                                                       playsinline autoplay muted loop preload="auto">
+                                                    <source src="{{ route('core.context-files.show', ['token' => $carouselFile->token]) }}" type="{{ $carouselFile->mime_type }}">
+                                                </video>
                                                 @endif
                                             </div>
                                         @endforeach
@@ -789,11 +785,11 @@
                                     {{-- Video --}}
                                     @if($mediaItem->contextFiles->where('meta.role', 'primary')->first())
                                         @php $primaryFile = $mediaItem->contextFiles->where('meta.role', 'primary')->first(); @endphp
-                                        <video class="absolute inset-0 h-full w-full object-cover"
-                                               playsinline autoplay muted loop>
-                                            <source src="{{ route('core.context-files.show', ['token' => $primaryFile->token]) }}" type="{{ $primaryFile->mime_type }}">
-                                        </video>
-                                    @endif
+                                    <video class="absolute inset-0 h-full w-full object-cover"
+                                           playsinline autoplay muted loop preload="auto">
+                                        <source src="{{ route('core.context-files.show', ['token' => $primaryFile->token]) }}" type="{{ $primaryFile->mime_type }}">
+                                    </video>
+                                        @endif
                                 @elseif($mediaItem->media_type === 'IMAGE' || !$mediaItem->media_type)
                                     {{-- Single Image --}}
                                     @if($mediaItem->contextFiles->where('meta.role', 'primary')->first())
