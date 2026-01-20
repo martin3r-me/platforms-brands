@@ -7,6 +7,7 @@ use Platform\Brands\Livewire\ContentBoard;
 use Platform\Brands\Livewire\ContentBoardSection;
 use Platform\Brands\Livewire\SocialBoard;
 use Platform\Brands\Livewire\SocialCard;
+use Platform\Brands\Livewire\MultiContentBoard;
 use Platform\Brands\Livewire\FacebookPage;
 use Platform\Brands\Livewire\InstagramAccount;
 use Platform\Brands\Models\BrandsBrand;
@@ -15,6 +16,7 @@ use Platform\Brands\Models\BrandsContentBoard;
 use Platform\Brands\Models\BrandsContentBoardSection;
 use Platform\Brands\Models\BrandsSocialBoard;
 use Platform\Brands\Models\BrandsSocialCard;
+use Platform\Brands\Models\BrandsMultiContentBoard;
 use Platform\Integrations\Models\IntegrationsFacebookPage;
 use Platform\Integrations\Models\IntegrationsInstagramAccount;
 
@@ -43,6 +45,10 @@ Route::get('/social-boards/{brandsSocialBoard}', SocialBoard::class)
 // Social Card Routes
 Route::get('/social-cards/{brandsSocialCard}', SocialCard::class)
     ->name('brands.social-cards.show');
+
+// Multi-Content-Board Routes
+Route::get('/multi-content-boards/{brandsMultiContentBoard}', MultiContentBoard::class)
+    ->name('brands.multi-content-boards.show');
 
 // Facebook Page Routes
 Route::get('/facebook-pages/{facebookPage}', FacebookPage::class)

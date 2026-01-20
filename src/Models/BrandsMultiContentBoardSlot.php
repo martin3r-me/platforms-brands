@@ -6,34 +6,27 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Symfony\Component\Uid\UuidV7;
-use Platform\Core\Contracts\HasDisplayName;
 
 /**
- * Model für Content Boards
+ * Model für Multi-Content-Board Slots
  * 
- * Vollständig unabhängiges Model - erbt direkt von Laravel Model
+ * Slots sind die Spalten im Kanban-Board
  */
-class BrandsContentBoard extends Model implements HasDisplayName
+class BrandsMultiContentBoardSlot extends Model
 {
-    protected $table = 'brands_content_boards';
+    protected $table = 'brands_multi_content_board_slots';
 
     protected $fillable = [
         'uuid',
-        'brand_id',
-        'multi_content_board_slot_id',
+        'multi_content_board_id',
         'name',
-        'description',
         'order',
         'user_id',
         'team_id',
-        'done',
-        'done_at',
     ];
 
     protected $casts = [
         'uuid' => 'string',
-        'done' => 'boolean',
-        'done_at' => 'datetime',
         'order' => 'integer',
     ];
 
@@ -47,15 +40,20 @@ class BrandsContentBoard extends Model implements HasDisplayName
             $model->uuid = $uuid;
             
             if (!$model->order) {
-                $maxOrder = self::where('brand_id', $model->brand_id)->max('order') ?? 0;
+                $maxOrder = self::where('multi_content_board_id', $model->multi_content_board_id)->max('order') ?? 0;
                 $model->order = $maxOrder + 1;
             }
         });
     }
 
-    public function brand(): BelongsTo
+    public function multiContentBoard(): BelongsTo
     {
-        return $this->belongsTo(BrandsBrand::class, 'brand_id');
+        return $this->belongsTo(BrandsMultiContentBoard::class, 'multi_content_board_id');
+    }
+
+    public function contentBoards(): HasMany
+    {
+        return $this->hasMany(BrandsContentBoard::class, 'multi_content_board_slot_id')->orderBy('order');
     }
 
     public function user(): BelongsTo
@@ -66,20 +64,5 @@ class BrandsContentBoard extends Model implements HasDisplayName
     public function team(): BelongsTo
     {
         return $this->belongsTo(\Platform\Core\Models\Team::class);
-    }
-
-    public function sections(): HasMany
-    {
-        return $this->hasMany(BrandsContentBoardSection::class, 'content_board_id')->orderBy('order');
-    }
-
-    public function multiContentBoardSlot(): BelongsTo
-    {
-        return $this->belongsTo(BrandsMultiContentBoardSlot::class, 'multi_content_board_slot_id');
-    }
-
-    public function getDisplayName(): ?string
-    {
-        return $this->name;
     }
 }

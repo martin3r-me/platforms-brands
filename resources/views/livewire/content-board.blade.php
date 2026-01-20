@@ -2,10 +2,17 @@
     <x-slot name="navbar">
         <x-ui-page-navbar :title="$contentBoard->name" icon="heroicon-o-document-text">
             <x-slot name="actions">
-                <a href="{{ route('brands.brands.show', $contentBoard->brand) }}" class="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-[var(--ui-secondary)] hover:text-[var(--ui-primary)] transition-colors">
-                    @svg('heroicon-o-arrow-left', 'w-4 h-4')
-                    <span>Zurück zur Marke</span>
-                </a>
+                @if($contentBoard->multiContentBoardSlot && $contentBoard->multiContentBoardSlot->multiContentBoard)
+                    <a href="{{ route('brands.multi-content-boards.show', $contentBoard->multiContentBoardSlot->multiContentBoard) }}" class="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-[var(--ui-secondary)] hover:text-[var(--ui-primary)] transition-colors">
+                        @svg('heroicon-o-arrow-left', 'w-4 h-4')
+                        <span>Zurück zum Multi-Content-Board</span>
+                    </a>
+                @else
+                    <a href="{{ route('brands.brands.show', $contentBoard->brand) }}" class="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-[var(--ui-secondary)] hover:text-[var(--ui-primary)] transition-colors">
+                        @svg('heroicon-o-arrow-left', 'w-4 h-4')
+                        <span>Zurück zur Marke</span>
+                    </a>
+                @endif
             </x-slot>
         </x-ui-page-navbar>
     </x-slot>
@@ -220,6 +227,29 @@
                                                                                 {{ $block->description }}
                                                                             </p>
                                                                         @endif
+                                                                        <div 
+                                                                            x-data="{ copied: false }"
+                                                                            class="inline-flex items-center gap-1.5 px-2 py-0.5 mt-2 bg-[var(--ui-muted-5)] border border-[var(--ui-border)]/40 rounded text-xs"
+                                                                        >
+                                                                            <span class="font-mono text-[var(--ui-muted)] text-[10px]">{{ $block->uuid }}</span>
+                                                                            <button
+                                                                                type="button"
+                                                                                @click.stop="
+                                                                                    navigator.clipboard.writeText('{{ $block->uuid }}');
+                                                                                    copied = true;
+                                                                                    setTimeout(() => copied = false, 2000);
+                                                                                "
+                                                                                class="p-0.5 rounded hover:bg-white transition-colors"
+                                                                                title="UUID kopieren"
+                                                                            >
+                                                                                <span x-show="!copied">
+                                                                                    @svg('heroicon-o-clipboard', 'w-2.5 h-2.5 text-[var(--ui-muted)] hover:text-[var(--ui-primary)]')
+                                                                                </span>
+                                                                                <span x-show="copied" x-cloak>
+                                                                                    @svg('heroicon-o-check', 'w-2.5 h-2.5 text-green-600')
+                                                                                </span>
+                                                                            </button>
+                                                                        </div>
                                                                     </div>
                                                                     @can('update', $contentBoard)
                                                                         <button 
@@ -299,6 +329,12 @@
                 <div>
                     <h3 class="text-xs font-semibold uppercase tracking-wide text-[var(--ui-muted)] mb-3">Navigation</h3>
                     <div class="flex flex-col gap-2">
+                        @if($contentBoard->multiContentBoardSlot && $contentBoard->multiContentBoardSlot->multiContentBoard)
+                            <a href="{{ route('brands.multi-content-boards.show', $contentBoard->multiContentBoardSlot->multiContentBoard) }}" class="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-[var(--ui-secondary)] hover:text-[var(--ui-primary)] transition-colors rounded-lg border border-[var(--ui-border)]/40 hover:bg-[var(--ui-muted-5)]">
+                                @svg('heroicon-o-arrow-left', 'w-4 h-4')
+                                <span>Zurück zum Multi-Content-Board</span>
+                            </a>
+                        @endif
                         <a href="{{ route('brands.brands.show', $contentBoard->brand) }}" class="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-[var(--ui-secondary)] hover:text-[var(--ui-primary)] transition-colors rounded-lg border border-[var(--ui-border)]/40 hover:bg-[var(--ui-muted-5)]">
                             @svg('heroicon-o-arrow-left', 'w-4 h-4')
                             <span>Zurück zur Marke</span>

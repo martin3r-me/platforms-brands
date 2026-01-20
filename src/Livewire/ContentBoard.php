@@ -14,7 +14,7 @@ class ContentBoard extends Component
     public function mount(BrandsContentBoard $brandsContentBoard)
     {
         // Model neu laden, um sicherzustellen, dass alle Daten vorhanden sind
-        $this->contentBoard = $brandsContentBoard->fresh()->load('sections.rows.blocks');
+        $this->contentBoard = $brandsContentBoard->fresh()->load('sections.rows.blocks', 'multiContentBoardSlot.multiContentBoard');
         
         // Berechtigung prüfen
         $this->authorize('view', $this->contentBoard);
@@ -24,7 +24,7 @@ class ContentBoard extends Component
     public function updateContentBoard()
     {
         $this->contentBoard->refresh();
-        $this->contentBoard->load('sections.rows.blocks');
+        $this->contentBoard->load('sections.rows.blocks', 'multiContentBoardSlot.multiContentBoard');
     }
 
     public function rules(): array

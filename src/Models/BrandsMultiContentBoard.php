@@ -9,18 +9,17 @@ use Symfony\Component\Uid\UuidV7;
 use Platform\Core\Contracts\HasDisplayName;
 
 /**
- * Model für Content Boards
+ * Model für Multi-Content-Boards
  * 
- * Vollständig unabhängiges Model - erbt direkt von Laravel Model
+ * Kanban-Board mit Slots, die Content Boards enthalten
  */
-class BrandsContentBoard extends Model implements HasDisplayName
+class BrandsMultiContentBoard extends Model implements HasDisplayName
 {
-    protected $table = 'brands_content_boards';
+    protected $table = 'brands_multi_content_boards';
 
     protected $fillable = [
         'uuid',
         'brand_id',
-        'multi_content_board_slot_id',
         'name',
         'description',
         'order',
@@ -68,14 +67,9 @@ class BrandsContentBoard extends Model implements HasDisplayName
         return $this->belongsTo(\Platform\Core\Models\Team::class);
     }
 
-    public function sections(): HasMany
+    public function slots(): HasMany
     {
-        return $this->hasMany(BrandsContentBoardSection::class, 'content_board_id')->orderBy('order');
-    }
-
-    public function multiContentBoardSlot(): BelongsTo
-    {
-        return $this->belongsTo(BrandsMultiContentBoardSlot::class, 'multi_content_board_slot_id');
+        return $this->hasMany(BrandsMultiContentBoardSlot::class, 'multi_content_board_id')->orderBy('order');
     }
 
     public function getDisplayName(): ?string
