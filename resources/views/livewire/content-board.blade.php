@@ -132,42 +132,36 @@
                                                 <div class="grid grid-cols-12 gap-2">
                                                     @foreach($row->blocks as $block)
                                                         <div 
-                                                            class="bg-white rounded-lg border border-[var(--ui-border)]/40 hover:border-[var(--ui-primary)]/40 transition-colors relative"
+                                                            class="group bg-white rounded-lg border border-[var(--ui-border)]/40 hover:border-[var(--ui-primary)]/60 hover:shadow-sm transition-all relative cursor-pointer"
                                                             style="grid-column: span {{ $block->span }};"
-                                                        >
-                                                            {{-- Block Header --}}
                                                             @can('update', $contentBoard)
-                                                                <div class="flex items-center justify-end p-1 border-b border-[var(--ui-border)]/40">
-                                                                    <button 
-                                                                        type="button"
-                                                                        x-data
-                                                                        @click="$dispatch('open-modal-content-board-block-settings', { blockId: {{ $block->id }} })"
-                                                                        class="p-1 rounded hover:bg-[var(--ui-muted-5)] transition-colors"
-                                                                        title="Block-Einstellungen"
-                                                                    >
-                                                                        @svg('heroicon-o-cog-6-tooth', 'w-3 h-3 text-[var(--ui-muted)]')
-                                                                    </button>
-                                                                </div>
+                                                                x-data
+                                                                @click="$dispatch('open-modal-content-board-block-settings', { blockId: {{ $block->id }} })"
                                                             @endcan
-                                                            
+                                                        >
                                                             {{-- Block Content --}}
-                                                            <div class="p-3">
-                                                                <div class="flex items-start justify-between">
-                                                                    <div class="flex-1">
-                                                                        @can('update', $contentBoard)
-                                                                            <input 
-                                                                                type="text"
-                                                                                value="{{ $block->name }}"
-                                                                                wire:blur="updateBlockName({{ $block->id }}, $event.target.value)"
-                                                                                class="text-xs font-semibold text-[var(--ui-secondary)] bg-transparent border-none p-0 focus:outline-none focus:ring-2 focus:ring-[var(--ui-primary)] rounded px-1 -ml-1 w-full"
-                                                                            />
-                                                                        @else
-                                                                            <h5 class="text-xs font-semibold text-[var(--ui-secondary)]">{{ $block->name }}</h5>
-                                                                        @endcan
+                                                            <div class="p-4">
+                                                                <div class="flex items-start justify-between gap-3">
+                                                                    <div class="flex-1 min-w-0">
+                                                                        <h5 class="text-sm font-medium text-[var(--ui-secondary)] leading-tight">
+                                                                            {{ $block->name }}
+                                                                        </h5>
                                                                         @if($block->description)
-                                                                            <p class="text-xs text-[var(--ui-muted)] mt-1">{{ $block->description }}</p>
+                                                                            <p class="text-xs text-[var(--ui-muted)] mt-1.5 leading-relaxed">
+                                                                                {{ $block->description }}
+                                                                            </p>
                                                                         @endif
                                                                     </div>
+                                                                    @can('update', $contentBoard)
+                                                                        <button 
+                                                                            type="button"
+                                                                            @click.stop="$dispatch('open-modal-content-board-block-settings', { blockId: {{ $block->id }} })"
+                                                                            class="opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0 p-1.5 rounded-md hover:bg-[var(--ui-muted-5)] text-[var(--ui-muted)] hover:text-[var(--ui-secondary)]"
+                                                                            title="Block-Einstellungen"
+                                                                        >
+                                                                            @svg('heroicon-o-cog-6-tooth', 'w-4 h-4')
+                                                                        </button>
+                                                                    @endcan
                                                                 </div>
                                                             </div>
                                                         </div>

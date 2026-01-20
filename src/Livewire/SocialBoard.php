@@ -145,8 +145,8 @@ class SocialBoard extends Component
     {
         $user = Auth::user();
 
-        // Slots mit Cards laden
-        $slots = $this->socialBoard->slots()->with('cards')->orderBy('order')->get();
+        // Slots mit Cards und Slot-Relation laden
+        $slots = $this->socialBoard->slots()->with(['cards.slot'])->orderBy('order')->get();
 
         return view('brands::livewire.social-board', [
             'user' => $user,

@@ -93,7 +93,8 @@
 
     {{-- Board-Container: füllt restliche Breite, Spalten scrollen intern --}}
     @if($slots->count() > 0)
-        <x-ui-kanban-container sortable="updateSlotOrder" sortable-group="updateCardOrder">
+        <div class="flex-1 min-h-0 h-full overflow-hidden relative">
+            <div class="h-full w-full flex gap-4 overflow-x-auto overflow-y-hidden p-2" wire:sortable="updateSlotOrder" wire:sortable-group="updateCardOrder">
             @foreach($slots as $slot)
                 <x-ui-kanban-column :title="$slot->name" :sortable-id="$slot->id" :scrollable="true">
                     <x-slot name="headerActions">
@@ -112,8 +113,9 @@
                         @include('brands::livewire.social-card-preview-card', ['card' => $card])
                     @endforeach
                 </x-ui-kanban-column>
-            @endforeach
-        </x-ui-kanban-container>
+                    @endforeach
+            </div>
+        </div>
     @else
         <div class="flex items-center justify-center h-full">
             <div class="bg-white rounded-xl border border-[var(--ui-border)]/60 shadow-sm p-12 text-center max-w-md">

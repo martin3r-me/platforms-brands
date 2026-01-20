@@ -1,6 +1,24 @@
 <x-ui-page>
     <x-slot name="navbar">
         <x-ui-page-navbar :title="$card->title" icon="heroicon-o-document-text">
+            <div class="mt-1 text-sm text-[var(--ui-muted)] flex items-center gap-2">
+                <a href="{{ route('brands.brands.show', $card->socialBoard->brand) }}" class="text-[var(--ui-secondary)] hover:text-[var(--ui-primary)] flex items-center gap-1">
+                    @svg('heroicon-o-tag', 'w-4 h-4')
+                    {{ $card->socialBoard->brand->name }}
+                </a>
+                <span>›</span>
+                <a href="{{ route('brands.social-boards.show', $card->socialBoard) }}" class="text-[var(--ui-secondary)] hover:text-[var(--ui-primary)] flex items-center gap-1">
+                    @svg('heroicon-o-share', 'w-4 h-4')
+                    {{ $card->socialBoard->name }}
+                </a>
+                @if($card->slot)
+                    <span>›</span>
+                    <span class="flex items-center gap-1">
+                        @svg('heroicon-o-view-columns', 'w-4 h-4')
+                        {{ $card->slot->name }}
+                    </span>
+                @endif
+            </div>
             <x-slot name="actions">
                 <a href="{{ route('brands.social-boards.show', $card->socialBoard) }}" class="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-[var(--ui-secondary)] hover:text-[var(--ui-primary)] transition-colors">
                     @svg('heroicon-o-arrow-left', 'w-4 h-4')
@@ -196,6 +214,30 @@
                             </span>
                         </div>
                     </div>
+                </div>
+            </div>
+        </x-ui-page-sidebar>
+    </x-slot>
+
+    <x-slot name="activity">
+        <x-ui-page-sidebar title="Aktivitäten" width="w-80" :defaultOpen="false" storeKey="activityOpen" side="right">
+            <div class="p-4 space-y-4">
+                <div class="text-sm text-[var(--ui-muted)]">Letzte Aktivitäten</div>
+                <div class="space-y-3 text-sm">
+                    @forelse(($activities ?? []) as $activity)
+                        <div class="p-2 rounded border border-[var(--ui-border)]/60 bg-[var(--ui-muted-5)]">
+                            <div class="font-medium text-[var(--ui-secondary)] truncate">{{ $activity['title'] ?? 'Aktivität' }}</div>
+                            <div class="text-[var(--ui-muted)]">{{ $activity['time'] ?? '' }}</div>
+                        </div>
+                    @empty
+                        <div class="py-8 text-center">
+                            <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-[var(--ui-muted-5)] mb-3">
+                                @svg('heroicon-o-clock', 'w-6 h-6 text-[var(--ui-muted)]')
+                            </div>
+                            <p class="text-sm text-[var(--ui-muted)]">Noch keine Aktivitäten</p>
+                            <p class="text-xs text-[var(--ui-muted)] mt-1">Änderungen werden hier angezeigt</p>
+                        </div>
+                    @endforelse
                 </div>
             </div>
         </x-ui-page-sidebar>

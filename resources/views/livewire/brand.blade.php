@@ -19,178 +19,213 @@
 
         {{-- Boards Section --}}
         <div>
-            <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center justify-between mb-6">
                 <h2 class="text-xl font-semibold text-[var(--ui-secondary)]">Boards</h2>
                 @can('update', $brand)
-                    <div class="flex items-center gap-2">
-                        <x-ui-button variant="primary" size="sm" wire:click="createContentBoard">
-                            <span class="inline-flex items-center gap-2">
-                                @svg('heroicon-o-plus', 'w-4 h-4')
-                                <span>Content Board erstellen</span>
-                            </span>
+                    <div class="relative" x-data="{ open: false }">
+                        <x-ui-button 
+                            variant="primary" 
+                            size="sm" 
+                            @click="open = !open"
+                            class="inline-flex items-center gap-2"
+                        >
+                            @svg('heroicon-o-plus', 'w-4 h-4')
+                            <span>Board erstellen</span>
+                            @svg('heroicon-o-chevron-down', 'w-4 h-4')
                         </x-ui-button>
-                        <x-ui-button variant="primary" size="sm" wire:click="createSocialBoard">
-                            <span class="inline-flex items-center gap-2">
-                                @svg('heroicon-o-plus', 'w-4 h-4')
-                                <span>Social Board erstellen</span>
-                            </span>
-                        </x-ui-button>
-                        <x-ui-button variant="primary" size="sm" wire:click="createCiBoard">
-                            <span class="inline-flex items-center gap-2">
-                                @svg('heroicon-o-plus', 'w-4 h-4')
-                                <span>CI Board erstellen</span>
-                            </span>
-                        </x-ui-button>
+                        
+                        <div 
+                            x-show="open"
+                            @click.away="open = false"
+                            x-transition:enter="transition ease-out duration-100"
+                            x-transition:enter-start="transform opacity-0 scale-95"
+                            x-transition:enter-end="transform opacity-100 scale-100"
+                            x-transition:leave="transition ease-in duration-75"
+                            x-transition:leave-start="transform opacity-100 scale-100"
+                            x-transition:leave-end="transform opacity-0 scale-95"
+                            class="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-[var(--ui-border)]/60 z-10 overflow-hidden"
+                            style="display: none;"
+                        >
+                            <div class="py-1">
+                                <button
+                                    wire:click="createContentBoard"
+                                    @click="open = false"
+                                    class="w-full text-left px-4 py-2.5 text-sm text-[var(--ui-secondary)] hover:bg-[var(--ui-muted-5)] transition-colors flex items-center gap-3"
+                                >
+                                    <div class="flex items-center justify-center w-8 h-8 rounded-md bg-blue-50">
+                                        @svg('heroicon-o-document-text', 'w-4 h-4 text-blue-600')
+                                    </div>
+                                    <div>
+                                        <div class="font-medium">Content Board</div>
+                                        <div class="text-xs text-[var(--ui-muted)]">Für Content-Planung</div>
+                                    </div>
+                                </button>
+                                <button
+                                    wire:click="createSocialBoard"
+                                    @click="open = false"
+                                    class="w-full text-left px-4 py-2.5 text-sm text-[var(--ui-secondary)] hover:bg-[var(--ui-muted-5)] transition-colors flex items-center gap-3"
+                                >
+                                    <div class="flex items-center justify-center w-8 h-8 rounded-md bg-purple-50">
+                                        @svg('heroicon-o-share', 'w-4 h-4 text-purple-600')
+                                    </div>
+                                    <div>
+                                        <div class="font-medium">Social Board</div>
+                                        <div class="text-xs text-[var(--ui-muted)]">Für Social Media</div>
+                                    </div>
+                                </button>
+                                <button
+                                    wire:click="createCiBoard"
+                                    @click="open = false"
+                                    class="w-full text-left px-4 py-2.5 text-sm text-[var(--ui-secondary)] hover:bg-[var(--ui-muted-5)] transition-colors flex items-center gap-3"
+                                >
+                                    <div class="flex items-center justify-center w-8 h-8 rounded-md bg-amber-50">
+                                        @svg('heroicon-o-paint-brush', 'w-4 h-4 text-amber-600')
+                                    </div>
+                                    <div>
+                                        <div class="font-medium">CI Board</div>
+                                        <div class="text-xs text-[var(--ui-muted)]">Für Corporate Identity</div>
+                                    </div>
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 @endcan
             </div>
 
             @php
-                // Alle Boards zusammenfassen: CI Boards, Content Boards, Social Boards, Facebook Pages und Instagram Accounts
-                $allBoards = $ciBoards->concat($contentBoards)->concat($socialBoards)->sortBy('order');
+                $hasAnyBoards = $ciBoards->count() > 0 || $contentBoards->count() > 0 || $socialBoards->count() > 0;
             @endphp
 
-            @if($allBoards->count() > 0 || $facebookPages->count() > 0 || $instagramAccounts->count() > 0)
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                    {{-- CI Boards, Content Boards und Social Boards --}}
-                    @foreach($allBoards as $board)
-                        @if($board instanceof \Platform\Brands\Models\BrandsCiBoard)
-                            <a href="{{ route('brands.ci-boards.show', $board) }}" class="block">
-                                <div class="bg-white rounded-xl border border-[var(--ui-border)]/60 shadow-sm hover:shadow-md transition-shadow p-6 h-full">
-                                    <div class="flex items-start justify-between mb-3">
-                                        <div class="flex-1">
-                                            <h3 class="text-lg font-semibold text-[var(--ui-secondary)] mb-1">{{ $board->name }}</h3>
-                                            @if($board->description)
-                                                <p class="text-sm text-[var(--ui-muted)] line-clamp-2">{{ $board->description }}</p>
-                                            @endif
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="flex items-center gap-2 mt-4">
-                                        <span class="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-[var(--ui-primary-5)] text-[var(--ui-primary)] text-xs font-medium">
-                                            @svg('heroicon-o-paint-brush', 'w-3 h-3')
-                                            CI Board
-                                        </span>
-                                    </div>
+            @if($hasAnyBoards)
+                <div class="space-y-8">
+                    {{-- CI Boards Gruppe --}}
+                    @if($ciBoards->count() > 0)
+                        <div>
+                            <div class="flex items-center gap-2 mb-4">
+                                <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-amber-50">
+                                    @svg('heroicon-o-paint-brush', 'w-5 h-5 text-amber-600')
                                 </div>
-                            </a>
-                        @elseif($board instanceof \Platform\Brands\Models\BrandsSocialBoard)
-                            <a href="{{ route('brands.social-boards.show', $board) }}" class="block">
-                                <div class="bg-white rounded-xl border border-[var(--ui-border)]/60 shadow-sm hover:shadow-md transition-shadow p-6 h-full">
-                                    <div class="flex items-start justify-between mb-3">
-                                        <div class="flex-1">
-                                            <h3 class="text-lg font-semibold text-[var(--ui-secondary)] mb-1">{{ $board->name }}</h3>
-                                            @if($board->description)
-                                                <p class="text-sm text-[var(--ui-muted)] line-clamp-2">{{ $board->description }}</p>
-                                            @endif
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="flex items-center gap-2 mt-4">
-                                        <span class="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-[var(--ui-primary-5)] text-[var(--ui-primary)] text-xs font-medium">
-                                            @svg('heroicon-o-share', 'w-3 h-3')
-                                            Social Board
-                                        </span>
-                                    </div>
-                                </div>
-                            </a>
-                        @else
-                            <a href="{{ route('brands.content-boards.show', $board) }}" class="block">
-                                <div class="bg-white rounded-xl border border-[var(--ui-border)]/60 shadow-sm hover:shadow-md transition-shadow p-6 h-full">
-                                    <div class="flex items-start justify-between mb-3">
-                                        <div class="flex-1">
-                                            <h3 class="text-lg font-semibold text-[var(--ui-secondary)] mb-1">{{ $board->name }}</h3>
-                                            @if($board->description)
-                                                <p class="text-sm text-[var(--ui-muted)] line-clamp-2">{{ $board->description }}</p>
-                                            @endif
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="flex items-center gap-2 mt-4">
-                                        <span class="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-[var(--ui-primary-5)] text-[var(--ui-primary)] text-xs font-medium">
-                                            @svg('heroicon-o-document-text', 'w-3 h-3')
-                                            Content Board
-                                        </span>
-                                    </div>
-                                </div>
-                            </a>
-                        @endif
-                    @endforeach
-
-                    {{-- Verknüpfte Facebook Pages als Boards --}}
-                    @foreach($facebookPages as $facebookPage)
-                        <a href="{{ route('brands.facebook-pages.show', $facebookPage) }}" class="block">
-                            <div class="bg-white rounded-xl border border-[var(--ui-border)]/60 shadow-sm hover:shadow-md transition-shadow p-6 h-full">
-                                <div class="flex items-start justify-between mb-3">
-                                    <div class="flex-1">
-                                        <h3 class="text-lg font-semibold text-[var(--ui-secondary)] mb-1">{{ $facebookPage->name }}</h3>
-                                        @if($facebookPage->description)
-                                            <p class="text-sm text-[var(--ui-muted)] line-clamp-2">{{ $facebookPage->description }}</p>
-                                        @endif
-                                    </div>
-                                </div>
-                                
-                                <div class="flex items-center gap-2 mt-4">
-                                    <span class="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-[var(--ui-primary-5)] text-[var(--ui-primary)] text-xs font-medium">
-                                        @svg('heroicon-o-globe-alt', 'w-3 h-3')
-                                        Facebook Page
-                                    </span>
-                                </div>
+                                <h3 class="text-lg font-semibold text-[var(--ui-secondary)]">CI Boards</h3>
+                                <span class="text-sm text-[var(--ui-muted)]">({{ $ciBoards->count() }})</span>
                             </div>
-                        </a>
-                    @endforeach
-
-                    {{-- Verknüpfte Instagram Accounts als Boards --}}
-                    @foreach($instagramAccounts as $instagramAccount)
-                        <a href="{{ route('brands.instagram-accounts.show', $instagramAccount) }}" class="block">
-                            <div class="bg-white rounded-xl border border-[var(--ui-border)]/60 shadow-sm hover:shadow-md transition-shadow p-6 h-full">
-                                <div class="flex items-start justify-between mb-3">
-                                    <div class="flex-1">
-                                        <h3 class="text-lg font-semibold text-[var(--ui-secondary)] mb-1">{{ '@' . $instagramAccount->username }}</h3>
-                                        @if($instagramAccount->description)
-                                            <p class="text-sm text-[var(--ui-muted)] line-clamp-2">{{ $instagramAccount->description }}</p>
-                                        @endif
-                                    </div>
-                                </div>
-                                
-                                <div class="flex items-center gap-2 mt-4">
-                                    <span class="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-[var(--ui-primary-5)] text-[var(--ui-primary)] text-xs font-medium">
-                                        @svg('heroicon-o-camera', 'w-3 h-3')
-                                        Instagram
-                                    </span>
-                                </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                                @foreach($ciBoards as $board)
+                                    <a href="{{ route('brands.ci-boards.show', $board) }}" class="group block">
+                                        <div class="bg-white rounded-xl border border-[var(--ui-border)]/60 shadow-sm hover:shadow-lg hover:border-amber-200 transition-all duration-200 p-6 h-full flex flex-col">
+                                            <div class="flex items-start justify-between mb-3">
+                                                <div class="flex-1 min-w-0">
+                                                    <h4 class="text-lg font-semibold text-[var(--ui-secondary)] mb-2 group-hover:text-amber-600 transition-colors truncate">{{ $board->name }}</h4>
+                                                    @if($board->description)
+                                                        <p class="text-sm text-[var(--ui-muted)] line-clamp-2">{{ $board->description }}</p>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="mt-auto pt-4 border-t border-[var(--ui-border)]/40">
+                                                <div class="flex items-center gap-2">
+                                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-amber-50 text-amber-700 text-xs font-medium">
+                                                        @svg('heroicon-o-paint-brush', 'w-3.5 h-3.5')
+                                                        CI Board
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                @endforeach
                             </div>
-                        </a>
-                    @endforeach
+                        </div>
+                    @endif
+
+                    {{-- Content Boards Gruppe --}}
+                    @if($contentBoards->count() > 0)
+                        <div>
+                            <div class="flex items-center gap-2 mb-4">
+                                <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-blue-50">
+                                    @svg('heroicon-o-document-text', 'w-5 h-5 text-blue-600')
+                                </div>
+                                <h3 class="text-lg font-semibold text-[var(--ui-secondary)]">Content Boards</h3>
+                                <span class="text-sm text-[var(--ui-muted)]">({{ $contentBoards->count() }})</span>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                                @foreach($contentBoards as $board)
+                                    <a href="{{ route('brands.content-boards.show', $board) }}" class="group block">
+                                        <div class="bg-white rounded-xl border border-[var(--ui-border)]/60 shadow-sm hover:shadow-lg hover:border-blue-200 transition-all duration-200 p-6 h-full flex flex-col">
+                                            <div class="flex items-start justify-between mb-3">
+                                                <div class="flex-1 min-w-0">
+                                                    <h4 class="text-lg font-semibold text-[var(--ui-secondary)] mb-2 group-hover:text-blue-600 transition-colors truncate">{{ $board->name }}</h4>
+                                                    @if($board->description)
+                                                        <p class="text-sm text-[var(--ui-muted)] line-clamp-2">{{ $board->description }}</p>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="mt-auto pt-4 border-t border-[var(--ui-border)]/40">
+                                                <div class="flex items-center gap-2">
+                                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-blue-50 text-blue-700 text-xs font-medium">
+                                                        @svg('heroicon-o-document-text', 'w-3.5 h-3.5')
+                                                        Content Board
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endif
+
+                    {{-- Social Boards Gruppe --}}
+                    @if($socialBoards->count() > 0)
+                        <div>
+                            <div class="flex items-center gap-2 mb-4">
+                                <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-purple-50">
+                                    @svg('heroicon-o-share', 'w-5 h-5 text-purple-600')
+                                </div>
+                                <h3 class="text-lg font-semibold text-[var(--ui-secondary)]">Social Boards</h3>
+                                <span class="text-sm text-[var(--ui-muted)]">({{ $socialBoards->count() }})</span>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                                @foreach($socialBoards as $board)
+                                    <a href="{{ route('brands.social-boards.show', $board) }}" class="group block">
+                                        <div class="bg-white rounded-xl border border-[var(--ui-border)]/60 shadow-sm hover:shadow-lg hover:border-purple-200 transition-all duration-200 p-6 h-full flex flex-col">
+                                            <div class="flex items-start justify-between mb-3">
+                                                <div class="flex-1 min-w-0">
+                                                    <h4 class="text-lg font-semibold text-[var(--ui-secondary)] mb-2 group-hover:text-purple-600 transition-colors truncate">{{ $board->name }}</h4>
+                                                    @if($board->description)
+                                                        <p class="text-sm text-[var(--ui-muted)] line-clamp-2">{{ $board->description }}</p>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="mt-auto pt-4 border-t border-[var(--ui-border)]/40">
+                                                <div class="flex items-center gap-2">
+                                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-purple-50 text-purple-700 text-xs font-medium">
+                                                        @svg('heroicon-o-share', 'w-3.5 h-3.5')
+                                                        Social Board
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endif
                 </div>
             @else
                 <div class="bg-white rounded-xl border border-[var(--ui-border)]/60 shadow-sm p-12 text-center">
-                    <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[var(--ui-muted-5)] mb-4">
-                        @svg('heroicon-o-squares-2x2', 'w-8 h-8 text-[var(--ui-muted)]')
+                    <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-[var(--ui-primary-5)] to-[var(--ui-primary-10)] mb-4">
+                        @svg('heroicon-o-squares-2x2', 'w-8 h-8 text-[var(--ui-primary)]')
                     </div>
                     <h3 class="text-lg font-semibold text-[var(--ui-secondary)] mb-2">Noch keine Boards</h3>
-                    <p class="text-sm text-[var(--ui-muted)] mb-4">Erstelle dein erstes Board für diese Marke.</p>
+                    <p class="text-sm text-[var(--ui-muted)] mb-6">Erstelle dein erstes Board für diese Marke.</p>
                     @can('update', $brand)
-                        <div class="flex items-center justify-center gap-2">
-                            <x-ui-button variant="primary" size="sm" wire:click="createContentBoard">
-                                <span class="inline-flex items-center gap-2">
-                                    @svg('heroicon-o-plus', 'w-4 h-4')
-                                    <span>Content Board erstellen</span>
-                                </span>
-                            </x-ui-button>
-                            <x-ui-button variant="primary" size="sm" wire:click="createSocialBoard">
-                                <span class="inline-flex items-center gap-2">
-                                    @svg('heroicon-o-plus', 'w-4 h-4')
-                                    <span>Social Board erstellen</span>
-                                </span>
-                            </x-ui-button>
-                            <x-ui-button variant="primary" size="sm" wire:click="createCiBoard">
-                                <span class="inline-flex items-center gap-2">
-                                    @svg('heroicon-o-plus', 'w-4 h-4')
-                                    <span>CI Board erstellen</span>
-                                </span>
-                            </x-ui-button>
-                        </div>
+                        <x-ui-button variant="primary" size="sm" wire:click="createContentBoard">
+                            <span class="inline-flex items-center gap-2">
+                                @svg('heroicon-o-plus', 'w-4 h-4')
+                                <span>Board erstellen</span>
+                            </span>
+                        </x-ui-button>
                     @endcan
                 </div>
             @endif
@@ -292,180 +327,191 @@
         </div>
 
         {{-- Social Media Section --}}
-        <div>
-            <div class="flex items-center justify-between mb-4">
-                <h2 class="text-xl font-semibold text-[var(--ui-secondary)]">Social Media</h2>
+        @if($metaConnection && ($availableFacebookPages->count() > 0 || $availableInstagramAccounts->count() > 0 || $facebookPages->count() > 0 || $instagramAccounts->count() > 0))
+            <div x-data="{ showSocialAccounts: false }">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-xl font-semibold text-[var(--ui-secondary)]">Social Media Accounts</h2>
+                    <button
+                        @click="showSocialAccounts = !showSocialAccounts"
+                        class="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-[var(--ui-secondary)] hover:text-[var(--ui-primary)] transition-colors rounded-lg hover:bg-[var(--ui-muted-5)]"
+                    >
+                        <span x-text="showSocialAccounts ? 'Ausblenden' : 'Accounts verwalten'"></span>
+                        <svg 
+                            x-show="!showSocialAccounts"
+                            class="w-4 h-4 transition-transform"
+                            fill="none" 
+                            stroke="currentColor" 
+                            viewBox="0 0 24 24"
+                        >
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                        <svg 
+                            x-show="showSocialAccounts"
+                            class="w-4 h-4 transition-transform"
+                            fill="none" 
+                            stroke="currentColor" 
+                            viewBox="0 0 24 24"
+                            style="display: none;"
+                        >
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path>
+                        </svg>
+                    </button>
+                </div>
+
+                <div 
+                    x-show="showSocialAccounts"
+                    x-transition:enter="transition ease-out duration-200"
+                    x-transition:enter-start="opacity-0 transform -translate-y-2"
+                    x-transition:enter-end="opacity-100 transform translate-y-0"
+                    x-transition:leave="transition ease-in duration-150"
+                    x-transition:leave-start="opacity-100 transform translate-y-0"
+                    x-transition:leave-end="opacity-0 transform -translate-y-2"
+                    style="display: none;"
+                >
+                    {{-- Verknüpfte Accounts als Liste --}}
+                    @if($facebookPages->count() > 0 || $instagramAccounts->count() > 0)
+                        <div class="mb-6">
+                            <h3 class="text-sm font-semibold text-[var(--ui-secondary)] mb-3">Verknüpfte Accounts</h3>
+                            <div class="bg-white rounded-xl border border-[var(--ui-border)]/60 shadow-sm overflow-hidden">
+                                <div class="divide-y divide-[var(--ui-border)]/40">
+                                    @foreach($facebookPages as $facebookPage)
+                                        <div class="p-4 hover:bg-[var(--ui-muted-5)] transition-colors">
+                                            <div class="flex items-center justify-between">
+                                                <div class="flex items-center gap-3 flex-1 min-w-0">
+                                                    <div class="flex-shrink-0 flex items-center justify-center w-10 h-10 rounded-lg bg-blue-50">
+                                                        @svg('heroicon-o-globe-alt', 'w-5 h-5 text-blue-600')
+                                                    </div>
+                                                    <div class="flex-1 min-w-0">
+                                                        <a href="{{ route('brands.facebook-pages.show', $facebookPage) }}" class="block">
+                                                            <h4 class="text-sm font-semibold text-[var(--ui-secondary)] hover:text-blue-600 transition-colors truncate">{{ $facebookPage->name }}</h4>
+                                                        </a>
+                                                        @if($facebookPage->description)
+                                                            <p class="text-xs text-[var(--ui-muted)] mt-0.5 line-clamp-1">{{ $facebookPage->description }}</p>
+                                                        @endif
+                                                    </div>
+                                                </div>
+                                                @can('update', $brand)
+                                                    <button
+                                                        wire:click="detachFacebookPage({{ $facebookPage->id }})"
+                                                        wire:confirm="Facebook Page wirklich von dieser Marke trennen?"
+                                                        class="flex-shrink-0 ml-3 p-1.5 text-[var(--ui-muted)] hover:text-[var(--ui-error)] hover:bg-red-50 rounded transition-colors"
+                                                        title="Verknüpfung trennen"
+                                                    >
+                                                        @svg('heroicon-o-x-mark', 'w-4 h-4')
+                                                    </button>
+                                                @endcan
+                                            </div>
+                                        </div>
+                                    @endforeach
+
+                                    @foreach($instagramAccounts as $instagramAccount)
+                                        <div class="p-4 hover:bg-[var(--ui-muted-5)] transition-colors">
+                                            <div class="flex items-center justify-between">
+                                                <div class="flex items-center gap-3 flex-1 min-w-0">
+                                                    <div class="flex-shrink-0 flex items-center justify-center w-10 h-10 rounded-lg bg-pink-50">
+                                                        @svg('heroicon-o-camera', 'w-5 h-5 text-pink-600')
+                                                    </div>
+                                                    <div class="flex-1 min-w-0">
+                                                        <a href="{{ route('brands.instagram-accounts.show', $instagramAccount) }}" class="block">
+                                                            <h4 class="text-sm font-semibold text-[var(--ui-secondary)] hover:text-pink-600 transition-colors truncate">{{ '@' . $instagramAccount->username }}</h4>
+                                                        </a>
+                                                        @if($instagramAccount->description)
+                                                            <p class="text-xs text-[var(--ui-muted)] mt-0.5 line-clamp-1">{{ $instagramAccount->description }}</p>
+                                                        @endif
+                                                    </div>
+                                                </div>
+                                                @can('update', $brand)
+                                                    <button
+                                                        wire:click="detachInstagramAccount({{ $instagramAccount->id }})"
+                                                        wire:confirm="Instagram Account wirklich von dieser Marke trennen?"
+                                                        class="flex-shrink-0 ml-3 p-1.5 text-[var(--ui-muted)] hover:text-[var(--ui-error)] hover:bg-red-50 rounded transition-colors"
+                                                        title="Verknüpfung trennen"
+                                                    >
+                                                        @svg('heroicon-o-x-mark', 'w-4 h-4')
+                                                    </button>
+                                                @endcan
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+
+                    {{-- Verfügbare Accounts zum Verknüpfen als Liste --}}
+                    @if($availableFacebookPages->count() > 0 || $availableInstagramAccounts->count() > 0)
+                        <div>
+                            <h3 class="text-sm font-semibold text-[var(--ui-secondary)] mb-3">Verfügbare Accounts verknüpfen</h3>
+                            <div class="bg-white rounded-xl border border-[var(--ui-border)]/60 shadow-sm overflow-hidden">
+                                <div class="divide-y divide-[var(--ui-border)]/40">
+                                    @foreach($availableFacebookPages as $facebookPage)
+                                        <div class="p-4 hover:bg-[var(--ui-muted-5)] transition-colors">
+                                            <div class="flex items-center justify-between">
+                                                <div class="flex items-center gap-3 flex-1 min-w-0">
+                                                    <div class="flex-shrink-0 flex items-center justify-center w-10 h-10 rounded-lg bg-blue-50">
+                                                        @svg('heroicon-o-globe-alt', 'w-5 h-5 text-blue-600')
+                                                    </div>
+                                                    <div class="flex-1 min-w-0">
+                                                        <h4 class="text-sm font-semibold text-[var(--ui-secondary)] truncate">{{ $facebookPage->name }}</h4>
+                                                        @if($facebookPage->description)
+                                                            <p class="text-xs text-[var(--ui-muted)] mt-0.5 line-clamp-1">{{ $facebookPage->description }}</p>
+                                                        @endif
+                                                    </div>
+                                                </div>
+                                                @can('update', $brand)
+                                                    <x-ui-button
+                                                        variant="primary"
+                                                        size="sm"
+                                                        wire:click="attachFacebookPage({{ $facebookPage->id }})"
+                                                        class="ml-3 flex-shrink-0"
+                                                    >
+                                                        <span class="inline-flex items-center gap-1.5">
+                                                            @svg('heroicon-o-plus', 'w-3.5 h-3.5')
+                                                            <span>Verknüpfen</span>
+                                                        </span>
+                                                    </x-ui-button>
+                                                @endcan
+                                            </div>
+                                        </div>
+                                    @endforeach
+
+                                    @foreach($availableInstagramAccounts as $instagramAccount)
+                                        <div class="p-4 hover:bg-[var(--ui-muted-5)] transition-colors">
+                                            <div class="flex items-center justify-between">
+                                                <div class="flex items-center gap-3 flex-1 min-w-0">
+                                                    <div class="flex-shrink-0 flex items-center justify-center w-10 h-10 rounded-lg bg-pink-50">
+                                                        @svg('heroicon-o-camera', 'w-5 h-5 text-pink-600')
+                                                    </div>
+                                                    <div class="flex-1 min-w-0">
+                                                        <h4 class="text-sm font-semibold text-[var(--ui-secondary)] truncate">{{ '@' . $instagramAccount->username }}</h4>
+                                                        @if($instagramAccount->description)
+                                                            <p class="text-xs text-[var(--ui-muted)] mt-0.5 line-clamp-1">{{ $instagramAccount->description }}</p>
+                                                        @endif
+                                                    </div>
+                                                </div>
+                                                @can('update', $brand)
+                                                    <x-ui-button
+                                                        variant="primary"
+                                                        size="sm"
+                                                        wire:click="attachInstagramAccount({{ $instagramAccount->id }})"
+                                                        class="ml-3 flex-shrink-0"
+                                                    >
+                                                        <span class="inline-flex items-center gap-1.5">
+                                                            @svg('heroicon-o-plus', 'w-3.5 h-3.5')
+                                                            <span>Verknüpfen</span>
+                                                        </span>
+                                                    </x-ui-button>
+                                                @endcan
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+                </div>
             </div>
-
-            {{-- Verknüpfte Accounts --}}
-            @if($facebookPages->count() > 0 || $instagramAccounts->count() > 0)
-                <div class="mb-6">
-                    <h3 class="text-sm font-semibold text-[var(--ui-secondary)] mb-3">Verknüpfte Accounts</h3>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                        @foreach($facebookPages as $facebookPage)
-                            <div class="bg-white rounded-xl border border-[var(--ui-border)]/60 shadow-sm hover:shadow-md transition-shadow p-6 h-full">
-                                <div class="flex items-start justify-between mb-3">
-                                    <div class="flex-1">
-                                        <a href="{{ route('brands.facebook-pages.show', $facebookPage) }}" class="block">
-                                            <h3 class="text-lg font-semibold text-[var(--ui-secondary)] mb-1 hover:text-[var(--ui-primary)] transition-colors">{{ $facebookPage->name }}</h3>
-                                        </a>
-                                        @if($facebookPage->description)
-                                            <p class="text-sm text-[var(--ui-muted)] line-clamp-2">{{ $facebookPage->description }}</p>
-                                        @endif
-                                    </div>
-                                    @can('update', $brand)
-                                        <button
-                                            wire:click="detachFacebookPage({{ $facebookPage->id }})"
-                                            wire:confirm="Facebook Page wirklich von dieser Marke trennen?"
-                                            class="flex-shrink-0 p-1 text-[var(--ui-muted)] hover:text-[var(--ui-error)] transition-colors"
-                                            title="Verknüpfung trennen"
-                                        >
-                                            @svg('heroicon-o-x-mark', 'w-4 h-4')
-                                        </button>
-                                    @endcan
-                                </div>
-                                
-                                <div class="flex items-center gap-2 mt-4">
-                                    <span class="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-[var(--ui-primary-5)] text-[var(--ui-primary)] text-xs font-medium">
-                                        @svg('heroicon-o-globe-alt', 'w-3 h-3')
-                                        Facebook Page
-                                    </span>
-                                </div>
-                            </div>
-                        @endforeach
-
-                        @foreach($instagramAccounts as $instagramAccount)
-                            <div class="bg-white rounded-xl border border-[var(--ui-border)]/60 shadow-sm hover:shadow-md transition-shadow p-6 h-full">
-                                <div class="flex items-start justify-between mb-3">
-                                    <div class="flex-1">
-                                        <a href="{{ route('brands.instagram-accounts.show', $instagramAccount) }}" class="block">
-                                            <h3 class="text-lg font-semibold text-[var(--ui-secondary)] mb-1 hover:text-[var(--ui-primary)] transition-colors">{{ '@' . $instagramAccount->username }}</h3>
-                                        </a>
-                                        @if($instagramAccount->description)
-                                            <p class="text-sm text-[var(--ui-muted)] line-clamp-2">{{ $instagramAccount->description }}</p>
-                                        @endif
-                                    </div>
-                                    @can('update', $brand)
-                                        <button
-                                            wire:click="detachInstagramAccount({{ $instagramAccount->id }})"
-                                            wire:confirm="Instagram Account wirklich von dieser Marke trennen?"
-                                            class="flex-shrink-0 p-1 text-[var(--ui-muted)] hover:text-[var(--ui-error)] transition-colors"
-                                            title="Verknüpfung trennen"
-                                        >
-                                            @svg('heroicon-o-x-mark', 'w-4 h-4')
-                                        </button>
-                                    @endcan
-                                </div>
-                                
-                                <div class="flex items-center gap-2 mt-4">
-                                    <span class="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-[var(--ui-primary-5)] text-[var(--ui-primary)] text-xs font-medium">
-                                        @svg('heroicon-o-camera', 'w-3 h-3')
-                                        Instagram
-                                    </span>
-                                </div>
-                            </div>
-                        @endforeach
-                    </div>
-                </div>
-            @endif
-
-            {{-- Verfügbare Accounts zum Verknüpfen --}}
-            @if($metaConnection && ($availableFacebookPages->count() > 0 || $availableInstagramAccounts->count() > 0))
-                <div>
-                    <h3 class="text-sm font-semibold text-[var(--ui-secondary)] mb-3">Verfügbare Accounts verknüpfen</h3>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                        @foreach($availableFacebookPages as $facebookPage)
-                            <div class="bg-white rounded-xl border-2 border-dashed border-[var(--ui-border)]/60 shadow-sm p-6 h-full">
-                                <div class="flex items-start justify-between mb-3">
-                                    <div class="flex-1">
-                                        <h3 class="text-lg font-semibold text-[var(--ui-secondary)] mb-1">{{ $facebookPage->name }}</h3>
-                                        @if($facebookPage->description)
-                                            <p class="text-sm text-[var(--ui-muted)] line-clamp-2">{{ $facebookPage->description }}</p>
-                                        @endif
-                                    </div>
-                                </div>
-                                
-                                <div class="mt-4">
-                                    @can('update', $brand)
-                                        <x-ui-button
-                                            variant="primary"
-                                            size="sm"
-                                            wire:click="attachFacebookPage({{ $facebookPage->id }})"
-                                            class="w-full"
-                                        >
-                                            <span class="inline-flex items-center gap-2">
-                                                @svg('heroicon-o-plus', 'w-4 h-4')
-                                                <span>Verknüpfen</span>
-                                            </span>
-                                        </x-ui-button>
-                                    @endcan
-                                </div>
-                                
-                                <div class="flex items-center gap-2 mt-4">
-                                    <span class="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-[var(--ui-muted-5)] text-[var(--ui-muted)] text-xs font-medium">
-                                        @svg('heroicon-o-globe-alt', 'w-3 h-3')
-                                        Facebook Page
-                                    </span>
-                                </div>
-                            </div>
-                        @endforeach
-
-                        @foreach($availableInstagramAccounts as $instagramAccount)
-                            <div class="bg-white rounded-xl border-2 border-dashed border-[var(--ui-border)]/60 shadow-sm p-6 h-full">
-                                <div class="flex items-start justify-between mb-3">
-                                    <div class="flex-1">
-                                        <h3 class="text-lg font-semibold text-[var(--ui-secondary)] mb-1">{{ '@' . $instagramAccount->username }}</h3>
-                                        @if($instagramAccount->description)
-                                            <p class="text-sm text-[var(--ui-muted)] line-clamp-2">{{ $instagramAccount->description }}</p>
-                                        @endif
-                                    </div>
-                                </div>
-                                
-                                <div class="mt-4">
-                                    @can('update', $brand)
-                                        <x-ui-button
-                                            variant="primary"
-                                            size="sm"
-                                            wire:click="attachInstagramAccount({{ $instagramAccount->id }})"
-                                            class="w-full"
-                                        >
-                                            <span class="inline-flex items-center gap-2">
-                                                @svg('heroicon-o-plus', 'w-4 h-4')
-                                                <span>Verknüpfen</span>
-                                            </span>
-                                        </x-ui-button>
-                                    @endcan
-                                </div>
-                                
-                                <div class="flex items-center gap-2 mt-4">
-                                    <span class="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-[var(--ui-muted-5)] text-[var(--ui-muted)] text-xs font-medium">
-                                        @svg('heroicon-o-camera', 'w-3 h-3')
-                                        Instagram
-                                    </span>
-                                </div>
-                            </div>
-                        @endforeach
-                    </div>
-                </div>
-            @endif
-
-            {{-- Keine Accounts vorhanden --}}
-            @if($facebookPages->count() === 0 && $instagramAccounts->count() === 0 && (!$metaConnection || ($availableFacebookPages->count() === 0 && $availableInstagramAccounts->count() === 0)))
-                <div class="bg-white rounded-xl border border-[var(--ui-border)]/60 shadow-sm p-12 text-center">
-                    <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[var(--ui-muted-5)] mb-4">
-                        @svg('heroicon-o-share', 'w-8 h-8 text-[var(--ui-muted)]')
-                    </div>
-                    <h3 class="text-lg font-semibold text-[var(--ui-secondary)] mb-2">Noch keine Social Media Accounts</h3>
-                    <p class="text-sm text-[var(--ui-muted)] mb-4">
-                        @if($metaConnection)
-                            Verwende die Commands, um Facebook Pages und Instagram Accounts zu synchronisieren, dann kannst du sie hier verknüpfen.
-                        @else
-                            Verknüpfe zuerst dein Meta-Konto im User-Modal, dann synchronisiere die Accounts und verknüpfe sie hier mit der Marke.
-                        @endif
-                    </p>
-                </div>
-            @endif
-        </div>
+        @endif
     </x-ui-page-container>
 
     <x-slot name="sidebar">

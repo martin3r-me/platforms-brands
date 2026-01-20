@@ -29,8 +29,8 @@
     <!-- Meta: Slot -->
     @if($card->slot)
         <div class="mb-2">
-            <span class="inline-flex items-start gap-1 text-xs text-[var(--ui-muted)]">
-                @svg('heroicon-o-view-columns','w-3 h-3 mt-0.5')
+            <span class="inline-flex items-start gap-1 text-xs text-[var(--ui-muted)] min-w-0">
+                @svg('heroicon-o-view-columns','w-2.5 h-2.5 mt-0.5')
                 <span class="truncate max-w-[9rem]">{{ $card->slot->name }}</span>
             </span>
         </div>
