@@ -269,8 +269,12 @@
                         if (!this.editor) return;
                         this.isSaving = true;
                         const md = this.editor.getMarkdown();
-                        $wire.set('content', md, false);
-                        $wire.save();
+                        // Content explizit setzen und dann speichern
+                        $wire.set('content', md);
+                        // Kurz warten, damit Livewire den Content verarbeitet
+                        setTimeout(() => {
+                            $wire.save();
+                        }, 50);
                     },
                 }"
                 class="min-h-[calc(100vh-220px)]"
@@ -280,7 +284,7 @@
                     <div class="flex items-start justify-between gap-4 mb-2">
                         <input
                             type="text"
-                            wire:model.defer="name"
+                            wire:model="name"
                             placeholder="Block Name…"
                             class="w-full text-4xl font-bold bg-transparent border-0 focus:ring-0 focus:outline-none text-[var(--ui-secondary)] placeholder:text-[var(--ui-muted)]"
                             style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;"

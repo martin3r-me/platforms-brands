@@ -57,8 +57,8 @@ class ContentBoardBlockTextEdit extends Component
     {
         $this->authorize('update', $this->block->row->section->contentBoard);
         
-        // Block-Namen aktualisieren, falls geändert
-        if (isset($this->name) && $this->name !== $this->block->name) {
+        // Block-Namen aktualisieren
+        if (isset($this->name) && trim($this->name)) {
             $this->block->update([
                 'name' => trim($this->name),
             ]);
@@ -67,12 +67,18 @@ class ContentBoardBlockTextEdit extends Component
         // Text-Content aktualisieren
         if ($this->block->content_type === 'text' && $this->block->content) {
             $this->block->content->update([
-                'content' => $this->content,
+                'content' => $this->content ?? '',
             ]);
         }
         
         $this->block->refresh();
         $this->block->load('content');
+        
+        // Aktualisiere lokale Werte
+        $this->name = $this->block->name;
+        if ($this->block->content_type === 'text' && $this->block->content) {
+            $this->content = $this->block->content->content ?? '';
+        }
 
         // Editor sync (wire:ignore) + UI can show "saved"
         $this->dispatch('content-block-saved', [
