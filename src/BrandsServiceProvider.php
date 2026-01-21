@@ -161,10 +161,12 @@ class BrandsServiceProvider extends ServiceProvider
 
     /**
      * Registriert Morph Map für Content Board Block Types
+     * Verwendet morphMap() statt enforceMorphMap(), damit nur unsere Content-Typen gemappt werden
+     * und andere polymorphe Beziehungen im System nicht betroffen sind.
      */
     protected function registerMorphMap(): void
     {
-        Relation::enforceMorphMap([
+        Relation::morphMap([
             'text' => BrandsContentBoardBlockText::class,
             // Weitere Content-Typen können hier hinzugefügt werden:
             // 'image' => BrandsContentBoardBlockImage::class,
