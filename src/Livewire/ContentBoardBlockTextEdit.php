@@ -76,6 +76,66 @@ class ContentBoardBlockTextEdit extends Component
         $this->dispatch('updateContentBoard');
     }
 
+    public function generateDummyText($type, $count)
+    {
+        $lorem = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.';
+        
+        $words = explode(' ', $lorem);
+        $generated = '';
+        
+        switch ($type) {
+            case 'words':
+                // Generiere X Wörter
+                $wordCount = min($count, 1000); // Max 1000 Wörter
+                $generated = implode(' ', array_slice($words, 0, $wordCount));
+                break;
+                
+            case 'chars':
+                // Generiere X Zeichen
+                $charCount = min($count, 10000); // Max 10000 Zeichen
+                $text = $lorem;
+                while (strlen($text) < $charCount) {
+                    $text .= ' ' . $lorem;
+                }
+                $generated = substr($text, 0, $charCount);
+                break;
+                
+            case 'paragraphs':
+                // Generiere X Absätze
+                $paragraphCount = min($count, 50); // Max 50 Absätze
+                for ($i = 0; $i < $paragraphCount; $i++) {
+                    $generated .= $lorem;
+                    if ($i < $paragraphCount - 1) {
+                        $generated .= "\n\n";
+                    }
+                }
+                break;
+                
+            case 'sentences':
+                // Generiere X Sätze
+                $sentenceCount = min($count, 200); // Max 200 Sätze
+                $sentences = [
+                    'Lorem ipsum dolor sit amet.',
+                    'Consectetur adipiscing elit.',
+                    'Sed do eiusmod tempor incididunt.',
+                    'Ut labore et dolore magna aliqua.',
+                    'Duis aute irure dolor in reprehenderit.',
+                    'Excepteur sint occaecat cupidatat non proident.',
+                ];
+                for ($i = 0; $i < $sentenceCount; $i++) {
+                    $generated .= $sentences[$i % count($sentences)] . ' ';
+                }
+                $generated = trim($generated);
+                break;
+        }
+        
+        // Editor aktualisieren - Text wird am Ende eingefügt
+        $this->dispatch('content-block-insert-text', [
+            'blockId' => $this->block->id,
+            'text' => $generated,
+        ]);
+    }
+
     public function getBreadcrumbs()
     {
         $contentBoard = $this->block->row->section->contentBoard;

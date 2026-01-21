@@ -237,8 +237,10 @@
                                                                         {{-- Content-Ausgabe je nach Typ --}}
                                                                         @if($hasContent)
                                                                             @if($block->content_type === 'text' && $block->content)
-                                                                                <div class="mt-3 text-sm text-[var(--ui-secondary)] line-clamp-3 markdown-content">
-                                                                                    {!! \Illuminate\Support\Str::markdown($block->content->content ?? '') !!}
+                                                                                <div class="mt-3 text-sm text-[var(--ui-secondary)] markdown-content-preview">
+                                                                                    <div class="line-clamp-3">
+                                                                                        {!! \Illuminate\Support\Str::markdown($block->content->content ?? '') !!}
+                                                                                    </div>
                                                                                 </div>
                                                                             @endif
                                                                         @else
@@ -281,6 +283,18 @@
                                                                     @endcan
                                                                 </div>
                                                             </div>
+                                                            
+                                                            {{-- Edit Icon unten rechts, nur wenn Content vorhanden --}}
+                                                            @if($hasContent)
+                                                                <a 
+                                                                    href="{{ route('brands.content-board-blocks.show', ['brandsContentBoardBlock' => $block->id, 'type' => $block->content_type]) }}"
+                                                                    @click.stop
+                                                                    class="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center w-8 h-8 rounded-md bg-[var(--ui-primary)] text-white hover:bg-[var(--ui-primary)]/90 shadow-sm"
+                                                                    title="Block bearbeiten"
+                                                                >
+                                                                    @svg('heroicon-o-pencil', 'w-4 h-4')
+                                                                </a>
+                                                            @endif
                                                         </div>
                                                     @endforeach
                                                 </div>
@@ -441,3 +455,109 @@
     <livewire:brands.content-board-settings-modal/>
     <livewire:brands.content-board-block-settings-modal/>
 </x-ui-page>
+
+@push('styles')
+<style>
+    /* Markdown Content Preview Styling für Content Board Blocks */
+    .markdown-content-preview {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+        line-height: 1.6;
+        color: var(--ui-secondary);
+    }
+    
+    .markdown-content-preview h1,
+    .markdown-content-preview h2,
+    .markdown-content-preview h3,
+    .markdown-content-preview h4 {
+        font-weight: 600;
+        margin-top: 0.5em;
+        margin-bottom: 0.25em;
+        line-height: 1.3;
+    }
+    
+    .markdown-content-preview h1 {
+        font-size: 1.5em;
+    }
+    
+    .markdown-content-preview h2 {
+        font-size: 1.25em;
+    }
+    
+    .markdown-content-preview h3 {
+        font-size: 1.1em;
+    }
+    
+    .markdown-content-preview h4 {
+        font-size: 1em;
+    }
+    
+    .markdown-content-preview p {
+        margin-bottom: 0.5em;
+    }
+    
+    .markdown-content-preview ul,
+    .markdown-content-preview ol {
+        margin-bottom: 0.5em;
+        padding-left: 1.25em;
+    }
+    
+    .markdown-content-preview li {
+        margin-bottom: 0.25em;
+    }
+    
+    .markdown-content-preview code {
+        background: var(--ui-muted-5);
+        padding: 0.15em 0.3em;
+        border-radius: 3px;
+        font-size: 0.9em;
+        font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    }
+    
+    .markdown-content-preview pre {
+        background: var(--ui-muted-5);
+        padding: 0.75em;
+        border-radius: 6px;
+        overflow-x: auto;
+        margin-bottom: 0.5em;
+    }
+    
+    .markdown-content-preview pre code {
+        background: transparent;
+        padding: 0;
+    }
+    
+    .markdown-content-preview blockquote {
+        border-left: 2px solid var(--ui-primary);
+        padding-left: 0.75em;
+        margin-left: 0;
+        color: var(--ui-muted);
+        font-style: italic;
+    }
+    
+    .markdown-content-preview strong {
+        font-weight: 600;
+    }
+    
+    .markdown-content-preview em {
+        font-style: italic;
+    }
+    
+    .markdown-content-preview a {
+        color: var(--ui-primary);
+        text-decoration: underline;
+    }
+    
+    .markdown-content-preview a:hover {
+        color: var(--ui-primary);
+        text-decoration: none;
+    }
+    
+    /* Line clamp für Preview */
+    .markdown-content-preview .line-clamp-3 {
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+</style>
+@endpush
