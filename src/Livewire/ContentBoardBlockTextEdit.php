@@ -57,6 +57,14 @@ class ContentBoardBlockTextEdit extends Component
     {
         $this->authorize('update', $this->block->row->section->contentBoard);
         
+        // Block-Namen aktualisieren, falls geändert
+        if (isset($this->name) && $this->name !== $this->block->name) {
+            $this->block->update([
+                'name' => trim($this->name),
+            ]);
+        }
+        
+        // Text-Content aktualisieren
         if ($this->block->content_type === 'text' && $this->block->content) {
             $this->block->content->update([
                 'content' => $this->content,
@@ -93,13 +101,17 @@ class ContentBoardBlockTextEdit extends Component
         
         // Text am Ende des aktuellen Inhalts einfügen
         $currentContent = $this->content ?? '';
-        $newContent = $currentContent ? $currentContent . "\n\n" . $generated : $generated;
+        $separator = $currentContent && trim($currentContent) ? "\n\n" : '';
+        $newContent = $currentContent . $separator . $generated;
+        
+        // Content direkt setzen
         $this->content = $newContent;
         
-        // Editor aktualisieren
+        // Editor aktualisieren via Event
         $this->dispatch('content-block-insert-text', [
             'blockId' => $this->block->id,
             'text' => $generated,
+            'fullContent' => $newContent,
         ]);
     }
 

@@ -231,13 +231,22 @@
 
                             Livewire.on('content-block-insert-text', (payload) => {
                                 if (!payload || payload.blockId !== {{ (int) $block->id }}) return;
-                                if (typeof payload.text === 'string' && this.editor) {
-                                    const currentContent = this.editor.getMarkdown();
-                                    const separator = currentContent && currentContent.trim() ? '\n\n' : '';
-                                    const newContent = currentContent + separator + payload.text;
+                                if (this.editor) {
+                                    // Verwende fullContent wenn vorhanden, sonst füge Text hinzu
+                                    let newContent;
+                                    if (payload.fullContent) {
+                                        newContent = payload.fullContent;
+                                    } else if (typeof payload.text === 'string') {
+                                        const currentContent = this.editor.getMarkdown();
+                                        const separator = currentContent && currentContent.trim() ? '\n\n' : '';
+                                        newContent = currentContent + separator + payload.text;
+                                    } else {
+                                        return;
+                                    }
+                                    
                                     this.editor.setMarkdown(newContent);
-                                    const md = this.editor.getMarkdown();
-                                    $wire.set('content', md, false);
+                                    // Stelle sicher, dass Livewire den Content hat
+                                    $wire.set('content', newContent, false);
                                     this.savedLabel = 'Ungespeichert';
                                 }
                             });
@@ -267,29 +276,34 @@
                 class="min-h-[calc(100vh-220px)]"
             >
                 {{-- Title + tiny status --}}
-                <div class="flex items-start justify-between gap-4 mb-6">
-                    <input
-                        type="text"
-                        wire:model.defer="name"
-                        placeholder="Block Name…"
-                        class="w-full text-4xl font-bold bg-transparent border-0 focus:ring-0 focus:outline-none text-[var(--ui-secondary)] placeholder:text-[var(--ui-muted)]"
-                        style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;"
-                    />
+                <div class="mb-6">
+                    <div class="flex items-start justify-between gap-4 mb-2">
+                        <input
+                            type="text"
+                            wire:model.defer="name"
+                            placeholder="Block Name…"
+                            class="w-full text-4xl font-bold bg-transparent border-0 focus:ring-0 focus:outline-none text-[var(--ui-secondary)] placeholder:text-[var(--ui-muted)]"
+                            style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;"
+                        />
 
-                    <div class="flex items-center gap-3 flex-shrink-0 pt-2">
-                        <div class="text-xs text-[var(--ui-muted)]">
-                            <span x-text="savedLabel"></span>
-                            <span class="mx-1">·</span>
-                            <span>⌘S</span>
+                        <div class="flex items-center gap-3 flex-shrink-0 pt-2">
+                            <div class="text-xs text-[var(--ui-muted)]">
+                                <span x-text="savedLabel"></span>
+                                <span class="mx-1">·</span>
+                                <span>⌘S</span>
+                            </div>
+                            <button
+                                type="button"
+                                @click="saveNow()"
+                                class="px-3 py-1.5 text-sm rounded-lg border border-[var(--ui-border)] hover:bg-[var(--ui-muted-5)] transition-colors"
+                            >
+                                Speichern
+                            </button>
                         </div>
-                        <button
-                            type="button"
-                            @click="saveNow()"
-                            class="px-3 py-1.5 text-sm rounded-lg border border-[var(--ui-border)] hover:bg-[var(--ui-muted-5)] transition-colors"
-                        >
-                            Speichern
-                        </button>
                     </div>
+                    <p class="text-xs text-[var(--ui-muted)] italic">
+                        Dieser Titel dient nur zur Orientierung und wird nicht mitgegeben.
+                    </p>
                 </div>
 
                 <div class="content-block-editor-shell">
