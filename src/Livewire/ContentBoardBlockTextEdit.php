@@ -87,7 +87,7 @@ class ContentBoardBlockTextEdit extends Component
 
         $breadcrumbs[] = [
             'name' => $this->block->name,
-            'url' => route('brands.content-board-blocks.show', ['block' => $this->block->id, 'type' => $this->block->content_type]),
+            'url' => route('brands.content-board-blocks.show', ['brandsContentBoardBlock' => $this->block->id, 'type' => $this->block->content_type]),
         ];
 
         return $breadcrumbs;
@@ -137,7 +137,7 @@ class ContentBoardBlockTextEdit extends Component
             'modelId' => $this->block->id,
             'subject' => $this->block->name,
             'description' => mb_substr(strip_tags($this->block->content->content ?? ''), 0, 100),
-            'url' => route('brands.content-board-blocks.show', ['block' => $this->block->id, 'type' => $this->block->content_type]),
+            'url' => route('brands.content-board-blocks.show', ['brandsContentBoardBlock' => $this->block->id, 'type' => $this->block->content_type]),
             'source' => 'brands.content-board-block.view',
             'recipients' => [],
             'capabilities' => [
