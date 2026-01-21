@@ -87,118 +87,28 @@
                 {{-- Dummy Text Generator --}}
                 <div>
                     <h3 class="text-xs font-semibold uppercase tracking-wide text-[var(--ui-muted)] mb-3">Dummy Text Generator</h3>
-                    <div class="space-y-3">
-                        {{-- Wörter --}}
-                        <div>
-                            <label class="block text-xs font-medium text-[var(--ui-secondary)] mb-2">Wörter</label>
-                            <div class="flex flex-wrap gap-2">
-                                <button
-                                    type="button"
-                                    wire:click="generateDummyText('words', 10)"
-                                    class="px-3 py-1.5 text-xs font-medium rounded-md border border-[var(--ui-border)]/40 bg-white hover:bg-[var(--ui-muted-5)] text-[var(--ui-secondary)] transition-colors"
-                                >
-                                    10 Wörter
-                                </button>
-                                <button
-                                    type="button"
-                                    wire:click="generateDummyText('words', 50)"
-                                    class="px-3 py-1.5 text-xs font-medium rounded-md border border-[var(--ui-border)]/40 bg-white hover:bg-[var(--ui-muted-5)] text-[var(--ui-secondary)] transition-colors"
-                                >
-                                    50 Wörter
-                                </button>
-                                <button
-                                    type="button"
-                                    wire:click="generateDummyText('words', 100)"
-                                    class="px-3 py-1.5 text-xs font-medium rounded-md border border-[var(--ui-border)]/40 bg-white hover:bg-[var(--ui-muted-5)] text-[var(--ui-secondary)] transition-colors"
-                                >
-                                    100 Wörter
-                                </button>
-                            </div>
-                        </div>
-                        
-                        {{-- Zeichen --}}
-                        <div>
-                            <label class="block text-xs font-medium text-[var(--ui-secondary)] mb-2">Zeichen</label>
-                            <div class="flex flex-wrap gap-2">
-                                <button
-                                    type="button"
-                                    wire:click="generateDummyText('chars', 100)"
-                                    class="px-3 py-1.5 text-xs font-medium rounded-md border border-[var(--ui-border)]/40 bg-white hover:bg-[var(--ui-muted-5)] text-[var(--ui-secondary)] transition-colors"
-                                >
-                                    100 Zeichen
-                                </button>
-                                <button
-                                    type="button"
-                                    wire:click="generateDummyText('chars', 500)"
-                                    class="px-3 py-1.5 text-xs font-medium rounded-md border border-[var(--ui-border)]/40 bg-white hover:bg-[var(--ui-muted-5)] text-[var(--ui-secondary)] transition-colors"
-                                >
-                                    500 Zeichen
-                                </button>
-                                <button
-                                    type="button"
-                                    wire:click="generateDummyText('chars', 1000)"
-                                    class="px-3 py-1.5 text-xs font-medium rounded-md border border-[var(--ui-border)]/40 bg-white hover:bg-[var(--ui-muted-5)] text-[var(--ui-secondary)] transition-colors"
-                                >
-                                    1000 Zeichen
-                                </button>
-                            </div>
-                        </div>
-                        
-                        {{-- Absätze --}}
-                        <div>
-                            <label class="block text-xs font-medium text-[var(--ui-secondary)] mb-2">Absätze</label>
-                            <div class="flex flex-wrap gap-2">
-                                <button
-                                    type="button"
-                                    wire:click="generateDummyText('paragraphs', 1)"
-                                    class="px-3 py-1.5 text-xs font-medium rounded-md border border-[var(--ui-border)]/40 bg-white hover:bg-[var(--ui-muted-5)] text-[var(--ui-secondary)] transition-colors"
-                                >
-                                    1 Absatz
-                                </button>
-                                <button
-                                    type="button"
-                                    wire:click="generateDummyText('paragraphs', 3)"
-                                    class="px-3 py-1.5 text-xs font-medium rounded-md border border-[var(--ui-border)]/40 bg-white hover:bg-[var(--ui-muted-5)] text-[var(--ui-secondary)] transition-colors"
-                                >
-                                    3 Absätze
-                                </button>
-                                <button
-                                    type="button"
-                                    wire:click="generateDummyText('paragraphs', 5)"
-                                    class="px-3 py-1.5 text-xs font-medium rounded-md border border-[var(--ui-border)]/40 bg-white hover:bg-[var(--ui-muted-5)] text-[var(--ui-secondary)] transition-colors"
-                                >
-                                    5 Absätze
-                                </button>
-                            </div>
-                        </div>
-                        
-                        {{-- Sätze --}}
-                        <div>
-                            <label class="block text-xs font-medium text-[var(--ui-secondary)] mb-2">Sätze</label>
-                            <div class="flex flex-wrap gap-2">
-                                <button
-                                    type="button"
-                                    wire:click="generateDummyText('sentences', 5)"
-                                    class="px-3 py-1.5 text-xs font-medium rounded-md border border-[var(--ui-border)]/40 bg-white hover:bg-[var(--ui-muted-5)] text-[var(--ui-secondary)] transition-colors"
-                                >
-                                    5 Sätze
-                                </button>
-                                <button
-                                    type="button"
-                                    wire:click="generateDummyText('sentences', 10)"
-                                    class="px-3 py-1.5 text-xs font-medium rounded-md border border-[var(--ui-border)]/40 bg-white hover:bg-[var(--ui-muted-5)] text-[var(--ui-secondary)] transition-colors"
-                                >
-                                    10 Sätze
-                                </button>
-                                <button
-                                    type="button"
-                                    wire:click="generateDummyText('sentences', 20)"
-                                    class="px-3 py-1.5 text-xs font-medium rounded-md border border-[var(--ui-border)]/40 bg-white hover:bg-[var(--ui-muted-5)] text-[var(--ui-secondary)] transition-colors"
-                                >
-                                    20 Sätze
-                                </button>
-                            </div>
-                        </div>
+                    <div class="flex flex-col gap-2">
+                        <button
+                            type="button"
+                            wire:click="generateDummyText(50)"
+                            class="w-full px-3 py-2 text-sm font-medium rounded-md border border-[var(--ui-border)]/40 bg-white hover:bg-[var(--ui-muted-5)] text-[var(--ui-secondary)] transition-colors text-left"
+                        >
+                            50 Wörter
+                        </button>
+                        <button
+                            type="button"
+                            wire:click="generateDummyText(100)"
+                            class="w-full px-3 py-2 text-sm font-medium rounded-md border border-[var(--ui-border)]/40 bg-white hover:bg-[var(--ui-muted-5)] text-[var(--ui-secondary)] transition-colors text-left"
+                        >
+                            100 Wörter
+                        </button>
+                        <button
+                            type="button"
+                            wire:click="generateDummyText(300)"
+                            class="w-full px-3 py-2 text-sm font-medium rounded-md border border-[var(--ui-border)]/40 bg-white hover:bg-[var(--ui-muted-5)] text-[var(--ui-secondary)] transition-colors text-left"
+                        >
+                            300 Wörter
+                        </button>
                     </div>
                 </div>
 
@@ -323,7 +233,8 @@
                                 if (!payload || payload.blockId !== {{ (int) $block->id }}) return;
                                 if (typeof payload.text === 'string' && this.editor) {
                                     const currentContent = this.editor.getMarkdown();
-                                    const newContent = currentContent ? currentContent + '\n\n' + payload.text : payload.text;
+                                    const separator = currentContent && currentContent.trim() ? '\n\n' : '';
+                                    const newContent = currentContent + separator + payload.text;
                                     this.editor.setMarkdown(newContent);
                                     const md = this.editor.getMarkdown();
                                     $wire.set('content', md, false);

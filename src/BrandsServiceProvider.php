@@ -251,6 +251,12 @@ class BrandsServiceProvider extends ServiceProvider
             $registry->register(new \Platform\Brands\Tools\BulkCreateContentBoardBlocksTool());
             $registry->register(new \Platform\Brands\Tools\BulkUpdateContentBoardBlocksTool());
             
+            // ContentBoardBlockText Tools (CRUD)
+            $registry->register(new \Platform\Brands\Tools\CreateContentBoardBlockTextTool());
+            $registry->register(new \Platform\Brands\Tools\UpdateContentBoardBlockTextTool());
+            $registry->register(new \Platform\Brands\Tools\GetContentBoardBlockTextTool());
+            $registry->register(new \Platform\Brands\Tools\DeleteContentBoardBlockTextTool());
+            
             // Facebook Pages-Tools
             $registry->register(new \Platform\Brands\Tools\ListFacebookPagesTool());
             $registry->register(new \Platform\Brands\Tools\GetFacebookPageTool());

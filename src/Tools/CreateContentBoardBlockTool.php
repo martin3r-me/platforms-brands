@@ -23,7 +23,7 @@ class CreateContentBoardBlockTool implements ToolContract, ToolMetadataContract
 
     public function getDescription(): string
     {
-        return 'POST /brands/content_board_rows/{row_id}/content_board_blocks - Erstellt einen neuen Content Board Block. REST-Parameter: row_id (required, integer) - Row-ID. name (optional, string) - Block-Name. description (optional, string) - Beschreibung. span (optional, integer) - Spaltenbreite (1-12).';
+        return 'POST /brands/content_board_rows/{row_id}/content_board_blocks - Erstellt einen neuen Content Board Block. REST-Parameter: row_id (required, integer) - Row-ID. name (optional, string) - Block-Name. description (optional, string) - Beschreibung. span (optional, integer) - Spaltenbreite (1-12). content_type (optional, string) - Content-Typ: "text", "image", "carousel", "video". Wenn "text" gewählt wird, wird automatisch ein leerer Text-Content erstellt.';
     }
 
     public function getSchema(): array
@@ -46,6 +46,11 @@ class CreateContentBoardBlockTool implements ToolContract, ToolMetadataContract
                 'span' => [
                     'type' => 'integer',
                     'description' => 'Spaltenbreite des Blocks (1-12). Standard: 1.'
+                ],
+                'content_type' => [
+                    'type' => 'string',
+                    'description' => 'Content-Typ des Blocks. Mögliche Werte: "text", "image", "carousel", "video". Wenn nicht angegeben, bleibt der Block ohne Content-Typ.',
+                    'enum' => ['text', 'image', 'carousel', 'video']
                 ],
             ],
             'required' => ['row_id']
@@ -81,32 +86,61 @@ class CreateContentBoardBlockTool implements ToolContract, ToolMetadataContract
 
             $name = $arguments['name'] ?? 'Neuer Block';
             $span = isset($arguments['span']) ? max(1, min(12, (int)$arguments['span'])) : 1;
+            $contentType = $arguments['content_type'] ?? null;
 
             // ContentBoardBlock direkt erstellen
             $block = BrandsContentBoardBlock::create([
                 'name' => $name,
                 'description' => $arguments['description'] ?? null,
                 'span' => $span,
+                'content_type' => $contentType,
+                'content_id' => null,
                 'user_id' => $context->user->id,
                 'team_id' => $contentBoard->team_id,
                 'row_id' => $row->id,
             ]);
 
-            $block->load(['row.section.contentBoard', 'user', 'team']);
+            // Wenn content_type "text" ist, Text-Content erstellen
+            if ($contentType === 'text') {
+                $textContent = \Platform\Brands\Models\BrandsContentBoardBlockText::create([
+                    'content' => '',
+                    'user_id' => $context->user->id,
+                    'team_id' => $contentBoard->team_id,
+                ]);
+                
+                $block->content_type = 'text';
+                $block->content_id = $textContent->id;
+                $block->save();
+            }
 
-            return ToolResult::success([
+            $block->load(['row.section.contentBoard', 'user', 'team', 'content']);
+
+            $result = [
                 'id' => $block->id,
                 'uuid' => $block->uuid,
                 'name' => $block->name,
                 'description' => $block->description,
                 'span' => $block->span,
+                'content_type' => $block->content_type,
+                'content_id' => $block->content_id,
                 'row_id' => $block->row_id,
                 'content_board_id' => $contentBoard->id,
                 'content_board_name' => $contentBoard->name,
                 'team_id' => $block->team_id,
                 'created_at' => $block->created_at->toIso8601String(),
                 'message' => "Content Board Block '{$block->name}' erfolgreich erstellt."
-            ]);
+            ];
+            
+            // Content-Daten hinzufügen, wenn vorhanden
+            if ($block->content_type === 'text' && $block->content) {
+                $result['text_content'] = [
+                    'id' => $block->content->id,
+                    'uuid' => $block->content->uuid,
+                    'content' => $block->content->content,
+                ];
+            }
+
+            return ToolResult::success($result);
         } catch (\Throwable $e) {
             return ToolResult::error('EXECUTION_ERROR', 'Fehler beim Erstellen des Content Board Blocks: ' . $e->getMessage());
         }

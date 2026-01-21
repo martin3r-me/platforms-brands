@@ -24,7 +24,7 @@ class UpdateContentBoardBlockTool implements ToolContract
 
     public function getDescription(): string
     {
-        return 'PUT /brands/content_board_blocks/{id} - Aktualisiert einen Content Board Block. REST-Parameter: content_board_block_id (required, integer) - Content Board Block-ID. name (optional, string) - Name. description (optional, string) - Beschreibung (Inhalt/Text). span (optional, integer) - Spaltenbreite (1-12).';
+        return 'PUT /brands/content_board_blocks/{id} - Aktualisiert einen Content Board Block. REST-Parameter: content_board_block_id (required, integer) - Content Board Block-ID. name (optional, string) - Name. description (optional, string) - Beschreibung (Inhalt/Text). span (optional, integer) - Spaltenbreite (1-12). content_type (optional, string) - Content-Typ ändern: "text", "image", "carousel", "video". Wenn "text" gewählt wird, wird automatisch ein leerer Text-Content erstellt (bestehender Content wird gelöscht).';
     }
 
     public function getSchema(): array
@@ -47,6 +47,11 @@ class UpdateContentBoardBlockTool implements ToolContract
                 'span' => [
                     'type' => 'integer',
                     'description' => 'Optional: Spaltenbreite des Blocks (1-12).'
+                ],
+                'content_type' => [
+                    'type' => 'string',
+                    'description' => 'Optional: Content-Typ des Blocks. Mögliche Werte: "text", "image", "carousel", "video". Wenn gesetzt, wird der Content-Typ geändert (bestehender Content wird gelöscht).',
+                    'enum' => ['text', 'image', 'carousel', 'video']
                 ],
             ],
             'required' => ['content_board_block_id']
@@ -96,24 +101,62 @@ class UpdateContentBoardBlockTool implements ToolContract
                 $updateData['span'] = max(1, min(12, (int)$arguments['span']));
             }
 
+            // Content-Typ ändern
+            if (isset($arguments['content_type'])) {
+                $newContentType = $arguments['content_type'];
+                
+                // Wenn bereits ein Content existiert, löschen
+                if ($block->content) {
+                    $block->content->delete();
+                }
+                
+                // Neuen Content erstellen, wenn Typ "text" ist
+                if ($newContentType === 'text') {
+                    $textContent = \Platform\Brands\Models\BrandsContentBoardBlockText::create([
+                        'content' => '',
+                        'user_id' => $context->user?->id ?? auth()->id(),
+                        'team_id' => $contentBoard->team_id,
+                    ]);
+                    
+                    $updateData['content_type'] = 'text';
+                    $updateData['content_id'] = $textContent->id;
+                } else {
+                    $updateData['content_type'] = $newContentType;
+                    $updateData['content_id'] = null;
+                }
+            }
+
             // ContentBoardBlock aktualisieren
             if (!empty($updateData)) {
                 $block->update($updateData);
             }
 
             $block->refresh();
-            $block->load(['row.section.contentBoard', 'user', 'team']);
+            $block->load(['row.section.contentBoard', 'user', 'team', 'content']);
 
-            return ToolResult::success([
+            $result = [
                 'content_board_block_id' => $block->id,
                 'name' => $block->name,
                 'description' => $block->description,
                 'span' => $block->span,
+                'content_type' => $block->content_type,
+                'content_id' => $block->content_id,
                 'content_board_id' => $contentBoard->id,
                 'content_board_name' => $contentBoard->name,
                 'updated_at' => $block->updated_at->toIso8601String(),
                 'message' => "Content Board Block '{$block->name}' erfolgreich aktualisiert."
-            ]);
+            ];
+            
+            // Content-Daten hinzufügen, wenn vorhanden
+            if ($block->content_type === 'text' && $block->content) {
+                $result['text_content'] = [
+                    'id' => $block->content->id,
+                    'uuid' => $block->content->uuid,
+                    'content' => $block->content->content,
+                ];
+            }
+
+            return ToolResult::success($result);
         } catch (\Throwable $e) {
             return ToolResult::error('EXECUTION_ERROR', 'Fehler beim Aktualisieren des Content Board Blocks: ' . $e->getMessage());
         }

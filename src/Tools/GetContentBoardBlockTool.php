@@ -67,12 +67,16 @@ class GetContentBoardBlockTool implements ToolContract, ToolMetadataContract
                 return ToolResult::error('ACCESS_DENIED', 'Du hast keinen Zugriff auf diesen Content Board Block (Policy).');
             }
 
+            $block->load('content');
+            
             $data = [
                 'id' => $block->id,
                 'uuid' => $block->uuid,
                 'name' => $block->name,
                 'description' => $block->description,
                 'span' => $block->span,
+                'content_type' => $block->content_type,
+                'content_id' => $block->content_id,
                 'row_id' => $block->row_id,
                 'content_board_id' => $contentBoard->id,
                 'content_board_name' => $contentBoard->name,
@@ -80,6 +84,15 @@ class GetContentBoardBlockTool implements ToolContract, ToolMetadataContract
                 'user_id' => $block->user_id,
                 'created_at' => $block->created_at->toIso8601String(),
             ];
+            
+            // Content-Daten hinzufügen, wenn vorhanden
+            if ($block->content_type === 'text' && $block->content) {
+                $data['content'] = [
+                    'id' => $block->content->id,
+                    'uuid' => $block->content->uuid,
+                    'content' => $block->content->content,
+                ];
+            }
 
             return ToolResult::success($data);
         } catch (\Throwable $e) {

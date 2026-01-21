@@ -70,7 +70,7 @@ class ListContentBoardBlocksTool implements ToolContract, ToolMetadataContract
                 ->whereHas('row.section', function($q) use ($contentBoardId) {
                     $q->where('content_board_id', $contentBoardId);
                 })
-                ->with(['row.section.contentBoard', 'user', 'team']);
+                ->with(['row.section.contentBoard', 'user', 'team', 'content']);
 
             // Standard-Operationen anwenden
             $this->applyStandardFilters($query, $arguments, [
@@ -93,12 +93,14 @@ class ListContentBoardBlocksTool implements ToolContract, ToolMetadataContract
 
             // Blocks formatieren
             $blocksList = $blocks->map(function($block) {
-                return [
+                $data = [
                     'id' => $block->id,
                     'uuid' => $block->uuid,
                     'name' => $block->name,
                     'description' => $block->description,
                     'span' => $block->span,
+                    'content_type' => $block->content_type,
+                    'content_id' => $block->content_id,
                     'row_id' => $block->row_id,
                     'content_board_id' => $block->row->section->content_board_id,
                     'content_board_name' => $block->row->section->contentBoard->name,
@@ -106,6 +108,13 @@ class ListContentBoardBlocksTool implements ToolContract, ToolMetadataContract
                     'user_id' => $block->user_id,
                     'created_at' => $block->created_at->toIso8601String(),
                 ];
+                
+                // Content-Daten hinzufügen, wenn vorhanden
+                if ($block->content_type === 'text' && $block->content) {
+                    $data['text_content_preview'] = mb_substr($block->content->content ?? '', 0, 100);
+                }
+                
+                return $data;
             })->values()->toArray();
 
             return ToolResult::success([
