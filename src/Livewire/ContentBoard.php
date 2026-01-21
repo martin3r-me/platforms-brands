@@ -14,7 +14,7 @@ class ContentBoard extends Component
     public function mount(BrandsContentBoard $brandsContentBoard)
     {
         // Model neu laden, um sicherzustellen, dass alle Daten vorhanden sind
-        $this->contentBoard = $brandsContentBoard->fresh()->load('sections.rows.blocks', 'multiContentBoardSlot.multiContentBoard');
+        $this->contentBoard = $brandsContentBoard->fresh()->load('sections.rows.blocks.content', 'multiContentBoardSlot.multiContentBoard');
         
         // Berechtigung prüfen
         $this->authorize('view', $this->contentBoard);
@@ -24,7 +24,7 @@ class ContentBoard extends Component
     public function updateContentBoard()
     {
         $this->contentBoard->refresh();
-        $this->contentBoard->load('sections.rows.blocks', 'multiContentBoardSlot.multiContentBoard');
+        $this->contentBoard->load('sections.rows.blocks.content', 'multiContentBoardSlot.multiContentBoard');
     }
 
     public function rules(): array
@@ -56,7 +56,7 @@ class ContentBoard extends Component
         ]);
 
         $this->contentBoard->refresh();
-        $this->contentBoard->load('sections.rows.blocks');
+        $this->contentBoard->load('sections.rows.blocks.content');
     }
 
     public function createRow($sectionId)
@@ -80,7 +80,7 @@ class ContentBoard extends Component
         ]);
 
         $this->contentBoard->refresh();
-        $this->contentBoard->load('sections.rows.blocks');
+        $this->contentBoard->load('sections.rows.blocks.content');
     }
 
     public function createBlock($rowId)
@@ -114,7 +114,7 @@ class ContentBoard extends Component
         ]);
 
         $this->contentBoard->refresh();
-        $this->contentBoard->load('sections.rows.blocks');
+        $this->contentBoard->load('sections.rows.blocks.content');
     }
 
     public function updateBlockSpan($blockId, $newSpan)
@@ -142,7 +142,7 @@ class ContentBoard extends Component
         $block->save();
         
         $this->contentBoard->refresh();
-        $this->contentBoard->load('sections.rows.blocks');
+        $this->contentBoard->load('sections.rows.blocks.content');
     }
 
     public function deleteBlock($blockId)
@@ -153,7 +153,7 @@ class ContentBoard extends Component
         $block->delete();
         
         $this->contentBoard->refresh();
-        $this->contentBoard->load('sections.rows.blocks');
+        $this->contentBoard->load('sections.rows.blocks.content');
     }
 
     public function deleteRow($rowId)
@@ -164,7 +164,7 @@ class ContentBoard extends Component
         $row->delete();
         
         $this->contentBoard->refresh();
-        $this->contentBoard->load('sections.rows.blocks');
+        $this->contentBoard->load('sections.rows.blocks.content');
     }
 
     public function deleteSection($sectionId)
@@ -175,7 +175,7 @@ class ContentBoard extends Component
         $section->delete();
         
         $this->contentBoard->refresh();
-        $this->contentBoard->load('sections.rows.blocks');
+        $this->contentBoard->load('sections.rows.blocks.content');
     }
 
     public function updateSectionName($sectionId, $newName)
@@ -187,7 +187,7 @@ class ContentBoard extends Component
         $section->save();
         
         $this->contentBoard->refresh();
-        $this->contentBoard->load('sections.rows.blocks');
+        $this->contentBoard->load('sections.rows.blocks.content');
     }
 
     public function updateRowName($rowId, $newName)
@@ -199,7 +199,7 @@ class ContentBoard extends Component
         $row->save();
         
         $this->contentBoard->refresh();
-        $this->contentBoard->load('sections.rows.blocks');
+        $this->contentBoard->load('sections.rows.blocks.content');
     }
 
     public function updateBlockName($blockId, $newName)
@@ -211,7 +211,7 @@ class ContentBoard extends Component
         $block->save();
         
         $this->contentBoard->refresh();
-        $this->contentBoard->load('sections.rows.blocks');
+        $this->contentBoard->load('sections.rows.blocks.content');
     }
 
     /**
@@ -230,7 +230,7 @@ class ContentBoard extends Component
         }
         
         $this->contentBoard->refresh();
-        $this->contentBoard->load('sections.rows.blocks');
+        $this->contentBoard->load('sections.rows.blocks.content');
     }
 
     /**
@@ -259,7 +259,7 @@ class ContentBoard extends Component
         }
         
         $this->contentBoard->refresh();
-        $this->contentBoard->load('sections.rows.blocks');
+        $this->contentBoard->load('sections.rows.blocks.content');
     }
 
     /**
@@ -288,7 +288,7 @@ class ContentBoard extends Component
         }
         
         $this->contentBoard->refresh();
-        $this->contentBoard->load('sections.rows.blocks');
+        $this->contentBoard->load('sections.rows.blocks.content');
     }
 
     public function render()

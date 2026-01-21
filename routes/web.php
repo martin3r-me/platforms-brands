@@ -5,6 +5,7 @@ use Platform\Brands\Livewire\Dashboard;
 use Platform\Brands\Livewire\CiBoard;
 use Platform\Brands\Livewire\ContentBoard;
 use Platform\Brands\Livewire\ContentBoardSection;
+use Platform\Brands\Livewire\ContentBoardBlockTextEdit;
 use Platform\Brands\Livewire\SocialBoard;
 use Platform\Brands\Livewire\SocialCard;
 use Platform\Brands\Livewire\MultiContentBoard;
@@ -17,6 +18,7 @@ use Platform\Brands\Models\BrandsContentBoardSection;
 use Platform\Brands\Models\BrandsSocialBoard;
 use Platform\Brands\Models\BrandsSocialCard;
 use Platform\Brands\Models\BrandsMultiContentBoard;
+use Platform\Brands\Models\BrandsContentBoardBlock;
 use Platform\Integrations\Models\IntegrationsFacebookPage;
 use Platform\Integrations\Models\IntegrationsInstagramAccount;
 
@@ -37,6 +39,10 @@ Route::get('/content-boards/{brandsContentBoard}', ContentBoard::class)
 // Content Board Section Routes
 Route::get('/content-board-sections/{brandsContentBoardSection}', ContentBoardSection::class)
     ->name('brands.content-board-sections.show');
+
+// Content Board Block Routes
+Route::get('/content-board-blocks/{brandsContentBoardBlock}/{type}', ContentBoardBlockTextEdit::class)
+    ->name('brands.content-board-blocks.show');
 
 // Social Board Routes
 Route::get('/social-boards/{brandsSocialBoard}', SocialBoard::class)

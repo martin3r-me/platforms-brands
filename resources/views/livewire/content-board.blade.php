@@ -207,13 +207,19 @@
                                             @if($row->blocks->count() > 0)
                                                 <div class="grid grid-cols-12 gap-2">
                                                     @foreach($row->blocks as $block)
+                                                        @php
+                                                            $block->load('content');
+                                                            $hasContent = $block->content_type && $block->content;
+                                                        @endphp
                                                         <div 
-                                                            class="group bg-white rounded-lg border border-[var(--ui-border)]/40 hover:border-[var(--ui-primary)]/60 hover:shadow-sm transition-all relative cursor-pointer"
+                                                            class="group bg-white rounded-lg border border-[var(--ui-border)]/40 hover:border-[var(--ui-primary)]/60 hover:shadow-sm transition-all relative {{ $hasContent ? 'cursor-pointer' : '' }}"
                                                             style="grid-column: span {{ $block->span }};"
-                                                            @can('update', $contentBoard)
+                                                            @if($hasContent)
+                                                                @click="window.location.href = '{{ route('brands.content-board-blocks.show', ['brandsContentBoardBlock' => $block->id, 'type' => $block->content_type]) }}'"
+                                                            @elseif(auth()->user()->can('update', $contentBoard))
                                                                 x-data
                                                                 @click="$dispatch('open-modal-content-board-block-settings', { blockId: {{ $block->id }} })"
-                                                            @endcan
+                                                            @endif
                                                         >
                                                             {{-- Block Content --}}
                                                             <div class="p-4">
@@ -227,6 +233,18 @@
                                                                                 {{ $block->description }}
                                                                             </p>
                                                                         @endif
+                                                                        
+                                                                        {{-- Content-Ausgabe je nach Typ --}}
+                                                                        @if($hasContent)
+                                                                            @if($block->content_type === 'text' && $block->content)
+                                                                                <div class="mt-3 text-sm text-[var(--ui-secondary)] line-clamp-3 markdown-content">
+                                                                                    {!! \Illuminate\Support\Str::markdown($block->content->content ?? '') !!}
+                                                                                </div>
+                                                                            @endif
+                                                                        @else
+                                                                            <p class="text-xs text-[var(--ui-muted)] italic mt-2">Noch kein Content</p>
+                                                                        @endif
+                                                                        
                                                                         <div 
                                                                             x-data="{ copied: false }"
                                                                             class="inline-flex items-center gap-1.5 px-2 py-0.5 mt-2 bg-[var(--ui-muted-5)] border border-[var(--ui-border)]/40 rounded text-xs"

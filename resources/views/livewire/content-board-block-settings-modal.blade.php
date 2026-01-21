@@ -20,6 +20,61 @@
                 :errorKey="'description'"
             />
 
+            {{-- Content Type --}}
+            <div>
+                <label class="block text-sm font-medium text-[var(--ui-secondary)] mb-3">
+                    Content-Typ
+                </label>
+                <div class="grid grid-cols-2 gap-2">
+                    <button
+                        type="button"
+                        wire:click="setContentType('text')"
+                        class="px-4 py-2 text-sm font-medium rounded-lg border transition-all
+                            @if($contentType === 'text')
+                                bg-[var(--ui-primary)] text-white border-[var(--ui-primary)] shadow-sm
+                            @else
+                                bg-white text-[var(--ui-secondary)] border-[var(--ui-border)]/40 hover:border-[var(--ui-primary)]/60 hover:bg-[var(--ui-muted-5)]
+                            @endif
+                        "
+                    >
+                        Text
+                    </button>
+                    <button
+                        type="button"
+                        disabled
+                        class="px-4 py-2 text-sm font-medium rounded-lg border bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed"
+                        title="Bald verfügbar"
+                    >
+                        Bild
+                    </button>
+                    <button
+                        type="button"
+                        disabled
+                        class="px-4 py-2 text-sm font-medium rounded-lg border bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed"
+                        title="Bald verfügbar"
+                    >
+                        Karussell
+                    </button>
+                    <button
+                        type="button"
+                        disabled
+                        class="px-4 py-2 text-sm font-medium rounded-lg border bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed"
+                        title="Bald verfügbar"
+                    >
+                        Video
+                    </button>
+                </div>
+                @if($contentType)
+                    <p class="mt-2 text-xs text-[var(--ui-muted)]">
+                        Aktueller Typ: <span class="font-medium">{{ $contentType }}</span>
+                    </p>
+                @else
+                    <p class="mt-2 text-xs text-[var(--ui-muted)]">
+                        Noch kein Content-Typ ausgewählt
+                    </p>
+                @endif
+            </div>
+
             {{-- Span --}}
             <div>
                 <label class="block text-sm font-medium text-[var(--ui-secondary)] mb-3">

@@ -14,6 +14,7 @@ class ContentBoardBlockSettingsModal extends Component
     public $span;
     public $name;
     public $description;
+    public $contentType;
 
     #[On('open-modal-content-board-block-settings')] 
     public function openModalContentBoardBlockSettings($blockId)
@@ -26,6 +27,7 @@ class ContentBoardBlockSettingsModal extends Component
         $this->span = $this->block->span;
         $this->name = $this->block->name;
         $this->description = $this->block->description;
+        $this->contentType = $this->block->content_type;
         
         $this->modalShow = true;
     }
@@ -41,7 +43,49 @@ class ContentBoardBlockSettingsModal extends Component
             'span' => 'required|integer|min:1|max:12',
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
+            'contentType' => 'nullable|string|in:text,image,carousel,video',
         ];
+    }
+
+    public function setContentType($type)
+    {
+        if (!$this->block) {
+            return;
+        }
+        
+        $this->authorize('update', $this->block->row->section->contentBoard);
+        
+        // Wenn bereits ein Content existiert, löschen
+        if ($this->block->content) {
+            $this->block->content->delete();
+        }
+        
+        // Neuen Content erstellen, wenn Typ gesetzt wird
+        if ($type === 'text') {
+            $user = Auth::user();
+            $team = $user->currentTeam;
+            
+            $textContent = \Platform\Brands\Models\BrandsContentBoardBlockText::create([
+                'content' => '',
+                'user_id' => $user->id,
+                'team_id' => $team->id,
+            ]);
+            
+            $this->block->content_type = 'text';
+            $this->block->content_id = $textContent->id;
+            $this->block->save();
+            
+            $this->contentType = 'text';
+        } else {
+            $this->block->content_type = $type;
+            $this->block->content_id = null;
+            $this->block->save();
+            
+            $this->contentType = $type;
+        }
+        
+        $this->dispatch('updateContentBoard');
+        $this->dispatch('updateSection');
     }
 
     public function save()
@@ -120,7 +164,7 @@ class ContentBoardBlockSettingsModal extends Component
             'noticable_id'   => $blockId,
         ]);
 
-        $this->reset(['block', 'span', 'name', 'description']);
+        $this->reset(['block', 'span', 'name', 'description', 'contentType']);
         $this->closeModal();
     }
 

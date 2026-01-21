@@ -4,6 +4,7 @@ namespace Platform\Brands\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Symfony\Component\Uid\UuidV7;
 use Platform\Core\Contracts\HasDisplayName;
 
@@ -21,6 +22,8 @@ class BrandsContentBoardBlock extends Model implements HasDisplayName
         'description',
         'order',
         'span',
+        'content_type',
+        'content_id',
         'user_id',
         'team_id',
     ];
@@ -77,6 +80,14 @@ class BrandsContentBoardBlock extends Model implements HasDisplayName
     public function team(): BelongsTo
     {
         return $this->belongsTo(\Platform\Core\Models\Team::class);
+    }
+
+    /**
+     * Polymorphe Beziehung zum Content
+     */
+    public function content(): MorphTo
+    {
+        return $this->morphTo('content', 'content_type', 'content_id');
     }
 
     public function getDisplayName(): ?string
