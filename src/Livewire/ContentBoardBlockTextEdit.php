@@ -110,7 +110,7 @@ class ContentBoardBlockTextEdit extends Component
         $separator = $currentContent && trim($currentContent) ? "\n\n" : '';
         $newContent = $currentContent . $separator . $generated;
         
-        // Content direkt setzen
+        // Content direkt setzen (wichtig: ohne defer, damit Livewire es sofort hat)
         $this->content = $newContent;
         
         // Editor aktualisieren via Event

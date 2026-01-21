@@ -245,8 +245,8 @@
                                     }
                                     
                                     this.editor.setMarkdown(newContent);
-                                    // Stelle sicher, dass Livewire den Content hat
-                                    $wire.set('content', newContent, false);
+                                    // Stelle sicher, dass Livewire den Content sofort hat (ohne false)
+                                    $wire.set('content', newContent);
                                     this.savedLabel = 'Ungespeichert';
                                 }
                             });
