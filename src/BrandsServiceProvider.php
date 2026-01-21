@@ -6,6 +6,7 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Str;
 use Livewire\Livewire;
 use Platform\Core\PlatformCore;
@@ -15,6 +16,7 @@ use Platform\Brands\Models\BrandsBrand;
 use Platform\Brands\Models\BrandsCiBoard;
 use Platform\Brands\Models\BrandsCiBoardColor;
 use Platform\Brands\Models\BrandsContentBoard;
+use Platform\Brands\Models\BrandsContentBoardBlockText;
 use Platform\Brands\Models\BrandsMultiContentBoard;
 use Platform\Brands\Models\BrandsSocialBoard;
 use Platform\Brands\Models\BrandsSocialCard;
@@ -92,6 +94,9 @@ class BrandsServiceProvider extends ServiceProvider
         // Policies registrieren
         $this->registerPolicies();
 
+        // Morph Map für Content Board Block Types registrieren
+        $this->registerMorphMap();
+
         // Tools registrieren
         $this->registerTools();
     }
@@ -152,6 +157,20 @@ class BrandsServiceProvider extends ServiceProvider
                 Gate::policy($model, $policy);
             }
         }
+    }
+
+    /**
+     * Registriert Morph Map für Content Board Block Types
+     */
+    protected function registerMorphMap(): void
+    {
+        Relation::enforceMorphMap([
+            'text' => BrandsContentBoardBlockText::class,
+            // Weitere Content-Typen können hier hinzugefügt werden:
+            // 'image' => BrandsContentBoardBlockImage::class,
+            // 'carousel' => BrandsContentBoardBlockCarousel::class,
+            // 'video' => BrandsContentBoardBlockVideo::class,
+        ]);
     }
 
     /**
