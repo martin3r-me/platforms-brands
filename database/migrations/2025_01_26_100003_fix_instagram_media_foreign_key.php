@@ -69,8 +69,8 @@ return new class extends Migration
                 [$databaseName, $tableName]
             );
             
-            // Erstelle korrekten Foreign Key nur wenn nicht vorhanden
-            if (empty($correctForeignKey)) {
+            // Erstelle korrekten Foreign Key nur wenn nicht vorhanden und wenn referenzierte Tabelle existiert
+            if (empty($correctForeignKey) && Schema::hasTable('integrations_instagram_accounts')) {
                 Schema::table($tableName, function (Blueprint $table) {
                     $table->foreign('instagram_account_id', 'bim_instagram_account_id_fk')
                         ->references('id')

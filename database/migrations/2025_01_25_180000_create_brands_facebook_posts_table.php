@@ -16,7 +16,15 @@ return new class extends Migration
             Schema::create($tableName, function (Blueprint $table) {
                 $table->id();
                 $table->string('uuid')->unique();
-                $table->foreignId('facebook_page_id')->constrained('integrations_facebook_pages')->onDelete('cascade');
+                
+                // Foreign Key nur erstellen, wenn die Tabelle existiert
+                $table->foreignId('facebook_page_id');
+                if (Schema::hasTable('integrations_facebook_pages')) {
+                    $table->foreign('facebook_page_id')
+                        ->references('id')
+                        ->on('integrations_facebook_pages')
+                        ->onDelete('cascade');
+                }
                 $table->string('external_id'); // Facebook Post ID
                 $table->text('message')->nullable(); // Post-Text
                 $table->text('story')->nullable(); // Story-Text
@@ -29,7 +37,16 @@ return new class extends Migration
                 $table->integer('like_count')->default(0);
                 $table->integer('comment_count')->default(0);
                 $table->integer('share_count')->default(0);
-                $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+                
+                // Foreign Key nur erstellen, wenn die Tabelle existiert
+                $table->foreignId('user_id');
+                if (Schema::hasTable('users')) {
+                    $table->foreign('user_id')
+                        ->references('id')
+                        ->on('users')
+                        ->onDelete('cascade');
+                }
+                
                 $table->timestamps();
                 
                 $table->index(['facebook_page_id'], 'bfp_page_id_idx');
