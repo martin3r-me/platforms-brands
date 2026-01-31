@@ -47,11 +47,15 @@ class SocialBoardSlotSettingsModal extends Component
 
     public function save()
     {
+        if (!$this->slot) {
+            return;
+        }
+
         $this->validate();
-        
+
         // Policy-Berechtigung prüfen
         $this->authorize('update', $this->slot->socialBoard);
-        
+
         $this->slot->save();
         
         $this->dispatch('updateSocialBoard');
@@ -60,9 +64,13 @@ class SocialBoardSlotSettingsModal extends Component
 
     public function deleteSlot()
     {
+        if (!$this->slot) {
+            return;
+        }
+
         // Policy-Berechtigung prüfen
         $this->authorize('update', $this->slot->socialBoard);
-        
+
         $this->slot->delete();
         
         $this->dispatch('updateSocialBoard');

@@ -57,7 +57,6 @@ class CiBoardSettingsModal extends Component
             'noticable_id'   => $this->ciBoard->getKey(),
         ]);
 
-        $this->reset('ciBoard');
         $this->closeModal();
     }
 

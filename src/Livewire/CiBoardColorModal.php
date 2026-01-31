@@ -86,7 +86,7 @@ class CiBoardColorModal extends Component
             'noticable_id'   => $this->color->getKey(),
         ]);
 
-        $this->reset('color', 'ciBoard', 'isEdit');
+        $this->reset('isEdit');
         $this->closeModal();
     }
 
@@ -112,14 +112,14 @@ class CiBoardColorModal extends Component
             'noticable_id'   => $this->color->id,
         ]);
         
-        $this->reset('color', 'ciBoard', 'isEdit');
+        $this->reset('isEdit');
         $this->closeModal();
     }
 
     public function closeModal()
     {
         $this->modalShow = false;
-        $this->reset('color', 'ciBoard', 'isEdit');
+        $this->reset('isEdit');
     }
 
     public function render()

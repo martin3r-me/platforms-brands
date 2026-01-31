@@ -57,7 +57,6 @@ class ContentBoardSettingsModal extends Component
             'noticable_id'   => $this->contentBoard->getKey(),
         ]);
 
-        $this->reset('contentBoard');
         $this->closeModal();
     }
 

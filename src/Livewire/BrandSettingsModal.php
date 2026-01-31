@@ -133,7 +133,7 @@ class BrandSettingsModal extends Component
             'noticable_id'   => $this->brand->getKey(),
         ]);
 
-        $this->reset('brand', 'selectedCompanyId', 'selectedContactId');
+        $this->reset('selectedCompanyId', 'selectedContactId');
         $this->closeModal();
     }
 

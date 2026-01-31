@@ -48,9 +48,13 @@ class FacebookPageModal extends Component
 
     public function startOAuth()
     {
+        if (!$this->brand) {
+            return;
+        }
+
         // Policy-Berechtigung prüfen
         $this->authorize('update', $this->brand);
-        
+
         // Modal schließen
         $this->closeModal();
         

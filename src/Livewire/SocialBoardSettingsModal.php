@@ -57,7 +57,6 @@ class SocialBoardSettingsModal extends Component
             'noticable_id'   => $this->socialBoard->getKey(),
         ]);
 
-        $this->reset('socialBoard');
         $this->closeModal();
     }
 

@@ -134,7 +134,7 @@ class ContentBoardBlockSettingsModal extends Component
             'noticable_id'   => $blockId,
         ]);
 
-        $this->reset(['block', 'span', 'name', 'description']);
+        $this->reset(['span', 'name', 'description']);
         $this->closeModal();
     }
 
@@ -164,7 +164,7 @@ class ContentBoardBlockSettingsModal extends Component
             'noticable_id'   => $blockId,
         ]);
 
-        $this->reset(['block', 'span', 'name', 'description', 'contentType']);
+        $this->reset(['span', 'name', 'description', 'contentType']);
         $this->closeModal();
     }
 
