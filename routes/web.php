@@ -8,6 +8,8 @@ use Platform\Brands\Livewire\ContentBoardSection;
 use Platform\Brands\Livewire\ContentBoardBlockTextEdit;
 use Platform\Brands\Livewire\SocialBoard;
 use Platform\Brands\Livewire\SocialCard;
+use Platform\Brands\Livewire\KanbanBoard;
+use Platform\Brands\Livewire\KanbanCard;
 use Platform\Brands\Livewire\MultiContentBoard;
 use Platform\Brands\Livewire\FacebookPage;
 use Platform\Brands\Livewire\InstagramAccount;
@@ -17,6 +19,8 @@ use Platform\Brands\Models\BrandsContentBoard;
 use Platform\Brands\Models\BrandsContentBoardSection;
 use Platform\Brands\Models\BrandsSocialBoard;
 use Platform\Brands\Models\BrandsSocialCard;
+use Platform\Brands\Models\BrandsKanbanBoard as BrandsKanbanBoardModel;
+use Platform\Brands\Models\BrandsKanbanCard as BrandsKanbanCardModel;
 use Platform\Brands\Models\BrandsMultiContentBoard;
 use Platform\Brands\Models\BrandsContentBoardBlock;
 use Platform\Integrations\Models\IntegrationsFacebookPage;
@@ -51,6 +55,14 @@ Route::get('/social-boards/{brandsSocialBoard}', SocialBoard::class)
 // Social Card Routes
 Route::get('/social-cards/{brandsSocialCard}', SocialCard::class)
     ->name('brands.social-cards.show');
+
+// Kanban Board Routes
+Route::get('/kanban-boards/{brandsKanbanBoard}', KanbanBoard::class)
+    ->name('brands.kanban-boards.show');
+
+// Kanban Card Routes
+Route::get('/kanban-cards/{brandsKanbanCard}', KanbanCard::class)
+    ->name('brands.kanban-cards.show');
 
 // Multi-Content-Board Routes
 Route::get('/multi-content-boards/{brandsMultiContentBoard}', MultiContentBoard::class)

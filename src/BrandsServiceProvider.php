@@ -20,6 +20,8 @@ use Platform\Brands\Models\BrandsContentBoardBlockText;
 use Platform\Brands\Models\BrandsMultiContentBoard;
 use Platform\Brands\Models\BrandsSocialBoard;
 use Platform\Brands\Models\BrandsSocialCard;
+use Platform\Brands\Models\BrandsKanbanBoard;
+use Platform\Brands\Models\BrandsKanbanCard;
 use Platform\Integrations\Models\IntegrationsFacebookPage;
 use Platform\Integrations\Models\IntegrationsInstagramAccount;
 use Platform\Brands\Policies\BrandPolicy;
@@ -29,6 +31,8 @@ use Platform\Brands\Policies\ContentBoardPolicy;
 use Platform\Brands\Policies\MultiContentBoardPolicy;
 use Platform\Brands\Policies\SocialBoardPolicy;
 use Platform\Brands\Policies\SocialCardPolicy;
+use Platform\Brands\Policies\KanbanBoardPolicy;
+use Platform\Brands\Policies\KanbanCardPolicy;
 use Platform\Brands\Policies\FacebookPagePolicy;
 use Platform\Brands\Policies\InstagramAccountPolicy;
 
@@ -148,6 +152,8 @@ class BrandsServiceProvider extends ServiceProvider
             BrandsMultiContentBoard::class => MultiContentBoardPolicy::class,
             BrandsSocialBoard::class => SocialBoardPolicy::class,
             BrandsSocialCard::class => SocialCardPolicy::class,
+            BrandsKanbanBoard::class => KanbanBoardPolicy::class,
+            BrandsKanbanCard::class => KanbanCardPolicy::class,
             IntegrationsFacebookPage::class => FacebookPagePolicy::class,
             IntegrationsInstagramAccount::class => InstagramAccountPolicy::class,
         ];
@@ -229,6 +235,20 @@ class BrandsServiceProvider extends ServiceProvider
             $registry->register(new \Platform\Brands\Tools\UpdateMultiContentBoardTool());
             $registry->register(new \Platform\Brands\Tools\DeleteMultiContentBoardTool());
             
+            // KanbanBoard-Tools
+            $registry->register(new \Platform\Brands\Tools\CreateKanbanBoardTool());
+            $registry->register(new \Platform\Brands\Tools\ListKanbanBoardsTool());
+            $registry->register(new \Platform\Brands\Tools\GetKanbanBoardTool());
+            $registry->register(new \Platform\Brands\Tools\UpdateKanbanBoardTool());
+            $registry->register(new \Platform\Brands\Tools\DeleteKanbanBoardTool());
+
+            // KanbanCard-Tools
+            $registry->register(new \Platform\Brands\Tools\CreateKanbanCardTool());
+            $registry->register(new \Platform\Brands\Tools\ListKanbanCardsTool());
+            $registry->register(new \Platform\Brands\Tools\GetKanbanCardTool());
+            $registry->register(new \Platform\Brands\Tools\UpdateKanbanCardTool());
+            $registry->register(new \Platform\Brands\Tools\DeleteKanbanCardTool());
+
             // SocialCard-Tools
             $registry->register(new \Platform\Brands\Tools\CreateSocialCardTool());
             $registry->register(new \Platform\Brands\Tools\ListSocialCardsTool());

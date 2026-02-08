@@ -100,6 +100,31 @@ class Brand extends Component
         return $this->redirect(route('brands.social-boards.show', $socialBoard), navigate: true);
     }
 
+    public function createKanbanBoard()
+    {
+        $this->authorize('update', $this->brand);
+
+        $user = Auth::user();
+        $team = $user->currentTeam;
+
+        if (!$team) {
+            session()->flash('error', 'Kein Team ausgewählt.');
+            return;
+        }
+
+        $kanbanBoard = \Platform\Brands\Models\BrandsKanbanBoard::create([
+            'name' => 'Neues Kanban Board',
+            'description' => null,
+            'user_id' => $user->id,
+            'team_id' => $team->id,
+            'brand_id' => $this->brand->id,
+        ]);
+
+        $this->brand->refresh();
+
+        return $this->redirect(route('brands.kanban-boards.show', $kanbanBoard), navigate: true);
+    }
+
     public function createMultiContentBoard()
     {
         $this->authorize('update', $this->brand);
@@ -317,10 +342,11 @@ class Brand extends Component
         $user = Auth::user();
         $team = $user->currentTeam;
         
-        // CI Boards, Content Boards, Social Boards und Multi-Content-Boards für diese Marke laden
+        // CI Boards, Content Boards, Social Boards, Kanban Boards und Multi-Content-Boards für diese Marke laden
         $ciBoards = $this->brand->ciBoards;
         $contentBoards = $this->brand->contentBoards;
         $socialBoards = $this->brand->socialBoards;
+        $kanbanBoards = $this->brand->kanbanBoards;
         $multiContentBoards = $this->brand->multiContentBoards;
         
         // Meta Connection laden
@@ -360,6 +386,7 @@ class Brand extends Component
             'ciBoards' => $ciBoards,
             'contentBoards' => $contentBoards,
             'socialBoards' => $socialBoards,
+            'kanbanBoards' => $kanbanBoards,
             'multiContentBoards' => $multiContentBoards,
             'facebookPages' => $facebookPages,
             'instagramAccounts' => $instagramAccounts,
