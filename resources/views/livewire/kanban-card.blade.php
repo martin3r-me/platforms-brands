@@ -84,6 +84,11 @@
                         :errorKey="'description'"
                     />
                 </div>
+
+                <x-core-extra-fields-section
+                    :definitions="$this->extraFieldDefinitions"
+                    class="mt-8"
+                />
             </div>
         @else
             {{-- Read-only View --}}

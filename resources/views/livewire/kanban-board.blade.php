@@ -41,6 +41,12 @@
                                     <span>Einstellungen</span>
                                 </span>
                             </x-ui-button>
+                            <x-ui-button variant="secondary-outline" size="sm" x-data @click="$dispatch('extrafields:open')">
+                                <span class="inline-flex items-center gap-2">
+                                    @svg('heroicon-o-adjustments-horizontal','w-4 h-4')
+                                    <span>Extra-Felder</span>
+                                </span>
+                            </x-ui-button>
                         @endcan
                     </div>
                 </div>

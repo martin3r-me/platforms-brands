@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Symfony\Component\Uid\UuidV7;
 use Platform\Core\Contracts\HasDisplayName;
+use Platform\Core\Traits\HasExtraFields;
 
 /**
  * Model für Kanban Boards
@@ -15,6 +16,7 @@ use Platform\Core\Contracts\HasDisplayName;
  */
 class BrandsKanbanBoard extends Model implements HasDisplayName
 {
+    use HasExtraFields;
     protected $table = 'brands_kanban_boards';
 
     protected $fillable = [

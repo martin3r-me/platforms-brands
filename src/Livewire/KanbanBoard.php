@@ -140,6 +140,14 @@ class KanbanBoard extends Component
         $this->kanbanBoard->load('slots.cards');
     }
 
+    public function rendered()
+    {
+        $this->dispatch('extrafields', [
+            'context_type' => get_class($this->kanbanBoard),
+            'context_id' => $this->kanbanBoard->id,
+        ]);
+    }
+
     public function render()
     {
         $user = Auth::user();

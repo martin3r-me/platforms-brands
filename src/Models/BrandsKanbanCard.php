@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Symfony\Component\Uid\UuidV7;
 use Platform\Core\Contracts\HasDisplayName;
+use Platform\Core\Traits\HasExtraFields;
 
 /**
  * Model für Kanban Cards
@@ -14,6 +15,7 @@ use Platform\Core\Contracts\HasDisplayName;
  */
 class BrandsKanbanCard extends Model implements HasDisplayName
 {
+    use HasExtraFields;
     protected $table = 'brands_kanban_cards';
 
     protected $fillable = [
