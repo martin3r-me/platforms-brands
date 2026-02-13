@@ -12,7 +12,6 @@ use Platform\Core\Contracts\HasTimeAncestors;
 use Platform\Core\Contracts\HasKeyResultAncestors;
 use Platform\Core\Contracts\HasDisplayName;
 use Platform\Crm\Traits\HasCompanyLinksTrait;
-use Platform\Hcm\Traits\HasEmployeeContact;
 use Platform\Crm\Contracts\CompanyInterface;
 use Platform\Crm\Contracts\ContactInterface;
 use Platform\Integrations\Contracts\SocialMediaAccountLinkableInterface;
@@ -22,7 +21,7 @@ use Platform\Integrations\Contracts\SocialMediaAccountLinkableInterface;
  */
 class BrandsBrand extends Model implements HasTimeAncestors, HasKeyResultAncestors, HasDisplayName, SocialMediaAccountLinkableInterface
 {
-    use HasOrganizationContexts, HasColors, HasCompanyLinksTrait, HasEmployeeContact;
+    use HasOrganizationContexts, HasColors, HasCompanyLinksTrait;
 
     protected $table = 'brands_brands';
 
@@ -62,6 +61,17 @@ class BrandsBrand extends Model implements HasTimeAncestors, HasKeyResultAncesto
     public function team(): BelongsTo
     {
         return $this->belongsTo(\Platform\Core\Models\Team::class);
+    }
+
+    /**
+     * Beziehung zu CRM-Kontakten über polymorphe Links
+     */
+    public function crmContactLinks()
+    {
+        return $this->morphMany(
+            \Platform\Crm\Models\CrmContactLink::class,
+            'linkable'
+        );
     }
 
     /**
