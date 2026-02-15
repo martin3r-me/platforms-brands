@@ -30,7 +30,7 @@ return new class extends Migration
 
         foreach ($contentBoardIds as $contentBoardId) {
             $blocks = DB::table('brands_content_board_blocks')
-                ->where('content_board_id', $contentBoardId)
+                ->where('brands_content_board_blocks.content_board_id', $contentBoardId)
                 ->join('brands_content_board_rows', 'brands_content_board_blocks.row_id', '=', 'brands_content_board_rows.id')
                 ->join('brands_content_board_sections', 'brands_content_board_rows.section_id', '=', 'brands_content_board_sections.id')
                 ->orderBy('brands_content_board_sections.order')
