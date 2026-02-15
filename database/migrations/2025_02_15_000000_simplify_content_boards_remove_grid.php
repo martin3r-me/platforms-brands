@@ -10,9 +10,11 @@ return new class extends Migration
     public function up(): void
     {
         // Step 1: Add content_board_id to blocks table (nullable initially for migration)
-        Schema::table('brands_content_board_blocks', function (Blueprint $table) {
-            $table->unsignedBigInteger('content_board_id')->nullable()->after('uuid');
-        });
+        if (!Schema::hasColumn('brands_content_board_blocks', 'content_board_id')) {
+            Schema::table('brands_content_board_blocks', function (Blueprint $table) {
+                $table->unsignedBigInteger('content_board_id')->nullable()->after('uuid');
+            });
+        }
 
         // Step 2: Migrate existing blocks - resolve content_board_id via row → section → content_board
         DB::statement('
