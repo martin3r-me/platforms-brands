@@ -24,7 +24,7 @@ class UpdateContentBoardBlockTool implements ToolContract
 
     public function getDescription(): string
     {
-        return 'PUT /brands/content_board_blocks/{id} - Aktualisiert einen Content Board Block. REST-Parameter: content_board_block_id (required, integer) - Content Board Block-ID. name (optional, string) - Name. description (optional, string) - Beschreibung (Inhalt/Text). span (optional, integer) - Spaltenbreite (1-12). content_type (optional, string) - Content-Typ ändern: "text", "image", "carousel", "video". Wenn "text" gewählt wird, wird automatisch ein leerer Text-Content erstellt (bestehender Content wird gelöscht).';
+        return 'PUT /brands/content_board_blocks/{id} - Aktualisiert einen Content Board Block. REST-Parameter: content_board_block_id (required, integer) - Content Board Block-ID. name (optional, string) - Name. description (optional, string) - Beschreibung (Inhalt/Text). content_type (optional, string) - Content-Typ ändern: "text", "image". Wenn "text" gewählt wird, wird automatisch ein leerer Text-Content erstellt (bestehender Content wird gelöscht).';
     }
 
     public function getSchema(): array
@@ -44,14 +44,10 @@ class UpdateContentBoardBlockTool implements ToolContract
                     'type' => 'string',
                     'description' => 'Optional: Beschreibung des Blocks (Inhalt/Text).'
                 ],
-                'span' => [
-                    'type' => 'integer',
-                    'description' => 'Optional: Spaltenbreite des Blocks (1-12).'
-                ],
                 'content_type' => [
                     'type' => 'string',
-                    'description' => 'Optional: Content-Typ des Blocks. Mögliche Werte: "text", "image", "carousel", "video". Wenn gesetzt, wird der Content-Typ geändert (bestehender Content wird gelöscht).',
-                    'enum' => ['text', 'image', 'carousel', 'video']
+                    'description' => 'Optional: Content-Typ des Blocks. Mögliche Werte: "text", "image". Wenn gesetzt, wird der Content-Typ geändert (bestehender Content wird gelöscht).',
+                    'enum' => ['text', 'image']
                 ],
             ],
             'required' => ['content_board_block_id']
@@ -76,8 +72,8 @@ class UpdateContentBoardBlockTool implements ToolContract
             }
             
             $block = $validation['model'];
-            $block->load('row.section.contentBoard');
-            $contentBoard = $block->row->section->contentBoard;
+            $block->load('contentBoard');
+            $contentBoard = $block->contentBoard;
             
             // Policy prüfen
             try {
@@ -95,10 +91,6 @@ class UpdateContentBoardBlockTool implements ToolContract
 
             if (isset($arguments['description'])) {
                 $updateData['description'] = $arguments['description'];
-            }
-
-            if (isset($arguments['span'])) {
-                $updateData['span'] = max(1, min(12, (int)$arguments['span']));
             }
 
             // Content-Typ ändern
@@ -132,13 +124,12 @@ class UpdateContentBoardBlockTool implements ToolContract
             }
 
             $block->refresh();
-            $block->load(['row.section.contentBoard', 'user', 'team', 'content']);
+            $block->load(['contentBoard', 'user', 'team', 'content']);
 
             $result = [
                 'content_board_block_id' => $block->id,
                 'name' => $block->name,
                 'description' => $block->description,
-                'span' => $block->span,
                 'content_type' => $block->content_type,
                 'content_id' => $block->content_id,
                 'content_board_id' => $contentBoard->id,

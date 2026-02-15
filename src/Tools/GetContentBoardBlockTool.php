@@ -51,14 +51,14 @@ class GetContentBoardBlockTool implements ToolContract, ToolMetadataContract
             }
 
             // ContentBoardBlock holen
-            $block = BrandsContentBoardBlock::with(['row.section.contentBoard', 'user', 'team'])
+            $block = BrandsContentBoardBlock::with(['contentBoard', 'user', 'team'])
                 ->find($arguments['id']);
 
             if (!$block) {
                 return ToolResult::error('CONTENT_BOARD_BLOCK_NOT_FOUND', 'Der angegebene Content Board Block wurde nicht gefunden. Nutze "brands.content_board_blocks.GET" um alle verfügbaren Content Board Blocks zu sehen.');
             }
 
-            $contentBoard = $block->row->section->contentBoard;
+            $contentBoard = $block->contentBoard;
 
             // Policy prüfen
             try {
@@ -74,10 +74,8 @@ class GetContentBoardBlockTool implements ToolContract, ToolMetadataContract
                 'uuid' => $block->uuid,
                 'name' => $block->name,
                 'description' => $block->description,
-                'span' => $block->span,
                 'content_type' => $block->content_type,
                 'content_id' => $block->content_id,
-                'row_id' => $block->row_id,
                 'content_board_id' => $contentBoard->id,
                 'content_board_name' => $contentBoard->name,
                 'team_id' => $block->team_id,

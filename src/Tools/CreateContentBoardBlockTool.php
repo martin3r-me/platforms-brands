@@ -6,7 +6,7 @@ use Platform\Core\Contracts\ToolContract;
 use Platform\Core\Contracts\ToolContext;
 use Platform\Core\Contracts\ToolResult;
 use Platform\Core\Contracts\ToolMetadataContract;
-use Platform\Brands\Models\BrandsContentBoardRow;
+use Platform\Brands\Models\BrandsContentBoard;
 use Platform\Brands\Models\BrandsContentBoardBlock;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -23,7 +23,7 @@ class CreateContentBoardBlockTool implements ToolContract, ToolMetadataContract
 
     public function getDescription(): string
     {
-        return 'POST /brands/content_board_rows/{row_id}/content_board_blocks - Erstellt einen neuen Content Board Block. REST-Parameter: row_id (required, integer) - Row-ID. name (optional, string) - Block-Name. description (optional, string) - Beschreibung. span (optional, integer) - Spaltenbreite (1-12). content_type (optional, string) - Content-Typ: "text", "image", "carousel", "video". Wenn "text" gewählt wird, wird automatisch ein leerer Text-Content erstellt.';
+        return 'POST /brands/content_boards/{content_board_id}/content_board_blocks - Erstellt einen neuen Content Board Block. REST-Parameter: content_board_id (required, integer) - Content Board-ID. name (optional, string) - Block-Name. description (optional, string) - Beschreibung. content_type (optional, string) - Content-Typ: "text", "image". Wenn "text" gewählt wird, wird automatisch ein leerer Text-Content erstellt.';
     }
 
     public function getSchema(): array
@@ -31,9 +31,9 @@ class CreateContentBoardBlockTool implements ToolContract, ToolMetadataContract
         return [
             'type' => 'object',
             'properties' => [
-                'row_id' => [
+                'content_board_id' => [
                     'type' => 'integer',
-                    'description' => 'ID der Content Board Row (ERFORDERLICH). Nutze "brands.content_board.GET" um Rows zu finden.'
+                    'description' => 'ID des Content Boards (ERFORDERLICH). Nutze "brands.content_boards.GET" um Content Boards zu finden.'
                 ],
                 'name' => [
                     'type' => 'string',
@@ -43,17 +43,13 @@ class CreateContentBoardBlockTool implements ToolContract, ToolMetadataContract
                     'type' => 'string',
                     'description' => 'Beschreibung des Blocks (Inhalt/Text).'
                 ],
-                'span' => [
-                    'type' => 'integer',
-                    'description' => 'Spaltenbreite des Blocks (1-12). Standard: 1.'
-                ],
                 'content_type' => [
                     'type' => 'string',
-                    'description' => 'Content-Typ des Blocks. Mögliche Werte: "text", "image", "carousel", "video". Wenn nicht angegeben, bleibt der Block ohne Content-Typ.',
-                    'enum' => ['text', 'image', 'carousel', 'video']
+                    'description' => 'Content-Typ des Blocks. Mögliche Werte: "text", "image". Wenn nicht angegeben, bleibt der Block ohne Content-Typ.',
+                    'enum' => ['text', 'image']
                 ],
             ],
-            'required' => ['row_id']
+            'required' => ['content_board_id']
         ];
     }
 
@@ -64,18 +60,16 @@ class CreateContentBoardBlockTool implements ToolContract, ToolMetadataContract
                 return ToolResult::error('AUTH_ERROR', 'Kein User im Kontext gefunden.');
             }
 
-            // Row finden
-            $rowId = $arguments['row_id'] ?? null;
-            if (!$rowId) {
-                return ToolResult::error('VALIDATION_ERROR', 'row_id ist erforderlich.');
+            // Content Board finden
+            $contentBoardId = $arguments['content_board_id'] ?? null;
+            if (!$contentBoardId) {
+                return ToolResult::error('VALIDATION_ERROR', 'content_board_id ist erforderlich.');
             }
 
-            $row = BrandsContentBoardRow::with('section.contentBoard')->find($rowId);
-            if (!$row) {
-                return ToolResult::error('ROW_NOT_FOUND', 'Die angegebene Row wurde nicht gefunden.');
+            $contentBoard = BrandsContentBoard::find($contentBoardId);
+            if (!$contentBoard) {
+                return ToolResult::error('CONTENT_BOARD_NOT_FOUND', 'Das angegebene Content Board wurde nicht gefunden.');
             }
-
-            $contentBoard = $row->section->contentBoard;
 
             // Policy prüfen
             try {
@@ -85,19 +79,17 @@ class CreateContentBoardBlockTool implements ToolContract, ToolMetadataContract
             }
 
             $name = $arguments['name'] ?? 'Neuer Block';
-            $span = isset($arguments['span']) ? max(1, min(12, (int)$arguments['span'])) : 1;
             $contentType = $arguments['content_type'] ?? null;
 
             // ContentBoardBlock direkt erstellen
             $block = BrandsContentBoardBlock::create([
                 'name' => $name,
                 'description' => $arguments['description'] ?? null,
-                'span' => $span,
                 'content_type' => $contentType,
                 'content_id' => null,
                 'user_id' => $context->user->id,
                 'team_id' => $contentBoard->team_id,
-                'row_id' => $row->id,
+                'content_board_id' => $contentBoard->id,
             ]);
 
             // Wenn content_type "text" ist, Text-Content erstellen
@@ -113,17 +105,15 @@ class CreateContentBoardBlockTool implements ToolContract, ToolMetadataContract
                 $block->save();
             }
 
-            $block->load(['row.section.contentBoard', 'user', 'team', 'content']);
+            $block->load(['contentBoard', 'user', 'team', 'content']);
 
             $result = [
                 'id' => $block->id,
                 'uuid' => $block->uuid,
                 'name' => $block->name,
                 'description' => $block->description,
-                'span' => $block->span,
                 'content_type' => $block->content_type,
                 'content_id' => $block->content_id,
-                'row_id' => $block->row_id,
                 'content_board_id' => $contentBoard->id,
                 'content_board_name' => $contentBoard->name,
                 'team_id' => $block->team_id,

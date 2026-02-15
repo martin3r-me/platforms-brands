@@ -100,14 +100,14 @@ class GetContentTool implements ToolContract, ToolMetadataContract
                     break;
 
                 case 'content_board_block':
-                    $content = BrandsContentBoardBlock::with(['row.section.contentBoard', 'user', 'team'])
+                    $content = BrandsContentBoardBlock::with(['contentBoard', 'user', 'team'])
                         ->find($id);
-                    
+
                     if (!$content) {
                         return ToolResult::error('CONTENT_BOARD_BLOCK_NOT_FOUND', 'Der angegebene Content Board Block wurde nicht gefunden.');
                     }
 
-                    $contentBoard = $content->row->section->contentBoard;
+                    $contentBoard = $content->contentBoard;
 
                     // Policy prüfen
                     try {
@@ -124,8 +124,6 @@ class GetContentTool implements ToolContract, ToolMetadataContract
                         'description' => $content->description,
                         'text' => $content->description, // Alias für description
                         'content' => $content->description, // Alias für description
-                        'span' => $content->span,
-                        'row_id' => $content->row_id,
                         'content_board_id' => $contentBoard->id,
                         'content_board_name' => $contentBoard->name,
                         'created_at' => $content->created_at->toIso8601String(),

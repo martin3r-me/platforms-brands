@@ -10,8 +10,9 @@ use Platform\Core\Contracts\HasDisplayName;
 
 /**
  * Model für Content Boards
- * 
- * Vollständig unabhängiges Model - erbt direkt von Laravel Model
+ *
+ * Einfaches lineares Block-System ohne Grid-Logik.
+ * Blöcke werden sequentiell angeordnet (order-Feld).
  */
 class BrandsContentBoard extends Model implements HasDisplayName
 {
@@ -68,9 +69,9 @@ class BrandsContentBoard extends Model implements HasDisplayName
         return $this->belongsTo(\Platform\Core\Models\Team::class);
     }
 
-    public function sections(): HasMany
+    public function blocks(): HasMany
     {
-        return $this->hasMany(BrandsContentBoardSection::class, 'content_board_id')->orderBy('order');
+        return $this->hasMany(BrandsContentBoardBlock::class, 'content_board_id')->orderBy('order');
     }
 
     public function multiContentBoardSlot(): BelongsTo

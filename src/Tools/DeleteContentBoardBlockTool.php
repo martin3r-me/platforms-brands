@@ -63,8 +63,8 @@ class DeleteContentBoardBlockTool implements ToolContract
             }
             
             $block = $validation['model'];
-            $block->load('row.section.contentBoard');
-            $contentBoard = $block->row->section->contentBoard;
+            $block->load('contentBoard');
+            $contentBoard = $block->contentBoard;
             
             // Policy prüfen
             try {

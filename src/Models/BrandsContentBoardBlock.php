@@ -17,11 +17,10 @@ class BrandsContentBoardBlock extends Model implements HasDisplayName
 
     protected $fillable = [
         'uuid',
-        'row_id',
+        'content_board_id',
         'name',
         'description',
         'order',
-        'span',
         'content_type',
         'content_id',
         'user_id',
@@ -31,7 +30,6 @@ class BrandsContentBoardBlock extends Model implements HasDisplayName
     protected $casts = [
         'uuid' => 'string',
         'order' => 'integer',
-        'span' => 'integer',
     ];
 
     protected static function booted(): void
@@ -42,34 +40,17 @@ class BrandsContentBoardBlock extends Model implements HasDisplayName
             } while (self::where('uuid', $uuid)->exists());
 
             $model->uuid = $uuid;
-            
+
             if (!$model->order) {
-                $maxOrder = self::where('row_id', $model->row_id)->max('order') ?? 0;
+                $maxOrder = self::where('content_board_id', $model->content_board_id)->max('order') ?? 0;
                 $model->order = $maxOrder + 1;
-            }
-            
-            // Span Standardwert setzen, falls nicht gesetzt
-            if (!$model->span) {
-                $model->span = 1;
-            }
-            
-            // Span validieren: muss zwischen 1 und 12 sein
-            if ($model->span < 1 || $model->span > 12) {
-                $model->span = max(1, min(12, $model->span));
-            }
-        });
-        
-        static::updating(function (self $model) {
-            // Span validieren: muss zwischen 1 und 12 sein
-            if (isset($model->span) && ($model->span < 1 || $model->span > 12)) {
-                $model->span = max(1, min(12, $model->span));
             }
         });
     }
 
-    public function row(): BelongsTo
+    public function contentBoard(): BelongsTo
     {
-        return $this->belongsTo(BrandsContentBoardRow::class, 'row_id');
+        return $this->belongsTo(BrandsContentBoard::class, 'content_board_id');
     }
 
     public function user(): BelongsTo

@@ -19,12 +19,12 @@
         </div>
     @endif
 
-    <!-- Meta: Sections Count -->
-    @if($contentBoard->sections)
+    <!-- Meta: Blocks Count -->
+    @if($contentBoard->blocks)
         <div class="mb-2">
             <span class="inline-flex items-center gap-1 text-xs text-[var(--ui-muted)]">
-                @svg('heroicon-o-squares-2x2','w-2.5 h-2.5')
-                <span>{{ $contentBoard->sections->count() }} {{ Str::plural('Section', $contentBoard->sections->count()) }}</span>
+                @svg('heroicon-o-document-text','w-2.5 h-2.5')
+                <span>{{ $contentBoard->blocks->count() }} {{ Str::plural('Block', $contentBoard->blocks->count()) }}</span>
             </span>
         </div>
     @endif

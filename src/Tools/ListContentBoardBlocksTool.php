@@ -65,12 +65,10 @@ class ListContentBoardBlocksTool implements ToolContract, ToolMetadataContract
                 return ToolResult::error('ACCESS_DENIED', 'Du hast keinen Zugriff auf dieses Content Board.');
             }
             
-            // Query aufbauen - Content Board Blocks über Sections -> Rows
+            // Query aufbauen - Content Board Blocks direkt über content_board_id
             $query = BrandsContentBoardBlock::query()
-                ->whereHas('row.section', function($q) use ($contentBoardId) {
-                    $q->where('content_board_id', $contentBoardId);
-                })
-                ->with(['row.section.contentBoard', 'user', 'team', 'content']);
+                ->where('content_board_id', $contentBoardId)
+                ->with(['contentBoard', 'user', 'team', 'content']);
 
             // Standard-Operationen anwenden
             $this->applyStandardFilters($query, $arguments, [
@@ -98,12 +96,10 @@ class ListContentBoardBlocksTool implements ToolContract, ToolMetadataContract
                     'uuid' => $block->uuid,
                     'name' => $block->name,
                     'description' => $block->description,
-                    'span' => $block->span,
                     'content_type' => $block->content_type,
                     'content_id' => $block->content_id,
-                    'row_id' => $block->row_id,
-                    'content_board_id' => $block->row->section->content_board_id,
-                    'content_board_name' => $block->row->section->contentBoard->name,
+                    'content_board_id' => $block->content_board_id,
+                    'content_board_name' => $block->contentBoard->name,
                     'team_id' => $block->team_id,
                     'user_id' => $block->user_id,
                     'created_at' => $block->created_at->toIso8601String(),

@@ -23,7 +23,7 @@ class BulkCreateContentBoardBlocksTool implements ToolContract, ToolMetadataCont
 
     public function getDescription(): string
     {
-        return 'POST /brands/content_board_blocks/bulk - Body MUSS {content_board_blocks:[{row_id,name,description?}], defaults?} enthalten. Erstellt viele Content Board Blocks (z.B. für mehrere Inhalte/Texte).';
+        return 'POST /brands/content_board_blocks/bulk - Body MUSS {content_board_blocks:[{content_board_id,name,description?}], defaults?} enthalten. Erstellt viele Content Board Blocks (z.B. für mehrere Inhalte/Texte).';
     }
 
     public function getSchema(): array
@@ -39,23 +39,21 @@ class BulkCreateContentBoardBlocksTool implements ToolContract, ToolMetadataCont
                     'type' => 'object',
                     'description' => 'Optional: Default-Werte, die auf jedes Item angewendet werden (können pro Item überschrieben werden).',
                     'properties' => [
-                        'row_id' => ['type' => 'integer'],
-                        'span' => ['type' => 'integer'],
+                        'content_board_id' => ['type' => 'integer'],
                     ],
                     'required' => [],
                 ],
                 'content_board_blocks' => [
                     'type' => 'array',
-                    'description' => 'Liste von Content Board Blocks. Jedes Element entspricht den Parametern von brands.content_board_blocks.POST (mindestens row_id, name).',
+                    'description' => 'Liste von Content Board Blocks. Jedes Element entspricht den Parametern von brands.content_board_blocks.POST (mindestens content_board_id, name).',
                     'items' => [
                         'type' => 'object',
                         'properties' => [
-                            'row_id' => ['type' => 'integer'],
+                            'content_board_id' => ['type' => 'integer'],
                             'name' => ['type' => 'string'],
                             'description' => ['type' => 'string'],
-                            'span' => ['type' => 'integer'],
                         ],
-                        'required' => ['row_id', 'name'],
+                        'required' => ['content_board_id', 'name'],
                     ],
                 ],
             ],

@@ -44,7 +44,6 @@ class BulkUpdateContentBoardBlocksTool implements ToolContract, ToolMetadataCont
                             'content_board_block_id' => ['type' => 'integer'],
                             'name' => ['type' => 'string'],
                             'description' => ['type' => 'string'],
-                            'span' => ['type' => 'integer'],
                         ],
                         'required' => ['content_board_block_id'],
                     ],

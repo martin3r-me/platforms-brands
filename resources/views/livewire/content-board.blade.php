@@ -51,301 +51,140 @@
             </div>
         </div>
 
-        {{-- Sections Section --}}
+        {{-- Blöcke --}}
         <div>
             <div class="flex items-center justify-between mb-4">
-                <h2 class="text-xl font-semibold text-[var(--ui-secondary)]">Sections</h2>
+                <h2 class="text-xl font-semibold text-[var(--ui-secondary)]">Blöcke</h2>
                 @can('update', $contentBoard)
-                    <x-ui-button variant="primary" size="sm" wire:click="createSection">
+                    <x-ui-button variant="primary" size="sm" wire:click="createBlock">
                         <span class="inline-flex items-center gap-2">
                             @svg('heroicon-o-plus', 'w-4 h-4')
-                            <span>Section erstellen</span>
+                            <span>Block erstellen</span>
                         </span>
                     </x-ui-button>
                 @endcan
             </div>
 
-            @if($contentBoard->sections->count() > 0)
-                <div class="space-y-6">
-                    @foreach($contentBoard->sections as $section)
-                        {{-- Section (volle Breite) --}}
-                        <div class="bg-white rounded-xl border border-[var(--ui-border)]/60 shadow-sm overflow-hidden">
-                            <div class="p-4 border-b border-[var(--ui-border)]/40 flex items-center justify-between">
-                                <div class="flex-1">
-                                    @can('update', $contentBoard)
-                                        <input 
-                                            type="text"
-                                            value="{{ $section->name }}"
-                                            wire:blur="updateSectionName({{ $section->id }}, $event.target.value)"
-                                            class="text-lg font-semibold text-[var(--ui-secondary)] bg-transparent border-none p-0 focus:outline-none focus:ring-2 focus:ring-[var(--ui-primary)] rounded px-1 -ml-1 w-full"
-                                        />
-                                    @else
-                                        <h3 class="text-lg font-semibold text-[var(--ui-secondary)]">{{ $section->name }}</h3>
-                                    @endcan
-                                    @if($section->description)
-                                        <p class="text-sm text-[var(--ui-muted)] mt-1">{{ $section->description }}</p>
-                                    @endif
-                                    <div 
-                                        x-data="{ copied: false }"
-                                        class="inline-flex items-center gap-2 px-2 py-1 mt-2 bg-[var(--ui-muted-5)] border border-[var(--ui-border)]/40 rounded text-xs"
-                                    >
-                                        <span class="font-mono text-[var(--ui-muted)]">{{ $section->uuid }}</span>
-                                        <button
-                                            type="button"
-                                            @click="
-                                                navigator.clipboard.writeText('{{ $section->uuid }}');
-                                                copied = true;
-                                                setTimeout(() => copied = false, 2000);
-                                            "
-                                            class="p-0.5 rounded hover:bg-white transition-colors"
-                                            title="UUID kopieren"
-                                        >
-                                            <span x-show="!copied">
-                                                @svg('heroicon-o-clipboard', 'w-3 h-3 text-[var(--ui-muted)] hover:text-[var(--ui-primary)]')
-                                            </span>
-                                            <span x-show="copied" x-cloak>
-                                                @svg('heroicon-o-check', 'w-3 h-3 text-green-600')
-                                            </span>
-                                        </button>
-                                    </div>
-                                </div>
-                                @can('update', $contentBoard)
-                                    <x-ui-button 
-                                        variant="danger-outline" 
-                                        size="xs" 
-                                        wire:click="deleteSection({{ $section->id }})"
-                                        wire:confirm="Möchtest du diese Section wirklich löschen? Alle Rows und Blocks werden ebenfalls gelöscht."
-                                    >
-                                        <span class="inline-flex items-center gap-1">
-                                            @svg('heroicon-o-trash', 'w-3 h-3')
-                                            <span>Löschen</span>
-                                        </span>
-                                    </x-ui-button>
-                                @endcan
-                            </div>
-                            
-                            {{-- Rows innerhalb der Section --}}
-                            <div class="p-4 space-y-4">
-                                @foreach($section->rows as $row)
-                                    <div class="bg-[var(--ui-muted-5)] rounded-lg border border-[var(--ui-border)]/40 overflow-hidden">
-                                        <div class="p-3 border-b border-[var(--ui-border)]/40 flex items-center justify-between">
-                                            <div class="flex items-center gap-3 flex-1 flex-wrap">
-                                                @can('update', $contentBoard)
-                                                    <input 
-                                                        type="text"
-                                                        value="{{ $row->name }}"
-                                                        wire:blur="updateRowName({{ $row->id }}, $event.target.value)"
-                                                        class="text-sm font-semibold text-[var(--ui-secondary)] bg-transparent border-none p-0 focus:outline-none focus:ring-2 focus:ring-[var(--ui-primary)] rounded px-1 -ml-1"
-                                                    />
-                                                @else
-                                                    <h4 class="text-sm font-semibold text-[var(--ui-secondary)]">{{ $row->name }}</h4>
-                                                @endcan
-                                                @if($row->description)
-                                                    <span class="text-xs text-[var(--ui-muted)]">{{ $row->description }}</span>
-                                                @endif
-                                                @php
-                                                    $totalSpan = $row->blocks->sum('span');
-                                                @endphp
-                                                <span class="text-xs px-2 py-0.5 rounded {{ $totalSpan > 12 ? 'bg-red-100 text-red-700' : ($totalSpan == 12 ? 'bg-green-100 text-green-700' : 'bg-[var(--ui-muted-5)] text-[var(--ui-muted)]') }}">
-                                                    Span: {{ $totalSpan }}/12
-                                                </span>
-                                                <div 
-                                                    x-data="{ copied: false }"
-                                                    class="inline-flex items-center gap-1.5 px-2 py-0.5 bg-white border border-[var(--ui-border)]/40 rounded text-xs"
-                                                >
-                                                    <span class="font-mono text-[var(--ui-muted)] text-[10px]">{{ $row->uuid }}</span>
-                                                    <button
-                                                        type="button"
-                                                        @click="
-                                                            navigator.clipboard.writeText('{{ $row->uuid }}');
-                                                            copied = true;
-                                                            setTimeout(() => copied = false, 2000);
-                                                        "
-                                                        class="p-0.5 rounded hover:bg-[var(--ui-muted-5)] transition-colors"
-                                                        title="UUID kopieren"
-                                                    >
-                                                        <span x-show="!copied">
-                                                            @svg('heroicon-o-clipboard', 'w-2.5 h-2.5 text-[var(--ui-muted)] hover:text-[var(--ui-primary)]')
-                                                        </span>
-                                                        <span x-show="copied" x-cloak>
-                                                            @svg('heroicon-o-check', 'w-2.5 h-2.5 text-green-600')
-                                                        </span>
-                                                    </button>
-                                                </div>
-                                            </div>
-                                            <div class="flex items-center gap-2">
-                                                @can('update', $contentBoard)
-                                                    @php
-                                                        $totalSpan = $row->blocks->sum('span');
-                                                    @endphp
-                                                    <x-ui-button 
-                                                        variant="primary" 
-                                                        size="xs" 
-                                                        wire:click="createBlock({{ $row->id }})"
-                                                        :disabled="$totalSpan >= 12"
-                                                    >
-                                                        <span class="inline-flex items-center gap-1">
-                                                            @svg('heroicon-o-plus', 'w-3 h-3')
-                                                            <span>Block</span>
-                                                        </span>
-                                                    </x-ui-button>
-                                                    <x-ui-button 
-                                                        variant="danger-outline" 
-                                                        size="xs" 
-                                                        wire:click="deleteRow({{ $row->id }})"
-                                                        wire:confirm="Möchtest du diese Row wirklich löschen? Alle Blocks werden ebenfalls gelöscht."
-                                                    >
-                                                        <span class="inline-flex items-center gap-1">
-                                                            @svg('heroicon-o-trash', 'w-3 h-3')
-                                                        </span>
-                                                    </x-ui-button>
-                                                @endcan
-                                            </div>
-                                        </div>
-                                        
-                                        <div class="p-3">
-                                            @if($row->blocks->count() > 0)
-                                                <div class="grid grid-cols-12 gap-2">
-                                                    @foreach($row->blocks as $block)
-                                                        @php
-                                                            $block->load('content');
-                                                            $hasContent = $block->content_type && $block->content;
-                                                        @endphp
-                                                        <div 
-                                                            class="group bg-white rounded-lg border border-[var(--ui-border)]/40 hover:border-[var(--ui-primary)]/60 hover:shadow-sm transition-all relative {{ $hasContent ? 'cursor-pointer' : '' }}"
-                                                            style="grid-column: span {{ $block->span }};"
-                                                            @if($hasContent)
-                                                                @click="window.location.href = '{{ route('brands.content-board-blocks.show', ['brandsContentBoardBlock' => $block->id, 'type' => $block->content_type]) }}'"
-                                                            @elseif(auth()->user()->can('update', $contentBoard))
-                                                                x-data
-                                                                @click="$dispatch('open-modal-content-board-block-settings', { blockId: {{ $block->id }} })"
-                                                            @endif
-                                                        >
-                                                            {{-- Block Content --}}
-                                                            <div class="p-4">
-                                                                <div class="flex items-start justify-between gap-3">
-                                                                    <div class="flex-1 min-w-0">
-                                                                        <h5 class="text-sm font-medium text-[var(--ui-secondary)] leading-tight">
-                                                                            {{ $block->name }}
-                                                                        </h5>
-                                                                        @if($block->description)
-                                                                            <p class="text-xs text-[var(--ui-muted)] mt-1.5 leading-relaxed">
-                                                                                {{ $block->description }}
-                                                                            </p>
-                                                                        @endif
-                                                                        
-                                                                        {{-- Content-Ausgabe je nach Typ --}}
-                                                                        @if($hasContent)
-                                                                            @if($block->content_type === 'text' && $block->content)
-                                                                                <div class="mt-3 text-sm text-[var(--ui-secondary)] markdown-content-preview">
-                                                                                    <div class="line-clamp-3">
-                                                                                        {!! \Illuminate\Support\Str::markdown($block->content->content ?? '') !!}
-                                                                                    </div>
-                                                                                </div>
-                                                                            @endif
-                                                                        @else
-                                                                            <p class="text-xs text-[var(--ui-muted)] italic mt-2">Noch kein Content</p>
-                                                                        @endif
-                                                                        
-                                                                        <div 
-                                                                            x-data="{ copied: false }"
-                                                                            class="inline-flex items-center gap-1.5 px-2 py-0.5 mt-2 bg-[var(--ui-muted-5)] border border-[var(--ui-border)]/40 rounded text-xs"
-                                                                        >
-                                                                            <span class="font-mono text-[var(--ui-muted)] text-[10px]">{{ $block->uuid }}</span>
-                                                                            <button
-                                                                                type="button"
-                                                                                @click.stop="
-                                                                                    navigator.clipboard.writeText('{{ $block->uuid }}');
-                                                                                    copied = true;
-                                                                                    setTimeout(() => copied = false, 2000);
-                                                                                "
-                                                                                class="p-0.5 rounded hover:bg-white transition-colors"
-                                                                                title="UUID kopieren"
-                                                                            >
-                                                                                <span x-show="!copied">
-                                                                                    @svg('heroicon-o-clipboard', 'w-2.5 h-2.5 text-[var(--ui-muted)] hover:text-[var(--ui-primary)]')
-                                                                                </span>
-                                                                                <span x-show="copied" x-cloak>
-                                                                                    @svg('heroicon-o-check', 'w-2.5 h-2.5 text-green-600')
-                                                                                </span>
-                                                                            </button>
-                                                                        </div>
-                                                                    </div>
-                                                                    @can('update', $contentBoard)
-                                                                        <button 
-                                                                            type="button"
-                                                                            @click.stop="$dispatch('open-modal-content-board-block-settings', { blockId: {{ $block->id }} })"
-                                                                            class="opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0 p-1.5 rounded-md hover:bg-[var(--ui-muted-5)] text-[var(--ui-muted)] hover:text-[var(--ui-secondary)]"
-                                                                            title="Block-Einstellungen"
-                                                                        >
-                                                                            @svg('heroicon-o-cog-6-tooth', 'w-4 h-4')
-                                                                        </button>
-                                                                    @endcan
-                                                                </div>
-                                                            </div>
-                                                            
-                                                            {{-- Edit Icon unten rechts, nur wenn Content vorhanden --}}
-                                                            @if($hasContent)
-                                                                <a 
-                                                                    href="{{ route('brands.content-board-blocks.show', ['brandsContentBoardBlock' => $block->id, 'type' => $block->content_type]) }}"
-                                                                    @click.stop
-                                                                    class="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center w-8 h-8 rounded-md bg-[var(--ui-primary)] text-white hover:bg-[var(--ui-primary)]/90 shadow-sm"
-                                                                    title="Block bearbeiten"
-                                                                >
-                                                                    @svg('heroicon-o-pencil', 'w-4 h-4')
-                                                                </a>
-                                                            @endif
-                                                        </div>
-                                                    @endforeach
-                                                </div>
-                                            @else
-                                                <div class="text-center py-4 border-2 border-dashed border-[var(--ui-border)]/40 rounded-lg">
-                                                    <p class="text-xs text-[var(--ui-muted)] mb-2">Noch keine Blöcke</p>
-                                                    @can('update', $contentBoard)
-                                                        <x-ui-button 
-                                                            variant="primary" 
-                                                            size="xs" 
-                                                            wire:click="createBlock({{ $row->id }})"
-                                                        >
-                                                            <span class="inline-flex items-center gap-1">
-                                                                @svg('heroicon-o-plus', 'w-3 h-3')
-                                                                <span>Block hinzufügen</span>
-                                                            </span>
-                                                        </x-ui-button>
-                                                    @endcan
+            @if($contentBoard->blocks->count() > 0)
+                <div class="space-y-3">
+                    @foreach($contentBoard->blocks as $block)
+                        @php
+                            $hasContent = $block->content_type && $block->content;
+                        @endphp
+                        <div
+                            class="group bg-white rounded-xl border border-[var(--ui-border)]/60 shadow-sm hover:border-[var(--ui-primary)]/60 hover:shadow-md transition-all relative {{ $hasContent ? 'cursor-pointer' : '' }}"
+                            @if($hasContent)
+                                @click="window.location.href = '{{ route('brands.content-board-blocks.show', ['brandsContentBoardBlock' => $block->id, 'type' => $block->content_type]) }}'"
+                            @elseif(auth()->user()->can('update', $contentBoard))
+                                x-data
+                                @click="$dispatch('open-modal-content-board-block-settings', { blockId: {{ $block->id }} })"
+                            @endif
+                        >
+                            <div class="p-4 lg:p-5">
+                                <div class="flex items-start justify-between gap-3">
+                                    <div class="flex-1 min-w-0">
+                                        @can('update', $contentBoard)
+                                            <input
+                                                type="text"
+                                                value="{{ $block->name }}"
+                                                wire:blur="updateBlockName({{ $block->id }}, $event.target.value)"
+                                                @click.stop
+                                                class="text-sm font-medium text-[var(--ui-secondary)] bg-transparent border-none p-0 focus:outline-none focus:ring-2 focus:ring-[var(--ui-primary)] rounded px-1 -ml-1 w-full"
+                                            />
+                                        @else
+                                            <h5 class="text-sm font-medium text-[var(--ui-secondary)] leading-tight">
+                                                {{ $block->name }}
+                                            </h5>
+                                        @endcan
+                                        @if($block->description)
+                                            <p class="text-xs text-[var(--ui-muted)] mt-1.5 leading-relaxed">
+                                                {{ $block->description }}
+                                            </p>
+                                        @endif
+
+                                        {{-- Content-Ausgabe je nach Typ --}}
+                                        @if($hasContent)
+                                            @if($block->content_type === 'text' && $block->content)
+                                                <div class="mt-3 text-sm text-[var(--ui-secondary)] markdown-content-preview">
+                                                    <div class="line-clamp-3">
+                                                        {!! \Illuminate\Support\Str::markdown($block->content->content ?? '') !!}
+                                                    </div>
                                                 </div>
                                             @endif
+                                        @else
+                                            <p class="text-xs text-[var(--ui-muted)] italic mt-2">Noch kein Content</p>
+                                        @endif
+
+                                        <div class="flex items-center gap-3 mt-2">
+                                            @if($block->content_type)
+                                                <span class="text-xs px-2 py-0.5 rounded-full bg-[var(--ui-primary-10)] text-[var(--ui-primary)] border border-[var(--ui-primary)]/20">
+                                                    {{ ucfirst($block->content_type) }}
+                                                </span>
+                                            @endif
+                                            <div
+                                                x-data="{ copied: false }"
+                                                class="inline-flex items-center gap-1.5 px-2 py-0.5 bg-[var(--ui-muted-5)] border border-[var(--ui-border)]/40 rounded text-xs"
+                                            >
+                                                <span class="font-mono text-[var(--ui-muted)] text-[10px]">{{ $block->uuid }}</span>
+                                                <button
+                                                    type="button"
+                                                    @click.stop="
+                                                        navigator.clipboard.writeText('{{ $block->uuid }}');
+                                                        copied = true;
+                                                        setTimeout(() => copied = false, 2000);
+                                                    "
+                                                    class="p-0.5 rounded hover:bg-white transition-colors"
+                                                    title="UUID kopieren"
+                                                >
+                                                    <span x-show="!copied">
+                                                        @svg('heroicon-o-clipboard', 'w-2.5 h-2.5 text-[var(--ui-muted)] hover:text-[var(--ui-primary)]')
+                                                    </span>
+                                                    <span x-show="copied" x-cloak>
+                                                        @svg('heroicon-o-check', 'w-2.5 h-2.5 text-green-600')
+                                                    </span>
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
-                                @endforeach
-
-                                {{-- Neue Row hinzufügen --}}
-                                @can('update', $contentBoard)
-                                    <div class="border-2 border-dashed border-[var(--ui-border)]/40 rounded-lg p-3 text-center">
-                                        <x-ui-button variant="secondary-outline" size="sm" wire:click="createRow({{ $section->id }})">
-                                            <span class="inline-flex items-center gap-2">
-                                                @svg('heroicon-o-plus', 'w-4 h-4')
-                                                <span>Row hinzufügen</span>
-                                            </span>
-                                        </x-ui-button>
-                                    </div>
-                                @endcan
+                                    @can('update', $contentBoard)
+                                        <button
+                                            type="button"
+                                            @click.stop="$dispatch('open-modal-content-board-block-settings', { blockId: {{ $block->id }} })"
+                                            class="opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0 p-1.5 rounded-md hover:bg-[var(--ui-muted-5)] text-[var(--ui-muted)] hover:text-[var(--ui-secondary)]"
+                                            title="Block-Einstellungen"
+                                        >
+                                            @svg('heroicon-o-cog-6-tooth', 'w-4 h-4')
+                                        </button>
+                                    @endcan
+                                </div>
                             </div>
+
+                            {{-- Edit Icon unten rechts, nur wenn Content vorhanden --}}
+                            @if($hasContent)
+                                <a
+                                    href="{{ route('brands.content-board-blocks.show', ['brandsContentBoardBlock' => $block->id, 'type' => $block->content_type]) }}"
+                                    @click.stop
+                                    class="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center w-8 h-8 rounded-md bg-[var(--ui-primary)] text-white hover:bg-[var(--ui-primary)]/90 shadow-sm"
+                                    title="Block bearbeiten"
+                                >
+                                    @svg('heroicon-o-pencil', 'w-4 h-4')
+                                </a>
+                            @endif
                         </div>
                     @endforeach
                 </div>
             @else
                 <div class="bg-white rounded-xl border border-[var(--ui-border)]/60 shadow-sm p-12 text-center">
                     <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[var(--ui-muted-5)] mb-4">
-                        @svg('heroicon-o-squares-2x2', 'w-8 h-8 text-[var(--ui-muted)]')
+                        @svg('heroicon-o-document-text', 'w-8 h-8 text-[var(--ui-muted)]')
                     </div>
-                    <h3 class="text-lg font-semibold text-[var(--ui-secondary)] mb-2">Noch keine Sections</h3>
-                    <p class="text-sm text-[var(--ui-muted)] mb-4">Erstelle deine erste Section für dieses Content Board.</p>
+                    <h3 class="text-lg font-semibold text-[var(--ui-secondary)] mb-2">Noch keine Blöcke</h3>
+                    <p class="text-sm text-[var(--ui-muted)] mb-4">Erstelle deinen ersten Block für dieses Content Board.</p>
                     @can('update', $contentBoard)
-                        <x-ui-button variant="primary" size="sm" wire:click="createSection">
+                        <x-ui-button variant="primary" size="sm" wire:click="createBlock">
                             <span class="inline-flex items-center gap-2">
                                 @svg('heroicon-o-plus', 'w-4 h-4')
-                                <span>Section erstellen</span>
+                                <span>Block erstellen</span>
                             </span>
                         </x-ui-button>
                     @endcan

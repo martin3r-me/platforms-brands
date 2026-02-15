@@ -174,10 +174,7 @@ class BrandsServiceProvider extends ServiceProvider
     {
         Relation::morphMap([
             'text' => BrandsContentBoardBlockText::class,
-            // Weitere Content-Typen können hier hinzugefügt werden:
             // 'image' => BrandsContentBoardBlockImage::class,
-            // 'carousel' => BrandsContentBoardBlockCarousel::class,
-            // 'video' => BrandsContentBoardBlockVideo::class,
         ]);
     }
 

@@ -15,10 +15,10 @@ class ContentBoardBlockTextEdit extends Component
 
     public function mount(BrandsContentBoardBlock $brandsContentBoardBlock, string $type)
     {
-        $this->block = $brandsContentBoardBlock->load('content', 'row.section.contentBoard');
-        
+        $this->block = $brandsContentBoardBlock->load('content', 'contentBoard');
+
         // Berechtigung prüfen
-        $this->authorize('view', $this->block->row->section->contentBoard);
+        $this->authorize('view', $this->block->contentBoard);
         
         // Prüfen, ob Content-Typ passt
         if ($this->block->content_type !== $type) {
@@ -55,7 +55,7 @@ class ContentBoardBlockTextEdit extends Component
 
     public function save()
     {
-        $this->authorize('update', $this->block->row->section->contentBoard);
+        $this->authorize('update', $this->block->contentBoard);
         
         // Block-Namen aktualisieren
         if (isset($this->name) && trim($this->name)) {
@@ -123,7 +123,7 @@ class ContentBoardBlockTextEdit extends Component
 
     public function getBreadcrumbs()
     {
-        $contentBoard = $this->block->row->section->contentBoard;
+        $contentBoard = $this->block->contentBoard;
         $breadcrumbs = [
             ['name' => 'Marken', 'url' => route('brands.brands.index')],
             ['name' => $contentBoard->brand->name, 'url' => route('brands.brands.show', $contentBoard->brand)],
@@ -140,39 +140,28 @@ class ContentBoardBlockTextEdit extends Component
 
     public function getPreviousBlock()
     {
-        $allBlocks = BrandsContentBoardBlock::whereHas('row.section', function($q) {
-            $q->where('content_board_id', $this->block->row->section->content_board_id);
-        })
-        ->where('content_type', $this->block->content_type)
-        ->where('id', '<', $this->block->id)
-        ->orderBy('id', 'desc')
-        ->first();
-        
-        return $allBlocks;
+        return BrandsContentBoardBlock::where('content_board_id', $this->block->content_board_id)
+            ->where('content_type', $this->block->content_type)
+            ->where('order', '<', $this->block->order)
+            ->orderBy('order', 'desc')
+            ->first();
     }
 
     public function getNextBlock()
     {
-        $allBlocks = BrandsContentBoardBlock::whereHas('row.section', function($q) {
-            $q->where('content_board_id', $this->block->row->section->content_board_id);
-        })
-        ->where('content_type', $this->block->content_type)
-        ->where('id', '>', $this->block->id)
-        ->orderBy('id', 'asc')
-        ->first();
-        
-        return $allBlocks;
+        return BrandsContentBoardBlock::where('content_board_id', $this->block->content_board_id)
+            ->where('content_type', $this->block->content_type)
+            ->where('order', '>', $this->block->order)
+            ->orderBy('order', 'asc')
+            ->first();
     }
 
     public function getAllBlocks()
     {
-        return BrandsContentBoardBlock::whereHas('row.section', function($q) {
-            $q->where('content_board_id', $this->block->row->section->content_board_id);
-        })
-        ->where('content_type', $this->block->content_type)
-        ->with('row.section')
-        ->orderBy('id', 'asc')
-        ->get();
+        return BrandsContentBoardBlock::where('content_board_id', $this->block->content_board_id)
+            ->where('content_type', $this->block->content_type)
+            ->orderBy('order', 'asc')
+            ->get();
     }
 
     public function rendered()
@@ -213,7 +202,7 @@ class ContentBoardBlockTextEdit extends Component
     public function render()
     {
         $user = Auth::user();
-        $contentBoard = $this->block->row->section->contentBoard;
+        $contentBoard = $this->block->contentBoard;
         $previousBlock = $this->getPreviousBlock();
         $nextBlock = $this->getNextBlock();
         $allBlocks = $this->getAllBlocks();

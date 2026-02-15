@@ -24,26 +24,14 @@
                     </div>
                 </div>
 
-                {{-- Aktuelle Position --}}
+                {{-- Block-Info --}}
                 <div>
-                    <h3 class="text-xs font-semibold uppercase tracking-wide text-[var(--ui-muted)] mb-3">Aktuelle Position</h3>
+                    <h3 class="text-xs font-semibold uppercase tracking-wide text-[var(--ui-muted)] mb-3">Block-Info</h3>
                     <div class="space-y-2">
                         <div class="flex justify-between items-center py-2 px-3 bg-[var(--ui-muted-5)] border border-[var(--ui-border)]/40 rounded">
-                            <span class="text-sm text-[var(--ui-muted)]">Section</span>
+                            <span class="text-sm text-[var(--ui-muted)]">Position</span>
                             <span class="text-sm text-[var(--ui-secondary)] font-medium">
-                                {{ $block->row->section->name }}
-                            </span>
-                        </div>
-                        <div class="flex justify-between items-center py-2 px-3 bg-[var(--ui-muted-5)] border border-[var(--ui-border)]/40 rounded">
-                            <span class="text-sm text-[var(--ui-muted)]">Row</span>
-                            <span class="text-sm text-[var(--ui-secondary)] font-medium">
-                                Row #{{ $block->row->order }}
-                            </span>
-                        </div>
-                        <div class="flex justify-between items-center py-2 px-3 bg-[var(--ui-muted-5)] border border-[var(--ui-border)]/40 rounded">
-                            <span class="text-sm text-[var(--ui-muted)]">Span</span>
-                            <span class="text-sm text-[var(--ui-secondary)] font-medium">
-                                {{ $block->span }}/12
+                                #{{ $block->order }}
                             </span>
                         </div>
                         <div class="flex justify-between items-center py-2 px-3 bg-[var(--ui-muted-5)] border border-[var(--ui-border)]/40 rounded">
@@ -77,7 +65,7 @@
                             @foreach($allBlocks as $otherBlock)
                                 <a href="{{ route('brands.content-board-blocks.show', ['brandsContentBoardBlock' => $otherBlock->id, 'type' => 'text']) }}" class="block px-3 py-2 text-sm text-[var(--ui-secondary)] hover:bg-[var(--ui-muted-5)] rounded transition-colors {{ $otherBlock->id === $block->id ? 'bg-[var(--ui-primary-10)] font-medium' : '' }}">
                                     <div class="truncate">{{ $otherBlock->name }}</div>
-                                    <div class="text-xs text-[var(--ui-muted)] mt-0.5">{{ $otherBlock->row->section->name }} · Row #{{ $otherBlock->row->order }}</div>
+                                    <div class="text-xs text-[var(--ui-muted)] mt-0.5">#{{ $otherBlock->order }}</div>
                                 </a>
                             @endforeach
                         </div>

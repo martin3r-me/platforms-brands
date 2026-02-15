@@ -56,12 +56,12 @@ class CreateContentBoardBlockTextTool implements ToolContract, ToolMetadataContr
                 return ToolResult::error('VALIDATION_ERROR', 'content_board_block_id ist erforderlich.');
             }
 
-            $block = BrandsContentBoardBlock::with('row.section.contentBoard')->find($blockId);
+            $block = BrandsContentBoardBlock::with('contentBoard')->find($blockId);
             if (!$block) {
                 return ToolResult::error('BLOCK_NOT_FOUND', 'Der angegebene Content Board Block wurde nicht gefunden.');
             }
 
-            $contentBoard = $block->row->section->contentBoard;
+            $contentBoard = $block->contentBoard;
 
             // Policy prüfen
             try {
