@@ -24,6 +24,8 @@ use Platform\Brands\Models\BrandsKanbanBoard;
 use Platform\Brands\Models\BrandsKanbanCard;
 use Platform\Brands\Models\BrandsTypographyBoard;
 use Platform\Brands\Models\BrandsTypographyEntry;
+use Platform\Brands\Models\BrandsLogoBoard;
+use Platform\Brands\Models\BrandsLogoVariant;
 use Platform\Integrations\Models\IntegrationsFacebookPage;
 use Platform\Integrations\Models\IntegrationsInstagramAccount;
 use Platform\Brands\Policies\BrandPolicy;
@@ -37,6 +39,8 @@ use Platform\Brands\Policies\KanbanBoardPolicy;
 use Platform\Brands\Policies\KanbanCardPolicy;
 use Platform\Brands\Policies\TypographyBoardPolicy;
 use Platform\Brands\Policies\TypographyEntryPolicy;
+use Platform\Brands\Policies\LogoBoardPolicy;
+use Platform\Brands\Policies\LogoVariantPolicy;
 use Platform\Brands\Policies\FacebookPagePolicy;
 use Platform\Brands\Policies\InstagramAccountPolicy;
 
@@ -163,6 +167,8 @@ class BrandsServiceProvider extends ServiceProvider
             BrandsKanbanCard::class => KanbanCardPolicy::class,
             BrandsTypographyBoard::class => TypographyBoardPolicy::class,
             BrandsTypographyEntry::class => TypographyEntryPolicy::class,
+            BrandsLogoBoard::class => LogoBoardPolicy::class,
+            BrandsLogoVariant::class => LogoVariantPolicy::class,
             IntegrationsFacebookPage::class => FacebookPagePolicy::class,
             IntegrationsInstagramAccount::class => InstagramAccountPolicy::class,
         ];
@@ -261,6 +267,20 @@ class BrandsServiceProvider extends ServiceProvider
             $registry->register(new \Platform\Brands\Tools\GetTypographyEntryTool());
             $registry->register(new \Platform\Brands\Tools\UpdateTypographyEntryTool());
             $registry->register(new \Platform\Brands\Tools\DeleteTypographyEntryTool());
+
+            // LogoBoard-Tools
+            $registry->register(new \Platform\Brands\Tools\CreateLogoBoardTool());
+            $registry->register(new \Platform\Brands\Tools\ListLogoBoardsTool());
+            $registry->register(new \Platform\Brands\Tools\GetLogoBoardTool());
+            $registry->register(new \Platform\Brands\Tools\UpdateLogoBoardTool());
+            $registry->register(new \Platform\Brands\Tools\DeleteLogoBoardTool());
+
+            // LogoVariant-Tools
+            $registry->register(new \Platform\Brands\Tools\CreateLogoVariantTool());
+            $registry->register(new \Platform\Brands\Tools\ListLogoVariantsTool());
+            $registry->register(new \Platform\Brands\Tools\GetLogoVariantTool());
+            $registry->register(new \Platform\Brands\Tools\UpdateLogoVariantTool());
+            $registry->register(new \Platform\Brands\Tools\DeleteLogoVariantTool());
 
             // KanbanCard-Tools
             $registry->register(new \Platform\Brands\Tools\CreateKanbanCardTool());

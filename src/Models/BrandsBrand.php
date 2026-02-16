@@ -155,6 +155,11 @@ class BrandsBrand extends Model implements HasTimeAncestors, HasKeyResultAncesto
         return $this->hasMany(BrandsTypographyBoard::class, 'brand_id')->orderBy('order');
     }
 
+    public function logoBoards()
+    {
+        return $this->hasMany(BrandsLogoBoard::class, 'brand_id')->orderBy('order');
+    }
+
     /**
      * Meta OAuth Token dieser Marke (über User)
      * Ein Brand verwendet den Meta Token des Users

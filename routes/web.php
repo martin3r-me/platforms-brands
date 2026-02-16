@@ -10,6 +10,7 @@ use Platform\Brands\Livewire\SocialCard;
 use Platform\Brands\Livewire\KanbanBoard;
 use Platform\Brands\Livewire\KanbanCard;
 use Platform\Brands\Livewire\TypographyBoard;
+use Platform\Brands\Livewire\LogoBoard;
 use Platform\Brands\Livewire\MultiContentBoard;
 use Platform\Brands\Livewire\FacebookPage;
 use Platform\Brands\Livewire\InstagramAccount;
@@ -23,6 +24,7 @@ use Platform\Brands\Models\BrandsSocialCard;
 use Platform\Brands\Models\BrandsKanbanBoard as BrandsKanbanBoardModel;
 use Platform\Brands\Models\BrandsKanbanCard as BrandsKanbanCardModel;
 use Platform\Brands\Models\BrandsTypographyBoard as BrandsTypographyBoardModel;
+use Platform\Brands\Models\BrandsLogoBoard as BrandsLogoBoardModel;
 use Platform\Brands\Models\BrandsMultiContentBoard;
 use Platform\Brands\Models\BrandsContentBoardBlock;
 use Platform\Integrations\Models\IntegrationsFacebookPage;
@@ -66,6 +68,10 @@ Route::get('/kanban-cards/{brandsKanbanCard}', KanbanCard::class)
 Route::get('/typography-boards/{brandsTypographyBoard}', TypographyBoard::class)
     ->name('brands.typography-boards.show');
 
+// Logo Board Routes
+Route::get('/logo-boards/{brandsLogoBoard}', LogoBoard::class)
+    ->name('brands.logo-boards.show');
+
 // Multi-Content-Board Routes
 Route::get('/multi-content-boards/{brandsMultiContentBoard}', MultiContentBoard::class)
     ->name('brands.multi-content-boards.show');
@@ -88,4 +94,4 @@ Route::get('/brands/{brandsBrand}/export/download/{format}', [ExportDownload::cl
 
 Route::get('/export/boards/{boardType}/{boardId}/download/{format}', [ExportDownload::class, 'downloadBoard'])
     ->name('brands.export.download-board')
-    ->where(['boardType' => 'ci-board|content-board|social-board|kanban-board|multi-content-board|typography-board', 'boardId' => '[0-9]+', 'format' => 'json|pdf']);
+    ->where(['boardType' => 'ci-board|content-board|social-board|kanban-board|multi-content-board|typography-board|logo-board', 'boardId' => '[0-9]+', 'format' => 'json|pdf']);
