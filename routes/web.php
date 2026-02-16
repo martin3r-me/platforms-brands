@@ -12,6 +12,8 @@ use Platform\Brands\Livewire\KanbanCard;
 use Platform\Brands\Livewire\MultiContentBoard;
 use Platform\Brands\Livewire\FacebookPage;
 use Platform\Brands\Livewire\InstagramAccount;
+use Platform\Brands\Livewire\Export;
+use Platform\Brands\Livewire\ExportDownload;
 use Platform\Brands\Models\BrandsBrand;
 use Platform\Brands\Models\BrandsCiBoard;
 use Platform\Brands\Models\BrandsContentBoard;
@@ -69,3 +71,15 @@ Route::get('/facebook-pages/{facebookPage}', FacebookPage::class)
 // Instagram Account Routes
 Route::get('/instagram-accounts/{instagramAccount}', InstagramAccount::class)
     ->name('brands.instagram-accounts.show');
+
+// Export Routes
+Route::get('/brands/{brandsBrand}/export', Export::class)
+    ->name('brands.export.show');
+
+Route::get('/brands/{brandsBrand}/export/download/{format}', [ExportDownload::class, 'downloadBrand'])
+    ->name('brands.export.download-brand')
+    ->where('format', 'json|pdf');
+
+Route::get('/export/boards/{boardType}/{boardId}/download/{format}', [ExportDownload::class, 'downloadBoard'])
+    ->name('brands.export.download-board')
+    ->where(['boardType' => 'ci-board|content-board|social-board|kanban-board|multi-content-board', 'boardId' => '[0-9]+', 'format' => 'json|pdf']);

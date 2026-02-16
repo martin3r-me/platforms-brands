@@ -55,6 +55,9 @@ class BrandsServiceProvider extends ServiceProvider
                 \Platform\Brands\Console\Commands\TruncateIntegrationsData::class,
             ]);
         }
+
+        // Export-Service als Singleton registrieren
+        $this->app->singleton(\Platform\Brands\Services\BrandsExportService::class);
     }
 
     public function boot(): void
@@ -292,6 +295,10 @@ class BrandsServiceProvider extends ServiceProvider
             
             // Content-Tool (generisch für Inhalte/Captions/Texte)
             $registry->register(new \Platform\Brands\Tools\GetContentTool());
+
+            // Export-Tools
+            $registry->register(new \Platform\Brands\Tools\ExportBrandTool());
+            $registry->register(new \Platform\Brands\Tools\ExportBoardTool());
         } catch (\Throwable $e) {
             // Silent fail - Tool-Registry könnte nicht verfügbar sein
         }

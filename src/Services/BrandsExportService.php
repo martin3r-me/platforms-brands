@@ -1,0 +1,324 @@
+<?php
+
+namespace Platform\Brands\Services;
+
+use Platform\Brands\Models\BrandsBrand;
+use Platform\Brands\Models\BrandsCiBoard;
+use Platform\Brands\Models\BrandsContentBoard;
+use Platform\Brands\Models\BrandsSocialBoard;
+use Platform\Brands\Models\BrandsKanbanBoard;
+use Platform\Brands\Models\BrandsMultiContentBoard;
+use Platform\Brands\Services\Export\ExportFormatInterface;
+use Platform\Brands\Services\Export\JsonExportFormat;
+use Platform\Brands\Services\Export\PdfExportFormat;
+
+class BrandsExportService
+{
+    /** @var ExportFormatInterface[] */
+    protected array $formats = [];
+
+    public function __construct()
+    {
+        $this->registerFormat(new JsonExportFormat());
+        $this->registerFormat(new PdfExportFormat());
+    }
+
+    public function registerFormat(ExportFormatInterface $format): void
+    {
+        $this->formats[$format->getKey()] = $format;
+    }
+
+    /**
+     * @return ExportFormatInterface[]
+     */
+    public function getAvailableFormats(): array
+    {
+        return $this->formats;
+    }
+
+    public function getFormat(string $key): ?ExportFormatInterface
+    {
+        return $this->formats[$key] ?? null;
+    }
+
+    // ──────────────────────────────────────────────
+    //  Brand Export
+    // ──────────────────────────────────────────────
+
+    public function exportBrand(BrandsBrand $brand, string $formatKey): array
+    {
+        $format = $this->getFormat($formatKey);
+        if (!$format) {
+            throw new \InvalidArgumentException("Export-Format '{$formatKey}' nicht verfügbar.");
+        }
+
+        $data = $this->collectBrandData($brand);
+        $content = $format->exportBrand($data);
+        $filename = $this->sanitizeFilename($brand->name) . '_brand-book.' . $format->getFileExtension();
+
+        return [
+            'content' => $content,
+            'filename' => $filename,
+            'mime_type' => $format->getMimeType(),
+        ];
+    }
+
+    // ──────────────────────────────────────────────
+    //  Board Export (polymorphic)
+    // ──────────────────────────────────────────────
+
+    public function exportBoard(object $board, string $formatKey): array
+    {
+        $format = $this->getFormat($formatKey);
+        if (!$format) {
+            throw new \InvalidArgumentException("Export-Format '{$formatKey}' nicht verfügbar.");
+        }
+
+        $boardData = $this->collectBoardData($board);
+        $brandContext = $this->collectBrandContext($board);
+        $content = $format->exportBoard($boardData, $brandContext);
+        $typeSuffix = $boardData['type'] ?? 'board';
+        $filename = $this->sanitizeFilename($board->name ?? 'board') . '_' . $typeSuffix . '.' . $format->getFileExtension();
+
+        return [
+            'content' => $content,
+            'filename' => $filename,
+            'mime_type' => $format->getMimeType(),
+        ];
+    }
+
+    // ──────────────────────────────────────────────
+    //  Data Collection: Full Brand
+    // ──────────────────────────────────────────────
+
+    public function collectBrandData(BrandsBrand $brand): array
+    {
+        $brand->load([
+            'ciBoards.colors',
+            'contentBoards.blocks.content',
+            'socialBoards.slots.cards',
+            'kanbanBoards.slots.cards',
+            'multiContentBoards.slots.contentBoards.blocks.content',
+        ]);
+
+        // Extract brand-level CI settings from the first CI board (if any)
+        $firstCi = $brand->ciBoards->first();
+        $settings = [
+            'primary_color' => $firstCi?->primary_color,
+            'secondary_color' => $firstCi?->secondary_color,
+            'accent_color' => $firstCi?->accent_color,
+        ];
+
+        return [
+            'id' => $brand->id,
+            'uuid' => $brand->uuid,
+            'name' => $brand->name,
+            'description' => $brand->description,
+            'created_at' => $brand->created_at?->toIso8601String(),
+            'settings' => $settings,
+            'ci_boards' => $brand->ciBoards->map(fn ($b) => $this->collectCiBoardData($b))->toArray(),
+            'content_boards' => $brand->contentBoards->map(fn ($b) => $this->collectContentBoardData($b))->toArray(),
+            'social_boards' => $brand->socialBoards->map(fn ($b) => $this->collectSocialBoardData($b))->toArray(),
+            'kanban_boards' => $brand->kanbanBoards->map(fn ($b) => $this->collectKanbanBoardData($b))->toArray(),
+            'multi_content_boards' => $brand->multiContentBoards->map(fn ($b) => $this->collectMultiContentBoardData($b))->toArray(),
+        ];
+    }
+
+    // ──────────────────────────────────────────────
+    //  Data Collection: Individual Boards
+    // ──────────────────────────────────────────────
+
+    public function collectBoardData(object $board): array
+    {
+        return match (true) {
+            $board instanceof BrandsCiBoard => $this->collectCiBoardData($board),
+            $board instanceof BrandsContentBoard => $this->collectContentBoardData($board),
+            $board instanceof BrandsSocialBoard => $this->collectSocialBoardData($board),
+            $board instanceof BrandsKanbanBoard => $this->collectKanbanBoardData($board),
+            $board instanceof BrandsMultiContentBoard => $this->collectMultiContentBoardData($board),
+            default => throw new \InvalidArgumentException('Unbekannter Board-Typ: ' . get_class($board)),
+        };
+    }
+
+    public function collectBrandContext(object $board): array
+    {
+        $brand = $board->brand;
+        if (!$brand) {
+            return ['name' => 'Unbekannt'];
+        }
+
+        $brand->load('ciBoards');
+        $firstCi = $brand->ciBoards->first();
+
+        return [
+            'id' => $brand->id,
+            'uuid' => $brand->uuid,
+            'name' => $brand->name,
+            'primary_color' => $firstCi?->primary_color,
+            'secondary_color' => $firstCi?->secondary_color,
+            'accent_color' => $firstCi?->accent_color,
+        ];
+    }
+
+    protected function collectCiBoardData(BrandsCiBoard $board): array
+    {
+        $board->loadMissing('colors');
+
+        return [
+            'id' => $board->id,
+            'uuid' => $board->uuid,
+            'type' => 'ci',
+            'name' => $board->name,
+            'description' => $board->description,
+            'primary_color' => $board->primary_color,
+            'secondary_color' => $board->secondary_color,
+            'accent_color' => $board->accent_color,
+            'slogan' => $board->slogan,
+            'tagline' => $board->tagline,
+            'font_family' => $board->font_family,
+            'colors' => $board->colors->map(fn ($c) => [
+                'id' => $c->id,
+                'uuid' => $c->uuid,
+                'title' => $c->title,
+                'color' => $c->color,
+                'description' => $c->description,
+                'order' => $c->order,
+            ])->toArray(),
+            'created_at' => $board->created_at?->toIso8601String(),
+        ];
+    }
+
+    protected function collectContentBoardData(BrandsContentBoard $board): array
+    {
+        $board->loadMissing('blocks.content');
+
+        return [
+            'id' => $board->id,
+            'uuid' => $board->uuid,
+            'type' => 'content',
+            'name' => $board->name,
+            'description' => $board->description,
+            'blocks' => $board->blocks->map(fn ($block) => [
+                'id' => $block->id,
+                'uuid' => $block->uuid,
+                'name' => $block->name,
+                'description' => $block->description,
+                'order' => $block->order,
+                'content_type' => $block->content_type,
+                'content' => $this->collectBlockContent($block),
+            ])->toArray(),
+            'created_at' => $board->created_at?->toIso8601String(),
+        ];
+    }
+
+    protected function collectBlockContent($block): ?array
+    {
+        $content = $block->content;
+        if (!$content) {
+            return null;
+        }
+
+        // Polymorphic: currently only 'text'
+        if ($block->content_type === 'text') {
+            return [
+                'type' => 'text',
+                'text' => $content->content,
+            ];
+        }
+
+        return [
+            'type' => $block->content_type,
+            'id' => $content->id ?? null,
+        ];
+    }
+
+    protected function collectSocialBoardData(BrandsSocialBoard $board): array
+    {
+        $board->loadMissing('slots.cards');
+
+        return [
+            'id' => $board->id,
+            'uuid' => $board->uuid,
+            'type' => 'social',
+            'name' => $board->name,
+            'description' => $board->description,
+            'slots' => $board->slots->map(fn ($slot) => [
+                'id' => $slot->id,
+                'uuid' => $slot->uuid,
+                'name' => $slot->name,
+                'order' => $slot->order,
+                'cards' => $slot->cards->map(fn ($card) => [
+                    'id' => $card->id,
+                    'uuid' => $card->uuid,
+                    'title' => $card->title,
+                    'description' => $card->description,
+                    'body_md' => $card->body_md,
+                    'order' => $card->order,
+                ])->toArray(),
+            ])->toArray(),
+            'created_at' => $board->created_at?->toIso8601String(),
+        ];
+    }
+
+    protected function collectKanbanBoardData(BrandsKanbanBoard $board): array
+    {
+        $board->loadMissing('slots.cards');
+
+        return [
+            'id' => $board->id,
+            'uuid' => $board->uuid,
+            'type' => 'kanban',
+            'name' => $board->name,
+            'description' => $board->description,
+            'slots' => $board->slots->map(fn ($slot) => [
+                'id' => $slot->id,
+                'uuid' => $slot->uuid,
+                'name' => $slot->name,
+                'order' => $slot->order,
+                'cards' => $slot->cards->map(fn ($card) => [
+                    'id' => $card->id,
+                    'uuid' => $card->uuid,
+                    'title' => $card->title,
+                    'description' => $card->description,
+                    'order' => $card->order,
+                ])->toArray(),
+            ])->toArray(),
+            'created_at' => $board->created_at?->toIso8601String(),
+        ];
+    }
+
+    protected function collectMultiContentBoardData(BrandsMultiContentBoard $board): array
+    {
+        $board->loadMissing('slots.contentBoards.blocks.content');
+
+        return [
+            'id' => $board->id,
+            'uuid' => $board->uuid,
+            'type' => 'multi_content',
+            'name' => $board->name,
+            'description' => $board->description,
+            'slots' => $board->slots->map(fn ($slot) => [
+                'id' => $slot->id,
+                'uuid' => $slot->uuid,
+                'name' => $slot->name,
+                'order' => $slot->order,
+                'content_boards' => $slot->contentBoards->map(fn ($cb) => $this->collectContentBoardData($cb))->toArray(),
+            ])->toArray(),
+            'created_at' => $board->created_at?->toIso8601String(),
+        ];
+    }
+
+    // ──────────────────────────────────────────────
+    //  Helpers
+    // ──────────────────────────────────────────────
+
+    protected function sanitizeFilename(string $name): string
+    {
+        $name = mb_strtolower($name);
+        $name = preg_replace('/[^a-z0-9äöüß\-_ ]/u', '', $name);
+        $name = preg_replace('/[\s]+/', '-', $name);
+        $name = trim($name, '-');
+
+        return $name ?: 'export';
+    }
+}
