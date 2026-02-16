@@ -150,6 +150,30 @@ class Brand extends Component
         return $this->redirect(route('brands.multi-content-boards.show', $multiContentBoard), navigate: true);
     }
 
+    public function createTypographyBoard()
+    {
+        $this->authorize('update', $this->brand);
+
+        $user = Auth::user();
+        $team = $user->currentTeam;
+
+        if (!$team) {
+            session()->flash('error', 'Kein Team ausgewählt.');
+            return;
+        }
+
+        $typographyBoard = \Platform\Brands\Models\BrandsTypographyBoard::create([
+            'name' => 'Neues Typografie Board',
+            'description' => null,
+            'user_id' => $user->id,
+            'team_id' => $team->id,
+            'brand_id' => $this->brand->id,
+        ]);
+
+        $this->brand->refresh();
+
+        return $this->redirect(route('brands.typography-boards.show', $typographyBoard), navigate: true);
+    }
 
     public function rendered()
     {
@@ -348,6 +372,7 @@ class Brand extends Component
         $socialBoards = $this->brand->socialBoards;
         $kanbanBoards = $this->brand->kanbanBoards;
         $multiContentBoards = $this->brand->multiContentBoards;
+        $typographyBoards = $this->brand->typographyBoards;
         
         // Meta Connection laden
         $metaConnection = $this->brand->metaConnection();
@@ -388,6 +413,7 @@ class Brand extends Component
             'socialBoards' => $socialBoards,
             'kanbanBoards' => $kanbanBoards,
             'multiContentBoards' => $multiContentBoards,
+            'typographyBoards' => $typographyBoards,
             'facebookPages' => $facebookPages,
             'instagramAccounts' => $instagramAccounts,
             'availableFacebookPages' => $availableFacebookPages,

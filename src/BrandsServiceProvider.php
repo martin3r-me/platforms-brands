@@ -22,6 +22,8 @@ use Platform\Brands\Models\BrandsSocialBoard;
 use Platform\Brands\Models\BrandsSocialCard;
 use Platform\Brands\Models\BrandsKanbanBoard;
 use Platform\Brands\Models\BrandsKanbanCard;
+use Platform\Brands\Models\BrandsTypographyBoard;
+use Platform\Brands\Models\BrandsTypographyEntry;
 use Platform\Integrations\Models\IntegrationsFacebookPage;
 use Platform\Integrations\Models\IntegrationsInstagramAccount;
 use Platform\Brands\Policies\BrandPolicy;
@@ -33,6 +35,8 @@ use Platform\Brands\Policies\SocialBoardPolicy;
 use Platform\Brands\Policies\SocialCardPolicy;
 use Platform\Brands\Policies\KanbanBoardPolicy;
 use Platform\Brands\Policies\KanbanCardPolicy;
+use Platform\Brands\Policies\TypographyBoardPolicy;
+use Platform\Brands\Policies\TypographyEntryPolicy;
 use Platform\Brands\Policies\FacebookPagePolicy;
 use Platform\Brands\Policies\InstagramAccountPolicy;
 
@@ -157,6 +161,8 @@ class BrandsServiceProvider extends ServiceProvider
             BrandsSocialCard::class => SocialCardPolicy::class,
             BrandsKanbanBoard::class => KanbanBoardPolicy::class,
             BrandsKanbanCard::class => KanbanCardPolicy::class,
+            BrandsTypographyBoard::class => TypographyBoardPolicy::class,
+            BrandsTypographyEntry::class => TypographyEntryPolicy::class,
             IntegrationsFacebookPage::class => FacebookPagePolicy::class,
             IntegrationsInstagramAccount::class => InstagramAccountPolicy::class,
         ];
@@ -241,6 +247,20 @@ class BrandsServiceProvider extends ServiceProvider
             $registry->register(new \Platform\Brands\Tools\GetKanbanBoardTool());
             $registry->register(new \Platform\Brands\Tools\UpdateKanbanBoardTool());
             $registry->register(new \Platform\Brands\Tools\DeleteKanbanBoardTool());
+
+            // TypographyBoard-Tools
+            $registry->register(new \Platform\Brands\Tools\CreateTypographyBoardTool());
+            $registry->register(new \Platform\Brands\Tools\ListTypographyBoardsTool());
+            $registry->register(new \Platform\Brands\Tools\GetTypographyBoardTool());
+            $registry->register(new \Platform\Brands\Tools\UpdateTypographyBoardTool());
+            $registry->register(new \Platform\Brands\Tools\DeleteTypographyBoardTool());
+
+            // TypographyEntry-Tools
+            $registry->register(new \Platform\Brands\Tools\CreateTypographyEntryTool());
+            $registry->register(new \Platform\Brands\Tools\ListTypographyEntriesTool());
+            $registry->register(new \Platform\Brands\Tools\GetTypographyEntryTool());
+            $registry->register(new \Platform\Brands\Tools\UpdateTypographyEntryTool());
+            $registry->register(new \Platform\Brands\Tools\DeleteTypographyEntryTool());
 
             // KanbanCard-Tools
             $registry->register(new \Platform\Brands\Tools\CreateKanbanCardTool());

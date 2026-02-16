@@ -10,6 +10,7 @@ use Platform\Brands\Models\BrandsContentBoard;
 use Platform\Brands\Models\BrandsSocialBoard;
 use Platform\Brands\Models\BrandsKanbanBoard;
 use Platform\Brands\Models\BrandsMultiContentBoard;
+use Platform\Brands\Models\BrandsTypographyBoard;
 use Platform\Brands\Services\BrandsExportService;
 
 /**
@@ -60,6 +61,7 @@ class ExportDownload
             'social-board' => BrandsSocialBoard::with('brand', 'slots.cards')->find($id),
             'kanban-board' => BrandsKanbanBoard::with('brand', 'slots.cards')->find($id),
             'multi-content-board' => BrandsMultiContentBoard::with('brand', 'slots.contentBoards.blocks.content')->find($id),
+            'typography-board' => BrandsTypographyBoard::with('brand', 'entries')->find($id),
             default => null,
         };
     }

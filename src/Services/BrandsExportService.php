@@ -8,6 +8,7 @@ use Platform\Brands\Models\BrandsContentBoard;
 use Platform\Brands\Models\BrandsSocialBoard;
 use Platform\Brands\Models\BrandsKanbanBoard;
 use Platform\Brands\Models\BrandsMultiContentBoard;
+use Platform\Brands\Models\BrandsTypographyBoard;
 use Platform\Brands\Services\Export\ExportFormatInterface;
 use Platform\Brands\Services\Export\JsonExportFormat;
 use Platform\Brands\Services\Export\PdfExportFormat;
@@ -99,6 +100,7 @@ class BrandsExportService
             'socialBoards.slots.cards',
             'kanbanBoards.slots.cards',
             'multiContentBoards.slots.contentBoards.blocks.content',
+            'typographyBoards.entries',
         ]);
 
         // Extract brand-level CI settings from the first CI board (if any)
@@ -121,6 +123,7 @@ class BrandsExportService
             'social_boards' => $brand->socialBoards->map(fn ($b) => $this->collectSocialBoardData($b))->toArray(),
             'kanban_boards' => $brand->kanbanBoards->map(fn ($b) => $this->collectKanbanBoardData($b))->toArray(),
             'multi_content_boards' => $brand->multiContentBoards->map(fn ($b) => $this->collectMultiContentBoardData($b))->toArray(),
+            'typography_boards' => $brand->typographyBoards->map(fn ($b) => $this->collectTypographyBoardData($b))->toArray(),
         ];
     }
 
@@ -136,6 +139,7 @@ class BrandsExportService
             $board instanceof BrandsSocialBoard => $this->collectSocialBoardData($board),
             $board instanceof BrandsKanbanBoard => $this->collectKanbanBoardData($board),
             $board instanceof BrandsMultiContentBoard => $this->collectMultiContentBoardData($board),
+            $board instanceof BrandsTypographyBoard => $this->collectTypographyBoardData($board),
             default => throw new \InvalidArgumentException('Unbekannter Board-Typ: ' . get_class($board)),
         };
     }
@@ -303,6 +307,37 @@ class BrandsExportService
                 'name' => $slot->name,
                 'order' => $slot->order,
                 'content_boards' => $slot->contentBoards->map(fn ($cb) => $this->collectContentBoardData($cb))->toArray(),
+            ])->toArray(),
+            'created_at' => $board->created_at?->toIso8601String(),
+        ];
+    }
+
+    protected function collectTypographyBoardData(BrandsTypographyBoard $board): array
+    {
+        $board->loadMissing('entries');
+
+        return [
+            'id' => $board->id,
+            'uuid' => $board->uuid,
+            'type' => 'typography',
+            'name' => $board->name,
+            'description' => $board->description,
+            'entries' => $board->entries->map(fn ($entry) => [
+                'id' => $entry->id,
+                'uuid' => $entry->uuid,
+                'name' => $entry->name,
+                'role' => $entry->role,
+                'font_family' => $entry->font_family,
+                'font_source' => $entry->font_source,
+                'font_weight' => $entry->font_weight,
+                'font_style' => $entry->font_style,
+                'font_size' => $entry->font_size,
+                'line_height' => $entry->line_height,
+                'letter_spacing' => $entry->letter_spacing,
+                'text_transform' => $entry->text_transform,
+                'sample_text' => $entry->sample_text,
+                'order' => $entry->order,
+                'description' => $entry->description,
             ])->toArray(),
             'created_at' => $board->created_at?->toIso8601String(),
         ];
