@@ -125,6 +125,19 @@
                                         <div class="text-xs text-[var(--ui-muted)]">Logo-Varianten verwalten</div>
                                     </div>
                                 </button>
+                                <button
+                                    wire:click="createToneOfVoiceBoard"
+                                    @click="open = false"
+                                    class="w-full text-left px-4 py-2.5 text-sm text-[var(--ui-secondary)] hover:bg-[var(--ui-muted-5)] transition-colors flex items-center gap-3"
+                                >
+                                    <div class="flex items-center justify-center w-8 h-8 rounded-md bg-violet-50">
+                                        @svg('heroicon-o-megaphone', 'w-4 h-4 text-violet-600')
+                                    </div>
+                                    <div>
+                                        <div class="font-medium">Tone of Voice Board</div>
+                                        <div class="text-xs text-[var(--ui-muted)]">Markenstimme & Messaging</div>
+                                    </div>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -132,7 +145,7 @@
             </div>
 
             @php
-                $hasAnyBoards = $ciBoards->count() > 0 || $contentBoards->count() > 0 || $socialBoards->count() > 0 || $kanbanBoards->count() > 0 || $multiContentBoards->count() > 0 || $typographyBoards->count() > 0 || $logoBoards->count() > 0 || $facebookPages->count() > 0 || $instagramAccounts->count() > 0;
+                $hasAnyBoards = $ciBoards->count() > 0 || $contentBoards->count() > 0 || $socialBoards->count() > 0 || $kanbanBoards->count() > 0 || $multiContentBoards->count() > 0 || $typographyBoards->count() > 0 || $logoBoards->count() > 0 || $toneOfVoiceBoards->count() > 0 || $facebookPages->count() > 0 || $instagramAccounts->count() > 0;
             @endphp
 
             @if($hasAnyBoards)
@@ -459,6 +472,52 @@
                         </div>
                     @endif
 
+                    {{-- Tone of Voice Boards Gruppe --}}
+                    @if($toneOfVoiceBoards->count() > 0)
+                        <div>
+                            <div class="flex items-center gap-2 mb-4">
+                                <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-violet-50">
+                                    @svg('heroicon-o-megaphone', 'w-5 h-5 text-violet-600')
+                                </div>
+                                <h3 class="text-lg font-semibold text-[var(--ui-secondary)]">Tone of Voice Boards</h3>
+                                <span class="text-sm text-[var(--ui-muted)]">({{ $toneOfVoiceBoards->count() }})</span>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                                @foreach($toneOfVoiceBoards as $board)
+                                    <div class="group block">
+                                        <div class="bg-white rounded-xl border border-[var(--ui-border)]/60 shadow-sm hover:shadow-lg hover:border-violet-200 transition-all duration-200 p-6 h-full flex flex-col">
+                                            <a href="{{ route('brands.tone-of-voice-boards.show', $board) }}" class="flex items-start justify-between mb-3">
+                                                <div class="flex-1 min-w-0">
+                                                    <h4 class="text-lg font-semibold text-[var(--ui-secondary)] mb-2 group-hover:text-violet-600 transition-colors truncate">{{ $board->name }}</h4>
+                                                    @if($board->description)
+                                                        <p class="text-sm text-[var(--ui-muted)] line-clamp-2">{{ $board->description }}</p>
+                                                    @endif
+                                                </div>
+                                            </a>
+
+                                            <div class="mt-auto pt-4 border-t border-[var(--ui-border)]/40">
+                                                <div class="flex items-center justify-between">
+                                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-violet-50 text-violet-700 text-xs font-medium">
+                                                        @svg('heroicon-o-megaphone', 'w-3.5 h-3.5')
+                                                        Tone of Voice
+                                                    </span>
+                                                    <div class="flex items-center gap-1">
+                                                        <a href="{{ route('brands.export.download-board', ['boardType' => 'tone-of-voice-board', 'boardId' => $board->id, 'format' => 'json']) }}" class="p-1.5 text-[var(--ui-muted)] hover:text-blue-600 hover:bg-blue-50 rounded transition-colors" title="JSON exportieren">
+                                                            @svg('heroicon-o-code-bracket', 'w-4 h-4')
+                                                        </a>
+                                                        <a href="{{ route('brands.export.download-board', ['boardType' => 'tone-of-voice-board', 'boardId' => $board->id, 'format' => 'pdf']) }}" class="p-1.5 text-[var(--ui-muted)] hover:text-red-600 hover:bg-red-50 rounded transition-colors" title="PDF exportieren">
+                                                            @svg('heroicon-o-document', 'w-4 h-4')
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endif
+
                     {{-- Social Accounts Gruppe (Facebook Pages & Instagram) --}}
                     @if($facebookPages->count() > 0 || $instagramAccounts->count() > 0)
                         <div>
@@ -704,7 +763,7 @@
                                     @svg('heroicon-o-squares-2x2', 'w-4 h-4 text-[var(--ui-primary)]')
                                     <span class="text-sm font-semibold text-[var(--ui-secondary)]">Boards</span>
                                 </div>
-                                <span class="text-lg font-bold text-[var(--ui-primary)]">{{ $ciBoards->count() + $contentBoards->count() + $socialBoards->count() + $kanbanBoards->count() + $multiContentBoards->count() + $typographyBoards->count() + $logoBoards->count() }}</span>
+                                <span class="text-lg font-bold text-[var(--ui-primary)]">{{ $ciBoards->count() + $contentBoards->count() + $socialBoards->count() + $kanbanBoards->count() + $multiContentBoards->count() + $typographyBoards->count() + $logoBoards->count() + $toneOfVoiceBoards->count() }}</span>
                             </div>
                             <div class="grid grid-cols-4 gap-2 mt-2">
                                 @if($ciBoards->count() > 0)
@@ -747,6 +806,12 @@
                                     <div class="text-center">
                                         <div class="text-xs font-medium text-emerald-600">{{ $logoBoards->count() }}</div>
                                         <div class="text-[10px] text-[var(--ui-muted)]">Logo</div>
+                                    </div>
+                                @endif
+                                @if($toneOfVoiceBoards->count() > 0)
+                                    <div class="text-center">
+                                        <div class="text-xs font-medium text-violet-600">{{ $toneOfVoiceBoards->count() }}</div>
+                                        <div class="text-[10px] text-[var(--ui-muted)]">ToV</div>
                                     </div>
                                 @endif
                             </div>

@@ -26,6 +26,9 @@ use Platform\Brands\Models\BrandsTypographyBoard;
 use Platform\Brands\Models\BrandsTypographyEntry;
 use Platform\Brands\Models\BrandsLogoBoard;
 use Platform\Brands\Models\BrandsLogoVariant;
+use Platform\Brands\Models\BrandsToneOfVoiceBoard;
+use Platform\Brands\Models\BrandsToneOfVoiceEntry;
+use Platform\Brands\Models\BrandsToneOfVoiceDimension;
 use Platform\Integrations\Models\IntegrationsFacebookPage;
 use Platform\Integrations\Models\IntegrationsInstagramAccount;
 use Platform\Brands\Policies\BrandPolicy;
@@ -41,6 +44,9 @@ use Platform\Brands\Policies\TypographyBoardPolicy;
 use Platform\Brands\Policies\TypographyEntryPolicy;
 use Platform\Brands\Policies\LogoBoardPolicy;
 use Platform\Brands\Policies\LogoVariantPolicy;
+use Platform\Brands\Policies\ToneOfVoiceBoardPolicy;
+use Platform\Brands\Policies\ToneOfVoiceEntryPolicy;
+use Platform\Brands\Policies\ToneOfVoiceDimensionPolicy;
 use Platform\Brands\Policies\FacebookPagePolicy;
 use Platform\Brands\Policies\InstagramAccountPolicy;
 
@@ -169,6 +175,9 @@ class BrandsServiceProvider extends ServiceProvider
             BrandsTypographyEntry::class => TypographyEntryPolicy::class,
             BrandsLogoBoard::class => LogoBoardPolicy::class,
             BrandsLogoVariant::class => LogoVariantPolicy::class,
+            BrandsToneOfVoiceBoard::class => ToneOfVoiceBoardPolicy::class,
+            BrandsToneOfVoiceEntry::class => ToneOfVoiceEntryPolicy::class,
+            BrandsToneOfVoiceDimension::class => ToneOfVoiceDimensionPolicy::class,
             IntegrationsFacebookPage::class => FacebookPagePolicy::class,
             IntegrationsInstagramAccount::class => InstagramAccountPolicy::class,
         ];
@@ -335,6 +344,26 @@ class BrandsServiceProvider extends ServiceProvider
             
             // Content-Tool (generisch für Inhalte/Captions/Texte)
             $registry->register(new \Platform\Brands\Tools\GetContentTool());
+
+            // ToneOfVoiceBoard-Tools
+            $registry->register(new \Platform\Brands\Tools\CreateToneOfVoiceBoardTool());
+            $registry->register(new \Platform\Brands\Tools\ListToneOfVoiceBoardsTool());
+            $registry->register(new \Platform\Brands\Tools\GetToneOfVoiceBoardTool());
+            $registry->register(new \Platform\Brands\Tools\UpdateToneOfVoiceBoardTool());
+            $registry->register(new \Platform\Brands\Tools\DeleteToneOfVoiceBoardTool());
+
+            // ToneOfVoiceEntry-Tools
+            $registry->register(new \Platform\Brands\Tools\CreateToneOfVoiceEntryTool());
+            $registry->register(new \Platform\Brands\Tools\ListToneOfVoiceEntriesTool());
+            $registry->register(new \Platform\Brands\Tools\GetToneOfVoiceEntryTool());
+            $registry->register(new \Platform\Brands\Tools\UpdateToneOfVoiceEntryTool());
+            $registry->register(new \Platform\Brands\Tools\DeleteToneOfVoiceEntryTool());
+
+            // ToneOfVoiceDimension-Tools
+            $registry->register(new \Platform\Brands\Tools\CreateToneOfVoiceDimensionTool());
+            $registry->register(new \Platform\Brands\Tools\ListToneOfVoiceDimensionsTool());
+            $registry->register(new \Platform\Brands\Tools\UpdateToneOfVoiceDimensionTool());
+            $registry->register(new \Platform\Brands\Tools\DeleteToneOfVoiceDimensionTool());
 
             // Export-Tools
             $registry->register(new \Platform\Brands\Tools\ExportBrandTool());

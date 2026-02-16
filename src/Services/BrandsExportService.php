@@ -9,6 +9,7 @@ use Platform\Brands\Models\BrandsSocialBoard;
 use Platform\Brands\Models\BrandsKanbanBoard;
 use Platform\Brands\Models\BrandsMultiContentBoard;
 use Platform\Brands\Models\BrandsTypographyBoard;
+use Platform\Brands\Models\BrandsToneOfVoiceBoard;
 use Platform\Brands\Services\Export\ExportFormatInterface;
 use Platform\Brands\Services\Export\JsonExportFormat;
 use Platform\Brands\Services\Export\PdfExportFormat;
@@ -101,6 +102,8 @@ class BrandsExportService
             'kanbanBoards.slots.cards',
             'multiContentBoards.slots.contentBoards.blocks.content',
             'typographyBoards.entries',
+            'toneOfVoiceBoards.entries',
+            'toneOfVoiceBoards.dimensions',
         ]);
 
         // Extract brand-level CI settings from the first CI board (if any)
@@ -124,6 +127,7 @@ class BrandsExportService
             'kanban_boards' => $brand->kanbanBoards->map(fn ($b) => $this->collectKanbanBoardData($b))->toArray(),
             'multi_content_boards' => $brand->multiContentBoards->map(fn ($b) => $this->collectMultiContentBoardData($b))->toArray(),
             'typography_boards' => $brand->typographyBoards->map(fn ($b) => $this->collectTypographyBoardData($b))->toArray(),
+            'tone_of_voice_boards' => $brand->toneOfVoiceBoards->map(fn ($b) => $this->collectToneOfVoiceBoardData($b))->toArray(),
         ];
     }
 
@@ -140,6 +144,7 @@ class BrandsExportService
             $board instanceof BrandsKanbanBoard => $this->collectKanbanBoardData($board),
             $board instanceof BrandsMultiContentBoard => $this->collectMultiContentBoardData($board),
             $board instanceof BrandsTypographyBoard => $this->collectTypographyBoardData($board),
+            $board instanceof BrandsToneOfVoiceBoard => $this->collectToneOfVoiceBoardData($board),
             default => throw new \InvalidArgumentException('Unbekannter Board-Typ: ' . get_class($board)),
         };
     }
@@ -338,6 +343,42 @@ class BrandsExportService
                 'sample_text' => $entry->sample_text,
                 'order' => $entry->order,
                 'description' => $entry->description,
+            ])->toArray(),
+            'created_at' => $board->created_at?->toIso8601String(),
+        ];
+    }
+
+    protected function collectToneOfVoiceBoardData(BrandsToneOfVoiceBoard $board): array
+    {
+        $board->loadMissing(['entries', 'dimensions']);
+
+        return [
+            'id' => $board->id,
+            'uuid' => $board->uuid,
+            'type' => 'tone_of_voice',
+            'name' => $board->name,
+            'description' => $board->description,
+            'entries' => $board->entries->map(fn ($entry) => [
+                'id' => $entry->id,
+                'uuid' => $entry->uuid,
+                'name' => $entry->name,
+                'type' => $entry->type,
+                'type_label' => $entry->type_label,
+                'content' => $entry->content,
+                'description' => $entry->description,
+                'example_positive' => $entry->example_positive,
+                'example_negative' => $entry->example_negative,
+                'order' => $entry->order,
+            ])->toArray(),
+            'dimensions' => $board->dimensions->map(fn ($dim) => [
+                'id' => $dim->id,
+                'uuid' => $dim->uuid,
+                'name' => $dim->name,
+                'label_left' => $dim->label_left,
+                'label_right' => $dim->label_right,
+                'value' => $dim->value,
+                'description' => $dim->description,
+                'order' => $dim->order,
             ])->toArray(),
             'created_at' => $board->created_at?->toIso8601String(),
         ];

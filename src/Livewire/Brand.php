@@ -200,6 +200,31 @@ class Brand extends Component
         return $this->redirect(route('brands.logo-boards.show', $logoBoard), navigate: true);
     }
 
+    public function createToneOfVoiceBoard()
+    {
+        $this->authorize('update', $this->brand);
+
+        $user = Auth::user();
+        $team = $user->currentTeam;
+
+        if (!$team) {
+            session()->flash('error', 'Kein Team ausgewählt.');
+            return;
+        }
+
+        $toneOfVoiceBoard = \Platform\Brands\Models\BrandsToneOfVoiceBoard::create([
+            'name' => 'Neues Tone of Voice Board',
+            'description' => null,
+            'user_id' => $user->id,
+            'team_id' => $team->id,
+            'brand_id' => $this->brand->id,
+        ]);
+
+        $this->brand->refresh();
+
+        return $this->redirect(route('brands.tone-of-voice-boards.show', $toneOfVoiceBoard), navigate: true);
+    }
+
     public function rendered()
     {
         $this->dispatch('comms', [
@@ -399,6 +424,7 @@ class Brand extends Component
         $multiContentBoards = $this->brand->multiContentBoards;
         $typographyBoards = $this->brand->typographyBoards;
         $logoBoards = $this->brand->logoBoards;
+        $toneOfVoiceBoards = $this->brand->toneOfVoiceBoards;
 
         // Meta Connection laden
         $metaConnection = $this->brand->metaConnection();
@@ -441,6 +467,7 @@ class Brand extends Component
             'multiContentBoards' => $multiContentBoards,
             'typographyBoards' => $typographyBoards,
             'logoBoards' => $logoBoards,
+            'toneOfVoiceBoards' => $toneOfVoiceBoards,
             'facebookPages' => $facebookPages,
             'instagramAccounts' => $instagramAccounts,
             'availableFacebookPages' => $availableFacebookPages,
