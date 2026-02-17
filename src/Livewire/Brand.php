@@ -540,8 +540,8 @@ class Brand extends Component
     {
         $user = Auth::user();
         $team = $user->currentTeam;
-        
-        // CI Boards, Content Boards, Social Boards, Kanban Boards und Multi-Content-Boards für diese Marke laden
+
+        // Alle Board-Typen laden mit Entry-Counts
         $ciBoards = $this->brand->ciBoards;
         $contentBoards = $this->brand->contentBoards;
         $socialBoards = $this->brand->socialBoards;
@@ -556,32 +556,179 @@ class Brand extends Component
         $moodboardBoards = $this->brand->moodboardBoards;
         $assetBoards = $this->brand->assetBoards;
 
+        // Board-Gruppen für tabellarische Darstellung
+        $boardGroups = collect([
+            [
+                'key' => 'ci',
+                'label' => 'CI Boards',
+                'icon' => 'heroicon-o-paint-brush',
+                'color' => 'amber',
+                'boards' => $ciBoards,
+                'routePrefix' => 'brands.ci-boards.show',
+                'boardType' => 'ci-board',
+                'entryRelation' => 'colors',
+                'entryLabel' => 'Farben',
+            ],
+            [
+                'key' => 'content',
+                'label' => 'Content Boards',
+                'icon' => 'heroicon-o-document-text',
+                'color' => 'blue',
+                'boards' => $contentBoards,
+                'routePrefix' => 'brands.content-boards.show',
+                'boardType' => 'content-board',
+                'entryRelation' => 'blocks',
+                'entryLabel' => 'Blöcke',
+            ],
+            [
+                'key' => 'social',
+                'label' => 'Social Boards',
+                'icon' => 'heroicon-o-share',
+                'color' => 'purple',
+                'boards' => $socialBoards,
+                'routePrefix' => 'brands.social-boards.show',
+                'boardType' => 'social-board',
+                'entryRelation' => 'cards',
+                'entryLabel' => 'Cards',
+            ],
+            [
+                'key' => 'kanban',
+                'label' => 'Kanban Boards',
+                'icon' => 'heroicon-o-view-columns',
+                'color' => 'indigo',
+                'boards' => $kanbanBoards,
+                'routePrefix' => 'brands.kanban-boards.show',
+                'boardType' => 'kanban-board',
+                'entryRelation' => 'cards',
+                'entryLabel' => 'Cards',
+            ],
+            [
+                'key' => 'multi-content',
+                'label' => 'Multi-Content-Boards',
+                'icon' => 'heroicon-o-squares-2x2',
+                'color' => 'green',
+                'boards' => $multiContentBoards,
+                'routePrefix' => 'brands.multi-content-boards.show',
+                'boardType' => 'multi-content-board',
+                'entryRelation' => 'slots',
+                'entryLabel' => 'Slots',
+            ],
+            [
+                'key' => 'typography',
+                'label' => 'Typografie Boards',
+                'icon' => 'heroicon-o-language',
+                'color' => 'rose',
+                'boards' => $typographyBoards,
+                'routePrefix' => 'brands.typography-boards.show',
+                'boardType' => 'typography-board',
+                'entryRelation' => 'entries',
+                'entryLabel' => 'Einträge',
+            ],
+            [
+                'key' => 'logo',
+                'label' => 'Logo Boards',
+                'icon' => 'heroicon-o-photo',
+                'color' => 'emerald',
+                'boards' => $logoBoards,
+                'routePrefix' => 'brands.logo-boards.show',
+                'boardType' => 'logo-board',
+                'entryRelation' => 'variants',
+                'entryLabel' => 'Varianten',
+            ],
+            [
+                'key' => 'tone-of-voice',
+                'label' => 'Tone of Voice Boards',
+                'icon' => 'heroicon-o-megaphone',
+                'color' => 'violet',
+                'boards' => $toneOfVoiceBoards,
+                'routePrefix' => 'brands.tone-of-voice-boards.show',
+                'boardType' => 'tone-of-voice-board',
+                'entryRelation' => 'entries',
+                'entryLabel' => 'Einträge',
+            ],
+            [
+                'key' => 'persona',
+                'label' => 'Persona Boards',
+                'icon' => 'heroicon-o-user-group',
+                'color' => 'teal',
+                'boards' => $personaBoards,
+                'routePrefix' => 'brands.persona-boards.show',
+                'boardType' => 'persona-board',
+                'entryRelation' => 'personas',
+                'entryLabel' => 'Personas',
+            ],
+            [
+                'key' => 'competitor',
+                'label' => 'Wettbewerber Boards',
+                'icon' => 'heroicon-o-scale',
+                'color' => 'orange',
+                'boards' => $competitorBoards,
+                'routePrefix' => 'brands.competitor-boards.show',
+                'boardType' => 'competitor-board',
+                'entryRelation' => 'competitors',
+                'entryLabel' => 'Wettbewerber',
+            ],
+            [
+                'key' => 'guideline',
+                'label' => 'Guidelines Boards',
+                'icon' => 'heroicon-o-book-open',
+                'color' => 'cyan',
+                'boards' => $guidelineBoards,
+                'routePrefix' => 'brands.guideline-boards.show',
+                'boardType' => 'guideline-board',
+                'entryRelation' => 'chapters',
+                'entryLabel' => 'Kapitel',
+            ],
+            [
+                'key' => 'moodboard',
+                'label' => 'Moodboard Boards',
+                'icon' => 'heroicon-o-photo',
+                'color' => 'rose',
+                'boards' => $moodboardBoards,
+                'routePrefix' => 'brands.moodboard-boards.show',
+                'boardType' => 'moodboard-board',
+                'entryRelation' => 'images',
+                'entryLabel' => 'Bilder',
+            ],
+            [
+                'key' => 'asset',
+                'label' => 'Asset Boards',
+                'icon' => 'heroicon-o-folder-open',
+                'color' => 'sky',
+                'boards' => $assetBoards,
+                'routePrefix' => 'brands.asset-boards.show',
+                'boardType' => 'asset-board',
+                'entryRelation' => 'assets',
+                'entryLabel' => 'Assets',
+            ],
+        ])->filter(fn($group) => $group['boards']->count() > 0);
+
         // Meta Connection laden
         $metaConnection = $this->brand->metaConnection();
 
         // Verknüpfte Facebook Pages und Instagram Accounts dieser Marke (über Service)
         $facebookPages = $this->brand->facebookPages();
         $instagramAccounts = $this->brand->instagramAccounts();
-        
+
         // Verfügbare Facebook Pages und Instagram Accounts des Users (noch nicht verknüpft)
         $availableFacebookPages = collect();
         $availableInstagramAccounts = collect();
         $linkService = app(\Platform\Integrations\Services\IntegrationAccountLinkService::class);
-        
+
         if ($metaConnection) {
             // Alle Facebook Pages des Users
             $allFacebookPages = \Platform\Integrations\Models\IntegrationsFacebookPage::where('user_id', $user->id)
                 ->get();
-            
+
             // Nur die, die noch nicht verknüpft sind
             $availableFacebookPages = $allFacebookPages->reject(function ($page) use ($linkService) {
                 return $linkService->isFacebookPageLinked($page);
             });
-            
+
             // Alle Instagram Accounts des Users
             $allInstagramAccounts = \Platform\Integrations\Models\IntegrationsInstagramAccount::where('user_id', $user->id)
                 ->get();
-            
+
             // Nur die, die noch nicht verknüpft sind
             $availableInstagramAccounts = $allInstagramAccounts->reject(function ($account) use ($linkService) {
                 return $linkService->isInstagramAccountLinked($account);
@@ -590,6 +737,7 @@ class Brand extends Component
 
         return view('brands::livewire.brand', [
             'user' => $user,
+            'boardGroups' => $boardGroups,
             'ciBoards' => $ciBoards,
             'contentBoards' => $contentBoards,
             'socialBoards' => $socialBoards,

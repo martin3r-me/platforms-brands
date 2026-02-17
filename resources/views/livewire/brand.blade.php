@@ -209,654 +209,147 @@
                 @endcan
             </div>
 
-            @php
-                $hasAnyBoards = $ciBoards->count() > 0 || $contentBoards->count() > 0 || $socialBoards->count() > 0 || $kanbanBoards->count() > 0 || $multiContentBoards->count() > 0 || $typographyBoards->count() > 0 || $logoBoards->count() > 0 || $toneOfVoiceBoards->count() > 0 || $personaBoards->count() > 0 || $competitorBoards->count() > 0 || $guidelineBoards->count() > 0 || $moodboardBoards->count() > 0 || $assetBoards->count() > 0 || $facebookPages->count() > 0 || $instagramAccounts->count() > 0;
-            @endphp
-
-            @if($hasAnyBoards)
-                <div class="space-y-8">
-                    {{-- CI Boards Gruppe --}}
-                    @if($ciBoards->count() > 0)
+            @if($boardGroups->count() > 0 || $facebookPages->count() > 0 || $instagramAccounts->count() > 0)
+                <div class="space-y-6">
+                    @foreach($boardGroups as $group)
                         <div>
-                            <div class="flex items-center gap-2 mb-4">
-                                <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-amber-50">
-                                    @svg('heroicon-o-paint-brush', 'w-5 h-5 text-amber-600')
+                            {{-- Gruppen-Header --}}
+                            <div class="flex items-center gap-2 mb-3">
+                                <div class="flex items-center justify-center w-7 h-7 rounded-lg bg-{{ $group['color'] }}-50">
+                                    @svg($group['icon'], 'w-4 h-4 text-' . $group['color'] . '-600')
                                 </div>
-                                <h3 class="text-lg font-semibold text-[var(--ui-secondary)]">CI Boards</h3>
-                                <span class="text-sm text-[var(--ui-muted)]">({{ $ciBoards->count() }})</span>
+                                <h3 class="text-sm font-semibold text-[var(--ui-secondary)] uppercase tracking-wide">{{ $group['label'] }}</h3>
+                                <span class="text-xs text-[var(--ui-muted)]">({{ $group['boards']->count() }})</span>
                             </div>
-                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                                @foreach($ciBoards as $board)
-                                    <div class="group block">
-                                        <div class="bg-white rounded-xl border border-[var(--ui-border)]/60 shadow-sm hover:shadow-lg hover:border-amber-200 transition-all duration-200 p-6 h-full flex flex-col">
-                                            <a href="{{ route('brands.ci-boards.show', $board) }}" class="flex items-start justify-between mb-3">
-                                                <div class="flex-1 min-w-0">
-                                                    <h4 class="text-lg font-semibold text-[var(--ui-secondary)] mb-2 group-hover:text-amber-600 transition-colors truncate">{{ $board->name }}</h4>
-                                                    @if($board->description)
-                                                        <p class="text-sm text-[var(--ui-muted)] line-clamp-2">{{ $board->description }}</p>
-                                                    @endif
-                                                </div>
-                                            </a>
 
-                                            <div class="mt-auto pt-4 border-t border-[var(--ui-border)]/40">
-                                                <div class="flex items-center justify-between">
-                                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-amber-50 text-amber-700 text-xs font-medium">
-                                                        @svg('heroicon-o-paint-brush', 'w-3.5 h-3.5')
-                                                        CI Board
-                                                    </span>
-                                                    <div class="flex items-center gap-1">
-                                                        <a href="{{ route('brands.export.download-board', ['boardType' => 'ci-board', 'boardId' => $board->id, 'format' => 'json']) }}" class="p-1.5 text-[var(--ui-muted)] hover:text-blue-600 hover:bg-blue-50 rounded transition-colors" title="JSON exportieren">
+                            {{-- Tabelle --}}
+                            <div class="bg-white rounded-xl border border-[var(--ui-border)]/60 shadow-sm overflow-hidden">
+                                <table class="w-full">
+                                    <thead>
+                                        <tr class="border-b border-[var(--ui-border)]/40">
+                                            <th class="text-left text-xs font-medium text-[var(--ui-muted)] uppercase tracking-wider px-4 py-2.5">Name</th>
+                                            <th class="text-left text-xs font-medium text-[var(--ui-muted)] uppercase tracking-wider px-4 py-2.5 hidden sm:table-cell">Status</th>
+                                            <th class="text-right text-xs font-medium text-[var(--ui-muted)] uppercase tracking-wider px-4 py-2.5 hidden md:table-cell">{{ $group['entryLabel'] }}</th>
+                                            <th class="text-right text-xs font-medium text-[var(--ui-muted)] uppercase tracking-wider px-4 py-2.5 hidden lg:table-cell">Letzte Änderung</th>
+                                            <th class="text-right text-xs font-medium text-[var(--ui-muted)] uppercase tracking-wider px-4 py-2.5 w-24">Export</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-[var(--ui-border)]/30">
+                                        @foreach($group['boards'] as $board)
+                                            @php
+                                                $entryCount = $board->{$group['entryRelation']}->count();
+                                            @endphp
+                                            <tr class="group hover:bg-{{ $group['color'] }}-50/30 transition-colors">
+                                                <td class="px-4 py-3">
+                                                    <a href="{{ route($group['routePrefix'], $board) }}" class="block">
+                                                        <div class="font-medium text-sm text-[var(--ui-secondary)] group-hover:text-{{ $group['color'] }}-600 transition-colors">{{ $board->name }}</div>
+                                                        @if($board->description)
+                                                            <div class="text-xs text-[var(--ui-muted)] mt-0.5 line-clamp-1">{{ $board->description }}</div>
+                                                        @endif
+                                                    </a>
+                                                </td>
+                                                <td class="px-4 py-3 hidden sm:table-cell">
+                                                    @if($board->done)
+                                                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-green-50 text-green-700 text-xs font-medium">
+                                                            @svg('heroicon-o-check-circle', 'w-3.5 h-3.5')
+                                                            Erledigt
+                                                        </span>
+                                                    @else
+                                                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-{{ $group['color'] }}-50 text-{{ $group['color'] }}-700 text-xs font-medium">
+                                                            @svg('heroicon-o-clock', 'w-3.5 h-3.5')
+                                                            Aktiv
+                                                        </span>
+                                                    @endif
+                                                </td>
+                                                <td class="px-4 py-3 text-right hidden md:table-cell">
+                                                    <span class="text-sm text-[var(--ui-secondary)] font-medium">{{ $entryCount }}</span>
+                                                </td>
+                                                <td class="px-4 py-3 text-right hidden lg:table-cell">
+                                                    <span class="text-xs text-[var(--ui-muted)]">{{ $board->updated_at->format('d.m.Y H:i') }}</span>
+                                                </td>
+                                                <td class="px-4 py-3 text-right">
+                                                    <div class="flex items-center justify-end gap-1">
+                                                        <a href="{{ route('brands.export.download-board', ['boardType' => $group['boardType'], 'boardId' => $board->id, 'format' => 'json']) }}" class="p-1.5 text-[var(--ui-muted)] hover:text-blue-600 hover:bg-blue-50 rounded transition-colors" title="JSON exportieren">
                                                             @svg('heroicon-o-code-bracket', 'w-4 h-4')
                                                         </a>
-                                                        <a href="{{ route('brands.export.download-board', ['boardType' => 'ci-board', 'boardId' => $board->id, 'format' => 'pdf']) }}" class="p-1.5 text-[var(--ui-muted)] hover:text-red-600 hover:bg-red-50 rounded transition-colors" title="PDF exportieren">
+                                                        <a href="{{ route('brands.export.download-board', ['boardType' => $group['boardType'], 'boardId' => $board->id, 'format' => 'pdf']) }}" class="p-1.5 text-[var(--ui-muted)] hover:text-red-600 hover:bg-red-50 rounded transition-colors" title="PDF exportieren">
                                                             @svg('heroicon-o-document', 'w-4 h-4')
                                                         </a>
                                                     </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                @endforeach
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
-                    @endif
-
-                    {{-- Content Boards Gruppe --}}
-                    @if($contentBoards->count() > 0)
-                        <div>
-                            <div class="flex items-center gap-2 mb-4">
-                                <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-blue-50">
-                                    @svg('heroicon-o-document-text', 'w-5 h-5 text-blue-600')
-                                </div>
-                                <h3 class="text-lg font-semibold text-[var(--ui-secondary)]">Content Boards</h3>
-                                <span class="text-sm text-[var(--ui-muted)]">({{ $contentBoards->count() }})</span>
-                            </div>
-                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                                @foreach($contentBoards as $board)
-                                    <div class="group block">
-                                        <div class="bg-white rounded-xl border border-[var(--ui-border)]/60 shadow-sm hover:shadow-lg hover:border-blue-200 transition-all duration-200 p-6 h-full flex flex-col">
-                                            <a href="{{ route('brands.content-boards.show', $board) }}" class="flex items-start justify-between mb-3">
-                                                <div class="flex-1 min-w-0">
-                                                    <h4 class="text-lg font-semibold text-[var(--ui-secondary)] mb-2 group-hover:text-blue-600 transition-colors truncate">{{ $board->name }}</h4>
-                                                    @if($board->description)
-                                                        <p class="text-sm text-[var(--ui-muted)] line-clamp-2">{{ $board->description }}</p>
-                                                    @endif
-                                                </div>
-                                            </a>
-
-                                            <div class="mt-auto pt-4 border-t border-[var(--ui-border)]/40">
-                                                <div class="flex items-center justify-between">
-                                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-blue-50 text-blue-700 text-xs font-medium">
-                                                        @svg('heroicon-o-document-text', 'w-3.5 h-3.5')
-                                                        Content Board
-                                                    </span>
-                                                    <div class="flex items-center gap-1">
-                                                        <a href="{{ route('brands.export.download-board', ['boardType' => 'content-board', 'boardId' => $board->id, 'format' => 'json']) }}" class="p-1.5 text-[var(--ui-muted)] hover:text-blue-600 hover:bg-blue-50 rounded transition-colors" title="JSON exportieren">
-                                                            @svg('heroicon-o-code-bracket', 'w-4 h-4')
-                                                        </a>
-                                                        <a href="{{ route('brands.export.download-board', ['boardType' => 'content-board', 'boardId' => $board->id, 'format' => 'pdf']) }}" class="p-1.5 text-[var(--ui-muted)] hover:text-red-600 hover:bg-red-50 rounded transition-colors" title="PDF exportieren">
-                                                            @svg('heroicon-o-document', 'w-4 h-4')
-                                                        </a>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                @endforeach
-                            </div>
-                        </div>
-                    @endif
-
-                    {{-- Social Boards Gruppe --}}
-                    @if($socialBoards->count() > 0)
-                        <div>
-                            <div class="flex items-center gap-2 mb-4">
-                                <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-purple-50">
-                                    @svg('heroicon-o-share', 'w-5 h-5 text-purple-600')
-                                </div>
-                                <h3 class="text-lg font-semibold text-[var(--ui-secondary)]">Social Boards</h3>
-                                <span class="text-sm text-[var(--ui-muted)]">({{ $socialBoards->count() }})</span>
-                            </div>
-                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                                @foreach($socialBoards as $board)
-                                    <div class="group block">
-                                        <div class="bg-white rounded-xl border border-[var(--ui-border)]/60 shadow-sm hover:shadow-lg hover:border-purple-200 transition-all duration-200 p-6 h-full flex flex-col">
-                                            <a href="{{ route('brands.social-boards.show', $board) }}" class="flex items-start justify-between mb-3">
-                                                <div class="flex-1 min-w-0">
-                                                    <h4 class="text-lg font-semibold text-[var(--ui-secondary)] mb-2 group-hover:text-purple-600 transition-colors truncate">{{ $board->name }}</h4>
-                                                    @if($board->description)
-                                                        <p class="text-sm text-[var(--ui-muted)] line-clamp-2">{{ $board->description }}</p>
-                                                    @endif
-                                                </div>
-                                            </a>
-
-                                            <div class="mt-auto pt-4 border-t border-[var(--ui-border)]/40">
-                                                <div class="flex items-center justify-between">
-                                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-purple-50 text-purple-700 text-xs font-medium">
-                                                        @svg('heroicon-o-share', 'w-3.5 h-3.5')
-                                                        Social Board
-                                                    </span>
-                                                    <div class="flex items-center gap-1">
-                                                        <a href="{{ route('brands.export.download-board', ['boardType' => 'social-board', 'boardId' => $board->id, 'format' => 'json']) }}" class="p-1.5 text-[var(--ui-muted)] hover:text-blue-600 hover:bg-blue-50 rounded transition-colors" title="JSON exportieren">
-                                                            @svg('heroicon-o-code-bracket', 'w-4 h-4')
-                                                        </a>
-                                                        <a href="{{ route('brands.export.download-board', ['boardType' => 'social-board', 'boardId' => $board->id, 'format' => 'pdf']) }}" class="p-1.5 text-[var(--ui-muted)] hover:text-red-600 hover:bg-red-50 rounded transition-colors" title="PDF exportieren">
-                                                            @svg('heroicon-o-document', 'w-4 h-4')
-                                                        </a>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                @endforeach
-                            </div>
-                        </div>
-                    @endif
-
-                    {{-- Kanban Boards Gruppe --}}
-                    @if($kanbanBoards->count() > 0)
-                        <div>
-                            <div class="flex items-center gap-2 mb-4">
-                                <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-indigo-50">
-                                    @svg('heroicon-o-view-columns', 'w-5 h-5 text-indigo-600')
-                                </div>
-                                <h3 class="text-lg font-semibold text-[var(--ui-secondary)]">Kanban Boards</h3>
-                                <span class="text-sm text-[var(--ui-muted)]">({{ $kanbanBoards->count() }})</span>
-                            </div>
-                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                                @foreach($kanbanBoards as $board)
-                                    <div class="group block">
-                                        <div class="bg-white rounded-xl border border-[var(--ui-border)]/60 shadow-sm hover:shadow-lg hover:border-indigo-200 transition-all duration-200 p-6 h-full flex flex-col">
-                                            <a href="{{ route('brands.kanban-boards.show', $board) }}" class="flex items-start justify-between mb-3">
-                                                <div class="flex-1 min-w-0">
-                                                    <h4 class="text-lg font-semibold text-[var(--ui-secondary)] mb-2 group-hover:text-indigo-600 transition-colors truncate">{{ $board->name }}</h4>
-                                                    @if($board->description)
-                                                        <p class="text-sm text-[var(--ui-muted)] line-clamp-2">{{ $board->description }}</p>
-                                                    @endif
-                                                </div>
-                                            </a>
-
-                                            <div class="mt-auto pt-4 border-t border-[var(--ui-border)]/40">
-                                                <div class="flex items-center justify-between">
-                                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-indigo-50 text-indigo-700 text-xs font-medium">
-                                                        @svg('heroicon-o-view-columns', 'w-3.5 h-3.5')
-                                                        Kanban Board
-                                                    </span>
-                                                    <div class="flex items-center gap-1">
-                                                        <a href="{{ route('brands.export.download-board', ['boardType' => 'kanban-board', 'boardId' => $board->id, 'format' => 'json']) }}" class="p-1.5 text-[var(--ui-muted)] hover:text-blue-600 hover:bg-blue-50 rounded transition-colors" title="JSON exportieren">
-                                                            @svg('heroicon-o-code-bracket', 'w-4 h-4')
-                                                        </a>
-                                                        <a href="{{ route('brands.export.download-board', ['boardType' => 'kanban-board', 'boardId' => $board->id, 'format' => 'pdf']) }}" class="p-1.5 text-[var(--ui-muted)] hover:text-red-600 hover:bg-red-50 rounded transition-colors" title="PDF exportieren">
-                                                            @svg('heroicon-o-document', 'w-4 h-4')
-                                                        </a>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                @endforeach
-                            </div>
-                        </div>
-                    @endif
-
-                    {{-- Multi-Content-Boards Gruppe --}}
-                    @if($multiContentBoards->count() > 0)
-                        <div>
-                            <div class="flex items-center gap-2 mb-4">
-                                <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-green-50">
-                                    @svg('heroicon-o-squares-2x2', 'w-5 h-5 text-green-600')
-                                </div>
-                                <h3 class="text-lg font-semibold text-[var(--ui-secondary)]">Multi-Content-Boards</h3>
-                                <span class="text-sm text-[var(--ui-muted)]">({{ $multiContentBoards->count() }})</span>
-                            </div>
-                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                                @foreach($multiContentBoards as $board)
-                                    <div class="group block">
-                                        <div class="bg-white rounded-xl border border-[var(--ui-border)]/60 shadow-sm hover:shadow-lg hover:border-green-200 transition-all duration-200 p-6 h-full flex flex-col">
-                                            <a href="{{ route('brands.multi-content-boards.show', $board) }}" class="flex items-start justify-between mb-3">
-                                                <div class="flex-1 min-w-0">
-                                                    <h4 class="text-lg font-semibold text-[var(--ui-secondary)] mb-2 group-hover:text-green-600 transition-colors truncate">{{ $board->name }}</h4>
-                                                    @if($board->description)
-                                                        <p class="text-sm text-[var(--ui-muted)] line-clamp-2">{{ $board->description }}</p>
-                                                    @endif
-                                                </div>
-                                            </a>
-
-                                            <div class="mt-auto pt-4 border-t border-[var(--ui-border)]/40">
-                                                <div class="flex items-center justify-between">
-                                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-green-50 text-green-700 text-xs font-medium">
-                                                        @svg('heroicon-o-squares-2x2', 'w-3.5 h-3.5')
-                                                        Multi-Content-Board
-                                                    </span>
-                                                    <div class="flex items-center gap-1">
-                                                        <a href="{{ route('brands.export.download-board', ['boardType' => 'multi-content-board', 'boardId' => $board->id, 'format' => 'json']) }}" class="p-1.5 text-[var(--ui-muted)] hover:text-blue-600 hover:bg-blue-50 rounded transition-colors" title="JSON exportieren">
-                                                            @svg('heroicon-o-code-bracket', 'w-4 h-4')
-                                                        </a>
-                                                        <a href="{{ route('brands.export.download-board', ['boardType' => 'multi-content-board', 'boardId' => $board->id, 'format' => 'pdf']) }}" class="p-1.5 text-[var(--ui-muted)] hover:text-red-600 hover:bg-red-50 rounded transition-colors" title="PDF exportieren">
-                                                            @svg('heroicon-o-document', 'w-4 h-4')
-                                                        </a>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                @endforeach
-                            </div>
-                        </div>
-                    @endif
-
-                    {{-- Typography Boards Gruppe --}}
-                    @if($typographyBoards->count() > 0)
-                        <div>
-                            <div class="flex items-center gap-2 mb-4">
-                                <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-rose-50">
-                                    @svg('heroicon-o-language', 'w-5 h-5 text-rose-600')
-                                </div>
-                                <h3 class="text-lg font-semibold text-[var(--ui-secondary)]">Typografie Boards</h3>
-                                <span class="text-sm text-[var(--ui-muted)]">({{ $typographyBoards->count() }})</span>
-                            </div>
-                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                                @foreach($typographyBoards as $board)
-                                    <div class="group block">
-                                        <div class="bg-white rounded-xl border border-[var(--ui-border)]/60 shadow-sm hover:shadow-lg hover:border-rose-200 transition-all duration-200 p-6 h-full flex flex-col">
-                                            <a href="{{ route('brands.typography-boards.show', $board) }}" class="flex items-start justify-between mb-3">
-                                                <div class="flex-1 min-w-0">
-                                                    <h4 class="text-lg font-semibold text-[var(--ui-secondary)] mb-2 group-hover:text-rose-600 transition-colors truncate">{{ $board->name }}</h4>
-                                                    @if($board->description)
-                                                        <p class="text-sm text-[var(--ui-muted)] line-clamp-2">{{ $board->description }}</p>
-                                                    @endif
-                                                </div>
-                                            </a>
-
-                                            <div class="mt-auto pt-4 border-t border-[var(--ui-border)]/40">
-                                                <div class="flex items-center justify-between">
-                                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-rose-50 text-rose-700 text-xs font-medium">
-                                                        @svg('heroicon-o-language', 'w-3.5 h-3.5')
-                                                        Typografie
-                                                    </span>
-                                                    <div class="flex items-center gap-1">
-                                                        <a href="{{ route('brands.export.download-board', ['boardType' => 'typography-board', 'boardId' => $board->id, 'format' => 'json']) }}" class="p-1.5 text-[var(--ui-muted)] hover:text-blue-600 hover:bg-blue-50 rounded transition-colors" title="JSON exportieren">
-                                                            @svg('heroicon-o-code-bracket', 'w-4 h-4')
-                                                        </a>
-                                                        <a href="{{ route('brands.export.download-board', ['boardType' => 'typography-board', 'boardId' => $board->id, 'format' => 'pdf']) }}" class="p-1.5 text-[var(--ui-muted)] hover:text-red-600 hover:bg-red-50 rounded transition-colors" title="PDF exportieren">
-                                                            @svg('heroicon-o-document', 'w-4 h-4')
-                                                        </a>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                @endforeach
-                            </div>
-                        </div>
-                    @endif
-
-                    {{-- Logo Boards Gruppe --}}
-                    @if($logoBoards->count() > 0)
-                        <div>
-                            <div class="flex items-center gap-2 mb-4">
-                                <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-emerald-50">
-                                    @svg('heroicon-o-photo', 'w-5 h-5 text-emerald-600')
-                                </div>
-                                <h3 class="text-lg font-semibold text-[var(--ui-secondary)]">Logo Boards</h3>
-                                <span class="text-sm text-[var(--ui-muted)]">({{ $logoBoards->count() }})</span>
-                            </div>
-                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                                @foreach($logoBoards as $board)
-                                    <div class="group block">
-                                        <div class="bg-white rounded-xl border border-[var(--ui-border)]/60 shadow-sm hover:shadow-lg hover:border-emerald-200 transition-all duration-200 p-6 h-full flex flex-col">
-                                            <a href="{{ route('brands.logo-boards.show', $board) }}" class="flex items-start justify-between mb-3">
-                                                <div class="flex-1 min-w-0">
-                                                    <h4 class="text-lg font-semibold text-[var(--ui-secondary)] mb-2 group-hover:text-emerald-600 transition-colors truncate">{{ $board->name }}</h4>
-                                                    @if($board->description)
-                                                        <p class="text-sm text-[var(--ui-muted)] line-clamp-2">{{ $board->description }}</p>
-                                                    @endif
-                                                </div>
-                                            </a>
-
-                                            <div class="mt-auto pt-4 border-t border-[var(--ui-border)]/40">
-                                                <div class="flex items-center justify-between">
-                                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-emerald-50 text-emerald-700 text-xs font-medium">
-                                                        @svg('heroicon-o-photo', 'w-3.5 h-3.5')
-                                                        Logo Board
-                                                    </span>
-                                                    <div class="flex items-center gap-1">
-                                                        <a href="{{ route('brands.export.download-board', ['boardType' => 'logo-board', 'boardId' => $board->id, 'format' => 'json']) }}" class="p-1.5 text-[var(--ui-muted)] hover:text-blue-600 hover:bg-blue-50 rounded transition-colors" title="JSON exportieren">
-                                                            @svg('heroicon-o-code-bracket', 'w-4 h-4')
-                                                        </a>
-                                                        <a href="{{ route('brands.export.download-board', ['boardType' => 'logo-board', 'boardId' => $board->id, 'format' => 'pdf']) }}" class="p-1.5 text-[var(--ui-muted)] hover:text-red-600 hover:bg-red-50 rounded transition-colors" title="PDF exportieren">
-                                                            @svg('heroicon-o-document', 'w-4 h-4')
-                                                        </a>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                @endforeach
-                            </div>
-                        </div>
-                    @endif
-
-                    {{-- Tone of Voice Boards Gruppe --}}
-                    @if($toneOfVoiceBoards->count() > 0)
-                        <div>
-                            <div class="flex items-center gap-2 mb-4">
-                                <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-violet-50">
-                                    @svg('heroicon-o-megaphone', 'w-5 h-5 text-violet-600')
-                                </div>
-                                <h3 class="text-lg font-semibold text-[var(--ui-secondary)]">Tone of Voice Boards</h3>
-                                <span class="text-sm text-[var(--ui-muted)]">({{ $toneOfVoiceBoards->count() }})</span>
-                            </div>
-                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                                @foreach($toneOfVoiceBoards as $board)
-                                    <div class="group block">
-                                        <div class="bg-white rounded-xl border border-[var(--ui-border)]/60 shadow-sm hover:shadow-lg hover:border-violet-200 transition-all duration-200 p-6 h-full flex flex-col">
-                                            <a href="{{ route('brands.tone-of-voice-boards.show', $board) }}" class="flex items-start justify-between mb-3">
-                                                <div class="flex-1 min-w-0">
-                                                    <h4 class="text-lg font-semibold text-[var(--ui-secondary)] mb-2 group-hover:text-violet-600 transition-colors truncate">{{ $board->name }}</h4>
-                                                    @if($board->description)
-                                                        <p class="text-sm text-[var(--ui-muted)] line-clamp-2">{{ $board->description }}</p>
-                                                    @endif
-                                                </div>
-                                            </a>
-
-                                            <div class="mt-auto pt-4 border-t border-[var(--ui-border)]/40">
-                                                <div class="flex items-center justify-between">
-                                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-violet-50 text-violet-700 text-xs font-medium">
-                                                        @svg('heroicon-o-megaphone', 'w-3.5 h-3.5')
-                                                        Tone of Voice
-                                                    </span>
-                                                    <div class="flex items-center gap-1">
-                                                        <a href="{{ route('brands.export.download-board', ['boardType' => 'tone-of-voice-board', 'boardId' => $board->id, 'format' => 'json']) }}" class="p-1.5 text-[var(--ui-muted)] hover:text-blue-600 hover:bg-blue-50 rounded transition-colors" title="JSON exportieren">
-                                                            @svg('heroicon-o-code-bracket', 'w-4 h-4')
-                                                        </a>
-                                                        <a href="{{ route('brands.export.download-board', ['boardType' => 'tone-of-voice-board', 'boardId' => $board->id, 'format' => 'pdf']) }}" class="p-1.5 text-[var(--ui-muted)] hover:text-red-600 hover:bg-red-50 rounded transition-colors" title="PDF exportieren">
-                                                            @svg('heroicon-o-document', 'w-4 h-4')
-                                                        </a>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                @endforeach
-                            </div>
-                        </div>
-                    @endif
-
-                    {{-- Persona Boards Gruppe --}}
-                    @if($personaBoards->count() > 0)
-                        <div>
-                            <div class="flex items-center gap-2 mb-4">
-                                <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-teal-50">
-                                    @svg('heroicon-o-user-group', 'w-5 h-5 text-teal-600')
-                                </div>
-                                <h3 class="text-lg font-semibold text-[var(--ui-secondary)]">Persona Boards</h3>
-                                <span class="text-sm text-[var(--ui-muted)]">({{ $personaBoards->count() }})</span>
-                            </div>
-                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                                @foreach($personaBoards as $board)
-                                    <div class="group block">
-                                        <div class="bg-white rounded-xl border border-[var(--ui-border)]/60 shadow-sm hover:shadow-lg hover:border-teal-200 transition-all duration-200 p-6 h-full flex flex-col">
-                                            <a href="{{ route('brands.persona-boards.show', $board) }}" class="flex items-start justify-between mb-3">
-                                                <div class="flex-1 min-w-0">
-                                                    <h4 class="text-lg font-semibold text-[var(--ui-secondary)] mb-2 group-hover:text-teal-600 transition-colors truncate">{{ $board->name }}</h4>
-                                                    @if($board->description)
-                                                        <p class="text-sm text-[var(--ui-muted)] line-clamp-2">{{ $board->description }}</p>
-                                                    @endif
-                                                </div>
-                                            </a>
-
-                                            <div class="mt-auto pt-4 border-t border-[var(--ui-border)]/40">
-                                                <div class="flex items-center justify-between">
-                                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-teal-50 text-teal-700 text-xs font-medium">
-                                                        @svg('heroicon-o-user-group', 'w-3.5 h-3.5')
-                                                        Personas
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                @endforeach
-                            </div>
-                        </div>
-                    @endif
-
-                    {{-- Competitor Boards Gruppe --}}
-                    @if($competitorBoards->count() > 0)
-                        <div>
-                            <div class="flex items-center gap-2 mb-4">
-                                <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-orange-50">
-                                    @svg('heroicon-o-scale', 'w-5 h-5 text-orange-600')
-                                </div>
-                                <h3 class="text-lg font-semibold text-[var(--ui-secondary)]">Wettbewerber Boards</h3>
-                                <span class="text-sm text-[var(--ui-muted)]">({{ $competitorBoards->count() }})</span>
-                            </div>
-                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                                @foreach($competitorBoards as $board)
-                                    <div class="group block">
-                                        <div class="bg-white rounded-xl border border-[var(--ui-border)]/60 shadow-sm hover:shadow-lg hover:border-orange-200 transition-all duration-200 p-6 h-full flex flex-col">
-                                            <a href="{{ route('brands.competitor-boards.show', $board) }}" class="flex items-start justify-between mb-3">
-                                                <div class="flex-1 min-w-0">
-                                                    <h4 class="text-lg font-semibold text-[var(--ui-secondary)] mb-2 group-hover:text-orange-600 transition-colors truncate">{{ $board->name }}</h4>
-                                                    @if($board->description)
-                                                        <p class="text-sm text-[var(--ui-muted)] line-clamp-2">{{ $board->description }}</p>
-                                                    @endif
-                                                </div>
-                                            </a>
-
-                                            <div class="mt-auto pt-4 border-t border-[var(--ui-border)]/40">
-                                                <div class="flex items-center justify-between">
-                                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-orange-50 text-orange-700 text-xs font-medium">
-                                                        @svg('heroicon-o-scale', 'w-3.5 h-3.5')
-                                                        Wettbewerber
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                @endforeach
-                            </div>
-                        </div>
-                    @endif
-
-                    {{-- Guidelines Boards Gruppe --}}
-                    @if($guidelineBoards->count() > 0)
-                        <div>
-                            <div class="flex items-center gap-2 mb-4">
-                                <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-cyan-50">
-                                    @svg('heroicon-o-book-open', 'w-5 h-5 text-cyan-600')
-                                </div>
-                                <h3 class="text-lg font-semibold text-[var(--ui-secondary)]">Guidelines Boards</h3>
-                                <span class="text-sm text-[var(--ui-muted)]">({{ $guidelineBoards->count() }})</span>
-                            </div>
-                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                                @foreach($guidelineBoards as $board)
-                                    <div class="group block">
-                                        <div class="bg-white rounded-xl border border-[var(--ui-border)]/60 shadow-sm hover:shadow-lg hover:border-cyan-200 transition-all duration-200 p-6 h-full flex flex-col">
-                                            <a href="{{ route('brands.guideline-boards.show', $board) }}" class="flex items-start justify-between mb-3">
-                                                <div class="flex-1 min-w-0">
-                                                    <h4 class="text-lg font-semibold text-[var(--ui-secondary)] mb-2 group-hover:text-cyan-600 transition-colors truncate">{{ $board->name }}</h4>
-                                                    @if($board->description)
-                                                        <p class="text-sm text-[var(--ui-muted)] line-clamp-2">{{ $board->description }}</p>
-                                                    @endif
-                                                </div>
-                                            </a>
-
-                                            <div class="mt-auto pt-4 border-t border-[var(--ui-border)]/40">
-                                                <div class="flex items-center justify-between">
-                                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-cyan-50 text-cyan-700 text-xs font-medium">
-                                                        @svg('heroicon-o-book-open', 'w-3.5 h-3.5')
-                                                        Guidelines
-                                                    </span>
-                                                    <div class="flex items-center gap-1">
-                                                        <a href="{{ route('brands.export.download-board', ['boardType' => 'guideline-board', 'boardId' => $board->id, 'format' => 'json']) }}" class="p-1.5 text-[var(--ui-muted)] hover:text-blue-600 hover:bg-blue-50 rounded transition-colors" title="JSON exportieren">
-                                                            @svg('heroicon-o-code-bracket', 'w-4 h-4')
-                                                        </a>
-                                                        <a href="{{ route('brands.export.download-board', ['boardType' => 'guideline-board', 'boardId' => $board->id, 'format' => 'pdf']) }}" class="p-1.5 text-[var(--ui-muted)] hover:text-red-600 hover:bg-red-50 rounded transition-colors" title="PDF exportieren">
-                                                            @svg('heroicon-o-document', 'w-4 h-4')
-                                                        </a>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                @endforeach
-                            </div>
-                        </div>
-                    @endif
-
-                    {{-- Moodboard Boards Gruppe --}}
-                    @if($moodboardBoards->count() > 0)
-                        <div>
-                            <div class="flex items-center gap-2 mb-4">
-                                <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-rose-50">
-                                    @svg('heroicon-o-photo', 'w-5 h-5 text-rose-600')
-                                </div>
-                                <h3 class="text-lg font-semibold text-[var(--ui-secondary)]">Moodboard Boards</h3>
-                                <span class="text-sm text-[var(--ui-muted)]">({{ $moodboardBoards->count() }})</span>
-                            </div>
-                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                                @foreach($moodboardBoards as $board)
-                                    <div class="group block">
-                                        <div class="bg-white rounded-xl border border-[var(--ui-border)]/60 shadow-sm hover:shadow-lg hover:border-rose-200 transition-all duration-200 p-6 h-full flex flex-col">
-                                            <a href="{{ route('brands.moodboard-boards.show', $board) }}" class="flex items-start justify-between mb-3">
-                                                <div class="flex-1 min-w-0">
-                                                    <h4 class="text-lg font-semibold text-[var(--ui-secondary)] mb-2 group-hover:text-rose-600 transition-colors truncate">{{ $board->name }}</h4>
-                                                    @if($board->description)
-                                                        <p class="text-sm text-[var(--ui-muted)] line-clamp-2">{{ $board->description }}</p>
-                                                    @endif
-                                                </div>
-                                            </a>
-
-                                            <div class="mt-auto pt-4 border-t border-[var(--ui-border)]/40">
-                                                <div class="flex items-center justify-between">
-                                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-rose-50 text-rose-700 text-xs font-medium">
-                                                        @svg('heroicon-o-photo', 'w-3.5 h-3.5')
-                                                        Moodboard
-                                                    </span>
-                                                    <div class="flex items-center gap-1">
-                                                        <a href="{{ route('brands.export.download-board', ['boardType' => 'moodboard-board', 'boardId' => $board->id, 'format' => 'json']) }}" class="p-1.5 text-[var(--ui-muted)] hover:text-blue-600 hover:bg-blue-50 rounded transition-colors" title="JSON exportieren">
-                                                            @svg('heroicon-o-code-bracket', 'w-4 h-4')
-                                                        </a>
-                                                        <a href="{{ route('brands.export.download-board', ['boardType' => 'moodboard-board', 'boardId' => $board->id, 'format' => 'pdf']) }}" class="p-1.5 text-[var(--ui-muted)] hover:text-red-600 hover:bg-red-50 rounded transition-colors" title="PDF exportieren">
-                                                            @svg('heroicon-o-document', 'w-4 h-4')
-                                                        </a>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                @endforeach
-                            </div>
-                        </div>
-                    @endif
-
-                    {{-- Asset Boards Gruppe --}}
-                    @if($assetBoards->count() > 0)
-                        <div>
-                            <div class="flex items-center gap-2 mb-4">
-                                <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-sky-50">
-                                    @svg('heroicon-o-folder-open', 'w-5 h-5 text-sky-600')
-                                </div>
-                                <h3 class="text-lg font-semibold text-[var(--ui-secondary)]">Asset Boards</h3>
-                                <span class="text-sm text-[var(--ui-muted)]">({{ $assetBoards->count() }})</span>
-                            </div>
-                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                                @foreach($assetBoards as $board)
-                                    <div class="group block">
-                                        <div class="bg-white rounded-xl border border-[var(--ui-border)]/60 shadow-sm hover:shadow-lg hover:border-sky-200 transition-all duration-200 p-6 h-full flex flex-col">
-                                            <a href="{{ route('brands.asset-boards.show', $board) }}" class="flex items-start justify-between mb-3">
-                                                <div class="flex-1 min-w-0">
-                                                    <h4 class="text-lg font-semibold text-[var(--ui-secondary)] mb-2 group-hover:text-sky-600 transition-colors truncate">{{ $board->name }}</h4>
-                                                    @if($board->description)
-                                                        <p class="text-sm text-[var(--ui-muted)] line-clamp-2">{{ $board->description }}</p>
-                                                    @endif
-                                                </div>
-                                            </a>
-
-                                            <div class="mt-auto pt-4 border-t border-[var(--ui-border)]/40">
-                                                <div class="flex items-center justify-between">
-                                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-sky-50 text-sky-700 text-xs font-medium">
-                                                        @svg('heroicon-o-folder-open', 'w-3.5 h-3.5')
-                                                        Asset Board
-                                                    </span>
-                                                    <div class="flex items-center gap-1">
-                                                        <a href="{{ route('brands.export.download-board', ['boardType' => 'asset-board', 'boardId' => $board->id, 'format' => 'json']) }}" class="p-1.5 text-[var(--ui-muted)] hover:text-blue-600 hover:bg-blue-50 rounded transition-colors" title="JSON exportieren">
-                                                            @svg('heroicon-o-code-bracket', 'w-4 h-4')
-                                                        </a>
-                                                        <a href="{{ route('brands.export.download-board', ['boardType' => 'asset-board', 'boardId' => $board->id, 'format' => 'pdf']) }}" class="p-1.5 text-[var(--ui-muted)] hover:text-red-600 hover:bg-red-50 rounded transition-colors" title="PDF exportieren">
-                                                            @svg('heroicon-o-document', 'w-4 h-4')
-                                                        </a>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                @endforeach
-                            </div>
-                        </div>
-                    @endif
+                    @endforeach
 
                     {{-- Social Accounts Gruppe (Facebook Pages & Instagram) --}}
                     @if($facebookPages->count() > 0 || $instagramAccounts->count() > 0)
                         <div>
-                            <div class="flex items-center gap-2 mb-4">
-                                <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-gradient-to-br from-blue-50 to-pink-50">
-                                    @svg('heroicon-o-globe-alt', 'w-5 h-5 text-blue-600')
+                            <div class="flex items-center gap-2 mb-3">
+                                <div class="flex items-center justify-center w-7 h-7 rounded-lg bg-gradient-to-br from-blue-50 to-pink-50">
+                                    @svg('heroicon-o-globe-alt', 'w-4 h-4 text-blue-600')
                                 </div>
-                                <h3 class="text-lg font-semibold text-[var(--ui-secondary)]">Social Accounts</h3>
-                                <span class="text-sm text-[var(--ui-muted)]">({{ $facebookPages->count() + $instagramAccounts->count() }})</span>
+                                <h3 class="text-sm font-semibold text-[var(--ui-secondary)] uppercase tracking-wide">Social Accounts</h3>
+                                <span class="text-xs text-[var(--ui-muted)]">({{ $facebookPages->count() + $instagramAccounts->count() }})</span>
                             </div>
-                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                                {{-- Facebook Pages --}}
-                                @foreach($facebookPages as $facebookPage)
-                                    <a href="{{ route('brands.facebook-pages.show', $facebookPage) }}" class="group block">
-                                        <div class="bg-white rounded-xl border border-[var(--ui-border)]/60 shadow-sm hover:shadow-lg hover:border-blue-200 transition-all duration-200 p-6 h-full flex flex-col">
-                                            <div class="flex items-start justify-between mb-3">
-                                                <div class="flex-1 min-w-0">
-                                                    <h4 class="text-lg font-semibold text-[var(--ui-secondary)] mb-2 group-hover:text-blue-600 transition-colors truncate">{{ $facebookPage->name }}</h4>
-                                                    @if($facebookPage->description)
-                                                        <p class="text-sm text-[var(--ui-muted)] line-clamp-2">{{ $facebookPage->description }}</p>
-                                                    @endif
-                                                </div>
-                                            </div>
-                                            
-                                            <div class="mt-auto pt-4 border-t border-[var(--ui-border)]/40">
-                                                <div class="flex items-center gap-2">
-                                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-blue-50 text-blue-700 text-xs font-medium">
+
+                            <div class="bg-white rounded-xl border border-[var(--ui-border)]/60 shadow-sm overflow-hidden">
+                                <table class="w-full">
+                                    <thead>
+                                        <tr class="border-b border-[var(--ui-border)]/40">
+                                            <th class="text-left text-xs font-medium text-[var(--ui-muted)] uppercase tracking-wider px-4 py-2.5">Name</th>
+                                            <th class="text-left text-xs font-medium text-[var(--ui-muted)] uppercase tracking-wider px-4 py-2.5 hidden sm:table-cell">Typ</th>
+                                            <th class="text-right text-xs font-medium text-[var(--ui-muted)] uppercase tracking-wider px-4 py-2.5 hidden lg:table-cell">Verknüpft seit</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-[var(--ui-border)]/30">
+                                        @foreach($facebookPages as $facebookPage)
+                                            <tr class="group hover:bg-blue-50/30 transition-colors">
+                                                <td class="px-4 py-3">
+                                                    <a href="{{ route('brands.facebook-pages.show', $facebookPage) }}" class="block">
+                                                        <div class="font-medium text-sm text-[var(--ui-secondary)] group-hover:text-blue-600 transition-colors">{{ $facebookPage->name }}</div>
+                                                        @if($facebookPage->description)
+                                                            <div class="text-xs text-[var(--ui-muted)] mt-0.5 line-clamp-1">{{ $facebookPage->description }}</div>
+                                                        @endif
+                                                    </a>
+                                                </td>
+                                                <td class="px-4 py-3 hidden sm:table-cell">
+                                                    <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 text-xs font-medium">
                                                         @svg('heroicon-o-globe-alt', 'w-3.5 h-3.5')
                                                         Facebook Page
                                                     </span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </a>
-                                @endforeach
-
-                                {{-- Instagram Accounts --}}
-                                @foreach($instagramAccounts as $instagramAccount)
-                                    <a href="{{ route('brands.instagram-accounts.show', $instagramAccount) }}" class="group block">
-                                        <div class="bg-white rounded-xl border border-[var(--ui-border)]/60 shadow-sm hover:shadow-lg hover:border-pink-200 transition-all duration-200 p-6 h-full flex flex-col">
-                                            <div class="flex items-start justify-between mb-3">
-                                                <div class="flex-1 min-w-0">
-                                                    <h4 class="text-lg font-semibold text-[var(--ui-secondary)] mb-2 group-hover:text-pink-600 transition-colors truncate">{{ '@' . $instagramAccount->username }}</h4>
-                                                    @if($instagramAccount->description)
-                                                        <p class="text-sm text-[var(--ui-muted)] line-clamp-2">{{ $instagramAccount->description }}</p>
-                                                    @endif
-                                                </div>
-                                            </div>
-                                            
-                                            <div class="mt-auto pt-4 border-t border-[var(--ui-border)]/40">
-                                                <div class="flex items-center gap-2">
-                                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-pink-50 text-pink-700 text-xs font-medium">
+                                                </td>
+                                                <td class="px-4 py-3 text-right hidden lg:table-cell">
+                                                    <span class="text-xs text-[var(--ui-muted)]">{{ $facebookPage->created_at->format('d.m.Y') }}</span>
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                        @foreach($instagramAccounts as $instagramAccount)
+                                            <tr class="group hover:bg-pink-50/30 transition-colors">
+                                                <td class="px-4 py-3">
+                                                    <a href="{{ route('brands.instagram-accounts.show', $instagramAccount) }}" class="block">
+                                                        <div class="font-medium text-sm text-[var(--ui-secondary)] group-hover:text-pink-600 transition-colors">{{ '@' . $instagramAccount->username }}</div>
+                                                        @if($instagramAccount->description)
+                                                            <div class="text-xs text-[var(--ui-muted)] mt-0.5 line-clamp-1">{{ $instagramAccount->description }}</div>
+                                                        @endif
+                                                    </a>
+                                                </td>
+                                                <td class="px-4 py-3 hidden sm:table-cell">
+                                                    <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-pink-50 text-pink-700 text-xs font-medium">
                                                         @svg('heroicon-o-camera', 'w-3.5 h-3.5')
                                                         Instagram
                                                     </span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </a>
-                                @endforeach
+                                                </td>
+                                                <td class="px-4 py-3 text-right hidden lg:table-cell">
+                                                    <span class="text-xs text-[var(--ui-muted)]">{{ $instagramAccount->created_at->format('d.m.Y') }}</span>
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     @endif
@@ -1036,87 +529,24 @@
                     
                     <div class="space-y-3">
                         {{-- Boards Statistik --}}
+                        @php
+                            $totalBoards = $boardGroups->sum(fn($g) => $g['boards']->count());
+                        @endphp
                         <div class="bg-white/80 backdrop-blur-sm rounded-lg p-3 border border-white/50">
                             <div class="flex items-center justify-between mb-2">
                                 <div class="flex items-center gap-2">
                                     @svg('heroicon-o-squares-2x2', 'w-4 h-4 text-[var(--ui-primary)]')
                                     <span class="text-sm font-semibold text-[var(--ui-secondary)]">Boards</span>
                                 </div>
-                                <span class="text-lg font-bold text-[var(--ui-primary)]">{{ $ciBoards->count() + $contentBoards->count() + $socialBoards->count() + $kanbanBoards->count() + $multiContentBoards->count() + $typographyBoards->count() + $logoBoards->count() + $toneOfVoiceBoards->count() + $personaBoards->count() + $competitorBoards->count() + $guidelineBoards->count() + $moodboardBoards->count() }}</span>
+                                <span class="text-lg font-bold text-[var(--ui-primary)]">{{ $totalBoards }}</span>
                             </div>
                             <div class="grid grid-cols-4 gap-2 mt-2">
-                                @if($ciBoards->count() > 0)
+                                @foreach($boardGroups as $group)
                                     <div class="text-center">
-                                        <div class="text-xs font-medium text-amber-600">{{ $ciBoards->count() }}</div>
-                                        <div class="text-[10px] text-[var(--ui-muted)]">CI</div>
+                                        <div class="text-xs font-medium text-{{ $group['color'] }}-600">{{ $group['boards']->count() }}</div>
+                                        <div class="text-[10px] text-[var(--ui-muted)]">{{ Str::limit($group['label'], 8, '.') }}</div>
                                     </div>
-                                @endif
-                                @if($contentBoards->count() > 0)
-                                    <div class="text-center">
-                                        <div class="text-xs font-medium text-blue-600">{{ $contentBoards->count() }}</div>
-                                        <div class="text-[10px] text-[var(--ui-muted)]">Content</div>
-                                    </div>
-                                @endif
-                                @if($socialBoards->count() > 0)
-                                    <div class="text-center">
-                                        <div class="text-xs font-medium text-purple-600">{{ $socialBoards->count() }}</div>
-                                        <div class="text-[10px] text-[var(--ui-muted)]">Social</div>
-                                    </div>
-                                @endif
-                                @if($kanbanBoards->count() > 0)
-                                    <div class="text-center">
-                                        <div class="text-xs font-medium text-indigo-600">{{ $kanbanBoards->count() }}</div>
-                                        <div class="text-[10px] text-[var(--ui-muted)]">Kanban</div>
-                                    </div>
-                                @endif
-                                @if($multiContentBoards->count() > 0)
-                                    <div class="text-center">
-                                        <div class="text-xs font-medium text-green-600">{{ $multiContentBoards->count() }}</div>
-                                        <div class="text-[10px] text-[var(--ui-muted)]">Multi</div>
-                                    </div>
-                                @endif
-                                @if($typographyBoards->count() > 0)
-                                    <div class="text-center">
-                                        <div class="text-xs font-medium text-rose-600">{{ $typographyBoards->count() }}</div>
-                                        <div class="text-[10px] text-[var(--ui-muted)]">Typo</div>
-                                    </div>
-                                @endif
-                                @if($logoBoards->count() > 0)
-                                    <div class="text-center">
-                                        <div class="text-xs font-medium text-emerald-600">{{ $logoBoards->count() }}</div>
-                                        <div class="text-[10px] text-[var(--ui-muted)]">Logo</div>
-                                    </div>
-                                @endif
-                                @if($toneOfVoiceBoards->count() > 0)
-                                    <div class="text-center">
-                                        <div class="text-xs font-medium text-violet-600">{{ $toneOfVoiceBoards->count() }}</div>
-                                        <div class="text-[10px] text-[var(--ui-muted)]">ToV</div>
-                                    </div>
-                                @endif
-                                @if($personaBoards->count() > 0)
-                                    <div class="text-center">
-                                        <div class="text-xs font-medium text-teal-600">{{ $personaBoards->count() }}</div>
-                                        <div class="text-[10px] text-[var(--ui-muted)]">Persona</div>
-                                    </div>
-                                @endif
-                                @if($competitorBoards->count() > 0)
-                                    <div class="text-center">
-                                        <div class="text-xs font-medium text-orange-600">{{ $competitorBoards->count() }}</div>
-                                        <div class="text-[10px] text-[var(--ui-muted)]">Wettb.</div>
-                                    </div>
-                                @endif
-                                @if($guidelineBoards->count() > 0)
-                                    <div class="text-center">
-                                        <div class="text-xs font-medium text-cyan-600">{{ $guidelineBoards->count() }}</div>
-                                        <div class="text-[10px] text-[var(--ui-muted)]">Guidel.</div>
-                                    </div>
-                                @endif
-                                @if($moodboardBoards->count() > 0)
-                                    <div class="text-center">
-                                        <div class="text-xs font-medium text-rose-600">{{ $moodboardBoards->count() }}</div>
-                                        <div class="text-[10px] text-[var(--ui-muted)]">Mood.</div>
-                                    </div>
-                                @endif
+                                @endforeach
                             </div>
                         </div>
 
