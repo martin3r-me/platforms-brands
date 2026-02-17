@@ -40,7 +40,7 @@ return new class extends Migration
             $table->integer('order')->default(0);
             $table->timestamps();
 
-            $table->index(['tone_of_voice_board_id', 'order']);
+            $table->index(['tone_of_voice_board_id', 'order'], 'tov_entries_board_order_idx');
             $table->index(['type']);
         });
 
@@ -57,7 +57,7 @@ return new class extends Migration
             $table->integer('order')->default(0);
             $table->timestamps();
 
-            $table->index(['tone_of_voice_board_id', 'order']);
+            $table->index(['tone_of_voice_board_id', 'order'], 'tov_dims_board_order_idx');
         });
     }
 
