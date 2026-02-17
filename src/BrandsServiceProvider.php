@@ -31,6 +31,8 @@ use Platform\Brands\Models\BrandsToneOfVoiceEntry;
 use Platform\Brands\Models\BrandsToneOfVoiceDimension;
 use Platform\Brands\Models\BrandsPersonaBoard;
 use Platform\Brands\Models\BrandsPersona;
+use Platform\Brands\Models\BrandsCompetitorBoard;
+use Platform\Brands\Models\BrandsCompetitor;
 use Platform\Integrations\Models\IntegrationsFacebookPage;
 use Platform\Integrations\Models\IntegrationsInstagramAccount;
 use Platform\Brands\Policies\BrandPolicy;
@@ -51,6 +53,8 @@ use Platform\Brands\Policies\ToneOfVoiceEntryPolicy;
 use Platform\Brands\Policies\ToneOfVoiceDimensionPolicy;
 use Platform\Brands\Policies\PersonaBoardPolicy;
 use Platform\Brands\Policies\PersonaPolicy;
+use Platform\Brands\Policies\CompetitorBoardPolicy;
+use Platform\Brands\Policies\CompetitorPolicy;
 use Platform\Brands\Policies\FacebookPagePolicy;
 use Platform\Brands\Policies\InstagramAccountPolicy;
 
@@ -184,6 +188,8 @@ class BrandsServiceProvider extends ServiceProvider
             BrandsToneOfVoiceDimension::class => ToneOfVoiceDimensionPolicy::class,
             BrandsPersonaBoard::class => PersonaBoardPolicy::class,
             BrandsPersona::class => PersonaPolicy::class,
+            BrandsCompetitorBoard::class => CompetitorBoardPolicy::class,
+            BrandsCompetitor::class => CompetitorPolicy::class,
             IntegrationsFacebookPage::class => FacebookPagePolicy::class,
             IntegrationsInstagramAccount::class => InstagramAccountPolicy::class,
         ];
@@ -384,6 +390,20 @@ class BrandsServiceProvider extends ServiceProvider
             $registry->register(new \Platform\Brands\Tools\GetPersonaTool());
             $registry->register(new \Platform\Brands\Tools\UpdatePersonaTool());
             $registry->register(new \Platform\Brands\Tools\DeletePersonaTool());
+
+            // CompetitorBoard-Tools
+            $registry->register(new \Platform\Brands\Tools\CreateCompetitorBoardTool());
+            $registry->register(new \Platform\Brands\Tools\ListCompetitorBoardsTool());
+            $registry->register(new \Platform\Brands\Tools\GetCompetitorBoardTool());
+            $registry->register(new \Platform\Brands\Tools\UpdateCompetitorBoardTool());
+            $registry->register(new \Platform\Brands\Tools\DeleteCompetitorBoardTool());
+
+            // Competitor-Tools
+            $registry->register(new \Platform\Brands\Tools\CreateCompetitorTool());
+            $registry->register(new \Platform\Brands\Tools\ListCompetitorsTool());
+            $registry->register(new \Platform\Brands\Tools\GetCompetitorTool());
+            $registry->register(new \Platform\Brands\Tools\UpdateCompetitorTool());
+            $registry->register(new \Platform\Brands\Tools\DeleteCompetitorTool());
 
             // Export-Tools
             $registry->register(new \Platform\Brands\Tools\ExportBrandTool());

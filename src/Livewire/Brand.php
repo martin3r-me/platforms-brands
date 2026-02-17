@@ -250,6 +250,31 @@ class Brand extends Component
         return $this->redirect(route('brands.persona-boards.show', $personaBoard), navigate: true);
     }
 
+    public function createCompetitorBoard()
+    {
+        $this->authorize('update', $this->brand);
+
+        $user = Auth::user();
+        $team = $user->currentTeam;
+
+        if (!$team) {
+            session()->flash('error', 'Kein Team ausgewählt.');
+            return;
+        }
+
+        $competitorBoard = \Platform\Brands\Models\BrandsCompetitorBoard::create([
+            'name' => 'Neues Wettbewerber Board',
+            'description' => null,
+            'user_id' => $user->id,
+            'team_id' => $team->id,
+            'brand_id' => $this->brand->id,
+        ]);
+
+        $this->brand->refresh();
+
+        return $this->redirect(route('brands.competitor-boards.show', $competitorBoard), navigate: true);
+    }
+
     public function rendered()
     {
         $this->dispatch('comms', [
@@ -451,6 +476,7 @@ class Brand extends Component
         $logoBoards = $this->brand->logoBoards;
         $toneOfVoiceBoards = $this->brand->toneOfVoiceBoards;
         $personaBoards = $this->brand->personaBoards;
+        $competitorBoards = $this->brand->competitorBoards;
 
         // Meta Connection laden
         $metaConnection = $this->brand->metaConnection();
@@ -495,6 +521,7 @@ class Brand extends Component
             'logoBoards' => $logoBoards,
             'toneOfVoiceBoards' => $toneOfVoiceBoards,
             'personaBoards' => $personaBoards,
+            'competitorBoards' => $competitorBoards,
             'facebookPages' => $facebookPages,
             'instagramAccounts' => $instagramAccounts,
             'availableFacebookPages' => $availableFacebookPages,
