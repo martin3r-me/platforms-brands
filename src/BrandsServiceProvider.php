@@ -38,6 +38,9 @@ use Platform\Brands\Models\BrandsGuidelineChapter;
 use Platform\Brands\Models\BrandsGuidelineEntry;
 use Platform\Brands\Models\BrandsMoodboardBoard;
 use Platform\Brands\Models\BrandsMoodboardImage;
+use Platform\Brands\Models\BrandsAssetBoard;
+use Platform\Brands\Models\BrandsAsset;
+use Platform\Brands\Models\BrandsAssetVersion;
 use Platform\Integrations\Models\IntegrationsFacebookPage;
 use Platform\Integrations\Models\IntegrationsInstagramAccount;
 use Platform\Brands\Policies\BrandPolicy;
@@ -65,6 +68,8 @@ use Platform\Brands\Policies\GuidelineChapterPolicy;
 use Platform\Brands\Policies\GuidelineEntryPolicy;
 use Platform\Brands\Policies\MoodboardBoardPolicy;
 use Platform\Brands\Policies\MoodboardImagePolicy;
+use Platform\Brands\Policies\AssetBoardPolicy;
+use Platform\Brands\Policies\AssetPolicy;
 use Platform\Brands\Policies\FacebookPagePolicy;
 use Platform\Brands\Policies\InstagramAccountPolicy;
 
@@ -205,6 +210,8 @@ class BrandsServiceProvider extends ServiceProvider
             BrandsGuidelineEntry::class => GuidelineEntryPolicy::class,
             BrandsMoodboardBoard::class => MoodboardBoardPolicy::class,
             BrandsMoodboardImage::class => MoodboardImagePolicy::class,
+            BrandsAssetBoard::class => AssetBoardPolicy::class,
+            BrandsAsset::class => AssetPolicy::class,
             IntegrationsFacebookPage::class => FacebookPagePolicy::class,
             IntegrationsInstagramAccount::class => InstagramAccountPolicy::class,
         ];
@@ -453,6 +460,20 @@ class BrandsServiceProvider extends ServiceProvider
             $registry->register(new \Platform\Brands\Tools\GetMoodboardImageTool());
             $registry->register(new \Platform\Brands\Tools\UpdateMoodboardImageTool());
             $registry->register(new \Platform\Brands\Tools\DeleteMoodboardImageTool());
+
+            // AssetBoard-Tools
+            $registry->register(new \Platform\Brands\Tools\CreateAssetBoardTool());
+            $registry->register(new \Platform\Brands\Tools\ListAssetBoardsTool());
+            $registry->register(new \Platform\Brands\Tools\GetAssetBoardTool());
+            $registry->register(new \Platform\Brands\Tools\UpdateAssetBoardTool());
+            $registry->register(new \Platform\Brands\Tools\DeleteAssetBoardTool());
+
+            // Asset-Tools
+            $registry->register(new \Platform\Brands\Tools\CreateAssetTool());
+            $registry->register(new \Platform\Brands\Tools\ListAssetsTool());
+            $registry->register(new \Platform\Brands\Tools\GetAssetTool());
+            $registry->register(new \Platform\Brands\Tools\UpdateAssetTool());
+            $registry->register(new \Platform\Brands\Tools\DeleteAssetTool());
 
             // Export-Tools
             $registry->register(new \Platform\Brands\Tools\ExportBrandTool());

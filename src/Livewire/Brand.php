@@ -325,6 +325,31 @@ class Brand extends Component
         return $this->redirect(route('brands.moodboard-boards.show', $moodboardBoard), navigate: true);
     }
 
+    public function createAssetBoard()
+    {
+        $this->authorize('update', $this->brand);
+
+        $user = Auth::user();
+        $team = $user->currentTeam;
+
+        if (!$team) {
+            session()->flash('error', 'Kein Team ausgewählt.');
+            return;
+        }
+
+        $assetBoard = \Platform\Brands\Models\BrandsAssetBoard::create([
+            'name' => 'Neues Asset Board',
+            'description' => null,
+            'user_id' => $user->id,
+            'team_id' => $team->id,
+            'brand_id' => $this->brand->id,
+        ]);
+
+        $this->brand->refresh();
+
+        return $this->redirect(route('brands.asset-boards.show', $assetBoard), navigate: true);
+    }
+
     public function rendered()
     {
         $this->dispatch('comms', [
@@ -529,6 +554,7 @@ class Brand extends Component
         $competitorBoards = $this->brand->competitorBoards;
         $guidelineBoards = $this->brand->guidelineBoards;
         $moodboardBoards = $this->brand->moodboardBoards;
+        $assetBoards = $this->brand->assetBoards;
 
         // Meta Connection laden
         $metaConnection = $this->brand->metaConnection();
@@ -576,6 +602,7 @@ class Brand extends Component
             'competitorBoards' => $competitorBoards,
             'guidelineBoards' => $guidelineBoards,
             'moodboardBoards' => $moodboardBoards,
+            'assetBoards' => $assetBoards,
             'facebookPages' => $facebookPages,
             'instagramAccounts' => $instagramAccounts,
             'availableFacebookPages' => $availableFacebookPages,

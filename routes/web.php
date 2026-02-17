@@ -16,6 +16,7 @@ use Platform\Brands\Livewire\PersonaBoard;
 use Platform\Brands\Livewire\CompetitorBoard;
 use Platform\Brands\Livewire\GuidelineBoard;
 use Platform\Brands\Livewire\MoodboardBoard;
+use Platform\Brands\Livewire\AssetBoard;
 use Platform\Brands\Livewire\MultiContentBoard;
 use Platform\Brands\Livewire\FacebookPage;
 use Platform\Brands\Livewire\InstagramAccount;
@@ -35,6 +36,7 @@ use Platform\Brands\Models\BrandsPersonaBoard as BrandsPersonaBoardModel;
 use Platform\Brands\Models\BrandsCompetitorBoard as BrandsCompetitorBoardModel;
 use Platform\Brands\Models\BrandsGuidelineBoard as BrandsGuidelineBoardModel;
 use Platform\Brands\Models\BrandsMoodboardBoard as BrandsMoodboardBoardModel;
+use Platform\Brands\Models\BrandsAssetBoard as BrandsAssetBoardModel;
 use Platform\Brands\Models\BrandsMultiContentBoard;
 use Platform\Brands\Models\BrandsContentBoardBlock;
 use Platform\Integrations\Models\IntegrationsFacebookPage;
@@ -102,6 +104,10 @@ Route::get('/guideline-boards/{brandsGuidelineBoard}', GuidelineBoard::class)
 Route::get('/moodboard-boards/{brandsMoodboardBoard}', MoodboardBoard::class)
     ->name('brands.moodboard-boards.show');
 
+// Asset Board Routes
+Route::get('/asset-boards/{brandsAssetBoard}', AssetBoard::class)
+    ->name('brands.asset-boards.show');
+
 // Multi-Content-Board Routes
 Route::get('/multi-content-boards/{brandsMultiContentBoard}', MultiContentBoard::class)
     ->name('brands.multi-content-boards.show');
@@ -124,4 +130,4 @@ Route::get('/brands/{brandsBrand}/export/download/{format}', [ExportDownload::cl
 
 Route::get('/export/boards/{boardType}/{boardId}/download/{format}', [ExportDownload::class, 'downloadBoard'])
     ->name('brands.export.download-board')
-    ->where(['boardType' => 'ci-board|content-board|social-board|kanban-board|multi-content-board|typography-board|logo-board|tone-of-voice-board|persona-board|competitor-board|guideline-board|moodboard-board', 'boardId' => '[0-9]+', 'format' => 'json|pdf']);
+    ->where(['boardType' => 'ci-board|content-board|social-board|kanban-board|multi-content-board|typography-board|logo-board|tone-of-voice-board|persona-board|competitor-board|guideline-board|moodboard-board|asset-board', 'boardId' => '[0-9]+', 'format' => 'json|pdf']);
