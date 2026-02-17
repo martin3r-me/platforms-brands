@@ -225,6 +225,31 @@ class Brand extends Component
         return $this->redirect(route('brands.tone-of-voice-boards.show', $toneOfVoiceBoard), navigate: true);
     }
 
+    public function createPersonaBoard()
+    {
+        $this->authorize('update', $this->brand);
+
+        $user = Auth::user();
+        $team = $user->currentTeam;
+
+        if (!$team) {
+            session()->flash('error', 'Kein Team ausgewählt.');
+            return;
+        }
+
+        $personaBoard = \Platform\Brands\Models\BrandsPersonaBoard::create([
+            'name' => 'Neues Persona Board',
+            'description' => null,
+            'user_id' => $user->id,
+            'team_id' => $team->id,
+            'brand_id' => $this->brand->id,
+        ]);
+
+        $this->brand->refresh();
+
+        return $this->redirect(route('brands.persona-boards.show', $personaBoard), navigate: true);
+    }
+
     public function rendered()
     {
         $this->dispatch('comms', [
@@ -425,6 +450,7 @@ class Brand extends Component
         $typographyBoards = $this->brand->typographyBoards;
         $logoBoards = $this->brand->logoBoards;
         $toneOfVoiceBoards = $this->brand->toneOfVoiceBoards;
+        $personaBoards = $this->brand->personaBoards;
 
         // Meta Connection laden
         $metaConnection = $this->brand->metaConnection();
@@ -468,6 +494,7 @@ class Brand extends Component
             'typographyBoards' => $typographyBoards,
             'logoBoards' => $logoBoards,
             'toneOfVoiceBoards' => $toneOfVoiceBoards,
+            'personaBoards' => $personaBoards,
             'facebookPages' => $facebookPages,
             'instagramAccounts' => $instagramAccounts,
             'availableFacebookPages' => $availableFacebookPages,
