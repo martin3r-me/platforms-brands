@@ -4,7 +4,7 @@
             <x-slot name="actions">
                 <a href="{{ route('brands.brands.show', $logoBoard->brand) }}" class="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-[var(--ui-secondary)] hover:text-[var(--ui-primary)] transition-colors">
                     @svg('heroicon-o-arrow-left', 'w-4 h-4')
-                    <span>Zur&uuml;ck zur Marke</span>
+                    <span>Zurück zur Marke</span>
                 </a>
             </x-slot>
         </x-ui-page-navbar>
@@ -50,7 +50,7 @@
                         >
                             <span class="inline-flex items-center gap-2">
                                 @svg('heroicon-o-plus', 'w-4 h-4')
-                                <span>Logo-Variante hinzuf&uuml;gen</span>
+                                <span>Logo-Variante hinzufügen</span>
                             </span>
                         </x-ui-button>
                     @endcan
@@ -80,9 +80,9 @@
                                             </button>
                                             <button
                                                 wire:click="deleteVariant({{ $variant->id }})"
-                                                wire:confirm="Logo-Variante wirklich l&ouml;schen?"
+                                                wire:confirm="Logo-Variante wirklich löschen?"
                                                 class="p-1.5 text-[var(--ui-muted)] hover:text-red-600 hover:bg-red-50 rounded transition-colors"
-                                                title="L&ouml;schen"
+                                                title="Löschen"
                                             >
                                                 @svg('heroicon-o-trash', 'w-4 h-4')
                                             </button>
@@ -132,7 +132,7 @@
                                     <div class="px-6 py-5 border-t border-[var(--ui-border)]/40 bg-[var(--ui-muted-5)]">
                                         <div class="flex items-center gap-2 mb-4">
                                             @svg('heroicon-o-shield-check', 'w-5 h-5 text-blue-600')
-                                            <h4 class="text-sm font-semibold text-[var(--ui-secondary)]">Schutzzonen & Mindestgr&ouml;&szlig;en</h4>
+                                            <h4 class="text-sm font-semibold text-[var(--ui-secondary)]">Schutzzonen & Mindestgrößen</h4>
                                         </div>
                                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                                             @if($variant->clearspace_factor)
@@ -154,7 +154,7 @@
                                                         </div>
                                                     </div>
                                                     <div class="text-center text-sm text-[var(--ui-secondary)]">
-                                                        <span class="font-medium">{{ $variant->clearspace_factor }}x</span> der Logoh&ouml;he
+                                                        <span class="font-medium">{{ $variant->clearspace_factor }}x</span> der Logohöhe
                                                     </div>
                                                 </div>
                                             @endif
@@ -207,7 +207,7 @@
                                     <div class="px-6 py-4 border-t border-[var(--ui-border)]/40">
                                         <div class="flex items-center gap-2 mb-3">
                                             @svg('heroicon-o-document-duplicate', 'w-4 h-4 text-[var(--ui-muted)]')
-                                            <span class="text-xs font-semibold text-[var(--ui-muted)] uppercase tracking-wider">Verf&uuml;gbare Formate</span>
+                                            <span class="text-xs font-semibold text-[var(--ui-muted)] uppercase tracking-wider">Verfügbare Formate</span>
                                         </div>
                                         <div class="flex flex-wrap gap-2">
                                             @if($variant->file_format)
@@ -319,7 +319,7 @@
                             >
                                 <span class="inline-flex items-center gap-2">
                                     @svg('heroicon-o-plus', 'w-4 h-4')
-                                    <span>Logo-Variante hinzuf&uuml;gen</span>
+                                    <span>Logo-Variante hinzufügen</span>
                                 </span>
                             </x-ui-button>
                         @endcan
@@ -330,7 +330,7 @@
     </x-ui-page-container>
 
     <x-slot name="sidebar">
-        <x-ui-page-sidebar title="Board-&Uuml;bersicht" width="w-80" :defaultOpen="true">
+        <x-ui-page-sidebar title="Board-Übersicht" width="w-80" :defaultOpen="true">
             <div class="p-6 space-y-6">
                 {{-- Navigation --}}
                 <div>
@@ -338,7 +338,7 @@
                     <div class="flex flex-col gap-2">
                         <a href="{{ route('brands.brands.show', $logoBoard->brand) }}" class="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-[var(--ui-secondary)] hover:text-[var(--ui-primary)] transition-colors rounded-lg border border-[var(--ui-border)]/40 hover:bg-[var(--ui-muted-5)]">
                             @svg('heroicon-o-arrow-left', 'w-4 h-4')
-                            <span>Zur&uuml;ck zur Marke</span>
+                            <span>Zurück zur Marke</span>
                         </a>
                     </div>
                 </div>
@@ -357,7 +357,7 @@
                             >
                                 <span class="inline-flex items-center gap-2">
                                     @svg('heroicon-o-plus', 'w-4 h-4')
-                                    <span>Logo-Variante hinzuf&uuml;gen</span>
+                                    <span>Logo-Variante hinzufügen</span>
                                 </span>
                             </x-ui-button>
                             <x-ui-button variant="secondary-outline" size="sm" x-data @click="$dispatch('open-modal-logo-board-settings', { logoBoardId: {{ $logoBoard->id }} })" class="w-full">
@@ -416,13 +416,13 @@
     </x-slot>
 
     <x-slot name="activity">
-        <x-ui-page-sidebar title="Aktivit&auml;ten" width="w-80" :defaultOpen="false" storeKey="activityOpen" side="right">
+        <x-ui-page-sidebar title="Aktivitäten" width="w-80" :defaultOpen="false" storeKey="activityOpen" side="right">
             <div class="p-6">
-                <h3 class="text-xs font-semibold uppercase tracking-wider text-[var(--ui-muted)] mb-4">Letzte Aktivit&auml;ten</h3>
+                <h3 class="text-xs font-semibold uppercase tracking-wider text-[var(--ui-muted)] mb-4">Letzte Aktivitäten</h3>
                 <div class="space-y-3">
                     @forelse(($activities ?? []) as $activity)
                         <div class="p-3 rounded-lg border border-[var(--ui-border)]/40 bg-[var(--ui-muted-5)]">
-                            <div class="text-sm font-medium text-[var(--ui-secondary)]">{{ $activity['title'] ?? 'Aktivit&auml;t' }}</div>
+                            <div class="text-sm font-medium text-[var(--ui-secondary)]">{{ $activity['title'] ?? 'Aktivität' }}</div>
                             <div class="text-xs text-[var(--ui-muted)]">{{ $activity['time'] ?? '' }}</div>
                         </div>
                     @empty
@@ -430,8 +430,8 @@
                             <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-[var(--ui-muted-5)] mb-3">
                                 @svg('heroicon-o-clock', 'w-6 h-6 text-[var(--ui-muted)]')
                             </div>
-                            <p class="text-sm text-[var(--ui-muted)]">Noch keine Aktivit&auml;ten</p>
-                            <p class="text-xs text-[var(--ui-muted)] mt-1">&Auml;nderungen werden hier angezeigt</p>
+                            <p class="text-sm text-[var(--ui-muted)]">Noch keine Aktivitäten</p>
+                            <p class="text-xs text-[var(--ui-muted)] mt-1">Änderungen werden hier angezeigt</p>
                         </div>
                     @endforelse
                 </div>

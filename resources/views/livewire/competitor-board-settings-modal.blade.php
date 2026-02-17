@@ -45,7 +45,7 @@
                                         </div>
                                         <div>
                                             <label for="axisYLabel" class="block text-sm font-medium text-[var(--ui-secondary)] mb-1">Y-Achse *</label>
-                                            <input type="text" id="axisYLabel" wire:model="axisYLabel" class="w-full rounded-lg border border-[var(--ui-border)] px-3 py-2 text-sm focus:border-indigo-500 focus:ring-indigo-500" placeholder="z.B. Qualit&auml;t">
+                                            <input type="text" id="axisYLabel" wire:model="axisYLabel" class="w-full rounded-lg border border-[var(--ui-border)] px-3 py-2 text-sm focus:border-indigo-500 focus:ring-indigo-500" placeholder="z.B. Qualität">
                                             @error('axisYLabel') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
                                         </div>
                                     </div>

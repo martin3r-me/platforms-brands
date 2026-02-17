@@ -4,7 +4,7 @@
             <x-slot name="actions">
                 <a href="{{ route('brands.brands.show', $assetBoard->brand) }}" class="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-[var(--ui-secondary)] hover:text-[var(--ui-primary)] transition-colors">
                     @svg('heroicon-o-arrow-left', 'w-4 h-4')
-                    <span>Zur&uuml;ck zur Marke</span>
+                    <span>Zurück zur Marke</span>
                 </a>
             </x-slot>
         </x-ui-page-navbar>
@@ -38,13 +38,13 @@
                     <option value="letterhead">Briefkopf</option>
                     <option value="signature">E-Mail-Signatur</option>
                     <option value="banner">Banner</option>
-                    <option value="presentation">Pr&auml;sentation</option>
+                    <option value="presentation">Präsentation</option>
                     <option value="other">Sonstiges</option>
                 </select>
 
                 {{-- Tag-Filter --}}
                 <select wire:model.live="filterTag" class="px-3 py-2 text-sm border border-[var(--ui-border)]/60 rounded-lg bg-white text-[var(--ui-secondary)] focus:ring-2 focus:ring-sky-500 focus:border-sky-500">
-                    <option value="">Alle Kan&auml;le</option>
+                    <option value="">Alle Kanäle</option>
                     @foreach($allTags->sortDesc() as $tag => $count)
                         <option value="{{ $tag }}">{{ $tag }} ({{ $count }})</option>
                     @endforeach
@@ -53,7 +53,7 @@
                 @if($filterType || $filterTag)
                     <button wire:click="$set('filterType', '')" x-on:click="$wire.set('filterTag', '')" class="inline-flex items-center gap-1 px-3 py-2 text-sm text-[var(--ui-muted)] hover:text-[var(--ui-secondary)] transition-colors">
                         @svg('heroicon-o-x-mark', 'w-4 h-4')
-                        Filter zur&uuml;cksetzen
+                        Filter zurücksetzen
                     </button>
                 @endif
             </div>
@@ -82,17 +82,17 @@
                     @svg('heroicon-o-cloud-arrow-up', 'w-6 h-6 text-sky-400')
                 </div>
                 <p class="text-sm font-medium text-[var(--ui-secondary)] mb-1">Assets hochladen</p>
-                <p class="text-xs text-[var(--ui-muted)] mb-4">Drag & Drop oder Klicken zum Ausw&auml;hlen (max. 50MB pro Datei)</p>
+                <p class="text-xs text-[var(--ui-muted)] mb-4">Drag & Drop oder Klicken zum Auswählen (max. 50MB pro Datei)</p>
                 <label class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-sky-500 hover:bg-sky-600 rounded-lg cursor-pointer transition-colors">
                     @svg('heroicon-o-plus', 'w-4 h-4')
-                    <span>Dateien ausw&auml;hlen</span>
+                    <span>Dateien auswählen</span>
                     <input type="file" wire:model="newFiles" multiple class="hidden">
                 </label>
                 @error('newFiles.*') <p class="text-sm text-red-500 mt-2">{{ $message }}</p> @enderror
 
                 @if(count($newFiles) > 0)
                     <div class="mt-4 flex items-center justify-center gap-3">
-                        <span class="text-sm text-[var(--ui-muted)]">{{ count($newFiles) }} Datei(en) ausgew&auml;hlt</span>
+                        <span class="text-sm text-[var(--ui-muted)]">{{ count($newFiles) }} Datei(en) ausgewählt</span>
                         <x-ui-button variant="primary" size="sm" wire:click="uploadFiles">
                             <span class="inline-flex items-center gap-2">
                                 @svg('heroicon-o-cloud-arrow-up', 'w-4 h-4')
@@ -171,9 +171,9 @@
                                     </a>
                                     <button
                                         wire:click="deleteAsset({{ $asset->id }})"
-                                        wire:confirm="Asset wirklich l&ouml;schen? Alle Versionen werden ebenfalls gel&ouml;scht."
+                                        wire:confirm="Asset wirklich löschen? Alle Versionen werden ebenfalls gelöscht."
                                         class="p-2 bg-white/90 hover:bg-white rounded-lg text-[var(--ui-secondary)] hover:text-red-600 transition-colors backdrop-blur-sm"
-                                        title="L&ouml;schen"
+                                        title="Löschen"
                                     >
                                         @svg('heroicon-o-trash', 'w-4 h-4')
                                     </button>
@@ -227,7 +227,7 @@
                     >
                         <span class="inline-flex items-center gap-2">
                             @svg('heroicon-o-plus', 'w-4 h-4')
-                            <span>Asset hinzuf&uuml;gen</span>
+                            <span>Asset hinzufügen</span>
                         </span>
                     </x-ui-button>
                 @endcan
@@ -236,7 +236,7 @@
     </x-ui-page-container>
 
     <x-slot name="sidebar">
-        <x-ui-page-sidebar title="Board-&Uuml;bersicht" width="w-80" :defaultOpen="true">
+        <x-ui-page-sidebar title="Board-Übersicht" width="w-80" :defaultOpen="true">
             <div class="p-6 space-y-6">
                 {{-- Navigation --}}
                 <div>
@@ -244,7 +244,7 @@
                     <div class="flex flex-col gap-2">
                         <a href="{{ route('brands.brands.show', $assetBoard->brand) }}" class="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-[var(--ui-secondary)] hover:text-[var(--ui-primary)] transition-colors rounded-lg border border-[var(--ui-border)]/40 hover:bg-[var(--ui-muted-5)]">
                             @svg('heroicon-o-arrow-left', 'w-4 h-4')
-                            <span>Zur&uuml;ck zur Marke</span>
+                            <span>Zurück zur Marke</span>
                         </a>
                     </div>
                 </div>
@@ -263,7 +263,7 @@
                             >
                                 <span class="inline-flex items-center gap-2">
                                     @svg('heroicon-o-plus', 'w-4 h-4')
-                                    <span>Asset hinzuf&uuml;gen</span>
+                                    <span>Asset hinzufügen</span>
                                 </span>
                             </x-ui-button>
                             <x-ui-button variant="secondary-outline" size="sm" x-data @click="$dispatch('open-modal-asset-board-settings', { assetBoardId: {{ $assetBoard->id }} })" class="w-full">
@@ -314,7 +314,7 @@
                                     'letterhead' => 'Briefkopf',
                                     'signature' => 'E-Mail-Signatur',
                                     'banner' => 'Banner',
-                                    'presentation' => 'Pr&auml;sentation',
+                                    'presentation' => 'Präsentation',
                                     'other' => 'Sonstiges',
                                 ];
                             @endphp
@@ -347,13 +347,13 @@
     </x-slot>
 
     <x-slot name="activity">
-        <x-ui-page-sidebar title="Aktivit&auml;ten" width="w-80" :defaultOpen="false" storeKey="activityOpen" side="right">
+        <x-ui-page-sidebar title="Aktivitäten" width="w-80" :defaultOpen="false" storeKey="activityOpen" side="right">
             <div class="p-6">
-                <h3 class="text-xs font-semibold uppercase tracking-wider text-[var(--ui-muted)] mb-4">Letzte Aktivit&auml;ten</h3>
+                <h3 class="text-xs font-semibold uppercase tracking-wider text-[var(--ui-muted)] mb-4">Letzte Aktivitäten</h3>
                 <div class="space-y-3">
                     @forelse(($activities ?? []) as $activity)
                         <div class="p-3 rounded-lg border border-[var(--ui-border)]/40 bg-[var(--ui-muted-5)]">
-                            <div class="text-sm font-medium text-[var(--ui-secondary)]">{{ $activity['title'] ?? 'Aktivit&auml;t' }}</div>
+                            <div class="text-sm font-medium text-[var(--ui-secondary)]">{{ $activity['title'] ?? 'Aktivität' }}</div>
                             <div class="text-xs text-[var(--ui-muted)]">{{ $activity['time'] ?? '' }}</div>
                         </div>
                     @empty
@@ -361,8 +361,8 @@
                             <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-[var(--ui-muted-5)] mb-3">
                                 @svg('heroicon-o-clock', 'w-6 h-6 text-[var(--ui-muted)]')
                             </div>
-                            <p class="text-sm text-[var(--ui-muted)]">Noch keine Aktivit&auml;ten</p>
-                            <p class="text-xs text-[var(--ui-muted)] mt-1">&Auml;nderungen werden hier angezeigt</p>
+                            <p class="text-sm text-[var(--ui-muted)]">Noch keine Aktivitäten</p>
+                            <p class="text-xs text-[var(--ui-muted)] mt-1">Änderungen werden hier angezeigt</p>
                         </div>
                     @endforelse
                 </div>

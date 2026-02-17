@@ -33,7 +33,7 @@
             name="imageAnnotation"
             label="Annotation – Warum passt dieses Bild zur Marke?"
             wire:model.live.debounce.300ms="imageAnnotation"
-            placeholder="Erkl&auml;re, warum dieses Bild die Bildsprache der Marke repr&auml;sentiert (oder warum nicht)..."
+            placeholder="Erkläre, warum dieses Bild die Bildsprache der Marke repräsentiert (oder warum nicht)..."
             :errorKey="'imageAnnotation'"
         />
 

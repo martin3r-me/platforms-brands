@@ -76,7 +76,7 @@
 
         {{-- Protection Zone & Min Sizes --}}
         <div>
-            <label class="block text-sm font-medium text-[var(--ui-secondary)] mb-2">Schutzzonen & Mindestgr&ouml;&szlig;en</label>
+            <label class="block text-sm font-medium text-[var(--ui-secondary)] mb-2">Schutzzonen & Mindestgrößen</label>
             <x-ui-form-grid :cols="3" :gap="4">
                 <div>
                     <label class="block text-xs font-medium text-[var(--ui-muted)] mb-1">Schutzzone (Faktor)</label>
@@ -89,7 +89,7 @@
                         placeholder="z.B. 0.5"
                         class="w-full px-3 py-2 text-sm border border-[var(--ui-border)] rounded-lg focus:ring-2 focus:ring-[var(--ui-primary)] focus:border-transparent"
                     >
-                    <p class="text-[10px] text-[var(--ui-muted)] mt-1">Faktor der Logoh&ouml;he</p>
+                    <p class="text-[10px] text-[var(--ui-muted)] mt-1">Faktor der Logohöhe</p>
                 </div>
                 <div>
                     <label class="block text-xs font-medium text-[var(--ui-muted)] mb-1">Min. Breite (px)</label>
@@ -101,7 +101,7 @@
                         placeholder="z.B. 120"
                         class="w-full px-3 py-2 text-sm border border-[var(--ui-border)] rounded-lg focus:ring-2 focus:ring-[var(--ui-primary)] focus:border-transparent"
                     >
-                    <p class="text-[10px] text-[var(--ui-muted)] mt-1">F&uuml;r digitale Medien</p>
+                    <p class="text-[10px] text-[var(--ui-muted)] mt-1">Für digitale Medien</p>
                 </div>
                 <div>
                     <label class="block text-xs font-medium text-[var(--ui-muted)] mb-1">Min. Breite (mm)</label>
@@ -113,7 +113,7 @@
                         placeholder="z.B. 30"
                         class="w-full px-3 py-2 text-sm border border-[var(--ui-border)] rounded-lg focus:ring-2 focus:ring-[var(--ui-primary)] focus:border-transparent"
                     >
-                    <p class="text-[10px] text-[var(--ui-muted)] mt-1">F&uuml;r Druckmedien</p>
+                    <p class="text-[10px] text-[var(--ui-muted)] mt-1">Für Druckmedien</p>
                 </div>
             </x-ui-form-grid>
         </div>
@@ -136,7 +136,7 @@
                         Do's (Richtige Verwendung)
                     </span>
                 </label>
-                <button type="button" wire:click="addDo" class="text-xs text-[var(--ui-primary)] hover:text-[var(--ui-primary-dark)] font-medium">+ Hinzuf&uuml;gen</button>
+                <button type="button" wire:click="addDo" class="text-xs text-[var(--ui-primary)] hover:text-[var(--ui-primary-dark)] font-medium">+ Hinzufügen</button>
             </div>
             <div class="space-y-2">
                 @foreach($dosList as $index => $do)
@@ -167,7 +167,7 @@
                         Don'ts (Falsche Verwendung)
                     </span>
                 </label>
-                <button type="button" wire:click="addDont" class="text-xs text-[var(--ui-primary)] hover:text-[var(--ui-primary-dark)] font-medium">+ Hinzuf&uuml;gen</button>
+                <button type="button" wire:click="addDont" class="text-xs text-[var(--ui-primary)] hover:text-[var(--ui-primary-dark)] font-medium">+ Hinzufügen</button>
             </div>
             <div class="space-y-2">
                 @foreach($dontsList as $index => $dont)

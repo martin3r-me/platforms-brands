@@ -61,22 +61,22 @@
                         <label for="competitorIsOwnBrand" class="text-sm text-[var(--ui-secondary)]">
                             Dies ist die eigene Marke
                         </label>
-                        <span class="text-xs text-[var(--ui-muted)] ml-auto">F&uuml;r den Vergleich in der Differenzierungstabelle</span>
+                        <span class="text-xs text-[var(--ui-muted)] ml-auto">Für den Vergleich in der Differenzierungstabelle</span>
                     </div>
                 </div>
             </div>
 
-            {{-- St&auml;rken --}}
+            {{-- Stärken --}}
             <div>
                 <div class="flex items-center justify-between mb-4">
                     <h3 class="text-lg font-semibold text-[var(--ui-secondary)] flex items-center gap-2">
                         @svg('heroicon-o-arrow-trending-up', 'w-5 h-5 text-green-500')
-                        St&auml;rken
+                        Stärken
                     </h3>
                     <x-ui-button variant="secondary-outline" size="sm" type="button" wire:click="addStrength">
                         <div class="flex items-center gap-2">
                             @svg('heroicon-o-plus', 'w-4 h-4')
-                            Hinzuf&uuml;gen
+                            Hinzufügen
                         </div>
                     </x-ui-button>
                 </div>
@@ -87,7 +87,7 @@
                                 <x-ui-input-text
                                     name="competitorStrengths.{{ $index }}.text"
                                     wire:model.live.debounce.500ms="competitorStrengths.{{ $index }}.text"
-                                    placeholder="St&auml;rke..."
+                                    placeholder="Stärke..."
                                 />
                                 <button type="button" wire:click="removeStrength({{ $index }})" class="p-2 text-[var(--ui-muted)] hover:text-red-500 transition-colors flex-shrink-0">
                                     @svg('heroicon-o-x-mark', 'w-4 h-4')
@@ -97,22 +97,22 @@
                     </div>
                 @else
                     <div class="p-4 text-center text-sm text-[var(--ui-muted)] bg-[var(--ui-muted-5)] rounded-lg border border-[var(--ui-border)]/60">
-                        Noch keine St&auml;rken hinzugef&uuml;gt.
+                        Noch keine Stärken hinzugefügt.
                     </div>
                 @endif
             </div>
 
-            {{-- Schw&auml;chen --}}
+            {{-- Schwächen --}}
             <div>
                 <div class="flex items-center justify-between mb-4">
                     <h3 class="text-lg font-semibold text-[var(--ui-secondary)] flex items-center gap-2">
                         @svg('heroicon-o-arrow-trending-down', 'w-5 h-5 text-red-500')
-                        Schw&auml;chen
+                        Schwächen
                     </h3>
                     <x-ui-button variant="secondary-outline" size="sm" type="button" wire:click="addWeakness">
                         <div class="flex items-center gap-2">
                             @svg('heroicon-o-plus', 'w-4 h-4')
-                            Hinzuf&uuml;gen
+                            Hinzufügen
                         </div>
                     </x-ui-button>
                 </div>
@@ -123,7 +123,7 @@
                                 <x-ui-input-text
                                     name="competitorWeaknesses.{{ $index }}.text"
                                     wire:model.live.debounce.500ms="competitorWeaknesses.{{ $index }}.text"
-                                    placeholder="Schw&auml;che..."
+                                    placeholder="Schwäche..."
                                 />
                                 <button type="button" wire:click="removeWeakness({{ $index }})" class="p-2 text-[var(--ui-muted)] hover:text-red-500 transition-colors flex-shrink-0">
                                     @svg('heroicon-o-x-mark', 'w-4 h-4')
@@ -133,7 +133,7 @@
                     </div>
                 @else
                     <div class="p-4 text-center text-sm text-[var(--ui-muted)] bg-[var(--ui-muted-5)] rounded-lg border border-[var(--ui-border)]/60">
-                        Noch keine Schw&auml;chen hinzugef&uuml;gt.
+                        Noch keine Schwächen hinzugefügt.
                     </div>
                 @endif
             </div>
@@ -192,11 +192,11 @@
                     <x-ui-button variant="secondary-outline" size="sm" type="button" wire:click="addDifferentiation">
                         <div class="flex items-center gap-2">
                             @svg('heroicon-o-plus', 'w-4 h-4')
-                            Hinzuf&uuml;gen
+                            Hinzufügen
                         </div>
                     </x-ui-button>
                 </div>
-                <p class="text-sm text-[var(--ui-muted)] mb-4">Vergleichsmerkmale f&uuml;r die Differenzierungstabelle.</p>
+                <p class="text-sm text-[var(--ui-muted)] mb-4">Vergleichsmerkmale für die Differenzierungstabelle.</p>
                 @if(count($competitorDifferentiation) > 0)
                     <div class="space-y-3">
                         @foreach($competitorDifferentiation as $index => $diff)
@@ -210,7 +210,7 @@
                                 <x-ui-input-text
                                     name="competitorDifferentiation.{{ $index }}.category"
                                     wire:model.live.debounce.500ms="competitorDifferentiation.{{ $index }}.category"
-                                    placeholder="Kategorie (z.B. Preis, Service, Qualit&auml;t)"
+                                    placeholder="Kategorie (z.B. Preis, Service, Qualität)"
                                 />
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                                     <x-ui-input-text
@@ -231,7 +231,7 @@
                     </div>
                 @else
                     <div class="p-4 text-center text-sm text-[var(--ui-muted)] bg-[var(--ui-muted-5)] rounded-lg border border-[var(--ui-border)]/60">
-                        Noch keine Differenzierungsmerkmale hinzugef&uuml;gt.
+                        Noch keine Differenzierungsmerkmale hinzugefügt.
                     </div>
                 @endif
             </div>

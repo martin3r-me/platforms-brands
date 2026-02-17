@@ -42,7 +42,7 @@
         {{-- Example Texts --}}
         <div class="border border-[var(--ui-border)]/60 rounded-xl overflow-hidden">
             <div class="bg-[var(--ui-muted-5)] px-4 py-3 border-b border-[var(--ui-border)]/40">
-                <h3 class="text-sm font-semibold text-[var(--ui-secondary)]">Beispiel-Texte (Tonalit&auml;t)</h3>
+                <h3 class="text-sm font-semibold text-[var(--ui-secondary)]">Beispiel-Texte (Tonalität)</h3>
                 <p class="text-xs text-[var(--ui-muted)]">Zeige, wie die Markenstimme klingen soll - und wie nicht</p>
             </div>
             <div class="p-4 space-y-4">

@@ -4,7 +4,7 @@
             <x-slot name="actions">
                 <a href="{{ route('brands.brands.show', $competitorBoard->brand) }}" class="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-[var(--ui-secondary)] hover:text-[var(--ui-primary)] transition-colors">
                     @svg('heroicon-o-arrow-left', 'w-4 h-4')
-                    <span>Zur&uuml;ck zur Marke</span>
+                    <span>Zurück zur Marke</span>
                 </a>
             </x-slot>
         </x-ui-page-navbar>
@@ -37,7 +37,7 @@
                     </div>
                     <div>
                         <h2 class="text-2xl font-bold text-[var(--ui-secondary)]">Wettbewerber</h2>
-                        <p class="text-sm text-[var(--ui-muted)]">Wettbewerber-Profile mit St&auml;rken und Schw&auml;chen</p>
+                        <p class="text-sm text-[var(--ui-muted)]">Wettbewerber-Profile mit Stärken und Schwächen</p>
                     </div>
                 </div>
                 @can('update', $competitorBoard)
@@ -49,7 +49,7 @@
                     >
                         <span class="inline-flex items-center gap-2">
                             @svg('heroicon-o-plus', 'w-4 h-4')
-                            <span>Wettbewerber hinzuf&uuml;gen</span>
+                            <span>Wettbewerber hinzufügen</span>
                         </span>
                     </x-ui-button>
                 @endcan
@@ -98,9 +98,9 @@
                                             </button>
                                             <button
                                                 wire:click="deleteCompetitor({{ $competitor->id }})"
-                                                wire:confirm="Wettbewerber wirklich l&ouml;schen?"
+                                                wire:confirm="Wettbewerber wirklich löschen?"
                                                 class="p-1.5 text-[var(--ui-muted)] hover:text-red-600 hover:bg-white/80 rounded transition-colors"
-                                                title="L&ouml;schen"
+                                                title="Löschen"
                                             >
                                                 @svg('heroicon-o-trash', 'w-4 h-4')
                                             </button>
@@ -121,7 +121,7 @@
                                     <div>
                                         <h4 class="text-xs font-semibold uppercase tracking-wider text-green-600 mb-2 flex items-center gap-1.5">
                                             @svg('heroicon-o-arrow-trending-up', 'w-3.5 h-3.5')
-                                            St&auml;rken
+                                            Stärken
                                         </h4>
                                         <div class="space-y-1">
                                             @foreach(array_slice($competitor->strengths, 0, 3) as $strength)
@@ -142,7 +142,7 @@
                                     <div>
                                         <h4 class="text-xs font-semibold uppercase tracking-wider text-red-600 mb-2 flex items-center gap-1.5">
                                             @svg('heroicon-o-arrow-trending-down', 'w-3.5 h-3.5')
-                                            Schw&auml;chen
+                                            Schwächen
                                         </h4>
                                         <div class="space-y-1">
                                             @foreach(array_slice($competitor->weaknesses, 0, 3) as $weakness)
@@ -178,7 +178,7 @@
                         @svg('heroicon-o-building-office', 'w-8 h-8 text-orange-400')
                     </div>
                     <p class="text-sm font-medium text-[var(--ui-secondary)] mb-1">Noch keine Wettbewerber</p>
-                    <p class="text-xs text-[var(--ui-muted)] mb-4">F&uuml;ge Wettbewerber hinzu, um die Marktpositionierung zu analysieren</p>
+                    <p class="text-xs text-[var(--ui-muted)] mb-4">Füge Wettbewerber hinzu, um die Marktpositionierung zu analysieren</p>
                     @can('update', $competitorBoard)
                         <x-ui-button
                             variant="primary"
@@ -188,7 +188,7 @@
                         >
                             <span class="inline-flex items-center gap-2">
                                 @svg('heroicon-o-plus', 'w-4 h-4')
-                                <span>Wettbewerber hinzuf&uuml;gen</span>
+                                <span>Wettbewerber hinzufügen</span>
                             </span>
                         </x-ui-button>
                     @endcan
@@ -205,7 +205,7 @@
                     </div>
                     <div>
                         <h2 class="text-2xl font-bold text-[var(--ui-secondary)]">Positionierungsmatrix</h2>
-                        <p class="text-sm text-[var(--ui-muted)]">{{ $competitorBoard->axis_x_label }} vs. {{ $competitorBoard->axis_y_label }} &ndash; Markenpositionierung im Wettbewerbsumfeld</p>
+                        <p class="text-sm text-[var(--ui-muted)]">{{ $competitorBoard->axis_x_label }} vs. {{ $competitorBoard->axis_y_label }} – Markenpositionierung im Wettbewerbsumfeld</p>
                     </div>
                 </div>
 
@@ -420,14 +420,14 @@
                         @svg('heroicon-o-table-cells', 'w-6 h-6 text-emerald-400')
                     </div>
                     <p class="text-sm font-medium text-[var(--ui-secondary)] mb-1">Noch keine Differenzierungsdaten</p>
-                    <p class="text-xs text-[var(--ui-muted)]">Markiere einen Wettbewerber als &bdquo;Eigene Marke&ldquo; und f&uuml;ge Differenzierungsmerkmale hinzu.</p>
+                    <p class="text-xs text-[var(--ui-muted)]">Markiere einen Wettbewerber als „Eigene Marke" und füge Differenzierungsmerkmale hinzu.</p>
                 </div>
             </div>
         @endif
     </x-ui-page-container>
 
     <x-slot name="sidebar">
-        <x-ui-page-sidebar title="Board-&Uuml;bersicht" width="w-80" :defaultOpen="true">
+        <x-ui-page-sidebar title="Board-Übersicht" width="w-80" :defaultOpen="true">
             <div class="p-6 space-y-6">
                 {{-- Navigation --}}
                 <div>
@@ -435,7 +435,7 @@
                     <div class="flex flex-col gap-2">
                         <a href="{{ route('brands.brands.show', $competitorBoard->brand) }}" class="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-[var(--ui-secondary)] hover:text-[var(--ui-primary)] transition-colors rounded-lg border border-[var(--ui-border)]/40 hover:bg-[var(--ui-muted-5)]">
                             @svg('heroicon-o-arrow-left', 'w-4 h-4')
-                            <span>Zur&uuml;ck zur Marke</span>
+                            <span>Zurück zur Marke</span>
                         </a>
                     </div>
                 </div>
@@ -454,7 +454,7 @@
                             >
                                 <span class="inline-flex items-center gap-2">
                                     @svg('heroicon-o-plus', 'w-4 h-4')
-                                    <span>Wettbewerber hinzuf&uuml;gen</span>
+                                    <span>Wettbewerber hinzufügen</span>
                                 </span>
                             </x-ui-button>
                             <x-ui-button variant="secondary-outline" size="sm" x-data @click="$dispatch('open-modal-competitor-board-settings', { competitorBoardId: {{ $competitorBoard->id }} })" class="w-full">
@@ -506,13 +506,13 @@
     </x-slot>
 
     <x-slot name="activity">
-        <x-ui-page-sidebar title="Aktivit&auml;ten" width="w-80" :defaultOpen="false" storeKey="activityOpen" side="right">
+        <x-ui-page-sidebar title="Aktivitäten" width="w-80" :defaultOpen="false" storeKey="activityOpen" side="right">
             <div class="p-6">
-                <h3 class="text-xs font-semibold uppercase tracking-wider text-[var(--ui-muted)] mb-4">Letzte Aktivit&auml;ten</h3>
+                <h3 class="text-xs font-semibold uppercase tracking-wider text-[var(--ui-muted)] mb-4">Letzte Aktivitäten</h3>
                 <div class="space-y-3">
                     @forelse(($activities ?? []) as $activity)
                         <div class="p-3 rounded-lg border border-[var(--ui-border)]/40 bg-[var(--ui-muted-5)]">
-                            <div class="text-sm font-medium text-[var(--ui-secondary)]">{{ $activity['title'] ?? 'Aktivit&auml;t' }}</div>
+                            <div class="text-sm font-medium text-[var(--ui-secondary)]">{{ $activity['title'] ?? 'Aktivität' }}</div>
                             <div class="text-xs text-[var(--ui-muted)]">{{ $activity['time'] ?? '' }}</div>
                         </div>
                     @empty
@@ -520,8 +520,8 @@
                             <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-[var(--ui-muted-5)] mb-3">
                                 @svg('heroicon-o-clock', 'w-6 h-6 text-[var(--ui-muted)]')
                             </div>
-                            <p class="text-sm text-[var(--ui-muted)]">Noch keine Aktivit&auml;ten</p>
-                            <p class="text-xs text-[var(--ui-muted)] mt-1">&Auml;nderungen werden hier angezeigt</p>
+                            <p class="text-sm text-[var(--ui-muted)]">Noch keine Aktivitäten</p>
+                            <p class="text-xs text-[var(--ui-muted)] mt-1">Änderungen werden hier angezeigt</p>
                         </div>
                     @endforelse
                 </div>

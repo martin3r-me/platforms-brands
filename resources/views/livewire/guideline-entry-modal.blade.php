@@ -5,7 +5,7 @@
             name="entryTitle"
             label="Regel-Titel"
             wire:model.live.debounce.300ms="entryTitle"
-            placeholder="z.B. Mindestgr&ouml;&szlig;e des Logos, Farbverwendung..."
+            placeholder="z.B. Mindestgröße des Logos, Farbverwendung..."
             required
             :errorKey="'entryTitle'"
         />
@@ -23,9 +23,9 @@
         {{-- Rationale --}}
         <x-ui-input-textarea
             name="entryRationale"
-            label="Begr&uuml;ndung (optional)"
+            label="Begründung (optional)"
             wire:model.live.debounce.300ms="entryRationale"
-            placeholder="Warum existiert diese Regel? Welches Problem wird gel&ouml;st?"
+            placeholder="Warum existiert diese Regel? Welches Problem wird gelöst?"
             :errorKey="'entryRationale'"
         />
 
@@ -93,7 +93,7 @@
                             wire:model.live="entryCrossReferences.{{ $index }}.board_type"
                             class="flex-1 px-3 py-2 text-sm border border-[var(--ui-border)] rounded-lg focus:ring-2 focus:ring-[var(--ui-primary)] focus:border-transparent"
                         >
-                            <option value="">Board-Typ w&auml;hlen...</option>
+                            <option value="">Board-Typ wählen...</option>
                             @foreach($availableBoards as $board)
                                 <option value="{{ $board['board_type'] }}___{{ $board['board_id'] }}">{{ $board['label'] }}</option>
                             @endforeach
@@ -113,7 +113,7 @@
                         </button>
                     </div>
                 @empty
-                    <p class="text-xs text-[var(--ui-muted)] text-center py-2">Keine Cross-Referenzen hinzugef&uuml;gt</p>
+                    <p class="text-xs text-[var(--ui-muted)] text-center py-2">Keine Cross-Referenzen hinzugefügt</p>
                 @endforelse
             </div>
         </div>

@@ -5,7 +5,7 @@
             name="dimensionName"
             label="Name der Dimension"
             wire:model.live.debounce.300ms="dimensionName"
-            placeholder="z.B. Formalit&auml;t, Humor, Komplexit&auml;t..."
+            placeholder="z.B. Formalität, Humor, Komplexität..."
             required
             :errorKey="'dimensionName'"
         />
@@ -58,7 +58,7 @@
             name="dimensionDescription"
             label="Beschreibung"
             wire:model.live.debounce.300ms="dimensionDescription"
-            placeholder="Erl&auml;uterung dieser Dimension..."
+            placeholder="Erläuterung dieser Dimension..."
             :errorKey="'dimensionDescription'"
         />
     </div>

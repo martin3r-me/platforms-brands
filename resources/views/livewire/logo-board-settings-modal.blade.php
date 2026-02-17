@@ -35,7 +35,7 @@
 
         @can('delete', $logoBoard)
             <div class="mt-4">
-                <x-ui-confirm-button action="deleteLogoBoard" text="Logo Board l&ouml;schen" confirmText="Wirklich l&ouml;schen?" />
+                <x-ui-confirm-button action="deleteLogoBoard" text="Logo Board löschen" confirmText="Wirklich löschen?" />
             </div>
         @endcan
     @endif

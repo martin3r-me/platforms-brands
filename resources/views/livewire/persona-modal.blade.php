@@ -59,7 +59,7 @@
                             name="personaLocation"
                             label="Wohnort"
                             wire:model.live.debounce.500ms="personaLocation"
-                            placeholder="z.B. M&uuml;nchen"
+                            placeholder="z.B. München"
                             :errorKey="'personaLocation'"
                         />
                     </div>
@@ -103,7 +103,7 @@
                     <x-ui-button variant="secondary-outline" size="sm" type="button" wire:click="addPainPoint">
                         <div class="flex items-center gap-2">
                             @svg('heroicon-o-plus', 'w-4 h-4')
-                            Hinzuf&uuml;gen
+                            Hinzufügen
                         </div>
                     </x-ui-button>
                 </div>
@@ -124,7 +124,7 @@
                     </div>
                 @else
                     <div class="p-4 text-center text-sm text-[var(--ui-muted)] bg-[var(--ui-muted-5)] rounded-lg border border-[var(--ui-border)]/60">
-                        Noch keine Pain Points hinzugef&uuml;gt.
+                        Noch keine Pain Points hinzugefügt.
                     </div>
                 @endif
             </div>
@@ -139,7 +139,7 @@
                     <x-ui-button variant="secondary-outline" size="sm" type="button" wire:click="addGoal">
                         <div class="flex items-center gap-2">
                             @svg('heroicon-o-plus', 'w-4 h-4')
-                            Hinzuf&uuml;gen
+                            Hinzufügen
                         </div>
                     </x-ui-button>
                 </div>
@@ -160,7 +160,7 @@
                     </div>
                 @else
                     <div class="p-4 text-center text-sm text-[var(--ui-muted)] bg-[var(--ui-muted-5)] rounded-lg border border-[var(--ui-border)]/60">
-                        Noch keine Ziele hinzugef&uuml;gt.
+                        Noch keine Ziele hinzugefügt.
                     </div>
                 @endif
             </div>
@@ -175,7 +175,7 @@
                     <x-ui-button variant="secondary-outline" size="sm" type="button" wire:click="addQuote">
                         <div class="flex items-center gap-2">
                             @svg('heroicon-o-plus', 'w-4 h-4')
-                            Hinzuf&uuml;gen
+                            Hinzufügen
                         </div>
                     </x-ui-button>
                 </div>
@@ -196,7 +196,7 @@
                     </div>
                 @else
                     <div class="p-4 text-center text-sm text-[var(--ui-muted)] bg-[var(--ui-muted-5)] rounded-lg border border-[var(--ui-border)]/60">
-                        Noch keine Zitate hinzugef&uuml;gt.
+                        Noch keine Zitate hinzugefügt.
                     </div>
                 @endif
             </div>
@@ -211,7 +211,7 @@
                     <x-ui-button variant="secondary-outline" size="sm" type="button" wire:click="addBehavior">
                         <div class="flex items-center gap-2">
                             @svg('heroicon-o-plus', 'w-4 h-4')
-                            Hinzuf&uuml;gen
+                            Hinzufügen
                         </div>
                     </x-ui-button>
                 </div>
@@ -232,22 +232,22 @@
                     </div>
                 @else
                     <div class="p-4 text-center text-sm text-[var(--ui-muted)] bg-[var(--ui-muted-5)] rounded-lg border border-[var(--ui-border)]/60">
-                        Noch keine Verhaltensweisen hinzugef&uuml;gt.
+                        Noch keine Verhaltensweisen hinzugefügt.
                     </div>
                 @endif
             </div>
 
-            {{-- Bevorzugte Kan&auml;le --}}
+            {{-- Bevorzugte Kanäle --}}
             <div>
                 <div class="flex items-center justify-between mb-4">
                     <h3 class="text-lg font-semibold text-[var(--ui-secondary)] flex items-center gap-2">
                         @svg('heroicon-o-signal', 'w-5 h-5 text-purple-500')
-                        Bevorzugte Kan&auml;le
+                        Bevorzugte Kanäle
                     </h3>
                     <x-ui-button variant="secondary-outline" size="sm" type="button" wire:click="addChannel">
                         <div class="flex items-center gap-2">
                             @svg('heroicon-o-plus', 'w-4 h-4')
-                            Hinzuf&uuml;gen
+                            Hinzufügen
                         </div>
                     </x-ui-button>
                 </div>
@@ -268,7 +268,7 @@
                     </div>
                 @else
                     <div class="p-4 text-center text-sm text-[var(--ui-muted)] bg-[var(--ui-muted-5)] rounded-lg border border-[var(--ui-border)]/60">
-                        Noch keine Kan&auml;le hinzugef&uuml;gt.
+                        Noch keine Kanäle hinzugefügt.
                     </div>
                 @endif
             </div>
@@ -283,7 +283,7 @@
                     <x-ui-button variant="secondary-outline" size="sm" type="button" wire:click="addBrandLiked">
                         <div class="flex items-center gap-2">
                             @svg('heroicon-o-plus', 'w-4 h-4')
-                            Hinzuf&uuml;gen
+                            Hinzufügen
                         </div>
                     </x-ui-button>
                 </div>
@@ -304,7 +304,7 @@
                     </div>
                 @else
                     <div class="p-4 text-center text-sm text-[var(--ui-muted)] bg-[var(--ui-muted-5)] rounded-lg border border-[var(--ui-border)]/60">
-                        Noch keine Lieblingsmarken hinzugef&uuml;gt.
+                        Noch keine Lieblingsmarken hinzugefügt.
                     </div>
                 @endif
             </div>
@@ -316,7 +316,7 @@
                     Tone of Voice Zuordnung
                 </h3>
                 <div class="p-4 bg-[var(--ui-muted-5)] rounded-lg border border-[var(--ui-border)]/60">
-                    <label class="block text-sm font-medium text-[var(--ui-secondary)] mb-1.5">Welcher Ton f&uuml;r diese Persona?</label>
+                    <label class="block text-sm font-medium text-[var(--ui-secondary)] mb-1.5">Welcher Ton für diese Persona?</label>
                     <select
                         wire:model="personaToneOfVoiceBoardId"
                         class="w-full px-3 py-2 border border-[var(--ui-border)] rounded-lg bg-[var(--ui-surface)] text-[var(--ui-secondary)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--ui-primary)] focus:border-transparent"
@@ -326,7 +326,7 @@
                             <option value="{{ $tovBoard->id }}">{{ $tovBoard->name }}</option>
                         @endforeach
                     </select>
-                    <p class="text-xs text-[var(--ui-muted)] mt-1.5">Ordne ein Tone of Voice Board zu, um den Kommunikationston f&uuml;r diese Zielgruppe festzulegen.</p>
+                    <p class="text-xs text-[var(--ui-muted)] mt-1.5">Ordne ein Tone of Voice Board zu, um den Kommunikationston für diese Zielgruppe festzulegen.</p>
                 </div>
             </div>
         </div>

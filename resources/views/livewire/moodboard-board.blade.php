@@ -4,7 +4,7 @@
             <x-slot name="actions">
                 <a href="{{ route('brands.brands.show', $moodboardBoard->brand) }}" class="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-[var(--ui-secondary)] hover:text-[var(--ui-primary)] transition-colors">
                     @svg('heroicon-o-arrow-left', 'w-4 h-4')
-                    <span>Zur&uuml;ck zur Marke</span>
+                    <span>Zurück zur Marke</span>
                 </a>
             </x-slot>
         </x-ui-page-navbar>
@@ -51,17 +51,17 @@
                     @svg('heroicon-o-cloud-arrow-up', 'w-6 h-6 text-rose-400')
                 </div>
                 <p class="text-sm font-medium text-[var(--ui-secondary)] mb-1">Bilder hochladen</p>
-                <p class="text-xs text-[var(--ui-muted)] mb-4">Drag & Drop oder Klicken zum Ausw&auml;hlen (max. 10MB pro Bild)</p>
+                <p class="text-xs text-[var(--ui-muted)] mb-4">Drag & Drop oder Klicken zum Auswählen (max. 10MB pro Bild)</p>
                 <label class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-rose-500 hover:bg-rose-600 rounded-lg cursor-pointer transition-colors">
                     @svg('heroicon-o-plus', 'w-4 h-4')
-                    <span>Bilder ausw&auml;hlen</span>
+                    <span>Bilder auswählen</span>
                     <input type="file" wire:model="newImages" multiple accept="image/*" class="hidden">
                 </label>
                 @error('newImages.*') <p class="text-sm text-red-500 mt-2">{{ $message }}</p> @enderror
 
                 @if(count($newImages) > 0)
                     <div class="mt-4 flex items-center justify-center gap-3">
-                        <span class="text-sm text-[var(--ui-muted)]">{{ count($newImages) }} Bild(er) ausgew&auml;hlt</span>
+                        <span class="text-sm text-[var(--ui-muted)]">{{ count($newImages) }} Bild(er) ausgewählt</span>
                         <x-ui-button variant="primary" size="sm" wire:click="uploadImages">
                             <span class="inline-flex items-center gap-2">
                                 @svg('heroicon-o-cloud-arrow-up', 'w-4 h-4')
@@ -123,9 +123,9 @@
                                     </button>
                                     <button
                                         wire:click="deleteImage({{ $img->id }})"
-                                        wire:confirm="Bild wirklich l&ouml;schen?"
+                                        wire:confirm="Bild wirklich löschen?"
                                         class="p-1.5 bg-white/90 hover:bg-white rounded-lg text-[var(--ui-muted)] hover:text-red-600 transition-colors backdrop-blur-sm"
-                                        title="L&ouml;schen"
+                                        title="Löschen"
                                     >
                                         @svg('heroicon-o-trash', 'w-3.5 h-3.5')
                                     </button>
@@ -196,9 +196,9 @@
                                     </button>
                                     <button
                                         wire:click="deleteImage({{ $img->id }})"
-                                        wire:confirm="Bild wirklich l&ouml;schen?"
+                                        wire:confirm="Bild wirklich löschen?"
                                         class="p-1.5 bg-white/90 hover:bg-white rounded-lg text-[var(--ui-muted)] hover:text-red-600 transition-colors backdrop-blur-sm"
-                                        title="L&ouml;schen"
+                                        title="Löschen"
                                     >
                                         @svg('heroicon-o-trash', 'w-3.5 h-3.5')
                                     </button>
@@ -227,7 +227,7 @@
                     >
                         <span class="inline-flex items-center gap-2">
                             @svg('heroicon-o-plus', 'w-4 h-4')
-                            <span>Bild hinzuf&uuml;gen</span>
+                            <span>Bild hinzufügen</span>
                         </span>
                     </x-ui-button>
                 @endcan
@@ -236,7 +236,7 @@
     </x-ui-page-container>
 
     <x-slot name="sidebar">
-        <x-ui-page-sidebar title="Board-&Uuml;bersicht" width="w-80" :defaultOpen="true">
+        <x-ui-page-sidebar title="Board-Übersicht" width="w-80" :defaultOpen="true">
             <div class="p-6 space-y-6">
                 {{-- Navigation --}}
                 <div>
@@ -244,7 +244,7 @@
                     <div class="flex flex-col gap-2">
                         <a href="{{ route('brands.brands.show', $moodboardBoard->brand) }}" class="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-[var(--ui-secondary)] hover:text-[var(--ui-primary)] transition-colors rounded-lg border border-[var(--ui-border)]/40 hover:bg-[var(--ui-muted-5)]">
                             @svg('heroicon-o-arrow-left', 'w-4 h-4')
-                            <span>Zur&uuml;ck zur Marke</span>
+                            <span>Zurück zur Marke</span>
                         </a>
                     </div>
                 </div>
@@ -263,7 +263,7 @@
                             >
                                 <span class="inline-flex items-center gap-2">
                                     @svg('heroicon-o-plus', 'w-4 h-4')
-                                    <span>Bild hinzuf&uuml;gen</span>
+                                    <span>Bild hinzufügen</span>
                                 </span>
                             </x-ui-button>
                             <x-ui-button variant="secondary-outline" size="sm" x-data @click="$dispatch('open-modal-moodboard-board-settings', { moodboardBoardId: {{ $moodboardBoard->id }} })" class="w-full">
@@ -337,13 +337,13 @@
     </x-slot>
 
     <x-slot name="activity">
-        <x-ui-page-sidebar title="Aktivit&auml;ten" width="w-80" :defaultOpen="false" storeKey="activityOpen" side="right">
+        <x-ui-page-sidebar title="Aktivitäten" width="w-80" :defaultOpen="false" storeKey="activityOpen" side="right">
             <div class="p-6">
-                <h3 class="text-xs font-semibold uppercase tracking-wider text-[var(--ui-muted)] mb-4">Letzte Aktivit&auml;ten</h3>
+                <h3 class="text-xs font-semibold uppercase tracking-wider text-[var(--ui-muted)] mb-4">Letzte Aktivitäten</h3>
                 <div class="space-y-3">
                     @forelse(($activities ?? []) as $activity)
                         <div class="p-3 rounded-lg border border-[var(--ui-border)]/40 bg-[var(--ui-muted-5)]">
-                            <div class="text-sm font-medium text-[var(--ui-secondary)]">{{ $activity['title'] ?? 'Aktivit&auml;t' }}</div>
+                            <div class="text-sm font-medium text-[var(--ui-secondary)]">{{ $activity['title'] ?? 'Aktivität' }}</div>
                             <div class="text-xs text-[var(--ui-muted)]">{{ $activity['time'] ?? '' }}</div>
                         </div>
                     @empty
@@ -351,8 +351,8 @@
                             <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-[var(--ui-muted-5)] mb-3">
                                 @svg('heroicon-o-clock', 'w-6 h-6 text-[var(--ui-muted)]')
                             </div>
-                            <p class="text-sm text-[var(--ui-muted)]">Noch keine Aktivit&auml;ten</p>
-                            <p class="text-xs text-[var(--ui-muted)] mt-1">&Auml;nderungen werden hier angezeigt</p>
+                            <p class="text-sm text-[var(--ui-muted)]">Noch keine Aktivitäten</p>
+                            <p class="text-xs text-[var(--ui-muted)] mt-1">Änderungen werden hier angezeigt</p>
                         </div>
                     @endforelse
                 </div>

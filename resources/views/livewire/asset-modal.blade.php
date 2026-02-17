@@ -31,7 +31,7 @@
                 <div class="mb-3 p-3 rounded-xl border border-green-200 bg-green-50/50">
                     <div class="flex items-center gap-2">
                         @svg('heroicon-o-check-circle', 'w-5 h-5 text-green-600')
-                        <span class="text-sm text-green-700">Neue Datei ausgew&auml;hlt</span>
+                        <span class="text-sm text-green-700">Neue Datei ausgewählt</span>
                     </div>
                 </div>
             @endif
@@ -43,9 +43,9 @@
         @if($asset && $assetFile)
             <x-ui-input-textarea
                 name="changeNote"
-                label="&Auml;nderungsnotiz (optional)"
+                label="Änderungsnotiz (optional)"
                 wire:model.live.debounce.300ms="changeNote"
-                placeholder="Was hat sich ge&auml;ndert? z.B. Farben aktualisiert, neues Logo eingesetzt..."
+                placeholder="Was hat sich geändert? z.B. Farben aktualisiert, neues Logo eingesetzt..."
                 :errorKey="'changeNote'"
             />
         @endif
@@ -65,7 +65,7 @@
             name="assetDescription"
             label="Beschreibung (optional)"
             wire:model.live.debounce.300ms="assetDescription"
-            placeholder="Wof&uuml;r wird dieses Asset verwendet?"
+            placeholder="Wofür wird dieses Asset verwendet?"
             :errorKey="'assetDescription'"
         />
 
@@ -87,7 +87,7 @@
         {{-- Kanal-Tags --}}
         <div>
             <label class="block text-sm font-medium text-[var(--ui-secondary)] mb-2">Kanal-Tags</label>
-            <p class="text-xs text-[var(--ui-muted)] mb-3">Klicke auf Tags, um Kan&auml;le zuzuweisen</p>
+            <p class="text-xs text-[var(--ui-muted)] mb-3">Klicke auf Tags, um Kanäle zuzuweisen</p>
             <div class="flex flex-wrap gap-2">
                 @foreach($availableTags as $tag)
                     <button
@@ -103,8 +103,8 @@
 
         {{-- Verfügbare Formate --}}
         <div>
-            <label class="block text-sm font-medium text-[var(--ui-secondary)] mb-2">Verf&uuml;gbare Formate</label>
-            <p class="text-xs text-[var(--ui-muted)] mb-3">In welchen Formaten steht dieses Asset zur Verf&uuml;gung?</p>
+            <label class="block text-sm font-medium text-[var(--ui-secondary)] mb-2">Verfügbare Formate</label>
+            <p class="text-xs text-[var(--ui-muted)] mb-3">In welchen Formaten steht dieses Asset zur Verfügung?</p>
             <div class="flex flex-wrap gap-2">
                 @foreach($availableFormats as $format)
                     <button
@@ -128,7 +128,7 @@
                             <div>
                                 <span class="text-sm font-medium text-[var(--ui-secondary)]">v{{ $version->version_number }}</span>
                                 @if($version->change_note)
-                                    <span class="text-xs text-[var(--ui-muted)]"> &ndash; {{ $version->change_note }}</span>
+                                    <span class="text-xs text-[var(--ui-muted)]"> – {{ $version->change_note }}</span>
                                 @endif
                                 <p class="text-xs text-[var(--ui-muted)]">{{ $version->created_at->format('d.m.Y H:i') }}</p>
                             </div>
