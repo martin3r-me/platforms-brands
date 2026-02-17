@@ -275,6 +275,31 @@ class Brand extends Component
         return $this->redirect(route('brands.competitor-boards.show', $competitorBoard), navigate: true);
     }
 
+    public function createGuidelineBoard()
+    {
+        $this->authorize('update', $this->brand);
+
+        $user = Auth::user();
+        $team = $user->currentTeam;
+
+        if (!$team) {
+            session()->flash('error', 'Kein Team ausgewählt.');
+            return;
+        }
+
+        $guidelineBoard = \Platform\Brands\Models\BrandsGuidelineBoard::create([
+            'name' => 'Neues Guidelines Board',
+            'description' => null,
+            'user_id' => $user->id,
+            'team_id' => $team->id,
+            'brand_id' => $this->brand->id,
+        ]);
+
+        $this->brand->refresh();
+
+        return $this->redirect(route('brands.guideline-boards.show', $guidelineBoard), navigate: true);
+    }
+
     public function rendered()
     {
         $this->dispatch('comms', [
@@ -477,6 +502,7 @@ class Brand extends Component
         $toneOfVoiceBoards = $this->brand->toneOfVoiceBoards;
         $personaBoards = $this->brand->personaBoards;
         $competitorBoards = $this->brand->competitorBoards;
+        $guidelineBoards = $this->brand->guidelineBoards;
 
         // Meta Connection laden
         $metaConnection = $this->brand->metaConnection();
@@ -522,6 +548,7 @@ class Brand extends Component
             'toneOfVoiceBoards' => $toneOfVoiceBoards,
             'personaBoards' => $personaBoards,
             'competitorBoards' => $competitorBoards,
+            'guidelineBoards' => $guidelineBoards,
             'facebookPages' => $facebookPages,
             'instagramAccounts' => $instagramAccounts,
             'availableFacebookPages' => $availableFacebookPages,

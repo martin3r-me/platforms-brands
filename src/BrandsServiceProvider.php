@@ -33,6 +33,9 @@ use Platform\Brands\Models\BrandsPersonaBoard;
 use Platform\Brands\Models\BrandsPersona;
 use Platform\Brands\Models\BrandsCompetitorBoard;
 use Platform\Brands\Models\BrandsCompetitor;
+use Platform\Brands\Models\BrandsGuidelineBoard;
+use Platform\Brands\Models\BrandsGuidelineChapter;
+use Platform\Brands\Models\BrandsGuidelineEntry;
 use Platform\Integrations\Models\IntegrationsFacebookPage;
 use Platform\Integrations\Models\IntegrationsInstagramAccount;
 use Platform\Brands\Policies\BrandPolicy;
@@ -55,6 +58,9 @@ use Platform\Brands\Policies\PersonaBoardPolicy;
 use Platform\Brands\Policies\PersonaPolicy;
 use Platform\Brands\Policies\CompetitorBoardPolicy;
 use Platform\Brands\Policies\CompetitorPolicy;
+use Platform\Brands\Policies\GuidelineBoardPolicy;
+use Platform\Brands\Policies\GuidelineChapterPolicy;
+use Platform\Brands\Policies\GuidelineEntryPolicy;
 use Platform\Brands\Policies\FacebookPagePolicy;
 use Platform\Brands\Policies\InstagramAccountPolicy;
 
@@ -190,6 +196,9 @@ class BrandsServiceProvider extends ServiceProvider
             BrandsPersona::class => PersonaPolicy::class,
             BrandsCompetitorBoard::class => CompetitorBoardPolicy::class,
             BrandsCompetitor::class => CompetitorPolicy::class,
+            BrandsGuidelineBoard::class => GuidelineBoardPolicy::class,
+            BrandsGuidelineChapter::class => GuidelineChapterPolicy::class,
+            BrandsGuidelineEntry::class => GuidelineEntryPolicy::class,
             IntegrationsFacebookPage::class => FacebookPagePolicy::class,
             IntegrationsInstagramAccount::class => InstagramAccountPolicy::class,
         ];
@@ -404,6 +413,26 @@ class BrandsServiceProvider extends ServiceProvider
             $registry->register(new \Platform\Brands\Tools\GetCompetitorTool());
             $registry->register(new \Platform\Brands\Tools\UpdateCompetitorTool());
             $registry->register(new \Platform\Brands\Tools\DeleteCompetitorTool());
+
+            // GuidelineBoard-Tools
+            $registry->register(new \Platform\Brands\Tools\CreateGuidelineBoardTool());
+            $registry->register(new \Platform\Brands\Tools\ListGuidelineBoardsTool());
+            $registry->register(new \Platform\Brands\Tools\GetGuidelineBoardTool());
+            $registry->register(new \Platform\Brands\Tools\UpdateGuidelineBoardTool());
+            $registry->register(new \Platform\Brands\Tools\DeleteGuidelineBoardTool());
+
+            // GuidelineChapter-Tools
+            $registry->register(new \Platform\Brands\Tools\CreateGuidelineChapterTool());
+            $registry->register(new \Platform\Brands\Tools\ListGuidelineChaptersTool());
+            $registry->register(new \Platform\Brands\Tools\UpdateGuidelineChapterTool());
+            $registry->register(new \Platform\Brands\Tools\DeleteGuidelineChapterTool());
+
+            // GuidelineEntry-Tools
+            $registry->register(new \Platform\Brands\Tools\CreateGuidelineEntryTool());
+            $registry->register(new \Platform\Brands\Tools\ListGuidelineEntriesTool());
+            $registry->register(new \Platform\Brands\Tools\GetGuidelineEntryTool());
+            $registry->register(new \Platform\Brands\Tools\UpdateGuidelineEntryTool());
+            $registry->register(new \Platform\Brands\Tools\DeleteGuidelineEntryTool());
 
             // Export-Tools
             $registry->register(new \Platform\Brands\Tools\ExportBrandTool());

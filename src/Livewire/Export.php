@@ -24,6 +24,7 @@ class Export extends Component
             'socialBoards',
             'kanbanBoards',
             'multiContentBoards',
+            'guidelineBoards',
         ]);
 
         $exportService = app(\Platform\Brands\Services\BrandsExportService::class);
@@ -49,6 +50,9 @@ class Export extends Component
         }
         foreach ($this->brand->multiContentBoards as $b) {
             $boards->push(['id' => $b->id, 'name' => $b->name, 'type' => 'multi_content', 'type_label' => 'Multi-Content Board', 'route_type' => 'multi-content-board']);
+        }
+        foreach ($this->brand->guidelineBoards as $b) {
+            $boards->push(['id' => $b->id, 'name' => $b->name, 'type' => 'guideline', 'type_label' => 'Guidelines Board', 'route_type' => 'guideline-board']);
         }
 
         return view('brands::livewire.export', [

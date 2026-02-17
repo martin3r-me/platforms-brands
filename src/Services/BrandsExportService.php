@@ -10,6 +10,7 @@ use Platform\Brands\Models\BrandsKanbanBoard;
 use Platform\Brands\Models\BrandsMultiContentBoard;
 use Platform\Brands\Models\BrandsTypographyBoard;
 use Platform\Brands\Models\BrandsToneOfVoiceBoard;
+use Platform\Brands\Models\BrandsGuidelineBoard;
 use Platform\Brands\Services\Export\ExportFormatInterface;
 use Platform\Brands\Services\Export\JsonExportFormat;
 use Platform\Brands\Services\Export\PdfExportFormat;
@@ -104,6 +105,7 @@ class BrandsExportService
             'typographyBoards.entries',
             'toneOfVoiceBoards.entries',
             'toneOfVoiceBoards.dimensions',
+            'guidelineBoards.chapters.entries',
         ]);
 
         // Extract brand-level CI settings from the first CI board (if any)
@@ -128,6 +130,7 @@ class BrandsExportService
             'multi_content_boards' => $brand->multiContentBoards->map(fn ($b) => $this->collectMultiContentBoardData($b))->toArray(),
             'typography_boards' => $brand->typographyBoards->map(fn ($b) => $this->collectTypographyBoardData($b))->toArray(),
             'tone_of_voice_boards' => $brand->toneOfVoiceBoards->map(fn ($b) => $this->collectToneOfVoiceBoardData($b))->toArray(),
+            'guideline_boards' => $brand->guidelineBoards->map(fn ($b) => $this->collectGuidelineBoardData($b))->toArray(),
         ];
     }
 
@@ -145,6 +148,7 @@ class BrandsExportService
             $board instanceof BrandsMultiContentBoard => $this->collectMultiContentBoardData($board),
             $board instanceof BrandsTypographyBoard => $this->collectTypographyBoardData($board),
             $board instanceof BrandsToneOfVoiceBoard => $this->collectToneOfVoiceBoardData($board),
+            $board instanceof BrandsGuidelineBoard => $this->collectGuidelineBoardData($board),
             default => throw new \InvalidArgumentException('Unbekannter Board-Typ: ' . get_class($board)),
         };
     }
@@ -379,6 +383,39 @@ class BrandsExportService
                 'value' => $dim->value,
                 'description' => $dim->description,
                 'order' => $dim->order,
+            ])->toArray(),
+            'created_at' => $board->created_at?->toIso8601String(),
+        ];
+    }
+
+    protected function collectGuidelineBoardData(BrandsGuidelineBoard $board): array
+    {
+        $board->loadMissing('chapters.entries');
+
+        return [
+            'id' => $board->id,
+            'uuid' => $board->uuid,
+            'type' => 'guideline',
+            'name' => $board->name,
+            'description' => $board->description,
+            'chapters' => $board->chapters->map(fn ($chapter) => [
+                'id' => $chapter->id,
+                'uuid' => $chapter->uuid,
+                'title' => $chapter->title,
+                'description' => $chapter->description,
+                'icon' => $chapter->icon,
+                'order' => $chapter->order,
+                'entries' => $chapter->entries->map(fn ($entry) => [
+                    'id' => $entry->id,
+                    'uuid' => $entry->uuid,
+                    'title' => $entry->title,
+                    'rule_text' => $entry->rule_text,
+                    'rationale' => $entry->rationale,
+                    'do_example' => $entry->do_example,
+                    'dont_example' => $entry->dont_example,
+                    'cross_references' => $entry->cross_references,
+                    'order' => $entry->order,
+                ])->toArray(),
             ])->toArray(),
             'created_at' => $board->created_at?->toIso8601String(),
         ];

@@ -12,6 +12,7 @@ use Platform\Brands\Models\BrandsKanbanBoard;
 use Platform\Brands\Models\BrandsMultiContentBoard;
 use Platform\Brands\Models\BrandsTypographyBoard;
 use Platform\Brands\Models\BrandsToneOfVoiceBoard;
+use Platform\Brands\Models\BrandsGuidelineBoard;
 use Platform\Brands\Services\BrandsExportService;
 
 /**
@@ -64,6 +65,7 @@ class ExportDownload
             'multi-content-board' => BrandsMultiContentBoard::with('brand', 'slots.contentBoards.blocks.content')->find($id),
             'typography-board' => BrandsTypographyBoard::with('brand', 'entries')->find($id),
             'tone-of-voice-board' => BrandsToneOfVoiceBoard::with('brand', 'entries', 'dimensions')->find($id),
+            'guideline-board' => BrandsGuidelineBoard::with('brand', 'chapters.entries')->find($id),
             default => null,
         };
     }

@@ -304,6 +304,15 @@ HTML;
             $pages .= '</div>';
         }
 
+        // Guideline Boards
+        foreach ($brandData['guideline_boards'] ?? [] as $board) {
+            $pages .= '<div class="page">';
+            $pages .= '<div class="section-header">Guidelines</div>';
+            $pages .= $this->renderBoardContent($board, $brandContext);
+            $pages .= '<div class="footer">Brand Book: ' . e($brandName) . ' | ' . $date . '</div>';
+            $pages .= '</div>';
+        }
+
         // If no boards exist, add an empty page note
         if (empty($pages)) {
             $pages = '<div class="page"><p style="text-align:center;color:#999;margin-top:40px;">Diese Marke enthält noch keine Boards.</p></div>';
@@ -365,6 +374,9 @@ HTML;
                 break;
             case 'multi_content':
                 $html .= $this->renderMultiContentBoardContent($boardData);
+                break;
+            case 'guideline':
+                $html .= $this->renderGuidelineBoardContent($boardData);
                 break;
         }
 
@@ -517,6 +529,60 @@ HTML;
                 $html .= '<div style="margin-left:16px;margin-bottom:16px;">';
                 $html .= '<div style="font-weight:600;font-size:11pt;margin-bottom:6px;">' . e($cb['name'] ?? 'Content Board') . '</div>';
                 $html .= $this->renderContentBoardContent($cb);
+                $html .= '</div>';
+            }
+        }
+
+        return $html;
+    }
+
+    protected function renderGuidelineBoardContent(array $data): string
+    {
+        $html = '';
+        if (empty($data['chapters'])) {
+            $html .= '<p style="color:#999;margin-top:16px;">Keine Kapitel vorhanden.</p>';
+            return $html;
+        }
+
+        foreach ($data['chapters'] as $chapter) {
+            $html .= '<div class="slot-header">' . e($chapter['title'] ?? 'Kapitel') . '</div>';
+            if (!empty($chapter['description'])) {
+                $html .= '<p style="color:#666;font-size:10pt;margin:4px 0 12px 0;">' . e($chapter['description']) . '</p>';
+            }
+
+            if (empty($chapter['entries'])) {
+                $html .= '<p style="color:#999;font-size:9pt;margin-left:12px;">Keine Regeln in diesem Kapitel.</p>';
+                continue;
+            }
+
+            foreach ($chapter['entries'] as $entry) {
+                $html .= '<div class="entry">';
+                $html .= '<div class="entry-title">' . e($entry['title'] ?? 'Regel') . '</div>';
+                if (!empty($entry['rule_text'])) {
+                    $html .= '<div class="entry-body">' . nl2br(e($entry['rule_text'])) . '</div>';
+                }
+                if (!empty($entry['rationale'])) {
+                    $html .= '<div class="entry-body" style="margin-top:6px;font-style:italic;color:#666;">' . e($entry['rationale']) . '</div>';
+                }
+
+                // Do / Don't
+                if (!empty($entry['do_example']) || !empty($entry['dont_example'])) {
+                    $html .= '<div style="display:flex;gap:12px;margin-top:8px;">';
+                    if (!empty($entry['do_example'])) {
+                        $html .= '<div style="flex:1;padding:8px 12px;border:2px solid #86efac;border-radius:6px;background:#f0fdf4;">';
+                        $html .= '<div style="font-size:9pt;font-weight:700;color:#166534;margin-bottom:4px;">DO</div>';
+                        $html .= '<div style="font-size:9pt;color:#14532d;">' . nl2br(e($entry['do_example'])) . '</div>';
+                        $html .= '</div>';
+                    }
+                    if (!empty($entry['dont_example'])) {
+                        $html .= '<div style="flex:1;padding:8px 12px;border:2px solid #fca5a5;border-radius:6px;background:#fef2f2;">';
+                        $html .= '<div style="font-size:9pt;font-weight:700;color:#991b1b;margin-bottom:4px;">DON\'T</div>';
+                        $html .= '<div style="font-size:9pt;color:#7f1d1d;">' . nl2br(e($entry['dont_example'])) . '</div>';
+                        $html .= '</div>';
+                    }
+                    $html .= '</div>';
+                }
+
                 $html .= '</div>';
             }
         }

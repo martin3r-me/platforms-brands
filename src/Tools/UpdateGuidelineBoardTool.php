@@ -1,0 +1,96 @@
+<?php
+
+namespace Platform\Brands\Tools;
+
+use Platform\Core\Contracts\ToolContract;
+use Platform\Core\Contracts\ToolContext;
+use Platform\Core\Contracts\ToolResult;
+use Platform\Core\Tools\Concerns\HasStandardizedWriteOperations;
+use Platform\Brands\Models\BrandsGuidelineBoard;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Auth\Access\AuthorizationException;
+
+class UpdateGuidelineBoardTool implements ToolContract
+{
+    use HasStandardizedWriteOperations;
+
+    public function getName(): string
+    {
+        return 'brands.guideline_boards.PUT';
+    }
+
+    public function getDescription(): string
+    {
+        return 'PUT /brands/guideline_boards/{id} - Aktualisiert ein Guidelines Board. REST-Parameter: guideline_board_id (required, integer) - Board-ID. name (optional, string) - Name. description (optional, string) - Beschreibung. done (optional, boolean) - Als erledigt markieren.';
+    }
+
+    public function getSchema(): array
+    {
+        return [
+            'type' => 'object',
+            'properties' => [
+                'guideline_board_id' => [
+                    'type' => 'integer',
+                    'description' => 'ID des Guidelines Boards (ERFORDERLICH). Nutze "brands.guideline_boards.GET" um Boards zu finden.'
+                ],
+                'name' => ['type' => 'string', 'description' => 'Optional: Name des Guidelines Boards.'],
+                'description' => ['type' => 'string', 'description' => 'Optional: Beschreibung des Guidelines Boards.'],
+                'done' => ['type' => 'boolean', 'description' => 'Optional: Board als erledigt markieren.'],
+            ],
+            'required' => ['guideline_board_id']
+        ];
+    }
+
+    public function execute(array $arguments, ToolContext $context): ToolResult
+    {
+        try {
+            $validation = $this->validateAndFindModel(
+                $arguments, $context, 'guideline_board_id',
+                BrandsGuidelineBoard::class, 'GUIDELINE_BOARD_NOT_FOUND',
+                'Das angegebene Guidelines Board wurde nicht gefunden.'
+            );
+
+            if ($validation['error']) {
+                return $validation['error'];
+            }
+
+            $board = $validation['model'];
+
+            try {
+                Gate::forUser($context->user)->authorize('update', $board);
+            } catch (AuthorizationException $e) {
+                return ToolResult::error('ACCESS_DENIED', 'Du darfst dieses Guidelines Board nicht bearbeiten (Policy).');
+            }
+
+            $updateData = [];
+            if (isset($arguments['name'])) $updateData['name'] = $arguments['name'];
+            if (isset($arguments['description'])) $updateData['description'] = $arguments['description'];
+            if (isset($arguments['done'])) {
+                $updateData['done'] = $arguments['done'];
+                $updateData['done_at'] = $arguments['done'] ? now() : null;
+            }
+
+            if (!empty($updateData)) {
+                $board->update($updateData);
+            }
+
+            $board->refresh();
+            $board->load(['brand', 'user', 'team']);
+
+            return ToolResult::success([
+                'id' => $board->id,
+                'uuid' => $board->uuid,
+                'name' => $board->name,
+                'description' => $board->description,
+                'brand_id' => $board->brand_id,
+                'brand_name' => $board->brand->name,
+                'done' => $board->done,
+                'done_at' => $board->done_at?->toIso8601String(),
+                'updated_at' => $board->updated_at->toIso8601String(),
+                'message' => "Guidelines Board '{$board->name}' erfolgreich aktualisiert."
+            ]);
+        } catch (\Throwable $e) {
+            return ToolResult::error('EXECUTION_ERROR', 'Fehler beim Aktualisieren des Guidelines Boards: ' . $e->getMessage());
+        }
+    }
+}
