@@ -36,6 +36,8 @@ use Platform\Brands\Models\BrandsCompetitor;
 use Platform\Brands\Models\BrandsGuidelineBoard;
 use Platform\Brands\Models\BrandsGuidelineChapter;
 use Platform\Brands\Models\BrandsGuidelineEntry;
+use Platform\Brands\Models\BrandsMoodboardBoard;
+use Platform\Brands\Models\BrandsMoodboardImage;
 use Platform\Integrations\Models\IntegrationsFacebookPage;
 use Platform\Integrations\Models\IntegrationsInstagramAccount;
 use Platform\Brands\Policies\BrandPolicy;
@@ -61,6 +63,8 @@ use Platform\Brands\Policies\CompetitorPolicy;
 use Platform\Brands\Policies\GuidelineBoardPolicy;
 use Platform\Brands\Policies\GuidelineChapterPolicy;
 use Platform\Brands\Policies\GuidelineEntryPolicy;
+use Platform\Brands\Policies\MoodboardBoardPolicy;
+use Platform\Brands\Policies\MoodboardImagePolicy;
 use Platform\Brands\Policies\FacebookPagePolicy;
 use Platform\Brands\Policies\InstagramAccountPolicy;
 
@@ -199,6 +203,8 @@ class BrandsServiceProvider extends ServiceProvider
             BrandsGuidelineBoard::class => GuidelineBoardPolicy::class,
             BrandsGuidelineChapter::class => GuidelineChapterPolicy::class,
             BrandsGuidelineEntry::class => GuidelineEntryPolicy::class,
+            BrandsMoodboardBoard::class => MoodboardBoardPolicy::class,
+            BrandsMoodboardImage::class => MoodboardImagePolicy::class,
             IntegrationsFacebookPage::class => FacebookPagePolicy::class,
             IntegrationsInstagramAccount::class => InstagramAccountPolicy::class,
         ];
@@ -433,6 +439,20 @@ class BrandsServiceProvider extends ServiceProvider
             $registry->register(new \Platform\Brands\Tools\GetGuidelineEntryTool());
             $registry->register(new \Platform\Brands\Tools\UpdateGuidelineEntryTool());
             $registry->register(new \Platform\Brands\Tools\DeleteGuidelineEntryTool());
+
+            // MoodboardBoard-Tools
+            $registry->register(new \Platform\Brands\Tools\CreateMoodboardBoardTool());
+            $registry->register(new \Platform\Brands\Tools\ListMoodboardBoardsTool());
+            $registry->register(new \Platform\Brands\Tools\GetMoodboardBoardTool());
+            $registry->register(new \Platform\Brands\Tools\UpdateMoodboardBoardTool());
+            $registry->register(new \Platform\Brands\Tools\DeleteMoodboardBoardTool());
+
+            // MoodboardImage-Tools
+            $registry->register(new \Platform\Brands\Tools\CreateMoodboardImageTool());
+            $registry->register(new \Platform\Brands\Tools\ListMoodboardImagesTool());
+            $registry->register(new \Platform\Brands\Tools\GetMoodboardImageTool());
+            $registry->register(new \Platform\Brands\Tools\UpdateMoodboardImageTool());
+            $registry->register(new \Platform\Brands\Tools\DeleteMoodboardImageTool());
 
             // Export-Tools
             $registry->register(new \Platform\Brands\Tools\ExportBrandTool());

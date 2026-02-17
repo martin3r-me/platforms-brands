@@ -300,6 +300,31 @@ class Brand extends Component
         return $this->redirect(route('brands.guideline-boards.show', $guidelineBoard), navigate: true);
     }
 
+    public function createMoodboardBoard()
+    {
+        $this->authorize('update', $this->brand);
+
+        $user = Auth::user();
+        $team = $user->currentTeam;
+
+        if (!$team) {
+            session()->flash('error', 'Kein Team ausgewählt.');
+            return;
+        }
+
+        $moodboardBoard = \Platform\Brands\Models\BrandsMoodboardBoard::create([
+            'name' => 'Neues Moodboard',
+            'description' => null,
+            'user_id' => $user->id,
+            'team_id' => $team->id,
+            'brand_id' => $this->brand->id,
+        ]);
+
+        $this->brand->refresh();
+
+        return $this->redirect(route('brands.moodboard-boards.show', $moodboardBoard), navigate: true);
+    }
+
     public function rendered()
     {
         $this->dispatch('comms', [
@@ -503,6 +528,7 @@ class Brand extends Component
         $personaBoards = $this->brand->personaBoards;
         $competitorBoards = $this->brand->competitorBoards;
         $guidelineBoards = $this->brand->guidelineBoards;
+        $moodboardBoards = $this->brand->moodboardBoards;
 
         // Meta Connection laden
         $metaConnection = $this->brand->metaConnection();
@@ -549,6 +575,7 @@ class Brand extends Component
             'personaBoards' => $personaBoards,
             'competitorBoards' => $competitorBoards,
             'guidelineBoards' => $guidelineBoards,
+            'moodboardBoards' => $moodboardBoards,
             'facebookPages' => $facebookPages,
             'instagramAccounts' => $instagramAccounts,
             'availableFacebookPages' => $availableFacebookPages,
