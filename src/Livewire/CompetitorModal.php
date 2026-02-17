@@ -151,11 +151,10 @@ class CompetitorModal extends Component
         }
 
         $this->dispatch('updateCompetitorBoard');
-        $this->closeModal();
-    }
-
-    public function closeModal()
-    {
+        $this->dispatch('notice', [
+            'type' => 'success',
+            'message' => $this->competitor ? 'Wettbewerber erfolgreich gespeichert!' : 'Wettbewerber erfolgreich erstellt!'
+        ]);
         $this->modalShow = false;
     }
 

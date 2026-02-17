@@ -200,11 +200,10 @@ class PersonaModal extends Component
         }
 
         $this->dispatch('updatePersonaBoard');
-        $this->closeModal();
-    }
-
-    public function closeModal()
-    {
+        $this->dispatch('notice', [
+            'type' => 'success',
+            'message' => $this->persona ? 'Persona erfolgreich gespeichert!' : 'Persona erfolgreich erstellt!'
+        ]);
         $this->modalShow = false;
     }
 

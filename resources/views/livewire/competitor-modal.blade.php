@@ -1,172 +1,254 @@
-<div>
-    @if($modalShow)
-        <div class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-            <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-                <div class="fixed inset-0 bg-gray-500/75 transition-opacity" wire:click="closeModal"></div>
-
-                <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-
-                <div class="inline-block align-bottom bg-white rounded-xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full">
-                    <form wire:submit="save">
-                        <div class="bg-white px-6 pt-6 pb-4">
-                            <div class="flex items-center gap-3 mb-6">
-                                <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-orange-100 to-orange-50 flex items-center justify-center">
-                                    @svg('heroicon-o-building-office', 'w-5 h-5 text-orange-600')
-                                </div>
-                                <h3 class="text-lg font-bold text-[var(--ui-secondary)]">
-                                    {{ $competitor ? 'Wettbewerber bearbeiten' : 'Neuen Wettbewerber erstellen' }}
-                                </h3>
-                            </div>
-
-                            <div class="space-y-6 max-h-[70vh] overflow-y-auto pr-2">
-                                {{-- Basic Info --}}
-                                <div class="space-y-4">
-                                    <h4 class="text-sm font-semibold text-[var(--ui-secondary)] border-b border-[var(--ui-border)]/40 pb-2">Grunddaten</h4>
-
-                                    <div>
-                                        <label for="competitorName" class="block text-sm font-medium text-[var(--ui-secondary)] mb-1">Name *</label>
-                                        <input type="text" id="competitorName" wire:model="competitorName" class="w-full rounded-lg border border-[var(--ui-border)] px-3 py-2 text-sm focus:border-orange-500 focus:ring-orange-500" placeholder="z.B. Wettbewerber GmbH">
-                                        @error('competitorName') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
-                                    </div>
-
-                                    <div class="grid grid-cols-2 gap-4">
-                                        <div>
-                                            <label for="competitorLogoUrl" class="block text-sm font-medium text-[var(--ui-secondary)] mb-1">Logo URL</label>
-                                            <input type="url" id="competitorLogoUrl" wire:model="competitorLogoUrl" class="w-full rounded-lg border border-[var(--ui-border)] px-3 py-2 text-sm focus:border-orange-500 focus:ring-orange-500" placeholder="https://...">
-                                        </div>
-                                        <div>
-                                            <label for="competitorWebsiteUrl" class="block text-sm font-medium text-[var(--ui-secondary)] mb-1">Website</label>
-                                            <input type="url" id="competitorWebsiteUrl" wire:model="competitorWebsiteUrl" class="w-full rounded-lg border border-[var(--ui-border)] px-3 py-2 text-sm focus:border-orange-500 focus:ring-orange-500" placeholder="https://...">
-                                        </div>
-                                    </div>
-
-                                    <div>
-                                        <label for="competitorDescription" class="block text-sm font-medium text-[var(--ui-secondary)] mb-1">Beschreibung</label>
-                                        <textarea id="competitorDescription" wire:model="competitorDescription" rows="3" class="w-full rounded-lg border border-[var(--ui-border)] px-3 py-2 text-sm focus:border-orange-500 focus:ring-orange-500" placeholder="Kurze Beschreibung des Wettbewerbers..."></textarea>
-                                    </div>
-
-                                    <div class="flex items-center gap-3 px-3 py-2 bg-orange-50 rounded-lg border border-orange-100">
-                                        <input type="checkbox" id="competitorIsOwnBrand" wire:model="competitorIsOwnBrand" class="rounded border-orange-300 text-orange-600 focus:ring-orange-500">
-                                        <label for="competitorIsOwnBrand" class="text-sm font-medium text-orange-700">Dies ist die eigene Marke</label>
-                                        <p class="text-xs text-orange-500 ml-auto">F&uuml;r den Vergleich in der Differenzierungstabelle</p>
-                                    </div>
-                                </div>
-
-                                {{-- Strengths --}}
-                                <div class="space-y-3">
-                                    <div class="flex items-center justify-between">
-                                        <h4 class="text-sm font-semibold text-[var(--ui-secondary)] flex items-center gap-2">
-                                            @svg('heroicon-o-arrow-trending-up', 'w-4 h-4 text-green-500')
-                                            St&auml;rken
-                                        </h4>
-                                        <button type="button" wire:click="addStrength" class="text-xs text-orange-600 hover:text-orange-700 font-medium">+ Hinzuf&uuml;gen</button>
-                                    </div>
-                                    @foreach($competitorStrengths as $index => $strength)
-                                        <div class="flex items-center gap-2">
-                                            <input type="text" wire:model="competitorStrengths.{{ $index }}.text" class="flex-1 rounded-lg border border-[var(--ui-border)] px-3 py-2 text-sm focus:border-orange-500 focus:ring-orange-500" placeholder="St&auml;rke...">
-                                            <button type="button" wire:click="removeStrength({{ $index }})" class="p-2 text-[var(--ui-muted)] hover:text-red-500 transition-colors">
-                                                @svg('heroicon-o-x-mark', 'w-4 h-4')
-                                            </button>
-                                        </div>
-                                    @endforeach
-                                </div>
-
-                                {{-- Weaknesses --}}
-                                <div class="space-y-3">
-                                    <div class="flex items-center justify-between">
-                                        <h4 class="text-sm font-semibold text-[var(--ui-secondary)] flex items-center gap-2">
-                                            @svg('heroicon-o-arrow-trending-down', 'w-4 h-4 text-red-500')
-                                            Schw&auml;chen
-                                        </h4>
-                                        <button type="button" wire:click="addWeakness" class="text-xs text-orange-600 hover:text-orange-700 font-medium">+ Hinzuf&uuml;gen</button>
-                                    </div>
-                                    @foreach($competitorWeaknesses as $index => $weakness)
-                                        <div class="flex items-center gap-2">
-                                            <input type="text" wire:model="competitorWeaknesses.{{ $index }}.text" class="flex-1 rounded-lg border border-[var(--ui-border)] px-3 py-2 text-sm focus:border-orange-500 focus:ring-orange-500" placeholder="Schw&auml;che...">
-                                            <button type="button" wire:click="removeWeakness({{ $index }})" class="p-2 text-[var(--ui-muted)] hover:text-red-500 transition-colors">
-                                                @svg('heroicon-o-x-mark', 'w-4 h-4')
-                                            </button>
-                                        </div>
-                                    @endforeach
-                                </div>
-
-                                {{-- Notes --}}
-                                <div class="space-y-3">
-                                    <h4 class="text-sm font-semibold text-[var(--ui-secondary)] flex items-center gap-2">
-                                        @svg('heroicon-o-document-text', 'w-4 h-4 text-amber-500')
-                                        Notizen
-                                    </h4>
-                                    <textarea wire:model="competitorNotes" rows="3" class="w-full rounded-lg border border-[var(--ui-border)] px-3 py-2 text-sm focus:border-orange-500 focus:ring-orange-500" placeholder="Freitext-Notizen zum Wettbewerber..."></textarea>
-                                </div>
-
-                                {{-- Positioning --}}
-                                <div class="space-y-3">
-                                    <h4 class="text-sm font-semibold text-[var(--ui-secondary)] border-b border-[var(--ui-border)]/40 pb-2 flex items-center gap-2">
-                                        @svg('heroicon-o-chart-bar-square', 'w-4 h-4 text-indigo-500')
-                                        Positionierung auf Matrix
-                                    </h4>
-                                    <div class="grid grid-cols-2 gap-4">
-                                        <div>
-                                            <label for="competitorPositionX" class="block text-sm font-medium text-[var(--ui-secondary)] mb-1">X-Position (0-100)</label>
-                                            <input type="range" id="competitorPositionX" wire:model="competitorPositionX" min="0" max="100" class="w-full accent-indigo-600">
-                                            <div class="flex justify-between text-[10px] text-[var(--ui-muted)]">
-                                                <span>0</span>
-                                                <span class="font-medium text-indigo-600">{{ $competitorPositionX }}</span>
-                                                <span>100</span>
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <label for="competitorPositionY" class="block text-sm font-medium text-[var(--ui-secondary)] mb-1">Y-Position (0-100)</label>
-                                            <input type="range" id="competitorPositionY" wire:model="competitorPositionY" min="0" max="100" class="w-full accent-indigo-600">
-                                            <div class="flex justify-between text-[10px] text-[var(--ui-muted)]">
-                                                <span>0</span>
-                                                <span class="font-medium text-indigo-600">{{ $competitorPositionY }}</span>
-                                                <span>100</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {{-- Differentiation --}}
-                                <div class="space-y-3">
-                                    <div class="flex items-center justify-between">
-                                        <h4 class="text-sm font-semibold text-[var(--ui-secondary)] flex items-center gap-2">
-                                            @svg('heroicon-o-table-cells', 'w-4 h-4 text-emerald-500')
-                                            Differenzierungsmerkmale
-                                        </h4>
-                                        <button type="button" wire:click="addDifferentiation" class="text-xs text-orange-600 hover:text-orange-700 font-medium">+ Hinzuf&uuml;gen</button>
-                                    </div>
-                                    <p class="text-xs text-[var(--ui-muted)]">Vergleichsmerkmale f&uuml;r die Differenzierungstabelle. &bdquo;Eigene Marke&ldquo;-Spalte wird nur bei der als eigene Marke markierten Eintr&auml;gen angezeigt.</p>
-                                    @foreach($competitorDifferentiation as $index => $diff)
-                                        <div class="p-3 bg-[var(--ui-muted-5)] rounded-lg border border-[var(--ui-border)]/40 space-y-2">
-                                            <div class="flex items-center justify-between">
-                                                <span class="text-xs font-medium text-[var(--ui-muted)]">Merkmal {{ $index + 1 }}</span>
-                                                <button type="button" wire:click="removeDifferentiation({{ $index }})" class="p-1 text-[var(--ui-muted)] hover:text-red-500 transition-colors">
-                                                    @svg('heroicon-o-x-mark', 'w-4 h-4')
-                                                </button>
-                                            </div>
-                                            <input type="text" wire:model="competitorDifferentiation.{{ $index }}.category" class="w-full rounded-lg border border-[var(--ui-border)] px-3 py-1.5 text-sm focus:border-orange-500 focus:ring-orange-500" placeholder="Kategorie (z.B. Preis, Service, Qualit&auml;t)">
-                                            <div class="grid grid-cols-2 gap-2">
-                                                <input type="text" wire:model="competitorDifferentiation.{{ $index }}.own_value" class="rounded-lg border border-[var(--ui-border)] px-3 py-1.5 text-sm focus:border-orange-500 focus:ring-orange-500" placeholder="Eigene Marke">
-                                                <input type="text" wire:model="competitorDifferentiation.{{ $index }}.competitor_value" class="rounded-lg border border-[var(--ui-border)] px-3 py-1.5 text-sm focus:border-orange-500 focus:ring-orange-500" placeholder="Wettbewerber">
-                                            </div>
-                                        </div>
-                                    @endforeach
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="bg-[var(--ui-muted-5)] px-6 py-4 flex items-center justify-end gap-3 border-t border-[var(--ui-border)]/40">
-                            <x-ui-button variant="secondary-outline" size="sm" type="button" wire:click="closeModal">
-                                Abbrechen
-                            </x-ui-button>
-                            <x-ui-button variant="primary" size="sm" type="submit">
-                                {{ $competitor ? 'Speichern' : 'Erstellen' }}
-                            </x-ui-button>
-                        </div>
-                    </form>
-                </div>
+<x-ui-modal size="lg" wire:model="modalShow">
+    <x-slot name="header">
+        <div class="flex items-center justify-between w-full">
+            <div class="flex items-center gap-3">
+                <h2 class="text-xl font-semibold text-[var(--ui-secondary)] m-0">
+                    {{ $competitor ? 'Wettbewerber bearbeiten' : 'Neuen Wettbewerber erstellen' }}
+                </h2>
+                <span class="text-xs text-[var(--ui-muted)] bg-[var(--ui-muted-5)] px-2 py-1 rounded-full">WETTBEWERBER</span>
             </div>
         </div>
-    @endif
-</div>
+    </x-slot>
+
+    <form wire:submit="save">
+        <div class="space-y-6">
+            {{-- Grunddaten --}}
+            <div>
+                <h3 class="text-lg font-semibold text-[var(--ui-secondary)] mb-4">Grunddaten</h3>
+                <div class="space-y-4">
+                    <x-ui-input-text
+                        name="competitorName"
+                        label="Name *"
+                        wire:model.live.debounce.500ms="competitorName"
+                        placeholder="z.B. Wettbewerber GmbH"
+                        :errorKey="'competitorName'"
+                    />
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <x-ui-input-text
+                            name="competitorLogoUrl"
+                            label="Logo URL"
+                            wire:model.live.debounce.500ms="competitorLogoUrl"
+                            placeholder="https://..."
+                            :errorKey="'competitorLogoUrl'"
+                        />
+                        <x-ui-input-text
+                            name="competitorWebsiteUrl"
+                            label="Website"
+                            wire:model.live.debounce.500ms="competitorWebsiteUrl"
+                            placeholder="https://..."
+                            :errorKey="'competitorWebsiteUrl'"
+                        />
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-[var(--ui-secondary)] mb-1.5">Beschreibung</label>
+                        <textarea
+                            wire:model.live.debounce.500ms="competitorDescription"
+                            rows="3"
+                            class="w-full px-3 py-2 border border-[var(--ui-border)] rounded-lg bg-[var(--ui-surface)] text-[var(--ui-secondary)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--ui-primary)] focus:border-transparent"
+                            placeholder="Kurze Beschreibung des Wettbewerbers..."
+                        ></textarea>
+                    </div>
+
+                    <div class="flex items-center gap-2 p-4 bg-[var(--ui-muted-5)] rounded-lg border border-[var(--ui-border)]/60">
+                        <input
+                            type="checkbox"
+                            id="competitorIsOwnBrand"
+                            wire:model="competitorIsOwnBrand"
+                            class="w-4 h-4 text-[var(--ui-primary)] border-[var(--ui-border)] rounded focus:ring-[var(--ui-primary)]"
+                        />
+                        <label for="competitorIsOwnBrand" class="text-sm text-[var(--ui-secondary)]">
+                            Dies ist die eigene Marke
+                        </label>
+                        <span class="text-xs text-[var(--ui-muted)] ml-auto">F&uuml;r den Vergleich in der Differenzierungstabelle</span>
+                    </div>
+                </div>
+            </div>
+
+            {{-- St&auml;rken --}}
+            <div>
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-semibold text-[var(--ui-secondary)] flex items-center gap-2">
+                        @svg('heroicon-o-arrow-trending-up', 'w-5 h-5 text-green-500')
+                        St&auml;rken
+                    </h3>
+                    <x-ui-button variant="secondary-outline" size="sm" type="button" wire:click="addStrength">
+                        <div class="flex items-center gap-2">
+                            @svg('heroicon-o-plus', 'w-4 h-4')
+                            Hinzuf&uuml;gen
+                        </div>
+                    </x-ui-button>
+                </div>
+                @if(count($competitorStrengths) > 0)
+                    <div class="space-y-2">
+                        @foreach($competitorStrengths as $index => $strength)
+                            <div class="flex items-center gap-2">
+                                <x-ui-input-text
+                                    name="competitorStrengths.{{ $index }}.text"
+                                    wire:model.live.debounce.500ms="competitorStrengths.{{ $index }}.text"
+                                    placeholder="St&auml;rke..."
+                                />
+                                <button type="button" wire:click="removeStrength({{ $index }})" class="p-2 text-[var(--ui-muted)] hover:text-red-500 transition-colors flex-shrink-0">
+                                    @svg('heroicon-o-x-mark', 'w-4 h-4')
+                                </button>
+                            </div>
+                        @endforeach
+                    </div>
+                @else
+                    <div class="p-4 text-center text-sm text-[var(--ui-muted)] bg-[var(--ui-muted-5)] rounded-lg border border-[var(--ui-border)]/60">
+                        Noch keine St&auml;rken hinzugef&uuml;gt.
+                    </div>
+                @endif
+            </div>
+
+            {{-- Schw&auml;chen --}}
+            <div>
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-semibold text-[var(--ui-secondary)] flex items-center gap-2">
+                        @svg('heroicon-o-arrow-trending-down', 'w-5 h-5 text-red-500')
+                        Schw&auml;chen
+                    </h3>
+                    <x-ui-button variant="secondary-outline" size="sm" type="button" wire:click="addWeakness">
+                        <div class="flex items-center gap-2">
+                            @svg('heroicon-o-plus', 'w-4 h-4')
+                            Hinzuf&uuml;gen
+                        </div>
+                    </x-ui-button>
+                </div>
+                @if(count($competitorWeaknesses) > 0)
+                    <div class="space-y-2">
+                        @foreach($competitorWeaknesses as $index => $weakness)
+                            <div class="flex items-center gap-2">
+                                <x-ui-input-text
+                                    name="competitorWeaknesses.{{ $index }}.text"
+                                    wire:model.live.debounce.500ms="competitorWeaknesses.{{ $index }}.text"
+                                    placeholder="Schw&auml;che..."
+                                />
+                                <button type="button" wire:click="removeWeakness({{ $index }})" class="p-2 text-[var(--ui-muted)] hover:text-red-500 transition-colors flex-shrink-0">
+                                    @svg('heroicon-o-x-mark', 'w-4 h-4')
+                                </button>
+                            </div>
+                        @endforeach
+                    </div>
+                @else
+                    <div class="p-4 text-center text-sm text-[var(--ui-muted)] bg-[var(--ui-muted-5)] rounded-lg border border-[var(--ui-border)]/60">
+                        Noch keine Schw&auml;chen hinzugef&uuml;gt.
+                    </div>
+                @endif
+            </div>
+
+            {{-- Notizen --}}
+            <div>
+                <h3 class="text-lg font-semibold text-[var(--ui-secondary)] mb-4 flex items-center gap-2">
+                    @svg('heroicon-o-document-text', 'w-5 h-5 text-amber-500')
+                    Notizen
+                </h3>
+                <textarea
+                    wire:model.live.debounce.500ms="competitorNotes"
+                    rows="3"
+                    class="w-full px-3 py-2 border border-[var(--ui-border)] rounded-lg bg-[var(--ui-surface)] text-[var(--ui-secondary)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--ui-primary)] focus:border-transparent"
+                    placeholder="Freitext-Notizen zum Wettbewerber..."
+                ></textarea>
+            </div>
+
+            {{-- Positionierung --}}
+            <div>
+                <h3 class="text-lg font-semibold text-[var(--ui-secondary)] mb-4 flex items-center gap-2">
+                    @svg('heroicon-o-chart-bar-square', 'w-5 h-5 text-indigo-500')
+                    Positionierung auf Matrix
+                </h3>
+                <div class="p-4 bg-[var(--ui-muted-5)] rounded-lg border border-[var(--ui-border)]/60">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-[var(--ui-secondary)] mb-1.5">X-Position (0-100)</label>
+                            <input type="range" wire:model.live="competitorPositionX" min="0" max="100" class="w-full accent-[var(--ui-primary)]">
+                            <div class="flex justify-between text-[10px] text-[var(--ui-muted)] mt-1">
+                                <span>0</span>
+                                <span class="font-medium text-[var(--ui-primary)]">{{ $competitorPositionX }}</span>
+                                <span>100</span>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-[var(--ui-secondary)] mb-1.5">Y-Position (0-100)</label>
+                            <input type="range" wire:model.live="competitorPositionY" min="0" max="100" class="w-full accent-[var(--ui-primary)]">
+                            <div class="flex justify-between text-[10px] text-[var(--ui-muted)] mt-1">
+                                <span>0</span>
+                                <span class="font-medium text-[var(--ui-primary)]">{{ $competitorPositionY }}</span>
+                                <span>100</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Differenzierungsmerkmale --}}
+            <div>
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-semibold text-[var(--ui-secondary)] flex items-center gap-2">
+                        @svg('heroicon-o-table-cells', 'w-5 h-5 text-emerald-500')
+                        Differenzierungsmerkmale
+                    </h3>
+                    <x-ui-button variant="secondary-outline" size="sm" type="button" wire:click="addDifferentiation">
+                        <div class="flex items-center gap-2">
+                            @svg('heroicon-o-plus', 'w-4 h-4')
+                            Hinzuf&uuml;gen
+                        </div>
+                    </x-ui-button>
+                </div>
+                <p class="text-sm text-[var(--ui-muted)] mb-4">Vergleichsmerkmale f&uuml;r die Differenzierungstabelle.</p>
+                @if(count($competitorDifferentiation) > 0)
+                    <div class="space-y-3">
+                        @foreach($competitorDifferentiation as $index => $diff)
+                            <div class="p-4 bg-[var(--ui-muted-5)] rounded-lg border border-[var(--ui-border)]/60 space-y-3">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-xs font-medium text-[var(--ui-muted)]">Merkmal {{ $index + 1 }}</span>
+                                    <button type="button" wire:click="removeDifferentiation({{ $index }})" class="p-1 text-[var(--ui-muted)] hover:text-red-500 transition-colors">
+                                        @svg('heroicon-o-x-mark', 'w-4 h-4')
+                                    </button>
+                                </div>
+                                <x-ui-input-text
+                                    name="competitorDifferentiation.{{ $index }}.category"
+                                    wire:model.live.debounce.500ms="competitorDifferentiation.{{ $index }}.category"
+                                    placeholder="Kategorie (z.B. Preis, Service, Qualit&auml;t)"
+                                />
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                    <x-ui-input-text
+                                        name="competitorDifferentiation.{{ $index }}.own_value"
+                                        label="Eigene Marke"
+                                        wire:model.live.debounce.500ms="competitorDifferentiation.{{ $index }}.own_value"
+                                        placeholder="Eigene Marke"
+                                    />
+                                    <x-ui-input-text
+                                        name="competitorDifferentiation.{{ $index }}.competitor_value"
+                                        label="Wettbewerber"
+                                        wire:model.live.debounce.500ms="competitorDifferentiation.{{ $index }}.competitor_value"
+                                        placeholder="Wettbewerber"
+                                    />
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                @else
+                    <div class="p-4 text-center text-sm text-[var(--ui-muted)] bg-[var(--ui-muted-5)] rounded-lg border border-[var(--ui-border)]/60">
+                        Noch keine Differenzierungsmerkmale hinzugef&uuml;gt.
+                    </div>
+                @endif
+            </div>
+        </div>
+
+        <x-slot name="footer">
+            <div class="flex justify-end gap-2">
+                <x-ui-button variant="secondary-outline" type="button" @click="modalShow = false">
+                    Abbrechen
+                </x-ui-button>
+                <x-ui-button variant="primary" type="submit">
+                    <div class="flex items-center gap-2">
+                        @svg('heroicon-o-check', 'w-4 h-4')
+                        {{ $competitor ? 'Speichern' : 'Erstellen' }}
+                    </div>
+                </x-ui-button>
+            </div>
+        </x-slot>
+    </form>
+</x-ui-modal>
