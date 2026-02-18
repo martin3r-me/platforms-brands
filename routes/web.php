@@ -18,6 +18,7 @@ use Platform\Brands\Livewire\GuidelineBoard;
 use Platform\Brands\Livewire\MoodboardBoard;
 use Platform\Brands\Livewire\AssetBoard;
 use Platform\Brands\Livewire\MultiContentBoard;
+use Platform\Brands\Livewire\SeoBoard as SeoBoardComponent;
 use Platform\Brands\Livewire\FacebookPage;
 use Platform\Brands\Livewire\InstagramAccount;
 use Platform\Brands\Livewire\Export;
@@ -38,6 +39,7 @@ use Platform\Brands\Models\BrandsGuidelineBoard as BrandsGuidelineBoardModel;
 use Platform\Brands\Models\BrandsMoodboardBoard as BrandsMoodboardBoardModel;
 use Platform\Brands\Models\BrandsAssetBoard as BrandsAssetBoardModel;
 use Platform\Brands\Models\BrandsMultiContentBoard;
+use Platform\Brands\Models\BrandsSeoBoard as BrandsSeoBoardModel;
 use Platform\Brands\Models\BrandsContentBoardBlock;
 use Platform\Integrations\Models\IntegrationsFacebookPage;
 use Platform\Integrations\Models\IntegrationsInstagramAccount;
@@ -111,6 +113,10 @@ Route::get('/asset-boards/{brandsAssetBoard}', AssetBoard::class)
 // Multi-Content-Board Routes
 Route::get('/multi-content-boards/{brandsMultiContentBoard}', MultiContentBoard::class)
     ->name('brands.multi-content-boards.show');
+
+// SEO Board Routes
+Route::get('/seo-boards/{brandsSeoBoard}', SeoBoardComponent::class)
+    ->name('brands.seo-boards.show');
 
 // Facebook Page Routes
 Route::get('/facebook-pages/{facebookPage}', FacebookPage::class)

@@ -41,6 +41,8 @@ use Platform\Brands\Models\BrandsMoodboardImage;
 use Platform\Brands\Models\BrandsAssetBoard;
 use Platform\Brands\Models\BrandsAsset;
 use Platform\Brands\Models\BrandsAssetVersion;
+use Platform\Brands\Models\BrandsSeoBoard;
+use Platform\Brands\Models\BrandsSeoKeyword;
 use Platform\Integrations\Models\IntegrationsFacebookPage;
 use Platform\Integrations\Models\IntegrationsInstagramAccount;
 use Platform\Brands\Policies\BrandPolicy;
@@ -70,6 +72,8 @@ use Platform\Brands\Policies\MoodboardBoardPolicy;
 use Platform\Brands\Policies\MoodboardImagePolicy;
 use Platform\Brands\Policies\AssetBoardPolicy;
 use Platform\Brands\Policies\AssetPolicy;
+use Platform\Brands\Policies\SeoBoardPolicy;
+use Platform\Brands\Policies\SeoKeywordPolicy;
 use Platform\Brands\Policies\FacebookPagePolicy;
 use Platform\Brands\Policies\InstagramAccountPolicy;
 
@@ -90,11 +94,19 @@ class BrandsServiceProvider extends ServiceProvider
                 \Platform\Brands\Console\Commands\SyncInstagramInsights::class,
                 \Platform\Brands\Console\Commands\SyncAll::class,
                 \Platform\Brands\Console\Commands\TruncateIntegrationsData::class,
+                \Platform\Brands\Console\Commands\RefreshSeoKeywords::class,
             ]);
         }
 
         // Export-Service als Singleton registrieren
         $this->app->singleton(\Platform\Brands\Services\BrandsExportService::class);
+
+        // SEO Services als Singletons registrieren
+        $this->app->singleton(\Platform\Brands\Services\SeoBudgetGuardService::class);
+        $this->app->singleton(\Platform\Brands\Services\DataForSeoClientService::class);
+        $this->app->singleton(\Platform\Brands\Services\SeoBoardService::class);
+        $this->app->singleton(\Platform\Brands\Services\SeoKeywordService::class);
+        $this->app->singleton(\Platform\Brands\Services\SeoAnalysisService::class);
     }
 
     public function boot(): void
@@ -212,6 +224,8 @@ class BrandsServiceProvider extends ServiceProvider
             BrandsMoodboardImage::class => MoodboardImagePolicy::class,
             BrandsAssetBoard::class => AssetBoardPolicy::class,
             BrandsAsset::class => AssetPolicy::class,
+            BrandsSeoBoard::class => SeoBoardPolicy::class,
+            BrandsSeoKeyword::class => SeoKeywordPolicy::class,
             IntegrationsFacebookPage::class => FacebookPagePolicy::class,
             IntegrationsInstagramAccount::class => InstagramAccountPolicy::class,
         ];
@@ -474,6 +488,34 @@ class BrandsServiceProvider extends ServiceProvider
             $registry->register(new \Platform\Brands\Tools\GetAssetTool());
             $registry->register(new \Platform\Brands\Tools\UpdateAssetTool());
             $registry->register(new \Platform\Brands\Tools\DeleteAssetTool());
+
+            // SeoBoard-Tools
+            $registry->register(new \Platform\Brands\Tools\CreateSeoBoardTool());
+            $registry->register(new \Platform\Brands\Tools\ListSeoBoardsTool());
+            $registry->register(new \Platform\Brands\Tools\GetSeoBoardTool());
+            $registry->register(new \Platform\Brands\Tools\UpdateSeoBoardTool());
+            $registry->register(new \Platform\Brands\Tools\DeleteSeoBoardTool());
+
+            // SeoKeywordCluster-Tools
+            $registry->register(new \Platform\Brands\Tools\CreateSeoKeywordClusterTool());
+            $registry->register(new \Platform\Brands\Tools\ListSeoKeywordClustersTool());
+            $registry->register(new \Platform\Brands\Tools\GetSeoKeywordClusterTool());
+            $registry->register(new \Platform\Brands\Tools\UpdateSeoKeywordClusterTool());
+            $registry->register(new \Platform\Brands\Tools\DeleteSeoKeywordClusterTool());
+
+            // SeoKeyword-Tools
+            $registry->register(new \Platform\Brands\Tools\CreateSeoKeywordTool());
+            $registry->register(new \Platform\Brands\Tools\ListSeoKeywordsTool());
+            $registry->register(new \Platform\Brands\Tools\GetSeoKeywordTool());
+            $registry->register(new \Platform\Brands\Tools\UpdateSeoKeywordTool());
+            $registry->register(new \Platform\Brands\Tools\DeleteSeoKeywordTool());
+            $registry->register(new \Platform\Brands\Tools\BulkCreateSeoKeywordsTool());
+
+            // SEO Analyse & Budget-Tools
+            $registry->register(new \Platform\Brands\Tools\FetchSeoKeywordMetricsTool());
+            $registry->register(new \Platform\Brands\Tools\GetSeoBudgetTool());
+            $registry->register(new \Platform\Brands\Tools\AnalyzeSeoKeywordsTool());
+            $registry->register(new \Platform\Brands\Tools\ResetSeoBudgetTool());
 
             // Export-Tools
             $registry->register(new \Platform\Brands\Tools\ExportBrandTool());

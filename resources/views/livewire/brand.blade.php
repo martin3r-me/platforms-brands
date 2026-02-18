@@ -203,6 +203,19 @@
                                         <div class="text-xs text-[var(--ui-muted)]">Templates & Brand Assets</div>
                                     </div>
                                 </button>
+                                <button
+                                    wire:click="createSeoBoard"
+                                    @click="open = false"
+                                    class="w-full text-left px-4 py-2.5 text-sm text-[var(--ui-secondary)] hover:bg-[var(--ui-muted-5)] transition-colors flex items-center gap-3"
+                                >
+                                    <div class="flex items-center justify-center w-8 h-8 rounded-md bg-lime-50">
+                                        @svg('heroicon-o-magnifying-glass', 'w-4 h-4 text-lime-600')
+                                    </div>
+                                    <div>
+                                        <div class="font-medium">SEO Board</div>
+                                        <div class="text-xs text-[var(--ui-muted)]">Keyword-Recherche & SEO-Analyse</div>
+                                    </div>
+                                </button>
                             </div>
                         </div>
                     </div>

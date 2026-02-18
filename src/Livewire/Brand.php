@@ -350,6 +350,31 @@ class Brand extends Component
         return $this->redirect(route('brands.asset-boards.show', $assetBoard), navigate: true);
     }
 
+    public function createSeoBoard()
+    {
+        $this->authorize('update', $this->brand);
+
+        $user = Auth::user();
+        $team = $user->currentTeam;
+
+        if (!$team) {
+            session()->flash('error', 'Kein Team ausgewählt.');
+            return;
+        }
+
+        $seoBoard = \Platform\Brands\Models\BrandsSeoBoard::create([
+            'name' => 'Neues SEO Board',
+            'description' => null,
+            'user_id' => $user->id,
+            'team_id' => $team->id,
+            'brand_id' => $this->brand->id,
+        ]);
+
+        $this->brand->refresh();
+
+        return $this->redirect(route('brands.seo-boards.show', $seoBoard), navigate: true);
+    }
+
     public function rendered()
     {
         $this->dispatch('comms', [
@@ -555,6 +580,7 @@ class Brand extends Component
         $guidelineBoards = $this->brand->guidelineBoards;
         $moodboardBoards = $this->brand->moodboardBoards;
         $assetBoards = $this->brand->assetBoards;
+        $seoBoards = $this->brand->seoBoards;
 
         // Board-Gruppen für tabellarische Darstellung
         $boardGroups = collect([
@@ -701,6 +727,17 @@ class Brand extends Component
                 'entryRelation' => 'assets',
                 'entryLabel' => 'Assets',
             ],
+            [
+                'key' => 'seo',
+                'label' => 'SEO Boards',
+                'icon' => 'heroicon-o-magnifying-glass',
+                'color' => 'lime',
+                'boards' => $seoBoards,
+                'routePrefix' => 'brands.seo-boards.show',
+                'boardType' => 'seo-board',
+                'entryRelation' => 'keywords',
+                'entryLabel' => 'Keywords',
+            ],
         ])->filter(fn($group) => $group['boards']->count() > 0);
 
         // Meta Connection laden
@@ -751,6 +788,7 @@ class Brand extends Component
             'guidelineBoards' => $guidelineBoards,
             'moodboardBoards' => $moodboardBoards,
             'assetBoards' => $assetBoards,
+            'seoBoards' => $seoBoards,
             'facebookPages' => $facebookPages,
             'instagramAccounts' => $instagramAccounts,
             'availableFacebookPages' => $availableFacebookPages,
