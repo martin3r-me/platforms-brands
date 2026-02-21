@@ -27,7 +27,7 @@ class ListSocialPlatformFormatsTool implements ToolContract, ToolMetadataContrac
 
     public function getDescription(): string
     {
-        return 'GET /brands/social_platform_formats - Listet Formate von Social-Media-Plattformen auf (z.B. Story, Post, Reel, Carousel) inkl. output_schema und rules. Formate sind eine lose Lookup-Tabelle — neue Formate werden zur Laufzeit hinzugefügt ohne Code-Deployment. Jedes Format hat einen output_schema (JSON-Contract für Worker-Output) und rules (weiche Regeln). Filterbar nach platform_id, media_type (image|video|carousel), is_active. REST-Parameter: platform_id (optional, filtert nach Plattform), media_type (optional), is_active (optional), search (optional), sort (optional), limit/offset (optional).';
+        return 'GET /brands/social_platform_formats - Listet Formate von Social-Media-Plattformen auf (z.B. Story, Post, Reel, Carousel) inkl. output_schema, rules und verknüpfte Personas (Audience-Kontext). Formate sind eine lose Lookup-Tabelle — neue Formate werden zur Laufzeit hinzugefügt ohne Code-Deployment. Jedes Format hat einen output_schema (JSON-Contract für Worker-Output), rules (weiche Regeln) und optional Personas (Zielgruppen-Profile). Worker-Kontext: Schema + Rules + Personas = vollständiges Produktions-Briefing. Filterbar nach platform_id, media_type (image|video|carousel), is_active. REST-Parameter: platform_id (optional, filtert nach Plattform), media_type (optional), is_active (optional), search (optional), sort (optional), limit/offset (optional).';
     }
 
     public function getSchema(): array
@@ -61,7 +61,7 @@ class ListSocialPlatformFormatsTool implements ToolContract, ToolMetadataContrac
             }
 
             $query = BrandsSocialPlatformFormat::query()
-                ->with(['platform']);
+                ->with(['platform', 'personas']);
 
             // Filter: platform_id
             if (isset($arguments['platform_id'])) {
@@ -113,6 +113,16 @@ class ListSocialPlatformFormatsTool implements ToolContract, ToolMetadataContrac
                     'output_schema' => $format->output_schema,
                     'rules' => $format->rules,
                     'is_active' => $format->is_active,
+                    'personas' => $format->personas->map(function ($persona) {
+                        return [
+                            'id' => $persona->id,
+                            'name' => $persona->name,
+                            'age' => $persona->age,
+                            'gender' => $persona->gender,
+                            'occupation' => $persona->occupation,
+                            'notes' => $persona->pivot->notes,
+                        ];
+                    })->values()->toArray(),
                     'created_at' => $format->created_at->toIso8601String(),
                 ];
             })->values()->toArray();

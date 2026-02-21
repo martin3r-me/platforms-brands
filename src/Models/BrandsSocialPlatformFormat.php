@@ -4,6 +4,8 @@ namespace Platform\Brands\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Platform\Core\Contracts\HasDisplayName;
 
 /**
@@ -42,6 +44,30 @@ class BrandsSocialPlatformFormat extends Model implements HasDisplayName
     public function team(): BelongsTo
     {
         return $this->belongsTo(\Platform\Core\Models\Team::class);
+    }
+
+    /**
+     * Verknüpfte Personas (Audience-Kontext).
+     * Mehrere Personas pro Format möglich (z.B. TikTok → "Gen Z" + "Early Adopter").
+     */
+    public function personas(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            BrandsPersona::class,
+            'brands_social_platform_format_personas',
+            'platform_format_id',
+            'persona_id'
+        )
+        ->withPivot('notes')
+        ->withTimestamps();
+    }
+
+    /**
+     * Pivot-Records für Persona-Verknüpfungen (für direkte Queries).
+     */
+    public function formatPersonas(): HasMany
+    {
+        return $this->hasMany(BrandsSocialPlatformFormatPersona::class, 'platform_format_id');
     }
 
     public function getDisplayName(): ?string

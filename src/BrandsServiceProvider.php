@@ -593,6 +593,11 @@ class BrandsServiceProvider extends ServiceProvider
             $registry->register(new \Platform\Brands\Tools\UpdateSocialPlatformFormatTool());
             $registry->register(new \Platform\Brands\Tools\DeleteSocialPlatformFormatTool());
 
+            // SocialPlatformFormatPersona-Tools (Persona-Verknüpfung an Formate)
+            $registry->register(new \Platform\Brands\Tools\CreateSocialPlatformFormatPersonaTool());
+            $registry->register(new \Platform\Brands\Tools\ListSocialPlatformFormatPersonasTool());
+            $registry->register(new \Platform\Brands\Tools\DeleteSocialPlatformFormatPersonaTool());
+
             // Export-Tools
             $registry->register(new \Platform\Brands\Tools\ExportBrandTool());
             $registry->register(new \Platform\Brands\Tools\ExportBoardTool());
