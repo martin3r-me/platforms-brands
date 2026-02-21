@@ -8,6 +8,7 @@ return new class extends Migration
 {
     public function up(): void
     {
+        Schema::dropIfExists('brands_social_platform_format_personas');
         Schema::create('brands_social_platform_format_personas', function (Blueprint $table) {
             $table->id();
             $table->foreignId('platform_format_id');
