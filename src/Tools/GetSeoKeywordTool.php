@@ -19,7 +19,7 @@ class GetSeoKeywordTool implements ToolContract, ToolMetadataContract
 
     public function getDescription(): string
     {
-        return 'GET /brands/seo_keywords/{id} - Ruft ein einzelnes SEO Keyword mit allen Details ab. REST-Parameter: id (required, integer) - Keyword-ID.';
+        return 'GET /brands/seo_keywords/{id} - Ruft ein einzelnes SEO Keyword mit allen Details inkl. Lifecycle-Felder (content_status, target_url, published_url, target_position, location) ab. REST-Parameter: id (required, integer) - Keyword-ID.';
     }
 
     public function getSchema(): array
@@ -79,6 +79,11 @@ class GetSeoKeywordTool implements ToolContract, ToolMetadataContract
                 'url' => $keyword->url,
                 'position' => $keyword->position,
                 'notes' => $keyword->notes,
+                'content_status' => $keyword->content_status,
+                'target_url' => $keyword->target_url,
+                'published_url' => $keyword->published_url,
+                'target_position' => $keyword->target_position,
+                'location' => $keyword->location,
                 'last_fetched_at' => $keyword->last_fetched_at?->toIso8601String(),
                 'team_id' => $keyword->team_id,
                 'user_id' => $keyword->user_id,

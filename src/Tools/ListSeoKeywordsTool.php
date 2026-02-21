@@ -22,7 +22,7 @@ class ListSeoKeywordsTool implements ToolContract, ToolMetadataContract
 
     public function getDescription(): string
     {
-        return 'GET /brands/seo_boards/{seo_board_id}/keywords - Listet Keywords eines SEO Boards auf. REST-Parameter: seo_board_id (required, integer). filters/search/sort/limit/offset (optional).';
+        return 'GET /brands/seo_boards/{seo_board_id}/keywords - Listet Keywords eines SEO Boards auf. REST-Parameter: seo_board_id (required, integer). filters/search/sort/limit/offset (optional). Filterbar nach content_status (none|planned|draft|published|optimized) und location für Content-Pipeline-Übersicht und lokale SEO. Beispiel: filters=[{"field":"content_status","op":"eq","value":"planned"}] zeigt alle Keywords mit geplantem Content.';
     }
 
     public function getSchema(): array
@@ -67,9 +67,10 @@ class ListSeoKeywordsTool implements ToolContract, ToolMetadataContract
 
             $this->applyStandardFilters($query, $arguments, [
                 'keyword', 'search_intent', 'keyword_type', 'priority', 'keyword_cluster_id',
-                'search_volume', 'keyword_difficulty', 'created_at', 'updated_at'
+                'search_volume', 'keyword_difficulty', 'content_status', 'location',
+                'created_at', 'updated_at'
             ]);
-            $this->applyStandardSearch($query, $arguments, ['keyword', 'content_idea', 'notes', 'url']);
+            $this->applyStandardSearch($query, $arguments, ['keyword', 'content_idea', 'notes', 'url', 'target_url', 'published_url', 'location']);
             $this->applyStandardSort($query, $arguments, [
                 'keyword', 'search_volume', 'keyword_difficulty', 'cpc_cents', 'position', 'order', 'created_at'
             ], 'order', 'asc');
@@ -100,6 +101,11 @@ class ListSeoKeywordsTool implements ToolContract, ToolMetadataContract
                     'keyword_cluster_id' => $kw->keyword_cluster_id,
                     'cluster_name' => $kw->cluster?->name,
                     'content_idea' => $kw->content_idea,
+                    'content_status' => $kw->content_status,
+                    'target_url' => $kw->target_url,
+                    'published_url' => $kw->published_url,
+                    'target_position' => $kw->target_position,
+                    'location' => $kw->location,
                     'last_fetched_at' => $kw->last_fetched_at?->toIso8601String(),
                     'created_at' => $kw->created_at->toIso8601String(),
                 ];

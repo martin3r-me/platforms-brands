@@ -21,7 +21,7 @@ class CreateSeoKeywordTool implements ToolContract, ToolMetadataContract
 
     public function getDescription(): string
     {
-        return 'POST /brands/seo_boards/{seo_board_id}/keywords - Erstellt ein neues SEO Keyword. REST-Parameter: seo_board_id (required), keyword (required, string), seo_keyword_cluster_id (optional), search_volume/keyword_difficulty/cpc_cents (optional), search_intent/keyword_type/priority (optional), content_idea/url/notes (optional).';
+        return 'POST /brands/seo_boards/{seo_board_id}/keywords - Erstellt ein neues SEO Keyword mit optionalen Lifecycle-Feldern für die Content-Pipeline. REST-Parameter: seo_board_id (required), keyword (required, string), seo_keyword_cluster_id (optional), search_volume/keyword_difficulty/cpc_cents (optional), search_intent/keyword_type/priority (optional), content_idea/url/notes (optional), content_status (optional: none|planned|draft|published|optimized), target_url/published_url (optional), target_position (optional, integer), location (optional, string für lokale SEO). Workflow: Keyword anlegen → content_status=planned → draft → published (+ published_url) → optimized.';
     }
 
     public function getSchema(): array
@@ -89,6 +89,27 @@ class CreateSeoKeywordTool implements ToolContract, ToolMetadataContract
                     'type' => 'string',
                     'description' => 'Optional: Notizen.'
                 ],
+                'content_status' => [
+                    'type' => 'string',
+                    'enum' => ['none', 'planned', 'draft', 'published', 'optimized'],
+                    'description' => 'Optional: Content-Pipeline-Status (none=kein Content, planned=Content geplant, draft=Entwurf erstellt, published=veröffentlicht, optimized=nach-optimiert). Standard: none.'
+                ],
+                'target_url' => [
+                    'type' => 'string',
+                    'description' => 'Optional: Geplante Ziel-URL für den Content zu diesem Keyword.'
+                ],
+                'published_url' => [
+                    'type' => 'string',
+                    'description' => 'Optional: Tatsächlich veröffentlichte URL (setzen wenn content_status=published).'
+                ],
+                'target_position' => [
+                    'type' => 'integer',
+                    'description' => 'Optional: Ziel-Ranking-Position (z.B. 3 für Top 3, 10 für Top 10).'
+                ],
+                'location' => [
+                    'type' => 'string',
+                    'description' => 'Optional: Lokaler Bezug des Keywords (Stadt/Region), z.B. "München", "Bayern". Wichtig für lokale SEO.'
+                ],
             ],
             'required' => ['seo_board_id', 'keyword']
         ];
@@ -132,6 +153,13 @@ class CreateSeoKeywordTool implements ToolContract, ToolMetadataContract
                 return ToolResult::error('ACCESS_DENIED', 'Du darfst keine Keywords für dieses SEO Board erstellen (Policy).');
             }
 
+            // content_status validieren
+            $contentStatus = $arguments['content_status'] ?? 'none';
+            $validStatuses = ['none', 'planned', 'draft', 'published', 'optimized'];
+            if (!in_array($contentStatus, $validStatuses, true)) {
+                return ToolResult::error('VALIDATION_ERROR', 'content_status muss einer der folgenden Werte sein: ' . implode(', ', $validStatuses));
+            }
+
             $seoKeyword = BrandsSeoKeyword::create([
                 'seo_board_id' => $seoBoard->id,
                 'keyword_cluster_id' => $clusterId,
@@ -147,6 +175,11 @@ class CreateSeoKeywordTool implements ToolContract, ToolMetadataContract
                 'url' => $arguments['url'] ?? null,
                 'position' => $arguments['position'] ?? null,
                 'notes' => $arguments['notes'] ?? null,
+                'content_status' => $contentStatus,
+                'target_url' => $arguments['target_url'] ?? null,
+                'published_url' => $arguments['published_url'] ?? null,
+                'target_position' => $arguments['target_position'] ?? null,
+                'location' => $arguments['location'] ?? null,
                 'user_id' => $context->user->id,
                 'team_id' => $seoBoard->team_id,
             ]);
@@ -165,6 +198,11 @@ class CreateSeoKeywordTool implements ToolContract, ToolMetadataContract
                 'keyword_difficulty' => $seoKeyword->keyword_difficulty,
                 'search_intent' => $seoKeyword->search_intent,
                 'priority' => $seoKeyword->priority,
+                'content_status' => $seoKeyword->content_status,
+                'target_url' => $seoKeyword->target_url,
+                'published_url' => $seoKeyword->published_url,
+                'target_position' => $seoKeyword->target_position,
+                'location' => $seoKeyword->location,
                 'created_at' => $seoKeyword->created_at->toIso8601String(),
                 'message' => "Keyword '{$seoKeyword->keyword}' erfolgreich erstellt."
             ]);

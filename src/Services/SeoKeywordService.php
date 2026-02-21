@@ -32,6 +32,11 @@ class SeoKeywordService
             'url' => $data['url'] ?? null,
             'position' => $data['position'] ?? null,
             'notes' => $data['notes'] ?? null,
+            'content_status' => $data['content_status'] ?? 'none',
+            'target_url' => $data['target_url'] ?? null,
+            'published_url' => $data['published_url'] ?? null,
+            'target_position' => $data['target_position'] ?? null,
+            'location' => $data['location'] ?? null,
             'user_id' => $user?->id,
             'team_id' => $board->team_id,
         ]);
@@ -56,6 +61,7 @@ class SeoKeywordService
             'keyword', 'keyword_cluster_id', 'search_volume', 'keyword_difficulty',
             'cpc_cents', 'trend', 'search_intent', 'keyword_type', 'content_idea',
             'priority', 'url', 'position', 'notes',
+            'content_status', 'target_url', 'published_url', 'target_position', 'location',
         ] as $field) {
             if (array_key_exists($field, $data)) {
                 $updateData[$field] = $data[$field];

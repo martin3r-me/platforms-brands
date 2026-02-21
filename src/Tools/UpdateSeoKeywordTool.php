@@ -21,7 +21,7 @@ class UpdateSeoKeywordTool implements ToolContract
 
     public function getDescription(): string
     {
-        return 'PUT /brands/seo_keywords/{id} - Aktualisiert ein SEO Keyword. REST-Parameter: seo_keyword_id (required, integer). keyword/seo_keyword_cluster_id/search_volume/keyword_difficulty/cpc_cents/trend/search_intent/keyword_type/content_idea/priority/url/position/notes (optional).';
+        return 'PUT /brands/seo_keywords/{id} - Aktualisiert ein SEO Keyword inkl. Lifecycle-Felder. REST-Parameter: seo_keyword_id (required, integer). keyword/seo_keyword_cluster_id/search_volume/keyword_difficulty/cpc_cents/trend/search_intent/keyword_type/content_idea/priority/url/position/notes (optional). Lifecycle: content_status (none|planned|draft|published|optimized), target_url, published_url, target_position, location (optional). Workflow-Beispiel: PUT mit content_status=published + published_url um Veröffentlichung zu tracken.';
     }
 
     public function getSchema(): array
@@ -47,6 +47,11 @@ class UpdateSeoKeywordTool implements ToolContract
                 'url' => ['type' => 'string', 'description' => 'Optional: URL.'],
                 'position' => ['type' => 'integer', 'description' => 'Optional: Ranking-Position.'],
                 'notes' => ['type' => 'string', 'description' => 'Optional: Notizen.'],
+                'content_status' => ['type' => 'string', 'enum' => ['none', 'planned', 'draft', 'published', 'optimized'], 'description' => 'Optional: Content-Pipeline-Status (none|planned|draft|published|optimized).'],
+                'target_url' => ['type' => 'string', 'description' => 'Optional: Geplante Ziel-URL für den Content.'],
+                'published_url' => ['type' => 'string', 'description' => 'Optional: Tatsächlich veröffentlichte URL.'],
+                'target_position' => ['type' => 'integer', 'description' => 'Optional: Ziel-Ranking-Position (z.B. 3 für Top 3).'],
+                'location' => ['type' => 'string', 'description' => 'Optional: Lokaler Bezug (Stadt/Region) für lokale SEO.'],
             ],
             'required' => ['seo_keyword_id']
         ];
@@ -77,11 +82,20 @@ class UpdateSeoKeywordTool implements ToolContract
                 $arguments['keyword_cluster_id'] = $arguments['seo_keyword_cluster_id'];
             }
 
+            // content_status validieren
+            if (array_key_exists('content_status', $arguments)) {
+                $validStatuses = ['none', 'planned', 'draft', 'published', 'optimized'];
+                if (!in_array($arguments['content_status'], $validStatuses, true)) {
+                    return ToolResult::error('VALIDATION_ERROR', 'content_status muss einer der folgenden Werte sein: ' . implode(', ', $validStatuses));
+                }
+            }
+
             $updateData = [];
             foreach ([
                 'keyword', 'keyword_cluster_id', 'search_volume', 'keyword_difficulty',
                 'cpc_cents', 'trend', 'search_intent', 'keyword_type', 'content_idea',
                 'priority', 'url', 'position', 'notes',
+                'content_status', 'target_url', 'published_url', 'target_position', 'location',
             ] as $field) {
                 if (array_key_exists($field, $arguments)) {
                     $updateData[$field] = $arguments[$field];
@@ -105,6 +119,11 @@ class UpdateSeoKeywordTool implements ToolContract
                 'search_volume' => $keyword->search_volume,
                 'keyword_difficulty' => $keyword->keyword_difficulty,
                 'priority' => $keyword->priority,
+                'content_status' => $keyword->content_status,
+                'target_url' => $keyword->target_url,
+                'published_url' => $keyword->published_url,
+                'target_position' => $keyword->target_position,
+                'location' => $keyword->location,
                 'updated_at' => $keyword->updated_at->toIso8601String(),
                 'message' => "Keyword '{$keyword->keyword}' erfolgreich aktualisiert."
             ]);

@@ -17,7 +17,7 @@ class BulkCreateSeoKeywordsTool implements ToolContract, ToolMetadataContract
 
     public function getDescription(): string
     {
-        return 'POST /brands/seo_keywords/bulk - Erstellt mehrere SEO Keywords in einem Call. Body MUSS {seo_keywords:[{seo_board_id, keyword, ...}], defaults?} enthalten.';
+        return 'POST /brands/seo_keywords/bulk - Erstellt mehrere SEO Keywords in einem Call. Body MUSS {seo_keywords:[{seo_board_id, keyword, ...}], defaults?} enthalten. Unterstützt Lifecycle-Felder: content_status (none|planned|draft|published|optimized), target_url, published_url, target_position, location. Defaults können Lifecycle-Felder für alle Keywords setzen (z.B. defaults.content_status="planned" für Batch-Planung).';
     }
 
     public function getSchema(): array
@@ -39,6 +39,11 @@ class BulkCreateSeoKeywordsTool implements ToolContract, ToolMetadataContract
                         'search_intent' => ['type' => 'string'],
                         'keyword_type' => ['type' => 'string'],
                         'priority' => ['type' => 'string'],
+                        'content_status' => ['type' => 'string', 'enum' => ['none', 'planned', 'draft', 'published', 'optimized']],
+                        'target_url' => ['type' => 'string'],
+                        'published_url' => ['type' => 'string'],
+                        'target_position' => ['type' => 'integer'],
+                        'location' => ['type' => 'string'],
                     ],
                 ],
                 'seo_keywords' => [
@@ -60,6 +65,11 @@ class BulkCreateSeoKeywordsTool implements ToolContract, ToolMetadataContract
                             'priority' => ['type' => 'string'],
                             'url' => ['type' => 'string'],
                             'notes' => ['type' => 'string'],
+                            'content_status' => ['type' => 'string', 'enum' => ['none', 'planned', 'draft', 'published', 'optimized']],
+                            'target_url' => ['type' => 'string'],
+                            'published_url' => ['type' => 'string'],
+                            'target_position' => ['type' => 'integer'],
+                            'location' => ['type' => 'string'],
                         ],
                         'required' => ['keyword'],
                     ],
