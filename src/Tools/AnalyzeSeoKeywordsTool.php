@@ -20,7 +20,17 @@ class AnalyzeSeoKeywordsTool implements ToolContract, ToolMetadataContract
 
     public function getDescription(): string
     {
-        return 'GET /brands/seo_boards/{seo_board_id}/keywords/analyze - Analysiert Keywords: Zusammenfassung, Wettbewerber-Lücken, Content-Chancen, Persona-Mapping, Ranking-Trends, Competitor-Gaps. REST-Parameter: seo_board_id (required, integer). analysis_type (optional, string) - summary|competitor_gap|competitor_gaps|content_opportunities|persona_mapping|ranking_trends (Standard: summary). days (optional, integer, nur für ranking_trends: Zeitraum in Tagen, Standard: 30). competitor_gaps zeigt Keywords wo Competitors ranken aber wir nicht (basierend auf erfassten Competitor-Rankings).';
+        return 'GET /brands/seo_boards/{seo_board_id}/keywords/analyze - Strategische Keyword-Analyse mit actionable Empfehlungen. '
+            . 'analysis_type bestimmt den Fokus: '
+            . 'summary (Standard) = Übersicht aller Keywords mit Statistiken. '
+            . 'quick_wins = Keywords mit hohem Suchvolumen + niedriger Difficulty + kein Content → schnelle Rankings erzielen. '
+            . 'content_gaps = Keywords ohne Content (none/planned), gruppiert nach Cluster → Content-Lücken aufdecken. '
+            . 'declining = Keywords die >5 Positionen verloren haben → Content optimieren bevor Rankings weiter fallen. '
+            . 'defend = Keywords in Position 1-3 mit hohem Suchvolumen → Top-Rankings schützen. '
+            . 'cluster_health = Pro Cluster: Coverage Score, Ø Position, Content-Status-Verteilung → Themen-Abdeckung bewerten. '
+            . 'local_opportunities = Keywords mit Ortsbezug ohne Content → lokale Chancen nutzen. '
+            . 'competitor_gap|competitor_gaps|content_opportunities|persona_mapping|ranking_trends = bestehende Analysen. '
+            . 'days (optional, für declining/ranking_trends: Zeitraum in Tagen, Standard: 30).';
     }
 
     public function getSchema(): array
@@ -34,11 +44,11 @@ class AnalyzeSeoKeywordsTool implements ToolContract, ToolMetadataContract
                 ],
                 'analysis_type' => [
                     'type' => 'string',
-                    'description' => 'Optional: Analyse-Typ. summary (Standard) | competitor_gap | competitor_gaps | content_opportunities | persona_mapping | ranking_trends. competitor_gaps zeigt Keywords wo Competitors ranken aber wir nicht.'
+                    'description' => 'Analyse-Typ: summary (Standard) | quick_wins | content_gaps | declining | defend | cluster_health | local_opportunities | competitor_gap | competitor_gaps | content_opportunities | persona_mapping | ranking_trends.'
                 ],
                 'days' => [
                     'type' => 'integer',
-                    'description' => 'Optional: Zeitraum in Tagen für ranking_trends Analyse. Standard: 30.'
+                    'description' => 'Optional: Zeitraum in Tagen für declining und ranking_trends Analyse. Standard: 30.'
                 ],
             ],
             'required' => ['seo_board_id']
@@ -71,7 +81,33 @@ class AnalyzeSeoKeywordsTool implements ToolContract, ToolMetadataContract
             $analysisService = app(SeoAnalysisService::class);
             $analysisType = $arguments['analysis_type'] ?? 'summary';
 
+            $days = (int) ($arguments['days'] ?? 30);
+
             $data = match ($analysisType) {
+                'quick_wins' => [
+                    'type' => 'quick_wins',
+                    'analysis' => $analysisService->getQuickWins($seoBoard),
+                ],
+                'content_gaps' => [
+                    'type' => 'content_gaps',
+                    'analysis' => $analysisService->getContentGaps($seoBoard),
+                ],
+                'declining' => [
+                    'type' => 'declining',
+                    'analysis' => $analysisService->getDeclining($seoBoard, $days),
+                ],
+                'defend' => [
+                    'type' => 'defend',
+                    'analysis' => $analysisService->getDefend($seoBoard),
+                ],
+                'cluster_health' => [
+                    'type' => 'cluster_health',
+                    'analysis' => $analysisService->getClusterHealth($seoBoard),
+                ],
+                'local_opportunities' => [
+                    'type' => 'local_opportunities',
+                    'analysis' => $analysisService->getLocalOpportunities($seoBoard),
+                ],
                 'competitor_gap' => [
                     'type' => 'competitor_gap',
                     'analysis' => $analysisService->getCompetitorGapAnalysis($seoBoard),
@@ -90,7 +126,7 @@ class AnalyzeSeoKeywordsTool implements ToolContract, ToolMetadataContract
                 ],
                 'ranking_trends' => [
                     'type' => 'ranking_trends',
-                    'analysis' => $analysisService->getRankingTrends($seoBoard, (int) ($arguments['days'] ?? 30)),
+                    'analysis' => $analysisService->getRankingTrends($seoBoard, $days),
                 ],
                 default => [
                     'type' => 'summary',
