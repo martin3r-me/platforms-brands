@@ -27,7 +27,7 @@ class ListSocialPlatformFormatsTool implements ToolContract, ToolMetadataContrac
 
     public function getDescription(): string
     {
-        return 'GET /brands/social_platform_formats - Listet Formate von Social-Media-Plattformen auf (z.B. Story, Post, Reel, Carousel). Formate sind eine lose Lookup-Tabelle — neue Formate werden zur Laufzeit hinzugefügt ohne Code-Deployment. Filterbar nach platform_id, media_type (image|video|carousel), is_active. REST-Parameter: platform_id (optional, filtert nach Plattform), media_type (optional), is_active (optional), search (optional), sort (optional), limit/offset (optional).';
+        return 'GET /brands/social_platform_formats - Listet Formate von Social-Media-Plattformen auf (z.B. Story, Post, Reel, Carousel) inkl. output_schema und rules. Formate sind eine lose Lookup-Tabelle — neue Formate werden zur Laufzeit hinzugefügt ohne Code-Deployment. Jedes Format hat einen output_schema (JSON-Contract für Worker-Output) und rules (weiche Regeln). Filterbar nach platform_id, media_type (image|video|carousel), is_active. REST-Parameter: platform_id (optional, filtert nach Plattform), media_type (optional), is_active (optional), search (optional), sort (optional), limit/offset (optional).';
     }
 
     public function getSchema(): array
@@ -110,6 +110,8 @@ class ListSocialPlatformFormatsTool implements ToolContract, ToolMetadataContrac
                     'key' => $format->key,
                     'aspect_ratio' => $format->aspect_ratio,
                     'media_type' => $format->media_type,
+                    'output_schema' => $format->output_schema,
+                    'rules' => $format->rules,
                     'is_active' => $format->is_active,
                     'created_at' => $format->created_at->toIso8601String(),
                 ];

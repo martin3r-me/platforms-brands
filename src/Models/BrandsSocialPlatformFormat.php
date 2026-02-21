@@ -22,12 +22,16 @@ class BrandsSocialPlatformFormat extends Model implements HasDisplayName
         'key',
         'aspect_ratio',
         'media_type',
+        'output_schema',
+        'rules',
         'is_active',
         'team_id',
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
+        'output_schema' => 'array',
+        'rules' => 'array',
     ];
 
     public function platform(): BelongsTo

@@ -24,7 +24,7 @@ class UpdateSocialPlatformFormatTool implements ToolContract
 
     public function getDescription(): string
     {
-        return 'PUT /brands/social_platform_formats/{id} - Aktualisiert ein Social-Media-Plattform-Format. REST-Parameter: format_id (required), name (optional), key (optional, unique pro Plattform), aspect_ratio (optional), media_type (optional), is_active (optional).';
+        return 'PUT /brands/social_platform_formats/{id} - Aktualisiert ein Social-Media-Plattform-Format. REST-Parameter: format_id (required), name (optional), key (optional, unique pro Plattform), aspect_ratio (optional), media_type (optional), output_schema (optional, JSON-Contract für Worker-Output), rules (optional, weiche Regeln als Key-Value-Pairs), is_active (optional). Worker-Workflow: 1) Format + output_schema laden, 2) Content gegen output_schema produzieren, 3) Ergebnis validieren. output_schema definiert den verbindlichen Output-Contract (Felder, Typen, Limits). rules enthält weiche Steuerungsregeln (z.B. allows_links, hashtag_style, tone_adjustment).';
     }
 
     public function getSchema(): array
@@ -51,6 +51,14 @@ class UpdateSocialPlatformFormatTool implements ToolContract
                 'media_type' => [
                     'type' => 'string',
                     'description' => 'Optional: Neuer Medientyp, z.B. "image", "video", "carousel". Null zum Entfernen.',
+                ],
+                'output_schema' => [
+                    'type' => 'object',
+                    'description' => 'Optional: JSON-Contract für Worker-Output. Definiert Felder, Typen und Limits, gegen die der Worker produziert. Beispiel: {"text": {"type": "string", "max_length": 2200, "required": true}, "image_url": {"type": "string", "required": true}}. Null zum Entfernen.',
+                ],
+                'rules' => [
+                    'type' => 'object',
+                    'description' => 'Optional: Weiche Regeln als Key-Value-Pairs für Feinsteuerung. Beispiel: {"allows_links": false, "hashtag_style": "many", "tone_adjustment": "casual"}. Null zum Entfernen.',
                 ],
                 'is_active' => [
                     'type' => 'boolean',
@@ -122,6 +130,22 @@ class UpdateSocialPlatformFormatTool implements ToolContract
                 $updateData['media_type'] = $arguments['media_type'];
             }
 
+            if (array_key_exists('output_schema', $arguments)) {
+                $value = $arguments['output_schema'];
+                if ($value !== null && !is_array($value)) {
+                    return ToolResult::error('VALIDATION_ERROR', 'output_schema muss ein JSON-Objekt oder null sein.');
+                }
+                $updateData['output_schema'] = $value;
+            }
+
+            if (array_key_exists('rules', $arguments)) {
+                $value = $arguments['rules'];
+                if ($value !== null && !is_array($value)) {
+                    return ToolResult::error('VALIDATION_ERROR', 'rules muss ein JSON-Objekt oder null sein.');
+                }
+                $updateData['rules'] = $value;
+            }
+
             if (isset($arguments['is_active'])) {
                 $updateData['is_active'] = (bool) $arguments['is_active'];
             }
@@ -141,6 +165,8 @@ class UpdateSocialPlatformFormatTool implements ToolContract
                 'key' => $format->key,
                 'aspect_ratio' => $format->aspect_ratio,
                 'media_type' => $format->media_type,
+                'output_schema' => $format->output_schema,
+                'rules' => $format->rules,
                 'is_active' => $format->is_active,
                 'team_id' => $format->team_id,
                 'updated_at' => $format->updated_at->toIso8601String(),

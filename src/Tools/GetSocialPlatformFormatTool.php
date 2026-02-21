@@ -22,7 +22,7 @@ class GetSocialPlatformFormatTool implements ToolContract, ToolMetadataContract
 
     public function getDescription(): string
     {
-        return 'GET /brands/social_platform_formats/{id} - Ruft ein einzelnes Social-Media-Plattform-Format ab. REST-Parameter: id (required, integer) - Format-ID. Nutze "brands.social_platform_formats.GET" um verfügbare Format-IDs zu sehen.';
+        return 'GET /brands/social_platform_formats/{id} - Ruft ein einzelnes Social-Media-Plattform-Format ab inkl. output_schema (JSON-Contract für Worker-Output) und rules (weiche Regeln). REST-Parameter: id (required, integer) - Format-ID. Nutze "brands.social_platform_formats.GET" um verfügbare Format-IDs zu sehen. Worker-Workflow: 1) Format + output_schema über dieses Tool laden, 2) Content gegen output_schema produzieren (Felder, Typen, Limits beachten), 3) rules für Feinsteuerung anwenden (z.B. allows_links, hashtag_style, tone_adjustment), 4) Ergebnis gegen output_schema validieren.';
     }
 
     public function getSchema(): array
@@ -73,6 +73,8 @@ class GetSocialPlatformFormatTool implements ToolContract, ToolMetadataContract
                 'key' => $format->key,
                 'aspect_ratio' => $format->aspect_ratio,
                 'media_type' => $format->media_type,
+                'output_schema' => $format->output_schema,
+                'rules' => $format->rules,
                 'is_active' => $format->is_active,
                 'team_id' => $format->team_id,
                 'created_at' => $format->created_at->toIso8601String(),

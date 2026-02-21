@@ -26,7 +26,7 @@ class CreateSocialPlatformFormatTool implements ToolContract, ToolMetadataContra
 
     public function getDescription(): string
     {
-        return 'POST /brands/social_platform_formats - Erstellt ein neues Format für eine Social-Media-Plattform (z.B. "Story" für Instagram). Formate sind eine lose Lookup-Tabelle — neue Formate werden zur Laufzeit hinzugefügt ohne Code-Deployment. REST-Parameter: platform_id (required), name (required), key (required, unique pro Plattform), aspect_ratio (optional, z.B. "9:16", "1:1"), media_type (optional, z.B. "image", "video", "carousel"), is_active (optional, default true).';
+        return 'POST /brands/social_platform_formats - Erstellt ein neues Format für eine Social-Media-Plattform (z.B. "Story" für Instagram). Formate sind eine lose Lookup-Tabelle — neue Formate werden zur Laufzeit hinzugefügt ohne Code-Deployment. REST-Parameter: platform_id (required), name (required), key (required, unique pro Plattform), aspect_ratio (optional, z.B. "9:16", "1:1"), media_type (optional, z.B. "image", "video", "carousel"), output_schema (optional, JSON-Contract für Worker-Output), rules (optional, weiche Regeln als Key-Value-Pairs), is_active (optional, default true).';
     }
 
     public function getSchema(): array
@@ -53,6 +53,14 @@ class CreateSocialPlatformFormatTool implements ToolContract, ToolMetadataContra
                 'media_type' => [
                     'type' => 'string',
                     'description' => 'Optional: Medientyp, z.B. "image", "video", "carousel".',
+                ],
+                'output_schema' => [
+                    'type' => 'object',
+                    'description' => 'Optional: JSON-Contract für Worker-Output. Definiert Felder, Typen und Limits, gegen die der Worker produziert. Beispiel: {"text": {"type": "string", "max_length": 2200, "required": true}, "image_url": {"type": "string", "required": true}}.',
+                ],
+                'rules' => [
+                    'type' => 'object',
+                    'description' => 'Optional: Weiche Regeln als Key-Value-Pairs für Feinsteuerung. Beispiel: {"allows_links": false, "hashtag_style": "many", "tone_adjustment": "casual"}.',
                 ],
                 'is_active' => [
                     'type' => 'boolean',
@@ -107,12 +115,26 @@ class CreateSocialPlatformFormatTool implements ToolContract, ToolMetadataContra
                 return ToolResult::error('DUPLICATE_KEY', "Ein Format mit dem Key '{$key}' existiert bereits für die Plattform '{$platform->name}'.");
             }
 
+            // output_schema validieren
+            $outputSchema = $arguments['output_schema'] ?? null;
+            if ($outputSchema !== null && !is_array($outputSchema)) {
+                return ToolResult::error('VALIDATION_ERROR', 'output_schema muss ein JSON-Objekt oder null sein.');
+            }
+
+            // rules validieren
+            $rules = $arguments['rules'] ?? null;
+            if ($rules !== null && !is_array($rules)) {
+                return ToolResult::error('VALIDATION_ERROR', 'rules muss ein JSON-Objekt oder null sein.');
+            }
+
             $format = BrandsSocialPlatformFormat::create([
                 'platform_id' => $platformId,
                 'name' => trim($name),
                 'key' => $key,
                 'aspect_ratio' => $arguments['aspect_ratio'] ?? null,
                 'media_type' => $arguments['media_type'] ?? null,
+                'output_schema' => $outputSchema,
+                'rules' => $rules,
                 'is_active' => $arguments['is_active'] ?? true,
                 'team_id' => $context->user->currentTeam?->id,
             ]);
@@ -127,6 +149,8 @@ class CreateSocialPlatformFormatTool implements ToolContract, ToolMetadataContra
                 'key' => $format->key,
                 'aspect_ratio' => $format->aspect_ratio,
                 'media_type' => $format->media_type,
+                'output_schema' => $format->output_schema,
+                'rules' => $format->rules,
                 'is_active' => $format->is_active,
                 'team_id' => $format->team_id,
                 'created_at' => $format->created_at->toIso8601String(),
