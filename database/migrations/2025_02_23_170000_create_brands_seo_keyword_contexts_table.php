@@ -21,7 +21,7 @@ return new class extends Migration
 
             $table->index(['seo_keyword_id']);
             $table->index(['context_type', 'context_id']);
-            $table->unique(['seo_keyword_id', 'context_type', 'context_id']);
+            $table->unique(['seo_keyword_id', 'context_type', 'context_id'], 'brands_seo_kw_ctx_unique');
         });
     }
 
