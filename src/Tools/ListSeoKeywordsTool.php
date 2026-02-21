@@ -63,7 +63,8 @@ class ListSeoKeywordsTool implements ToolContract, ToolMetadataContract
 
             $query = BrandsSeoKeyword::query()
                 ->where('seo_board_id', $seoBoardId)
-                ->with(['seoBoard', 'cluster']);
+                ->with(['seoBoard', 'cluster'])
+                ->withCount('competitors');
 
             $this->applyStandardFilters($query, $arguments, [
                 'keyword', 'search_intent', 'keyword_type', 'priority', 'keyword_cluster_id',
@@ -107,6 +108,8 @@ class ListSeoKeywordsTool implements ToolContract, ToolMetadataContract
                     'target_position' => $kw->target_position,
                     'location' => $kw->location,
                     'last_fetched_at' => $kw->last_fetched_at?->toIso8601String(),
+                    'competitor_gap' => $kw->competitor_gap,
+                    'competitors_count' => $kw->competitors_count ?? 0,
                     'created_at' => $kw->created_at->toIso8601String(),
                 ];
             })->values()->toArray();

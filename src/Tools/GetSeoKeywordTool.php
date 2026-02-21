@@ -19,7 +19,7 @@ class GetSeoKeywordTool implements ToolContract, ToolMetadataContract
 
     public function getDescription(): string
     {
-        return 'GET /brands/seo_keywords/{id} - Ruft ein einzelnes SEO Keyword mit allen Details inkl. Lifecycle-Felder (content_status, target_url, published_url, target_position, location) ab. REST-Parameter: id (required, integer) - Keyword-ID.';
+        return 'GET /brands/seo_keywords/{id} - Ruft ein einzelnes SEO Keyword mit allen Details inkl. Lifecycle-Felder (content_status, target_url, published_url, target_position, location) und Competitor-Daten (competitor_gap, competitors) ab. REST-Parameter: id (required, integer) - Keyword-ID.';
     }
 
     public function getSchema(): array
@@ -47,7 +47,7 @@ class GetSeoKeywordTool implements ToolContract, ToolMetadataContract
                 return ToolResult::error('VALIDATION_ERROR', 'Keyword-ID ist erforderlich.');
             }
 
-            $keyword = BrandsSeoKeyword::with(['seoBoard', 'cluster', 'user', 'team'])
+            $keyword = BrandsSeoKeyword::with(['seoBoard', 'cluster', 'user', 'team', 'competitors'])
                 ->find($arguments['id']);
 
             if (!$keyword) {
@@ -85,6 +85,15 @@ class GetSeoKeywordTool implements ToolContract, ToolMetadataContract
                 'target_position' => $keyword->target_position,
                 'location' => $keyword->location,
                 'last_fetched_at' => $keyword->last_fetched_at?->toIso8601String(),
+                'competitor_gap' => $keyword->competitor_gap,
+                'competitors' => $keyword->competitors->map(fn ($c) => [
+                    'id' => $c->id,
+                    'domain' => $c->domain,
+                    'url' => $c->url,
+                    'position' => $c->position,
+                    'tracked_at' => $c->tracked_at?->toIso8601String(),
+                ])->values()->toArray(),
+                'competitors_count' => $keyword->competitors->count(),
                 'team_id' => $keyword->team_id,
                 'user_id' => $keyword->user_id,
                 'created_at' => $keyword->created_at->toIso8601String(),

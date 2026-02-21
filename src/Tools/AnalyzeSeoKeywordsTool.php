@@ -20,7 +20,7 @@ class AnalyzeSeoKeywordsTool implements ToolContract, ToolMetadataContract
 
     public function getDescription(): string
     {
-        return 'GET /brands/seo_boards/{seo_board_id}/keywords/analyze - Analysiert Keywords: Zusammenfassung, Wettbewerber-Lücken, Content-Chancen, Persona-Mapping, Ranking-Trends. REST-Parameter: seo_board_id (required, integer). analysis_type (optional, string) - summary|competitor_gap|content_opportunities|persona_mapping|ranking_trends (Standard: summary). days (optional, integer, nur für ranking_trends: Zeitraum in Tagen, Standard: 30).';
+        return 'GET /brands/seo_boards/{seo_board_id}/keywords/analyze - Analysiert Keywords: Zusammenfassung, Wettbewerber-Lücken, Content-Chancen, Persona-Mapping, Ranking-Trends, Competitor-Gaps. REST-Parameter: seo_board_id (required, integer). analysis_type (optional, string) - summary|competitor_gap|competitor_gaps|content_opportunities|persona_mapping|ranking_trends (Standard: summary). days (optional, integer, nur für ranking_trends: Zeitraum in Tagen, Standard: 30). competitor_gaps zeigt Keywords wo Competitors ranken aber wir nicht (basierend auf erfassten Competitor-Rankings).';
     }
 
     public function getSchema(): array
@@ -34,7 +34,7 @@ class AnalyzeSeoKeywordsTool implements ToolContract, ToolMetadataContract
                 ],
                 'analysis_type' => [
                     'type' => 'string',
-                    'description' => 'Optional: Analyse-Typ. summary (Standard) | competitor_gap | content_opportunities | persona_mapping | ranking_trends.'
+                    'description' => 'Optional: Analyse-Typ. summary (Standard) | competitor_gap | competitor_gaps | content_opportunities | persona_mapping | ranking_trends. competitor_gaps zeigt Keywords wo Competitors ranken aber wir nicht.'
                 ],
                 'days' => [
                     'type' => 'integer',
@@ -75,6 +75,10 @@ class AnalyzeSeoKeywordsTool implements ToolContract, ToolMetadataContract
                 'competitor_gap' => [
                     'type' => 'competitor_gap',
                     'analysis' => $analysisService->getCompetitorGapAnalysis($seoBoard),
+                ],
+                'competitor_gaps' => [
+                    'type' => 'competitor_gaps',
+                    'analysis' => $analysisService->getCompetitorGaps($seoBoard),
                 ],
                 'content_opportunities' => [
                     'type' => 'content_opportunities',

@@ -184,6 +184,64 @@ class SeoAnalysisService
         ];
     }
 
+    /**
+     * Competitor-Gap-Analyse: Keywords wo Competitors ranken, wir aber nicht.
+     * Basiert auf der seo_keyword_competitors Sub-Table.
+     */
+    public function getCompetitorGaps(BrandsSeoBoard $board): array
+    {
+        $keywords = $board->keywords()->with(['cluster', 'competitors'])->get();
+
+        $gaps = [];
+        $domains = [];
+
+        foreach ($keywords as $keyword) {
+            if ($keyword->competitors->isEmpty()) {
+                continue;
+            }
+
+            $isGap = empty($keyword->published_url) || $keyword->position === null;
+
+            foreach ($keyword->competitors as $comp) {
+                $domains[$comp->domain] = ($domains[$comp->domain] ?? 0) + 1;
+            }
+
+            if ($isGap) {
+                $gaps[] = [
+                    'keyword' => $keyword->keyword,
+                    'keyword_id' => $keyword->id,
+                    'cluster' => $keyword->cluster?->name,
+                    'search_volume' => $keyword->search_volume,
+                    'keyword_difficulty' => $keyword->keyword_difficulty,
+                    'our_position' => $keyword->position,
+                    'published_url' => $keyword->published_url,
+                    'competitors' => $keyword->competitors->map(fn ($c) => [
+                        'domain' => $c->domain,
+                        'url' => $c->url,
+                        'position' => $c->position,
+                    ])->values()->toArray(),
+                    'best_competitor_position' => $keyword->competitors->min('position'),
+                    'opportunity_score' => $this->calculateOpportunityScore($keyword),
+                ];
+            }
+        }
+
+        usort($gaps, fn($a, $b) => ($b['opportunity_score'] ?? 0) <=> ($a['opportunity_score'] ?? 0));
+
+        arsort($domains);
+
+        $totalKeywords = $keywords->count();
+        $keywordsWithCompetitors = $keywords->filter(fn ($kw) => $kw->competitors->isNotEmpty())->count();
+
+        return [
+            'gaps' => $gaps,
+            'gaps_count' => count($gaps),
+            'total_keywords' => $totalKeywords,
+            'keywords_with_competitors' => $keywordsWithCompetitors,
+            'top_competitor_domains' => array_slice($domains, 0, 10, true),
+        ];
+    }
+
     protected function calculateOpportunityScore(mixed $keyword): float
     {
         $volume = $keyword->search_volume ?? 0;

@@ -102,6 +102,26 @@ class BrandsSeoKeyword extends Model implements HasDisplayName
         return $this->hasMany(BrandsSeoKeywordContext::class, 'seo_keyword_id')->orderByDesc('created_at');
     }
 
+    public function competitors(): HasMany
+    {
+        return $this->hasMany(BrandsSeoKeywordCompetitor::class, 'seo_keyword_id')->orderByDesc('tracked_at');
+    }
+
+    /**
+     * Computed: true wenn Competitors ranken aber wir nicht
+     * (published_url = null oder position = null)
+     */
+    public function getCompetitorGapAttribute(): bool
+    {
+        $hasCompetitors = $this->competitors()->exists();
+
+        if (!$hasCompetitors) {
+            return false;
+        }
+
+        return empty($this->published_url) || $this->position === null;
+    }
+
     public function getDisplayName(): ?string
     {
         return $this->keyword;

@@ -45,6 +45,7 @@ use Platform\Brands\Models\BrandsSeoBoard;
 use Platform\Brands\Models\BrandsSeoKeyword;
 use Platform\Brands\Models\BrandsSeoKeywordPosition;
 use Platform\Brands\Models\BrandsSeoKeywordContext;
+use Platform\Brands\Models\BrandsSeoKeywordCompetitor;
 use Platform\Integrations\Models\IntegrationsFacebookPage;
 use Platform\Integrations\Models\IntegrationsInstagramAccount;
 use Platform\Brands\Policies\BrandPolicy;
@@ -78,6 +79,7 @@ use Platform\Brands\Policies\SeoBoardPolicy;
 use Platform\Brands\Policies\SeoKeywordPolicy;
 use Platform\Brands\Policies\SeoKeywordPositionPolicy;
 use Platform\Brands\Policies\SeoKeywordContextPolicy;
+use Platform\Brands\Policies\SeoKeywordCompetitorPolicy;
 use Platform\Brands\Policies\FacebookPagePolicy;
 use Platform\Brands\Policies\InstagramAccountPolicy;
 
@@ -232,6 +234,7 @@ class BrandsServiceProvider extends ServiceProvider
             BrandsSeoKeyword::class => SeoKeywordPolicy::class,
             BrandsSeoKeywordPosition::class => SeoKeywordPositionPolicy::class,
             BrandsSeoKeywordContext::class => SeoKeywordContextPolicy::class,
+            BrandsSeoKeywordCompetitor::class => SeoKeywordCompetitorPolicy::class,
             IntegrationsFacebookPage::class => FacebookPagePolicy::class,
             IntegrationsInstagramAccount::class => InstagramAccountPolicy::class,
         ];
@@ -525,6 +528,11 @@ class BrandsServiceProvider extends ServiceProvider
             $registry->register(new \Platform\Brands\Tools\ListSeoKeywordContextsTool());
             $registry->register(new \Platform\Brands\Tools\CreateSeoKeywordContextTool());
             $registry->register(new \Platform\Brands\Tools\DeleteSeoKeywordContextTool());
+
+            // SeoKeywordCompetitor-Tools (Wettbewerbs-Dimension)
+            $registry->register(new \Platform\Brands\Tools\ListSeoKeywordCompetitorsTool());
+            $registry->register(new \Platform\Brands\Tools\CreateSeoKeywordCompetitorTool());
+            $registry->register(new \Platform\Brands\Tools\DeleteSeoKeywordCompetitorTool());
 
             // SEO Analyse & Budget-Tools
             $registry->register(new \Platform\Brands\Tools\FetchSeoKeywordMetricsTool());
