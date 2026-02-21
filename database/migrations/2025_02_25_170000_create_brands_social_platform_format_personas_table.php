@@ -10,7 +10,8 @@ return new class extends Migration
     {
         Schema::create('brands_social_platform_format_personas', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('platform_format_id')->constrained('brands_social_platform_formats')->onDelete('cascade');
+            $table->foreignId('platform_format_id');
+            $table->foreign('platform_format_id', 'fk_format_personas_format')->references('id')->on('brands_social_platform_formats')->onDelete('cascade');
             $table->foreignId('persona_id')->constrained('brands_personas')->onDelete('cascade');
             $table->string('notes')->nullable();
             $table->timestamps();
