@@ -50,7 +50,7 @@ class GetCtaTool implements ToolContract, ToolMetadataContract
                 return ToolResult::error('VALIDATION_ERROR', 'CTA-ID ist erforderlich. Nutze "brands.ctas.GET" um CTAs zu finden.');
             }
 
-            $cta = BrandsCta::with(['brand', 'targetPage', 'user', 'team'])
+            $cta = BrandsCta::with(['brand', 'targetPage.contentBoard', 'user', 'team'])
                 ->find($arguments['id']);
 
             if (!$cta) {
@@ -83,6 +83,7 @@ class GetCtaTool implements ToolContract, ToolMetadataContract
                 'clicks' => $cta->clicks,
                 'conversion_rate' => $cta->conversion_rate,
                 'last_clicked_at' => $cta->last_clicked_at?->toIso8601String(),
+                'page_context_url' => $cta->getPageContextUrl(),
                 'tracking_url' => route('brands.track.cta.click', ['uuid' => $cta->uuid]),
                 'created_at' => $cta->created_at->toIso8601String(),
                 'updated_at' => $cta->updated_at->toIso8601String(),

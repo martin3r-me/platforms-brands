@@ -88,7 +88,7 @@ class ListCtasTool implements ToolContract, ToolMetadataContract
             // Query aufbauen
             $query = BrandsCta::query()
                 ->where('brand_id', $brandId)
-                ->with(['brand', 'targetPage', 'user', 'team']);
+                ->with(['brand', 'targetPage.contentBoard', 'user', 'team']);
 
             // Spezifische Filter
             if (isset($arguments['type'])) {
@@ -152,6 +152,7 @@ class ListCtasTool implements ToolContract, ToolMetadataContract
                     'impressions' => $cta->impressions,
                     'clicks' => $cta->clicks,
                     'conversion_rate' => $cta->conversion_rate,
+                    'page_context_url' => $cta->getPageContextUrl(),
                     'last_clicked_at' => $cta->last_clicked_at?->toIso8601String(),
                     'created_at' => $cta->created_at->toIso8601String(),
                 ];

@@ -22,7 +22,10 @@ class GetContentBoardTool implements ToolContract, ToolMetadataContract
 
     public function getDescription(): string
     {
-        return 'GET /brands/content_boards/{id} - Ruft ein einzelnes Content Board ab. REST-Parameter: id (required, integer) - Content Board-ID. Nutze "brands.content_boards.GET" um verfügbare Content Board-IDs zu sehen.';
+        return 'GET /brands/content_boards/{id} - Ruft ein einzelnes Content Board ab. '
+            . 'Ein Content Board repräsentiert eine Page / Landing Page. Die Blocks innerhalb des Boards sind die Sektionen der Page. '
+            . 'Enthält Page-Felder: domain, slug, published_url. '
+            . 'REST-Parameter: id (required, integer) - Content Board-ID. Nutze "brands.content_boards.GET" um verfügbare Content Board-IDs zu sehen.';
     }
 
     public function getSchema(): array
@@ -70,6 +73,9 @@ class GetContentBoardTool implements ToolContract, ToolMetadataContract
                 'uuid' => $contentBoard->uuid,
                 'name' => $contentBoard->name,
                 'description' => $contentBoard->description,
+                'domain' => $contentBoard->domain,
+                'slug' => $contentBoard->slug,
+                'published_url' => $contentBoard->published_url,
                 'brand_id' => $contentBoard->brand_id,
                 'brand_name' => $contentBoard->brand->name,
                 'team_id' => $contentBoard->team_id,

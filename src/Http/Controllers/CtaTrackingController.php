@@ -18,7 +18,8 @@ class CtaTrackingController extends Controller
      */
     public function click(Request $request, string $uuid): RedirectResponse|JsonResponse
     {
-        $cta = BrandsCta::where('uuid', $uuid)
+        $cta = BrandsCta::with(['targetPage.contentBoard'])
+            ->where('uuid', $uuid)
             ->where('is_active', true)
             ->first();
 

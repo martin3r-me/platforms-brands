@@ -25,7 +25,10 @@ class ListContentBoardsTool implements ToolContract, ToolMetadataContract
 
     public function getDescription(): string
     {
-        return 'GET /brands/{brand_id}/content_boards - Listet Content Boards einer Marke auf. REST-Parameter: brand_id (required, integer) - Marken-ID. filters (optional, array) - Filter-Array. search (optional, string) - Suchbegriff. sort (optional, array) - Sortierung. limit/offset (optional) - Pagination.';
+        return 'GET /brands/{brand_id}/content_boards - Listet Content Boards (= Pages / Landing Pages) einer Marke auf. '
+            . 'Jedes Content Board repräsentiert eine Page, die Blocks sind die Sektionen. '
+            . 'Enthält Page-Felder: domain, slug, published_url. '
+            . 'REST-Parameter: brand_id (required, integer) - Marken-ID. filters (optional, array) - Filter-Array. search (optional, string) - Suchbegriff. sort (optional, array) - Sortierung. limit/offset (optional) - Pagination.';
     }
 
     public function getSchema(): array
@@ -102,6 +105,9 @@ class ListContentBoardsTool implements ToolContract, ToolMetadataContract
                     'uuid' => $contentBoard->uuid,
                     'name' => $contentBoard->name,
                     'description' => $contentBoard->description,
+                    'domain' => $contentBoard->domain,
+                    'slug' => $contentBoard->slug,
+                    'published_url' => $contentBoard->published_url,
                     'brand_id' => $contentBoard->brand_id,
                     'brand_name' => $contentBoard->brand->name,
                     'team_id' => $contentBoard->team_id,

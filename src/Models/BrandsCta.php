@@ -109,7 +109,7 @@ class BrandsCta extends Model implements HasDisplayName
 
     /**
      * Resolve the redirect URL for click tracking.
-     * Prefers target_url, falls back to target page URL.
+     * Prefers target_url, then published_url of the target page's Content Board, then internal route.
      */
     public function getRedirectUrl(): ?string
     {
@@ -118,10 +118,32 @@ class BrandsCta extends Model implements HasDisplayName
         }
 
         if ($this->target_page_id && $this->targetPage) {
+            // Prefer published_url from the parent Content Board if available
+            $contentBoard = $this->targetPage->contentBoard;
+            if ($contentBoard && $contentBoard->published_url) {
+                return $contentBoard->published_url;
+            }
+
             return route('brands.content-board-blocks.show', [
                 'brandsContentBoardBlock' => $this->target_page_id,
                 'type' => 'text',
             ]);
+        }
+
+        return null;
+    }
+
+    /**
+     * Resolve the page context URL for this CTA.
+     * Returns the published_url of the target page's Content Board if available.
+     */
+    public function getPageContextUrl(): ?string
+    {
+        if ($this->target_page_id && $this->targetPage) {
+            $contentBoard = $this->targetPage->contentBoard;
+            if ($contentBoard && $contentBoard->published_url) {
+                return $contentBoard->published_url;
+            }
         }
 
         return null;

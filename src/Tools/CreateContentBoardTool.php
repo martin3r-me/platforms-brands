@@ -23,7 +23,12 @@ class CreateContentBoardTool implements ToolContract, ToolMetadataContract
 
     public function getDescription(): string
     {
-        return 'POST /brands/{brand_id}/content_boards - Erstellt ein neues Content Board für eine Marke. REST-Parameter: brand_id (required, integer) - Marken-ID. name (optional, string) - Board-Name. description (optional, string) - Beschreibung.';
+        return 'POST /brands/{brand_id}/content_boards - Erstellt ein neues Content Board (= Page / Landing Page) für eine Marke. '
+            . 'Ein Content Board repräsentiert eine vollständige Page. Die Blocks innerhalb des Boards sind die Sektionen der Page. '
+            . 'REST-Parameter: brand_id (required, integer) - Marken-ID. name (optional, string) - Board-Name. description (optional, string) - Beschreibung. '
+            . 'domain (optional, string) - Domain der Page, z.B. "taisteone.de". '
+            . 'slug (optional, string) - URL-Pfad, z.B. "/leistungen/arbeitsmedizin". '
+            . 'published_url (optional, string) - Vollständige URL nach Deploy.';
     }
 
     public function getSchema(): array
@@ -42,6 +47,18 @@ class CreateContentBoardTool implements ToolContract, ToolMetadataContract
                 'description' => [
                     'type' => 'string',
                     'description' => 'Beschreibung des Content Boards.'
+                ],
+                'domain' => [
+                    'type' => 'string',
+                    'description' => 'Optional: Domain der Page, z.B. "taisteone.de".'
+                ],
+                'slug' => [
+                    'type' => 'string',
+                    'description' => 'Optional: URL-Pfad der Page, z.B. "/leistungen/arbeitsmedizin".'
+                ],
+                'published_url' => [
+                    'type' => 'string',
+                    'description' => 'Optional: Vollständige URL nach Deploy, z.B. "https://taisteone.de/leistungen/arbeitsmedizin".'
                 ],
             ],
             'required' => ['brand_id']
@@ -79,6 +96,9 @@ class CreateContentBoardTool implements ToolContract, ToolMetadataContract
             $contentBoard = BrandsContentBoard::create([
                 'name' => $name,
                 'description' => $arguments['description'] ?? null,
+                'domain' => $arguments['domain'] ?? null,
+                'slug' => $arguments['slug'] ?? null,
+                'published_url' => $arguments['published_url'] ?? null,
                 'user_id' => $context->user->id,
                 'team_id' => $brand->team_id,
                 'brand_id' => $brand->id,
@@ -91,6 +111,9 @@ class CreateContentBoardTool implements ToolContract, ToolMetadataContract
                 'uuid' => $contentBoard->uuid,
                 'name' => $contentBoard->name,
                 'description' => $contentBoard->description,
+                'domain' => $contentBoard->domain,
+                'slug' => $contentBoard->slug,
+                'published_url' => $contentBoard->published_url,
                 'brand_id' => $contentBoard->brand_id,
                 'brand_name' => $contentBoard->brand->name,
                 'team_id' => $contentBoard->team_id,

@@ -52,6 +52,7 @@ class CtaAnalysisService
     public function getTopPerformers(BrandsBrand $brand): array
     {
         $ctas = $brand->ctas()
+            ->with(['targetPage.contentBoard'])
             ->where('impressions', '>=', 10)
             ->get()
             ->sortByDesc('conversion_rate')
@@ -65,6 +66,7 @@ class CtaAnalysisService
             'impressions' => $cta->impressions,
             'clicks' => $cta->clicks,
             'conversion_rate' => $cta->conversion_rate,
+            'page_context_url' => $cta->getPageContextUrl(),
             'last_clicked_at' => $cta->last_clicked_at?->toIso8601String(),
         ])->values()->toArray();
     }
@@ -75,6 +77,7 @@ class CtaAnalysisService
     public function getWeakPerformers(BrandsBrand $brand): array
     {
         $ctas = $brand->ctas()
+            ->with(['targetPage.contentBoard'])
             ->where('impressions', '>=', 10)
             ->get()
             ->sortBy('conversion_rate')
@@ -88,6 +91,7 @@ class CtaAnalysisService
             'impressions' => $cta->impressions,
             'clicks' => $cta->clicks,
             'conversion_rate' => $cta->conversion_rate,
+            'page_context_url' => $cta->getPageContextUrl(),
             'last_clicked_at' => $cta->last_clicked_at?->toIso8601String(),
         ])->values()->toArray();
     }
