@@ -21,6 +21,7 @@ class BrandsCta extends Model implements HasDisplayName
     protected $fillable = [
         'uuid',
         'brand_id',
+        'cta_board_id',
         'label',
         'description',
         'type',
@@ -28,6 +29,7 @@ class BrandsCta extends Model implements HasDisplayName
         'target_page_id',
         'target_url',
         'is_active',
+        'order',
         'user_id',
         'team_id',
     ];
@@ -35,6 +37,7 @@ class BrandsCta extends Model implements HasDisplayName
     protected $casts = [
         'uuid' => 'string',
         'is_active' => 'boolean',
+        'order' => 'integer',
     ];
 
     public const TYPES = ['primary', 'secondary', 'micro'];
@@ -54,6 +57,11 @@ class BrandsCta extends Model implements HasDisplayName
     public function brand(): BelongsTo
     {
         return $this->belongsTo(BrandsBrand::class, 'brand_id');
+    }
+
+    public function ctaBoard(): BelongsTo
+    {
+        return $this->belongsTo(BrandsCtaBoard::class, 'cta_board_id');
     }
 
     /**

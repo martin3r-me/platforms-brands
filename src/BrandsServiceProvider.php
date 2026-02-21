@@ -47,6 +47,7 @@ use Platform\Brands\Models\BrandsSeoKeywordPosition;
 use Platform\Brands\Models\BrandsSeoKeywordContext;
 use Platform\Brands\Models\BrandsSeoKeywordCompetitor;
 use Platform\Brands\Models\BrandsCta;
+use Platform\Brands\Models\BrandsCtaBoard;
 use Platform\Integrations\Models\IntegrationsFacebookPage;
 use Platform\Integrations\Models\IntegrationsInstagramAccount;
 use Platform\Brands\Policies\BrandPolicy;
@@ -82,6 +83,7 @@ use Platform\Brands\Policies\SeoKeywordPositionPolicy;
 use Platform\Brands\Policies\SeoKeywordContextPolicy;
 use Platform\Brands\Policies\SeoKeywordCompetitorPolicy;
 use Platform\Brands\Policies\CtaPolicy;
+use Platform\Brands\Policies\CtaBoardPolicy;
 use Platform\Brands\Policies\FacebookPagePolicy;
 use Platform\Brands\Policies\InstagramAccountPolicy;
 
@@ -238,6 +240,7 @@ class BrandsServiceProvider extends ServiceProvider
             BrandsSeoKeywordContext::class => SeoKeywordContextPolicy::class,
             BrandsSeoKeywordCompetitor::class => SeoKeywordCompetitorPolicy::class,
             BrandsCta::class => CtaPolicy::class,
+            BrandsCtaBoard::class => CtaBoardPolicy::class,
             IntegrationsFacebookPage::class => FacebookPagePolicy::class,
             IntegrationsInstagramAccount::class => InstagramAccountPolicy::class,
         ];
@@ -547,6 +550,13 @@ class BrandsServiceProvider extends ServiceProvider
             // CTA Bulk-Tools
             $registry->register(new \Platform\Brands\Tools\BulkCreateCtasTool());
             $registry->register(new \Platform\Brands\Tools\BulkUpdateCtasTool());
+
+            // CtaBoard-Tools (CTA Cockpit)
+            $registry->register(new \Platform\Brands\Tools\CreateCtaBoardTool());
+            $registry->register(new \Platform\Brands\Tools\ListCtaBoardsTool());
+            $registry->register(new \Platform\Brands\Tools\GetCtaBoardTool());
+            $registry->register(new \Platform\Brands\Tools\UpdateCtaBoardTool());
+            $registry->register(new \Platform\Brands\Tools\DeleteCtaBoardTool());
 
             // SEO Analyse & Budget-Tools
             $registry->register(new \Platform\Brands\Tools\FetchSeoKeywordMetricsTool());
