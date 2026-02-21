@@ -196,6 +196,14 @@ class BrandsBrand extends Model implements HasTimeAncestors, HasKeyResultAncesto
     }
 
     /**
+     * CTAs (Call-to-Actions) dieser Marke
+     */
+    public function ctas()
+    {
+        return $this->hasMany(BrandsCta::class, 'brand_id');
+    }
+
+    /**
      * Meta OAuth Token dieser Marke (über User)
      * Ein Brand verwendet den Meta Token des Users
      */
