@@ -48,6 +48,8 @@ use Platform\Brands\Models\BrandsSeoKeywordContext;
 use Platform\Brands\Models\BrandsSeoKeywordCompetitor;
 use Platform\Brands\Models\BrandsCta;
 use Platform\Brands\Models\BrandsCtaBoard;
+use Platform\Brands\Models\BrandsSocialPlatform;
+use Platform\Brands\Models\BrandsSocialPlatformFormat;
 use Platform\Integrations\Models\IntegrationsFacebookPage;
 use Platform\Integrations\Models\IntegrationsInstagramAccount;
 use Platform\Brands\Policies\BrandPolicy;
@@ -84,6 +86,8 @@ use Platform\Brands\Policies\SeoKeywordContextPolicy;
 use Platform\Brands\Policies\SeoKeywordCompetitorPolicy;
 use Platform\Brands\Policies\CtaPolicy;
 use Platform\Brands\Policies\CtaBoardPolicy;
+use Platform\Brands\Policies\SocialPlatformPolicy;
+use Platform\Brands\Policies\SocialPlatformFormatPolicy;
 use Platform\Brands\Policies\FacebookPagePolicy;
 use Platform\Brands\Policies\InstagramAccountPolicy;
 
@@ -247,6 +251,8 @@ class BrandsServiceProvider extends ServiceProvider
             BrandsSeoKeywordCompetitor::class => SeoKeywordCompetitorPolicy::class,
             BrandsCta::class => CtaPolicy::class,
             BrandsCtaBoard::class => CtaBoardPolicy::class,
+            BrandsSocialPlatform::class => SocialPlatformPolicy::class,
+            BrandsSocialPlatformFormat::class => SocialPlatformFormatPolicy::class,
             IntegrationsFacebookPage::class => FacebookPagePolicy::class,
             IntegrationsInstagramAccount::class => InstagramAccountPolicy::class,
         ];
@@ -572,6 +578,20 @@ class BrandsServiceProvider extends ServiceProvider
             $registry->register(new \Platform\Brands\Tools\GetSeoBudgetTool());
             $registry->register(new \Platform\Brands\Tools\AnalyzeSeoKeywordsTool());
             $registry->register(new \Platform\Brands\Tools\ResetSeoBudgetTool());
+
+            // SocialPlatform-Tools (Lookup-Tabellen für Social Publishing)
+            $registry->register(new \Platform\Brands\Tools\CreateSocialPlatformTool());
+            $registry->register(new \Platform\Brands\Tools\ListSocialPlatformsTool());
+            $registry->register(new \Platform\Brands\Tools\GetSocialPlatformTool());
+            $registry->register(new \Platform\Brands\Tools\UpdateSocialPlatformTool());
+            $registry->register(new \Platform\Brands\Tools\DeleteSocialPlatformTool());
+
+            // SocialPlatformFormat-Tools (Formate pro Plattform)
+            $registry->register(new \Platform\Brands\Tools\CreateSocialPlatformFormatTool());
+            $registry->register(new \Platform\Brands\Tools\ListSocialPlatformFormatsTool());
+            $registry->register(new \Platform\Brands\Tools\GetSocialPlatformFormatTool());
+            $registry->register(new \Platform\Brands\Tools\UpdateSocialPlatformFormatTool());
+            $registry->register(new \Platform\Brands\Tools\DeleteSocialPlatformFormatTool());
 
             // Export-Tools
             $registry->register(new \Platform\Brands\Tools\ExportBrandTool());
