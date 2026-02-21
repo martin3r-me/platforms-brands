@@ -22,7 +22,7 @@ class GetCtaTool implements ToolContract, ToolMetadataContract
 
     public function getDescription(): string
     {
-        return 'GET /brands/ctas/{id} - Ruft einen einzelnen CTA (Call-to-Action) ab. Ein CTA ist eine Handlungsaufforderung (z.B. "Jetzt anfragen") mit Typ, Funnel-Stage und optionaler Zielseite. REST-Parameter: id (required, integer) - CTA-ID. Nutze "brands.ctas.GET" um verfügbare CTA-IDs zu sehen.';
+        return 'GET /brands/ctas/{id} - Ruft einen einzelnen CTA (Call-to-Action) ab inkl. Analytics-Daten (Impressions, Clicks, Conversion Rate). Ein CTA ist eine Handlungsaufforderung (z.B. "Jetzt anfragen") mit Typ, Funnel-Stage und optionaler Zielseite. REST-Parameter: id (required, integer) - CTA-ID. Nutze "brands.ctas.GET" um verfügbare CTA-IDs zu sehen.';
     }
 
     public function getSchema(): array
@@ -79,6 +79,11 @@ class GetCtaTool implements ToolContract, ToolMetadataContract
                 'brand_name' => $cta->brand->name,
                 'team_id' => $cta->team_id,
                 'user_id' => $cta->user_id,
+                'impressions' => $cta->impressions,
+                'clicks' => $cta->clicks,
+                'conversion_rate' => $cta->conversion_rate,
+                'last_clicked_at' => $cta->last_clicked_at?->toIso8601String(),
+                'tracking_url' => route('brands.track.cta.click', ['uuid' => $cta->uuid]),
                 'created_at' => $cta->created_at->toIso8601String(),
                 'updated_at' => $cta->updated_at->toIso8601String(),
             ];

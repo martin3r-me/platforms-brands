@@ -117,6 +117,9 @@ class BrandsServiceProvider extends ServiceProvider
         $this->app->singleton(\Platform\Brands\Services\SeoBoardService::class);
         $this->app->singleton(\Platform\Brands\Services\SeoKeywordService::class);
         $this->app->singleton(\Platform\Brands\Services\SeoAnalysisService::class);
+
+        // CTA Analysis Service
+        $this->app->singleton(\Platform\Brands\Services\CtaAnalysisService::class);
     }
 
     public function boot(): void
@@ -150,6 +153,9 @@ class BrandsServiceProvider extends ServiceProvider
             ModuleRouter::group('brands', function () {
                 $this->loadRoutesFrom(__DIR__.'/../routes/web.php');
             });
+
+            // Public tracking routes (no auth, rate-limited for bot protection)
+            $this->registerTrackingRoutes();
         }
 
         // Migrations, Views, Livewire-Komponenten
@@ -558,6 +564,9 @@ class BrandsServiceProvider extends ServiceProvider
             $registry->register(new \Platform\Brands\Tools\UpdateCtaBoardTool());
             $registry->register(new \Platform\Brands\Tools\DeleteCtaBoardTool());
 
+            // CTA Analyse-Tool
+            $registry->register(new \Platform\Brands\Tools\AnalyzeCtasTool());
+
             // SEO Analyse & Budget-Tools
             $registry->register(new \Platform\Brands\Tools\FetchSeoKeywordMetricsTool());
             $registry->register(new \Platform\Brands\Tools\GetSeoBudgetTool());
@@ -570,5 +579,27 @@ class BrandsServiceProvider extends ServiceProvider
         } catch (\Throwable $e) {
             // Silent fail - Tool-Registry könnte nicht verfügbar sein
         }
+    }
+
+    /**
+     * Registriert öffentliche CTA-Tracking-Routes (ohne Auth-Middleware).
+     * Rate-Limiting schützt vor Bot-Missbrauch.
+     */
+    protected function registerTrackingRoutes(): void
+    {
+        Route::prefix('track')
+            ->middleware(['web', 'throttle:60,1'])
+            ->group(function () {
+                Route::get('/cta/{uuid}/click', [
+                    \Platform\Brands\Http\Controllers\CtaTrackingController::class,
+                    'click',
+                ])->name('brands.track.cta.click')
+                  ->where('uuid', '[a-zA-Z0-9\-]+');
+
+                Route::post('/cta/impressions', [
+                    \Platform\Brands\Http\Controllers\CtaTrackingController::class,
+                    'impressions',
+                ])->name('brands.track.cta.impressions');
+            });
     }
 }

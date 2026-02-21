@@ -92,24 +92,30 @@
         @endif
     </div>
 
-    {{-- Performance Placeholder --}}
+    {{-- Performance Metrics --}}
     <div class="border-t border-[var(--ui-border)]/30 pt-2 mt-2">
         <div class="flex items-center gap-3 text-[10px] text-[var(--ui-muted)]">
             <div class="flex items-center gap-1" title="Impressions">
                 @svg('heroicon-o-eye', 'w-3 h-3')
-                <span>--</span>
+                <span>{{ number_format($cta->impressions ?? 0) }}</span>
             </div>
             <div class="flex items-center gap-1" title="Clicks">
                 @svg('heroicon-o-cursor-arrow-ripple', 'w-3 h-3')
-                <span>--</span>
+                <span>{{ number_format($cta->clicks ?? 0) }}</span>
             </div>
             <div class="flex items-center gap-1" title="Conversion Rate">
                 @svg('heroicon-o-chart-bar', 'w-3 h-3')
-                <span>--</span>
+                <span>{{ number_format($cta->conversion_rate * 100, 1) }}%</span>
             </div>
         </div>
-        <div class="text-[9px] text-[var(--ui-muted)] mt-0.5 italic">
-            Tracking noch nicht aktiv
-        </div>
+        @if($cta->impressions > 0 && $cta->last_clicked_at)
+            <div class="text-[9px] text-[var(--ui-muted)] mt-0.5">
+                Letzter Klick: {{ $cta->last_clicked_at->diffForHumans() }}
+            </div>
+        @elseif($cta->impressions === 0)
+            <div class="text-[9px] text-[var(--ui-muted)] mt-0.5 italic">
+                Noch keine Tracking-Daten
+            </div>
+        @endif
     </div>
 </x-ui-kanban-card>

@@ -30,6 +30,9 @@ class BrandsCta extends Model implements HasDisplayName
         'target_url',
         'is_active',
         'order',
+        'impressions',
+        'clicks',
+        'last_clicked_at',
         'user_id',
         'team_id',
     ];
@@ -38,7 +41,12 @@ class BrandsCta extends Model implements HasDisplayName
         'uuid' => 'string',
         'is_active' => 'boolean',
         'order' => 'integer',
+        'impressions' => 'integer',
+        'clicks' => 'integer',
+        'last_clicked_at' => 'datetime',
     ];
+
+    protected $appends = ['conversion_rate'];
 
     public const TYPES = ['primary', 'secondary', 'micro'];
     public const FUNNEL_STAGES = ['awareness', 'consideration', 'decision'];
@@ -85,5 +93,37 @@ class BrandsCta extends Model implements HasDisplayName
     public function getDisplayName(): ?string
     {
         return $this->label;
+    }
+
+    /**
+     * Computed: Conversion Rate (clicks / impressions)
+     */
+    public function getConversionRateAttribute(): float
+    {
+        if ($this->impressions === 0 || $this->impressions === null) {
+            return 0.0;
+        }
+
+        return round($this->clicks / $this->impressions, 4);
+    }
+
+    /**
+     * Resolve the redirect URL for click tracking.
+     * Prefers target_url, falls back to target page URL.
+     */
+    public function getRedirectUrl(): ?string
+    {
+        if ($this->target_url) {
+            return $this->target_url;
+        }
+
+        if ($this->target_page_id && $this->targetPage) {
+            return route('brands.content-board-blocks.show', [
+                'brandsContentBoardBlock' => $this->target_page_id,
+                'type' => 'text',
+            ]);
+        }
+
+        return null;
     }
 }

@@ -149,6 +149,10 @@ class ListCtasTool implements ToolContract, ToolMetadataContract
                     'brand_name' => $cta->brand->name,
                     'team_id' => $cta->team_id,
                     'user_id' => $cta->user_id,
+                    'impressions' => $cta->impressions,
+                    'clicks' => $cta->clicks,
+                    'conversion_rate' => $cta->conversion_rate,
+                    'last_clicked_at' => $cta->last_clicked_at?->toIso8601String(),
                     'created_at' => $cta->created_at->toIso8601String(),
                 ];
             })->values()->toArray();
