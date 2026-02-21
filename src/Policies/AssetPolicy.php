@@ -15,12 +15,12 @@ class AssetPolicy
             return false;
         }
 
-        return $user->current_team_id === $board->team_id;
+        return $user->currentTeam?->id === $board->team_id;
     }
 
     public function create(User $user, BrandsAssetBoard $board): bool
     {
-        return $user->current_team_id === $board->team_id;
+        return $user->currentTeam?->id === $board->team_id;
     }
 
     public function update(User $user, BrandsAsset $asset): bool
@@ -30,7 +30,7 @@ class AssetPolicy
             return false;
         }
 
-        return $user->current_team_id === $board->team_id;
+        return $user->currentTeam?->id === $board->team_id;
     }
 
     public function delete(User $user, BrandsAsset $asset): bool
@@ -40,6 +40,6 @@ class AssetPolicy
             return false;
         }
 
-        return $user->current_team_id === $board->team_id;
+        return $user->currentTeam?->id === $board->team_id;
     }
 }

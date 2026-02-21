@@ -71,7 +71,7 @@ class DeleteLogoVariantTool implements ToolContract
             try {
                 $cacheService = app(\Platform\Core\Services\ToolCacheService::class);
                 if ($cacheService) {
-                    $cacheService->invalidate('brands.logo_variants.GET', $context->user->id, $context->user->current_team_id);
+                    $cacheService->invalidate('brands.logo_variants.GET', $context->user->id, $context->team?->id);
                 }
             } catch (\Throwable $e) {
                 // Silent fail

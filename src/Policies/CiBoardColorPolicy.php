@@ -16,13 +16,13 @@ class CiBoardColorPolicy
             return false;
         }
         
-        return $user->current_team_id === $ciBoard->team_id;
+        return $user->currentTeam?->id === $ciBoard->team_id;
     }
 
     public function create(User $user, BrandsCiBoard $ciBoard): bool
     {
         // Farben können nur erstellt werden, wenn das CI Board bearbeitet werden kann
-        return $user->current_team_id === $ciBoard->team_id;
+        return $user->currentTeam?->id === $ciBoard->team_id;
     }
 
     public function update(User $user, BrandsCiBoardColor $color): bool
@@ -33,7 +33,7 @@ class CiBoardColorPolicy
             return false;
         }
         
-        return $user->current_team_id === $ciBoard->team_id;
+        return $user->currentTeam?->id === $ciBoard->team_id;
     }
 
     public function delete(User $user, BrandsCiBoardColor $color): bool
@@ -44,6 +44,6 @@ class CiBoardColorPolicy
             return false;
         }
         
-        return $user->current_team_id === $ciBoard->team_id;
+        return $user->currentTeam?->id === $ciBoard->team_id;
     }
 }

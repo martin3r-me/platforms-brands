@@ -15,12 +15,12 @@ class LogoVariantPolicy
             return false;
         }
 
-        return $user->current_team_id === $board->team_id;
+        return $user->currentTeam?->id === $board->team_id;
     }
 
     public function create(User $user, BrandsLogoBoard $board): bool
     {
-        return $user->current_team_id === $board->team_id;
+        return $user->currentTeam?->id === $board->team_id;
     }
 
     public function update(User $user, BrandsLogoVariant $variant): bool
@@ -30,7 +30,7 @@ class LogoVariantPolicy
             return false;
         }
 
-        return $user->current_team_id === $board->team_id;
+        return $user->currentTeam?->id === $board->team_id;
     }
 
     public function delete(User $user, BrandsLogoVariant $variant): bool
@@ -40,6 +40,6 @@ class LogoVariantPolicy
             return false;
         }
 
-        return $user->current_team_id === $board->team_id;
+        return $user->currentTeam?->id === $board->team_id;
     }
 }

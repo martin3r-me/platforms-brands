@@ -15,12 +15,12 @@ class MoodboardImagePolicy
             return false;
         }
 
-        return $user->current_team_id === $board->team_id;
+        return $user->currentTeam?->id === $board->team_id;
     }
 
     public function create(User $user, BrandsMoodboardBoard $board): bool
     {
-        return $user->current_team_id === $board->team_id;
+        return $user->currentTeam?->id === $board->team_id;
     }
 
     public function update(User $user, BrandsMoodboardImage $image): bool
@@ -30,7 +30,7 @@ class MoodboardImagePolicy
             return false;
         }
 
-        return $user->current_team_id === $board->team_id;
+        return $user->currentTeam?->id === $board->team_id;
     }
 
     public function delete(User $user, BrandsMoodboardImage $image): bool
@@ -40,6 +40,6 @@ class MoodboardImagePolicy
             return false;
         }
 
-        return $user->current_team_id === $board->team_id;
+        return $user->currentTeam?->id === $board->team_id;
     }
 }

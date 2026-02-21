@@ -15,12 +15,12 @@ class CompetitorPolicy
             return false;
         }
 
-        return $user->current_team_id === $board->team_id;
+        return $user->currentTeam?->id === $board->team_id;
     }
 
     public function create(User $user, BrandsCompetitorBoard $board): bool
     {
-        return $user->current_team_id === $board->team_id;
+        return $user->currentTeam?->id === $board->team_id;
     }
 
     public function update(User $user, BrandsCompetitor $competitor): bool
@@ -30,7 +30,7 @@ class CompetitorPolicy
             return false;
         }
 
-        return $user->current_team_id === $board->team_id;
+        return $user->currentTeam?->id === $board->team_id;
     }
 
     public function delete(User $user, BrandsCompetitor $competitor): bool
@@ -40,6 +40,6 @@ class CompetitorPolicy
             return false;
         }
 
-        return $user->current_team_id === $board->team_id;
+        return $user->currentTeam?->id === $board->team_id;
     }
 }

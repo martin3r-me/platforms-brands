@@ -15,12 +15,12 @@ class ToneOfVoiceEntryPolicy
             return false;
         }
 
-        return $user->current_team_id === $board->team_id;
+        return $user->currentTeam?->id === $board->team_id;
     }
 
     public function create(User $user, BrandsToneOfVoiceBoard $board): bool
     {
-        return $user->current_team_id === $board->team_id;
+        return $user->currentTeam?->id === $board->team_id;
     }
 
     public function update(User $user, BrandsToneOfVoiceEntry $entry): bool
@@ -30,7 +30,7 @@ class ToneOfVoiceEntryPolicy
             return false;
         }
 
-        return $user->current_team_id === $board->team_id;
+        return $user->currentTeam?->id === $board->team_id;
     }
 
     public function delete(User $user, BrandsToneOfVoiceEntry $entry): bool
@@ -40,6 +40,6 @@ class ToneOfVoiceEntryPolicy
             return false;
         }
 
-        return $user->current_team_id === $board->team_id;
+        return $user->currentTeam?->id === $board->team_id;
     }
 }

@@ -71,7 +71,7 @@ class DeleteTypographyEntryTool implements ToolContract
             try {
                 $cacheService = app(\Platform\Core\Services\ToolCacheService::class);
                 if ($cacheService) {
-                    $cacheService->invalidate('brands.typography_entries.GET', $context->user->id, $context->user->current_team_id);
+                    $cacheService->invalidate('brands.typography_entries.GET', $context->user->id, $context->team?->id);
                 }
             } catch (\Throwable $e) {
                 // Silent fail

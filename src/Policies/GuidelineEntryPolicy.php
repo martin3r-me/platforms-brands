@@ -15,7 +15,7 @@ class GuidelineEntryPolicy
             return false;
         }
 
-        return $user->current_team_id === $board->team_id;
+        return $user->currentTeam?->id === $board->team_id;
     }
 
     public function create(User $user, BrandsGuidelineChapter $chapter): bool
@@ -25,7 +25,7 @@ class GuidelineEntryPolicy
             return false;
         }
 
-        return $user->current_team_id === $board->team_id;
+        return $user->currentTeam?->id === $board->team_id;
     }
 
     public function update(User $user, BrandsGuidelineEntry $entry): bool
@@ -35,7 +35,7 @@ class GuidelineEntryPolicy
             return false;
         }
 
-        return $user->current_team_id === $board->team_id;
+        return $user->currentTeam?->id === $board->team_id;
     }
 
     public function delete(User $user, BrandsGuidelineEntry $entry): bool
@@ -45,6 +45,6 @@ class GuidelineEntryPolicy
             return false;
         }
 
-        return $user->current_team_id === $board->team_id;
+        return $user->currentTeam?->id === $board->team_id;
     }
 }
