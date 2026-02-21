@@ -3,6 +3,7 @@
 namespace Platform\Brands\Services;
 
 use Platform\Brands\Models\BrandsSeoBoard;
+use Platform\Brands\Models\BrandsSeoKeywordPosition;
 
 class SeoAnalysisService
 {
@@ -100,6 +101,86 @@ class SeoAnalysisService
             'with_metrics' => $keywords->whereNotNull('search_volume')->count(),
             'without_metrics' => $keywords->whereNull('search_volume')->count(),
             'last_refreshed_at' => $board->last_refreshed_at?->toIso8601String(),
+        ];
+    }
+
+    /**
+     * Ranking-Trend-Analyse basierend auf Position-History.
+     * Klassifiziert Keywords als: Aufsteiger, Absteiger, Stabil, Neu eingestiegen.
+     */
+    public function getRankingTrends(BrandsSeoBoard $board, int $days = 30): array
+    {
+        $keywords = $board->keywords()->with('cluster')->get();
+        $since = now()->subDays($days);
+
+        $trends = [
+            'rising' => [],
+            'falling' => [],
+            'stable' => [],
+            'new_entries' => [],
+            'no_data' => [],
+        ];
+
+        foreach ($keywords as $keyword) {
+            $snapshots = BrandsSeoKeywordPosition::where('seo_keyword_id', $keyword->id)
+                ->where('tracked_at', '>=', $since)
+                ->orderBy('tracked_at')
+                ->get();
+
+            if ($snapshots->isEmpty()) {
+                $trends['no_data'][] = [
+                    'keyword' => $keyword->keyword,
+                    'cluster' => $keyword->cluster?->name,
+                    'current_position' => $keyword->position,
+                ];
+                continue;
+            }
+
+            $firstSnapshot = $snapshots->first();
+            $lastSnapshot = $snapshots->last();
+            $positionChange = $firstSnapshot->position - $lastSnapshot->position; // positive = aufgestiegen
+
+            $entry = [
+                'keyword' => $keyword->keyword,
+                'cluster' => $keyword->cluster?->name,
+                'current_position' => $lastSnapshot->position,
+                'start_position' => $firstSnapshot->position,
+                'position_change' => $positionChange,
+                'snapshots_count' => $snapshots->count(),
+                'best_position' => $snapshots->min('position'),
+                'worst_position' => $snapshots->max('position'),
+            ];
+
+            // Klassifizierung: Erster Snapshot hat keine previous_position = "Neu eingestiegen"
+            if ($firstSnapshot->previous_position === null && $snapshots->count() <= 2) {
+                $trends['new_entries'][] = $entry;
+            } elseif ($positionChange > 2) {
+                $trends['rising'][] = $entry;
+            } elseif ($positionChange < -2) {
+                $trends['falling'][] = $entry;
+            } else {
+                $trends['stable'][] = $entry;
+            }
+        }
+
+        // Sortieren: Aufsteiger nach größtem Anstieg, Absteiger nach größtem Verlust
+        usort($trends['rising'], fn($a, $b) => $b['position_change'] <=> $a['position_change']);
+        usort($trends['falling'], fn($a, $b) => $a['position_change'] <=> $b['position_change']);
+
+        return [
+            'period_days' => $days,
+            'since' => $since->toIso8601String(),
+            'summary' => [
+                'rising_count' => count($trends['rising']),
+                'falling_count' => count($trends['falling']),
+                'stable_count' => count($trends['stable']),
+                'new_entries_count' => count($trends['new_entries']),
+                'no_data_count' => count($trends['no_data']),
+            ],
+            'rising' => $trends['rising'],
+            'falling' => $trends['falling'],
+            'stable' => $trends['stable'],
+            'new_entries' => $trends['new_entries'],
         ];
     }
 

@@ -43,6 +43,7 @@ use Platform\Brands\Models\BrandsAsset;
 use Platform\Brands\Models\BrandsAssetVersion;
 use Platform\Brands\Models\BrandsSeoBoard;
 use Platform\Brands\Models\BrandsSeoKeyword;
+use Platform\Brands\Models\BrandsSeoKeywordPosition;
 use Platform\Integrations\Models\IntegrationsFacebookPage;
 use Platform\Integrations\Models\IntegrationsInstagramAccount;
 use Platform\Brands\Policies\BrandPolicy;
@@ -74,6 +75,7 @@ use Platform\Brands\Policies\AssetBoardPolicy;
 use Platform\Brands\Policies\AssetPolicy;
 use Platform\Brands\Policies\SeoBoardPolicy;
 use Platform\Brands\Policies\SeoKeywordPolicy;
+use Platform\Brands\Policies\SeoKeywordPositionPolicy;
 use Platform\Brands\Policies\FacebookPagePolicy;
 use Platform\Brands\Policies\InstagramAccountPolicy;
 
@@ -226,6 +228,7 @@ class BrandsServiceProvider extends ServiceProvider
             BrandsAsset::class => AssetPolicy::class,
             BrandsSeoBoard::class => SeoBoardPolicy::class,
             BrandsSeoKeyword::class => SeoKeywordPolicy::class,
+            BrandsSeoKeywordPosition::class => SeoKeywordPositionPolicy::class,
             IntegrationsFacebookPage::class => FacebookPagePolicy::class,
             IntegrationsInstagramAccount::class => InstagramAccountPolicy::class,
         ];
@@ -510,6 +513,10 @@ class BrandsServiceProvider extends ServiceProvider
             $registry->register(new \Platform\Brands\Tools\UpdateSeoKeywordTool());
             $registry->register(new \Platform\Brands\Tools\DeleteSeoKeywordTool());
             $registry->register(new \Platform\Brands\Tools\BulkCreateSeoKeywordsTool());
+
+            // SeoKeywordPosition-Tools
+            $registry->register(new \Platform\Brands\Tools\ListSeoKeywordPositionsTool());
+            $registry->register(new \Platform\Brands\Tools\CreateSeoKeywordPositionTool());
 
             // SEO Analyse & Budget-Tools
             $registry->register(new \Platform\Brands\Tools\FetchSeoKeywordMetricsTool());

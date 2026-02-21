@@ -67,13 +67,17 @@ class FetchSeoKeywordMetricsTool implements ToolContract, ToolMetadataContract
                 return ToolResult::error('BUDGET_EXCEEDED', $result['error']);
             }
 
+            $positionSnapshots = $result['position_snapshots'] ?? 0;
+
             return ToolResult::success([
                 'seo_board_id' => $seoBoard->id,
                 'seo_board_name' => $seoBoard->name,
                 'fetched' => $result['fetched'],
                 'cost_cents' => $result['cost_cents'],
+                'position_snapshots' => $positionSnapshots,
                 'message' => $result['fetched'] > 0
                     ? "{$result['fetched']} Keyword-Metriken erfolgreich aktualisiert. Kosten: {$result['cost_cents']} Cents."
+                        . ($positionSnapshots > 0 ? " {$positionSnapshots} Ranking-Position-Snapshot(s) gespeichert." : '')
                     : 'Keine Metriken abgerufen (DataForSEO nicht konfiguriert oder keine Keywords vorhanden).'
             ]);
         } catch (\Throwable $e) {

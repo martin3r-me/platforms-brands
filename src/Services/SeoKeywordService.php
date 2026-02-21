@@ -5,6 +5,7 @@ namespace Platform\Brands\Services;
 use Platform\Brands\Models\BrandsSeoBoard;
 use Platform\Brands\Models\BrandsSeoKeyword;
 use Platform\Brands\Models\BrandsSeoKeywordCluster;
+use Platform\Brands\Models\BrandsSeoKeywordPosition;
 use Platform\Core\Models\User;
 use Illuminate\Support\Collection;
 
@@ -145,16 +146,42 @@ class SeoKeywordService
         }
 
         $fetchedCount = 0;
+        $positionSnapshots = 0;
         foreach ($keywords as $keyword) {
             if (isset($metrics[$keyword->keyword])) {
                 $m = $metrics[$keyword->keyword];
+                $newPosition = $m['position'] ?? null;
+
                 $keyword->update([
                     'search_volume' => $m['search_volume'] ?? $keyword->search_volume,
                     'keyword_difficulty' => $m['keyword_difficulty'] ?? $keyword->keyword_difficulty,
                     'cpc_cents' => $m['cpc'] ?? $keyword->cpc_cents,
+                    'position' => $newPosition ?? $keyword->position,
                     'last_fetched_at' => now(),
                     'dataforseo_raw' => $m,
                 ]);
+
+                // Position-Snapshot schreiben wenn Position vorhanden
+                if ($newPosition !== null) {
+                    $lastSnapshot = BrandsSeoKeywordPosition::where('seo_keyword_id', $keyword->id)
+                        ->where('search_engine', 'google')
+                        ->where('device', 'desktop')
+                        ->orderByDesc('tracked_at')
+                        ->first();
+
+                    BrandsSeoKeywordPosition::create([
+                        'seo_keyword_id' => $keyword->id,
+                        'position' => $newPosition,
+                        'previous_position' => $lastSnapshot?->position,
+                        'serp_features' => $m['serp_features'] ?? null,
+                        'tracked_at' => now(),
+                        'search_engine' => 'google',
+                        'device' => 'desktop',
+                        'location' => $keyword->location,
+                    ]);
+                    $positionSnapshots++;
+                }
+
                 $fetchedCount++;
             }
         }
@@ -164,6 +191,6 @@ class SeoKeywordService
 
         $board->update(['last_refreshed_at' => now()]);
 
-        return ['fetched' => $fetchedCount, 'cost_cents' => $actualCost];
+        return ['fetched' => $fetchedCount, 'cost_cents' => $actualCost, 'position_snapshots' => $positionSnapshots];
     }
 }

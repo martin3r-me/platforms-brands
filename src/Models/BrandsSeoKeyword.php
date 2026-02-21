@@ -4,6 +4,7 @@ namespace Platform\Brands\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Symfony\Component\Uid\UuidV7;
 use Platform\Core\Contracts\HasDisplayName;
 
@@ -89,6 +90,11 @@ class BrandsSeoKeyword extends Model implements HasDisplayName
     public function team(): BelongsTo
     {
         return $this->belongsTo(\Platform\Core\Models\Team::class);
+    }
+
+    public function positions(): HasMany
+    {
+        return $this->hasMany(BrandsSeoKeywordPosition::class, 'seo_keyword_id')->orderByDesc('tracked_at');
     }
 
     public function getDisplayName(): ?string
