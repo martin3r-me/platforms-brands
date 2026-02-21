@@ -21,7 +21,7 @@ class CreateSeoKeywordTool implements ToolContract, ToolMetadataContract
 
     public function getDescription(): string
     {
-        return 'POST /brands/seo_boards/{seo_board_id}/keywords - Erstellt ein neues SEO Keyword. REST-Parameter: seo_board_id (required), keyword (required, string), keyword_cluster_id (optional), search_volume/keyword_difficulty/cpc_cents (optional), search_intent/keyword_type/priority (optional), content_idea/url/notes (optional).';
+        return 'POST /brands/seo_boards/{seo_board_id}/keywords - Erstellt ein neues SEO Keyword. REST-Parameter: seo_board_id (required), keyword (required, string), seo_keyword_cluster_id (optional), search_volume/keyword_difficulty/cpc_cents (optional), search_intent/keyword_type/priority (optional), content_idea/url/notes (optional).';
     }
 
     public function getSchema(): array
@@ -37,9 +37,13 @@ class CreateSeoKeywordTool implements ToolContract, ToolMetadataContract
                     'type' => 'string',
                     'description' => 'Das Keyword (ERFORDERLICH).'
                 ],
-                'keyword_cluster_id' => [
+                'seo_keyword_cluster_id' => [
                     'type' => 'integer',
                     'description' => 'Optional: ID des Keyword-Clusters.'
+                ],
+                'keyword_cluster_id' => [
+                    'type' => 'integer',
+                    'description' => 'Alias für seo_keyword_cluster_id (deprecated, nutze seo_keyword_cluster_id).'
                 ],
                 'search_volume' => [
                     'type' => 'integer',
@@ -112,8 +116,11 @@ class CreateSeoKeywordTool implements ToolContract, ToolMetadataContract
                 return ToolResult::error('VALIDATION_ERROR', 'keyword ist erforderlich.');
             }
 
-            if (!empty($arguments['keyword_cluster_id'])) {
-                $cluster = BrandsSeoKeywordCluster::find($arguments['keyword_cluster_id']);
+            // seo_keyword_cluster_id hat Vorrang, keyword_cluster_id als Fallback
+            $clusterId = $arguments['seo_keyword_cluster_id'] ?? $arguments['keyword_cluster_id'] ?? null;
+
+            if (!empty($clusterId)) {
+                $cluster = BrandsSeoKeywordCluster::find($clusterId);
                 if (!$cluster || $cluster->seo_board_id != $seoBoardId) {
                     return ToolResult::error('CLUSTER_NOT_FOUND', 'Der angegebene Cluster wurde nicht gefunden oder gehört nicht zu diesem SEO Board.');
                 }
@@ -127,7 +134,7 @@ class CreateSeoKeywordTool implements ToolContract, ToolMetadataContract
 
             $seoKeyword = BrandsSeoKeyword::create([
                 'seo_board_id' => $seoBoard->id,
-                'keyword_cluster_id' => $arguments['keyword_cluster_id'] ?? null,
+                'keyword_cluster_id' => $clusterId,
                 'keyword' => $keyword,
                 'search_volume' => $arguments['search_volume'] ?? null,
                 'keyword_difficulty' => $arguments['keyword_difficulty'] ?? null,

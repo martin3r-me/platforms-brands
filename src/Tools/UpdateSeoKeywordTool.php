@@ -21,7 +21,7 @@ class UpdateSeoKeywordTool implements ToolContract
 
     public function getDescription(): string
     {
-        return 'PUT /brands/seo_keywords/{id} - Aktualisiert ein SEO Keyword. REST-Parameter: seo_keyword_id (required, integer). keyword/keyword_cluster_id/search_volume/keyword_difficulty/cpc_cents/trend/search_intent/keyword_type/content_idea/priority/url/position/notes (optional).';
+        return 'PUT /brands/seo_keywords/{id} - Aktualisiert ein SEO Keyword. REST-Parameter: seo_keyword_id (required, integer). keyword/seo_keyword_cluster_id/search_volume/keyword_difficulty/cpc_cents/trend/search_intent/keyword_type/content_idea/priority/url/position/notes (optional).';
     }
 
     public function getSchema(): array
@@ -34,7 +34,8 @@ class UpdateSeoKeywordTool implements ToolContract
                     'description' => 'ID des Keywords (ERFORDERLICH).'
                 ],
                 'keyword' => ['type' => 'string', 'description' => 'Optional: Keyword-Text.'],
-                'keyword_cluster_id' => ['type' => 'integer', 'description' => 'Optional: Cluster-ID (null zum Entfernen).'],
+                'seo_keyword_cluster_id' => ['type' => 'integer', 'description' => 'Optional: Cluster-ID (null zum Entfernen).'],
+                'keyword_cluster_id' => ['type' => 'integer', 'description' => 'Alias für seo_keyword_cluster_id (deprecated, nutze seo_keyword_cluster_id).'],
                 'search_volume' => ['type' => 'integer', 'description' => 'Optional: Suchvolumen.'],
                 'keyword_difficulty' => ['type' => 'integer', 'description' => 'Optional: KD (0-100).'],
                 'cpc_cents' => ['type' => 'integer', 'description' => 'Optional: CPC in Cents.'],
@@ -69,6 +70,11 @@ class UpdateSeoKeywordTool implements ToolContract
                 Gate::forUser($context->user)->authorize('update', $keyword);
             } catch (AuthorizationException $e) {
                 return ToolResult::error('ACCESS_DENIED', 'Du darfst dieses Keyword nicht bearbeiten (Policy).');
+            }
+
+            // seo_keyword_cluster_id → keyword_cluster_id mapping
+            if (array_key_exists('seo_keyword_cluster_id', $arguments) && !array_key_exists('keyword_cluster_id', $arguments)) {
+                $arguments['keyword_cluster_id'] = $arguments['seo_keyword_cluster_id'];
             }
 
             $updateData = [];

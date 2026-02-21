@@ -34,7 +34,8 @@ class BulkCreateSeoKeywordsTool implements ToolContract, ToolMetadataContract
                     'description' => 'Optional: Default-Werte für alle Keywords.',
                     'properties' => [
                         'seo_board_id' => ['type' => 'integer'],
-                        'keyword_cluster_id' => ['type' => 'integer'],
+                        'seo_keyword_cluster_id' => ['type' => 'integer'],
+                        'keyword_cluster_id' => ['type' => 'integer', 'description' => 'Alias für seo_keyword_cluster_id (deprecated).'],
                         'search_intent' => ['type' => 'string'],
                         'keyword_type' => ['type' => 'string'],
                         'priority' => ['type' => 'string'],
@@ -48,7 +49,8 @@ class BulkCreateSeoKeywordsTool implements ToolContract, ToolMetadataContract
                         'properties' => [
                             'seo_board_id' => ['type' => 'integer'],
                             'keyword' => ['type' => 'string'],
-                            'keyword_cluster_id' => ['type' => 'integer'],
+                            'seo_keyword_cluster_id' => ['type' => 'integer'],
+                            'keyword_cluster_id' => ['type' => 'integer', 'description' => 'Alias für seo_keyword_cluster_id (deprecated).'],
                             'search_volume' => ['type' => 'integer'],
                             'keyword_difficulty' => ['type' => 'integer'],
                             'cpc_cents' => ['type' => 'integer'],
