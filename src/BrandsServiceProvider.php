@@ -44,6 +44,7 @@ use Platform\Brands\Models\BrandsAssetVersion;
 use Platform\Brands\Models\BrandsSeoBoard;
 use Platform\Brands\Models\BrandsSeoKeyword;
 use Platform\Brands\Models\BrandsSeoKeywordPosition;
+use Platform\Brands\Models\BrandsSeoKeywordContext;
 use Platform\Integrations\Models\IntegrationsFacebookPage;
 use Platform\Integrations\Models\IntegrationsInstagramAccount;
 use Platform\Brands\Policies\BrandPolicy;
@@ -76,6 +77,7 @@ use Platform\Brands\Policies\AssetPolicy;
 use Platform\Brands\Policies\SeoBoardPolicy;
 use Platform\Brands\Policies\SeoKeywordPolicy;
 use Platform\Brands\Policies\SeoKeywordPositionPolicy;
+use Platform\Brands\Policies\SeoKeywordContextPolicy;
 use Platform\Brands\Policies\FacebookPagePolicy;
 use Platform\Brands\Policies\InstagramAccountPolicy;
 
@@ -229,6 +231,7 @@ class BrandsServiceProvider extends ServiceProvider
             BrandsSeoBoard::class => SeoBoardPolicy::class,
             BrandsSeoKeyword::class => SeoKeywordPolicy::class,
             BrandsSeoKeywordPosition::class => SeoKeywordPositionPolicy::class,
+            BrandsSeoKeywordContext::class => SeoKeywordContextPolicy::class,
             IntegrationsFacebookPage::class => FacebookPagePolicy::class,
             IntegrationsInstagramAccount::class => InstagramAccountPolicy::class,
         ];
@@ -517,6 +520,11 @@ class BrandsServiceProvider extends ServiceProvider
             // SeoKeywordPosition-Tools
             $registry->register(new \Platform\Brands\Tools\ListSeoKeywordPositionsTool());
             $registry->register(new \Platform\Brands\Tools\CreateSeoKeywordPositionTool());
+
+            // SeoKeywordContext-Tools (Context-Links für lose Board-Kopplung)
+            $registry->register(new \Platform\Brands\Tools\ListSeoKeywordContextsTool());
+            $registry->register(new \Platform\Brands\Tools\CreateSeoKeywordContextTool());
+            $registry->register(new \Platform\Brands\Tools\DeleteSeoKeywordContextTool());
 
             // SEO Analyse & Budget-Tools
             $registry->register(new \Platform\Brands\Tools\FetchSeoKeywordMetricsTool());

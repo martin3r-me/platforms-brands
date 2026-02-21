@@ -97,6 +97,11 @@ class BrandsSeoKeyword extends Model implements HasDisplayName
         return $this->hasMany(BrandsSeoKeywordPosition::class, 'seo_keyword_id')->orderByDesc('tracked_at');
     }
 
+    public function contexts(): HasMany
+    {
+        return $this->hasMany(BrandsSeoKeywordContext::class, 'seo_keyword_id')->orderByDesc('created_at');
+    }
+
     public function getDisplayName(): ?string
     {
         return $this->keyword;
