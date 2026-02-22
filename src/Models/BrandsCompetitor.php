@@ -33,14 +33,44 @@ class BrandsCompetitor extends Model implements HasDisplayName
 
     protected $casts = [
         'uuid' => 'string',
-        'strengths' => 'array',
-        'weaknesses' => 'array',
-        'differentiation' => 'array',
         'position_x' => 'integer',
         'position_y' => 'integer',
         'is_own_brand' => 'boolean',
         'order' => 'integer',
     ];
+
+    public function getStrengthsAttribute($value): array
+    {
+        $decoded = $this->fromJson($value);
+        return is_array($decoded) ? $decoded : [];
+    }
+
+    public function getWeaknessesAttribute($value): array
+    {
+        $decoded = $this->fromJson($value);
+        return is_array($decoded) ? $decoded : [];
+    }
+
+    public function getDifferentiationAttribute($value): array
+    {
+        $decoded = $this->fromJson($value);
+        return is_array($decoded) ? $decoded : [];
+    }
+
+    public function setStrengthsAttribute($value): void
+    {
+        $this->attributes['strengths'] = is_array($value) ? $this->asJson($value) : $value;
+    }
+
+    public function setWeaknessesAttribute($value): void
+    {
+        $this->attributes['weaknesses'] = is_array($value) ? $this->asJson($value) : $value;
+    }
+
+    public function setDifferentiationAttribute($value): void
+    {
+        $this->attributes['differentiation'] = is_array($value) ? $this->asJson($value) : $value;
+    }
 
     protected static function booted(): void
     {
