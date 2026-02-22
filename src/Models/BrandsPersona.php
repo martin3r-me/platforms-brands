@@ -48,6 +48,46 @@ class BrandsPersona extends Model implements HasDisplayName
         'order' => 'integer',
     ];
 
+    /**
+     * Ensure JSON array fields always return an array, even if the stored
+     * value is a plain string or otherwise non-array after cast.
+     */
+    public function getPainPointsAttribute($value): array
+    {
+        $decoded = $this->castAttribute('pain_points', $value);
+        return is_array($decoded) ? $decoded : [];
+    }
+
+    public function getGoalsAttribute($value): array
+    {
+        $decoded = $this->castAttribute('goals', $value);
+        return is_array($decoded) ? $decoded : [];
+    }
+
+    public function getQuotesAttribute($value): array
+    {
+        $decoded = $this->castAttribute('quotes', $value);
+        return is_array($decoded) ? $decoded : [];
+    }
+
+    public function getBehaviorsAttribute($value): array
+    {
+        $decoded = $this->castAttribute('behaviors', $value);
+        return is_array($decoded) ? $decoded : [];
+    }
+
+    public function getChannelsAttribute($value): array
+    {
+        $decoded = $this->castAttribute('channels', $value);
+        return is_array($decoded) ? $decoded : [];
+    }
+
+    public function getBrandsLikedAttribute($value): array
+    {
+        $decoded = $this->castAttribute('brands_liked', $value);
+        return is_array($decoded) ? $decoded : [];
+    }
+
     public const GENDERS = [
         'female' => 'Weiblich',
         'male' => 'Männlich',

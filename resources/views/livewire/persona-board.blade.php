@@ -139,7 +139,7 @@
                                 @endif
 
                                 {{-- Pain Points --}}
-                                @if($persona->pain_points && count($persona->pain_points) > 0)
+                                @if(is_array($persona->pain_points) && count($persona->pain_points) > 0)
                                     <div>
                                         <h4 class="text-xs font-semibold uppercase tracking-wider text-red-600 mb-2 flex items-center gap-1.5">
                                             @svg('heroicon-o-exclamation-triangle', 'w-3.5 h-3.5')
@@ -160,7 +160,7 @@
                                 @endif
 
                                 {{-- Goals --}}
-                                @if($persona->goals && count($persona->goals) > 0)
+                                @if(is_array($persona->goals) && count($persona->goals) > 0)
                                     <div>
                                         <h4 class="text-xs font-semibold uppercase tracking-wider text-green-600 mb-2 flex items-center gap-1.5">
                                             @svg('heroicon-o-flag', 'w-3.5 h-3.5')
@@ -181,7 +181,7 @@
                                 @endif
 
                                 {{-- Quotes --}}
-                                @if($persona->quotes && count($persona->quotes) > 0)
+                                @if(is_array($persona->quotes) && count($persona->quotes) > 0)
                                     <div>
                                         <h4 class="text-xs font-semibold uppercase tracking-wider text-amber-600 mb-2 flex items-center gap-1.5">
                                             @svg('heroicon-o-chat-bubble-bottom-center-text', 'w-3.5 h-3.5')
@@ -194,7 +194,7 @@
                                 @endif
 
                                 {{-- Behaviors --}}
-                                @if($persona->behaviors && count($persona->behaviors) > 0)
+                                @if(is_array($persona->behaviors) && count($persona->behaviors) > 0)
                                     <div>
                                         <h4 class="text-xs font-semibold uppercase tracking-wider text-blue-600 mb-2 flex items-center gap-1.5">
                                             @svg('heroicon-o-finger-print', 'w-3.5 h-3.5')
@@ -212,7 +212,7 @@
                                 @endif
 
                                 {{-- Channels --}}
-                                @if($persona->channels && count($persona->channels) > 0)
+                                @if(is_array($persona->channels) && count($persona->channels) > 0)
                                     <div>
                                         <h4 class="text-xs font-semibold uppercase tracking-wider text-purple-600 mb-2 flex items-center gap-1.5">
                                             @svg('heroicon-o-signal', 'w-3.5 h-3.5')
