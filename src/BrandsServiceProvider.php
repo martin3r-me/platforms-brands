@@ -50,6 +50,7 @@ use Platform\Brands\Models\BrandsCta;
 use Platform\Brands\Models\BrandsCtaBoard;
 use Platform\Brands\Models\BrandsSocialPlatform;
 use Platform\Brands\Models\BrandsSocialPlatformFormat;
+use Platform\Brands\Models\BrandsSocialCardContract;
 use Platform\Integrations\Models\IntegrationsFacebookPage;
 use Platform\Integrations\Models\IntegrationsInstagramAccount;
 use Platform\Brands\Policies\BrandPolicy;
@@ -88,6 +89,7 @@ use Platform\Brands\Policies\CtaPolicy;
 use Platform\Brands\Policies\CtaBoardPolicy;
 use Platform\Brands\Policies\SocialPlatformPolicy;
 use Platform\Brands\Policies\SocialPlatformFormatPolicy;
+use Platform\Brands\Policies\SocialCardContractPolicy;
 use Platform\Brands\Policies\FacebookPagePolicy;
 use Platform\Brands\Policies\InstagramAccountPolicy;
 
@@ -124,6 +126,9 @@ class BrandsServiceProvider extends ServiceProvider
 
         // CTA Analysis Service
         $this->app->singleton(\Platform\Brands\Services\CtaAnalysisService::class);
+
+        // Meta Publishing Service
+        $this->app->singleton(\Platform\Brands\Services\MetaPublishingService::class);
     }
 
     public function boot(): void
@@ -253,6 +258,7 @@ class BrandsServiceProvider extends ServiceProvider
             BrandsCtaBoard::class => CtaBoardPolicy::class,
             BrandsSocialPlatform::class => SocialPlatformPolicy::class,
             BrandsSocialPlatformFormat::class => SocialPlatformFormatPolicy::class,
+            BrandsSocialCardContract::class => SocialCardContractPolicy::class,
             IntegrationsFacebookPage::class => FacebookPagePolicy::class,
             IntegrationsInstagramAccount::class => InstagramAccountPolicy::class,
         ];
@@ -597,6 +603,12 @@ class BrandsServiceProvider extends ServiceProvider
             $registry->register(new \Platform\Brands\Tools\CreateSocialPlatformFormatPersonaTool());
             $registry->register(new \Platform\Brands\Tools\ListSocialPlatformFormatPersonasTool());
             $registry->register(new \Platform\Brands\Tools\DeleteSocialPlatformFormatPersonaTool());
+
+            // SocialCardContract-Tools (Contract-Generierung + Publishing)
+            $registry->register(new \Platform\Brands\Tools\CreateSocialCardContractsTool());
+            $registry->register(new \Platform\Brands\Tools\ListSocialCardContractsTool());
+            $registry->register(new \Platform\Brands\Tools\UpdateSocialCardContractTool());
+            $registry->register(new \Platform\Brands\Tools\PublishSocialCardTool());
 
             // Export-Tools
             $registry->register(new \Platform\Brands\Tools\ExportBrandTool());

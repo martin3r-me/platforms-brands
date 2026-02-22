@@ -4,6 +4,7 @@ namespace Platform\Brands\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Symfony\Component\Uid\UuidV7;
 use Platform\Core\Contracts\HasDisplayName;
 
@@ -24,6 +25,9 @@ class BrandsSocialCard extends Model implements HasDisplayName
         'body_md',
         'description',
         'order',
+        'publish_at',
+        'published_at',
+        'status',
         'user_id',
         'team_id',
     ];
@@ -31,6 +35,22 @@ class BrandsSocialCard extends Model implements HasDisplayName
     protected $casts = [
         'uuid' => 'string',
         'order' => 'integer',
+        'publish_at' => 'datetime',
+        'published_at' => 'datetime',
+    ];
+
+    const STATUS_DRAFT = 'draft';
+    const STATUS_SCHEDULED = 'scheduled';
+    const STATUS_PUBLISHING = 'publishing';
+    const STATUS_PUBLISHED = 'published';
+    const STATUS_FAILED = 'failed';
+
+    const STATUSES = [
+        self::STATUS_DRAFT,
+        self::STATUS_SCHEDULED,
+        self::STATUS_PUBLISHING,
+        self::STATUS_PUBLISHED,
+        self::STATUS_FAILED,
     ];
 
     protected static function booted(): void
@@ -68,6 +88,14 @@ class BrandsSocialCard extends Model implements HasDisplayName
     public function team(): BelongsTo
     {
         return $this->belongsTo(\Platform\Core\Models\Team::class);
+    }
+
+    /**
+     * Contracts für diese Social Card (pro Platform-Format ein Contract).
+     */
+    public function contracts(): HasMany
+    {
+        return $this->hasMany(BrandsSocialCardContract::class, 'social_card_id');
     }
 
     public function getDisplayName(): ?string

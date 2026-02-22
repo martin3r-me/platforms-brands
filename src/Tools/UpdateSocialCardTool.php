@@ -9,6 +9,7 @@ use Platform\Core\Tools\Concerns\HasStandardizedWriteOperations;
 use Platform\Brands\Models\BrandsSocialCard;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Auth\Access\AuthorizationException;
+use Carbon\Carbon;
 
 /**
  * Tool zum Bearbeiten von SocialCards
@@ -24,7 +25,7 @@ class UpdateSocialCardTool implements ToolContract
 
     public function getDescription(): string
     {
-        return 'PUT /brands/social_cards/{id} - Aktualisiert eine Social Card. REST-Parameter: social_card_id (required, integer) - Social Card-ID. title (optional, string) - Titel. body_md (optional, string) - Markdown-Inhalt (Caption/Text). description (optional, string) - Beschreibung.';
+        return 'PUT /brands/social_cards/{id} - Aktualisiert eine Social Card. REST-Parameter: social_card_id (required, integer) - Social Card-ID. title (optional, string) - Titel. body_md (optional, string) - Markdown-Inhalt (Caption/Text). description (optional, string) - Beschreibung. publish_at (optional, string) - Geplanter Veröffentlichungszeitpunkt (ISO8601). status (optional, string) - Status: draft|scheduled|publishing|published|failed.';
     }
 
     public function getSchema(): array
@@ -47,6 +48,15 @@ class UpdateSocialCardTool implements ToolContract
                 'description' => [
                     'type' => 'string',
                     'description' => 'Optional: Beschreibung der Social Card.'
+                ],
+                'publish_at' => [
+                    'type' => 'string',
+                    'description' => 'Optional: Geplanter Veröffentlichungszeitpunkt im ISO8601-Format (z.B. "2025-03-01T10:00:00Z"). Setzt automatisch status auf "scheduled".'
+                ],
+                'status' => [
+                    'type' => 'string',
+                    'enum' => ['draft', 'scheduled'],
+                    'description' => 'Optional: Status der Social Card. Nur "draft" und "scheduled" können manuell gesetzt werden.'
                 ],
             ],
             'required' => ['social_card_id']
@@ -94,6 +104,25 @@ class UpdateSocialCardTool implements ToolContract
                 $updateData['description'] = $arguments['description'];
             }
 
+            if (isset($arguments['publish_at'])) {
+                try {
+                    $updateData['publish_at'] = Carbon::parse($arguments['publish_at']);
+                    // Automatisch auf scheduled setzen wenn publish_at gesetzt wird
+                    if (!isset($arguments['status'])) {
+                        $updateData['status'] = BrandsSocialCard::STATUS_SCHEDULED;
+                    }
+                } catch (\Throwable $e) {
+                    return ToolResult::error('VALIDATION_ERROR', 'Ungültiges Datum für publish_at. Bitte ISO8601-Format verwenden (z.B. "2025-03-01T10:00:00Z").');
+                }
+            }
+
+            if (isset($arguments['status'])) {
+                if (!in_array($arguments['status'], ['draft', 'scheduled'])) {
+                    return ToolResult::error('VALIDATION_ERROR', 'Status kann nur auf "draft" oder "scheduled" gesetzt werden. Andere Status werden vom System gesetzt.');
+                }
+                $updateData['status'] = $arguments['status'];
+            }
+
             // SocialCard aktualisieren
             if (!empty($updateData)) {
                 $socialCard->update($updateData);
@@ -109,6 +138,9 @@ class UpdateSocialCardTool implements ToolContract
                 'description' => $socialCard->description,
                 'social_board_id' => $socialCard->social_board_id,
                 'social_board_name' => $socialCard->socialBoard->name,
+                'status' => $socialCard->status,
+                'publish_at' => $socialCard->publish_at?->toIso8601String(),
+                'published_at' => $socialCard->published_at?->toIso8601String(),
                 'updated_at' => $socialCard->updated_at->toIso8601String(),
                 'message' => "Social Card '{$socialCard->title}' erfolgreich aktualisiert."
             ]);

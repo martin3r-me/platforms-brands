@@ -72,7 +72,7 @@ class ListSocialCardsTool implements ToolContract, ToolMetadataContract
 
             // Standard-Operationen anwenden
             $this->applyStandardFilters($query, $arguments, [
-                'title', 'description', 'created_at', 'updated_at'
+                'title', 'description', 'status', 'publish_at', 'published_at', 'created_at', 'updated_at'
             ]);
             
             // Standard-Suche anwenden
@@ -80,7 +80,7 @@ class ListSocialCardsTool implements ToolContract, ToolMetadataContract
             
             // Standard-Sortierung anwenden
             $this->applyStandardSort($query, $arguments, [
-                'title', 'created_at', 'updated_at', 'order'
+                'title', 'created_at', 'updated_at', 'order', 'status', 'publish_at'
             ], 'order', 'asc');
             
             // Standard-Pagination anwenden
@@ -107,6 +107,9 @@ class ListSocialCardsTool implements ToolContract, ToolMetadataContract
                     'social_board_name' => $socialCard->socialBoard->name,
                     'slot_id' => $socialCard->social_board_slot_id,
                     'slot_name' => $socialCard->slot->name ?? null,
+                    'status' => $socialCard->status ?? 'draft',
+                    'publish_at' => $socialCard->publish_at?->toIso8601String(),
+                    'published_at' => $socialCard->published_at?->toIso8601String(),
                     'team_id' => $socialCard->team_id,
                     'user_id' => $socialCard->user_id,
                     'created_at' => $socialCard->created_at->toIso8601String(),
