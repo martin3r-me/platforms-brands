@@ -610,6 +610,9 @@ class BrandsServiceProvider extends ServiceProvider
             $registry->register(new \Platform\Brands\Tools\UpdateSocialCardContractTool());
             $registry->register(new \Platform\Brands\Tools\PublishSocialCardTool());
 
+            // Editorial Plan (Redaktionsplan-Ansicht)
+            $registry->register(new \Platform\Brands\Tools\GetEditorialPlanTool());
+
             // Export-Tools
             $registry->register(new \Platform\Brands\Tools\ExportBrandTool());
             $registry->register(new \Platform\Brands\Tools\ExportBoardTool());

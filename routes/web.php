@@ -6,6 +6,7 @@ use Platform\Brands\Livewire\CiBoard;
 use Platform\Brands\Livewire\ContentBoard;
 use Platform\Brands\Livewire\ContentBoardBlockTextEdit;
 use Platform\Brands\Livewire\SocialBoard;
+use Platform\Brands\Livewire\EditorialPlanBoard;
 use Platform\Brands\Livewire\SocialCard;
 use Platform\Brands\Livewire\KanbanBoard;
 use Platform\Brands\Livewire\KanbanCard;
@@ -67,6 +68,10 @@ Route::get('/content-board-blocks/{brandsContentBoardBlock}/{type}', ContentBoar
 // Social Board Routes
 Route::get('/social-boards/{brandsSocialBoard}', SocialBoard::class)
     ->name('brands.social-boards.show');
+
+// Editorial Plan (Redaktionsplan) Routes
+Route::get('/social-boards/{brandsSocialBoard}/editorial-plan', EditorialPlanBoard::class)
+    ->name('brands.social-boards.editorial-plan');
 
 // Social Card Routes
 Route::get('/social-cards/{brandsSocialCard}', SocialCard::class)

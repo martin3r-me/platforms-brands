@@ -17,6 +17,10 @@
                 <div>
                     <h3 class="text-xs font-semibold uppercase tracking-wide text-[var(--ui-muted)] mb-3">Navigation</h3>
                     <div class="flex flex-col gap-2">
+                        <a href="{{ route('brands.social-boards.editorial-plan', $socialBoard) }}" class="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-[var(--ui-secondary)] hover:text-[var(--ui-primary)] transition-colors rounded-lg border border-[var(--ui-border)]/40 hover:bg-[var(--ui-muted-5)]">
+                            @svg('heroicon-o-calendar-days', 'w-4 h-4')
+                            <span>Redaktionsplan</span>
+                        </a>
                         <a href="{{ route('brands.brands.show', $socialBoard->brand) }}" class="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-[var(--ui-secondary)] hover:text-[var(--ui-primary)] transition-colors rounded-lg border border-[var(--ui-border)]/40 hover:bg-[var(--ui-muted-5)]">
                             @svg('heroicon-o-arrow-left', 'w-4 h-4')
                             <span>Zurück zur Marke</span>
