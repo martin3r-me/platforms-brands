@@ -25,6 +25,9 @@ use Platform\Brands\Livewire\FacebookPage;
 use Platform\Brands\Livewire\InstagramAccount;
 use Platform\Brands\Livewire\Export;
 use Platform\Brands\Livewire\ExportDownload;
+use Platform\Brands\Livewire\IntakeBoard as IntakeBoardComponent;
+use Platform\Brands\Livewire\IntakeBlockDefinitionIndex;
+use Platform\Brands\Livewire\IntakeSessionView;
 use Platform\Brands\Models\BrandsBrand;
 use Platform\Brands\Models\BrandsCiBoard;
 use Platform\Brands\Models\BrandsContentBoard;
@@ -148,3 +151,15 @@ Route::get('/brands/{brandsBrand}/export/download/{format}', [ExportDownload::cl
 Route::get('/export/boards/{boardType}/{boardId}/download/{format}', [ExportDownload::class, 'downloadBoard'])
     ->name('brands.export.download-board')
     ->where(['boardType' => 'ci-board|content-board|social-board|kanban-board|multi-content-board|typography-board|logo-board|tone-of-voice-board|persona-board|competitor-board|guideline-board|moodboard-board|asset-board', 'boardId' => '[0-9]+', 'format' => 'json|pdf']);
+
+// Intake Board Routes
+Route::get('/intake-boards/{brandsIntakeBoard}', IntakeBoardComponent::class)
+    ->name('brands.intake-boards.show');
+
+// Intake Block Definition Routes
+Route::get('/intake-block-definitions', IntakeBlockDefinitionIndex::class)
+    ->name('brands.intake-block-definitions.index');
+
+// Intake Session Routes
+Route::get('/intake-sessions/{brandsIntakeSession}', IntakeSessionView::class)
+    ->name('brands.intake-sessions.show');

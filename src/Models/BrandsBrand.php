@@ -195,6 +195,11 @@ class BrandsBrand extends Model implements HasTimeAncestors, HasKeyResultAncesto
         return $this->hasMany(BrandsSeoBoard::class, 'brand_id')->orderBy('order');
     }
 
+    public function intakeBoards()
+    {
+        return $this->hasMany(BrandsIntakeBoard::class, 'brand_id')->orderBy('order');
+    }
+
     /**
      * CTAs (Call-to-Actions) dieser Marke
      */

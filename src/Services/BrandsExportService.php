@@ -11,6 +11,7 @@ use Platform\Brands\Models\BrandsMultiContentBoard;
 use Platform\Brands\Models\BrandsTypographyBoard;
 use Platform\Brands\Models\BrandsToneOfVoiceBoard;
 use Platform\Brands\Models\BrandsGuidelineBoard;
+use Platform\Brands\Models\BrandsIntakeBoard;
 use Platform\Brands\Services\Export\ExportFormatInterface;
 use Platform\Brands\Services\Export\JsonExportFormat;
 use Platform\Brands\Services\Export\PdfExportFormat;
@@ -106,6 +107,8 @@ class BrandsExportService
             'toneOfVoiceBoards.entries',
             'toneOfVoiceBoards.dimensions',
             'guidelineBoards.chapters.entries',
+            'intakeBoards.boardBlocks.blockDefinition',
+            'intakeBoards.sessions',
         ]);
 
         // Extract brand-level CI settings from the first CI board (if any)
@@ -131,6 +134,7 @@ class BrandsExportService
             'typography_boards' => $brand->typographyBoards->map(fn ($b) => $this->collectTypographyBoardData($b))->toArray(),
             'tone_of_voice_boards' => $brand->toneOfVoiceBoards->map(fn ($b) => $this->collectToneOfVoiceBoardData($b))->toArray(),
             'guideline_boards' => $brand->guidelineBoards->map(fn ($b) => $this->collectGuidelineBoardData($b))->toArray(),
+            'intake_boards' => $brand->intakeBoards->map(fn ($b) => $this->collectIntakeBoardData($b))->toArray(),
         ];
     }
 
@@ -149,6 +153,7 @@ class BrandsExportService
             $board instanceof BrandsTypographyBoard => $this->collectTypographyBoardData($board),
             $board instanceof BrandsToneOfVoiceBoard => $this->collectToneOfVoiceBoardData($board),
             $board instanceof BrandsGuidelineBoard => $this->collectGuidelineBoardData($board),
+            $board instanceof BrandsIntakeBoard => $this->collectIntakeBoardData($board),
             default => throw new \InvalidArgumentException('Unbekannter Board-Typ: ' . get_class($board)),
         };
     }
@@ -417,6 +422,41 @@ class BrandsExportService
                     'order' => $entry->order,
                 ])->toArray(),
             ])->toArray(),
+            'created_at' => $board->created_at?->toIso8601String(),
+        ];
+    }
+
+    protected function collectIntakeBoardData(BrandsIntakeBoard $board): array
+    {
+        $board->loadMissing(['boardBlocks.blockDefinition', 'sessions']);
+
+        return [
+            'id' => $board->id,
+            'uuid' => $board->uuid,
+            'type' => 'intake',
+            'name' => $board->name,
+            'description' => $board->description,
+            'status' => $board->status,
+            'ai_personality' => $board->ai_personality,
+            'industry_context' => $board->industry_context,
+            'public_token' => $board->public_token,
+            'started_at' => $board->started_at?->toIso8601String(),
+            'completed_at' => $board->completed_at?->toIso8601String(),
+            'blocks' => $board->boardBlocks->sortBy('sort_order')->map(fn ($block) => [
+                'id' => $block->id,
+                'uuid' => $block->uuid,
+                'sort_order' => $block->sort_order,
+                'is_required' => $block->is_required,
+                'definition' => $block->blockDefinition ? [
+                    'id' => $block->blockDefinition->id,
+                    'name' => $block->blockDefinition->name,
+                    'block_type' => $block->blockDefinition->block_type,
+                    'description' => $block->blockDefinition->description,
+                    'ai_prompt' => $block->blockDefinition->ai_prompt,
+                ] : null,
+            ])->values()->toArray(),
+            'session_count' => $board->sessions->count(),
+            'completed_session_count' => $board->sessions->filter(fn ($s) => $s->completed_at !== null)->count(),
             'created_at' => $board->created_at?->toIso8601String(),
         ];
     }

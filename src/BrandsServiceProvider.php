@@ -92,6 +92,16 @@ use Platform\Brands\Policies\SocialPlatformFormatPolicy;
 use Platform\Brands\Policies\SocialCardContractPolicy;
 use Platform\Brands\Policies\FacebookPagePolicy;
 use Platform\Brands\Policies\InstagramAccountPolicy;
+use Platform\Brands\Policies\IntakeBoardPolicy;
+use Platform\Brands\Policies\IntakeBlockDefinitionPolicy;
+use Platform\Brands\Policies\IntakeBoardBlockPolicy;
+use Platform\Brands\Policies\IntakeSessionPolicy;
+use Platform\Brands\Policies\IntakeStepPolicy;
+use Platform\Brands\Models\BrandsIntakeBoard;
+use Platform\Brands\Models\BrandsIntakeBlockDefinition;
+use Platform\Brands\Models\BrandsIntakeBoardBlock;
+use Platform\Brands\Models\BrandsIntakeSession;
+use Platform\Brands\Models\BrandsIntakeStep;
 
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
@@ -166,6 +176,11 @@ class BrandsServiceProvider extends ServiceProvider
             // Public tracking routes (no auth, rate-limited for bot protection)
             $this->registerTrackingRoutes();
         }
+
+        // Public Routes (kein Auth, kein ModuleRouter)
+        Route::middleware(['web'])
+            ->prefix('brands')
+            ->group(__DIR__.'/../routes/public.php');
 
         // Migrations, Views, Livewire-Komponenten
         $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
@@ -261,6 +276,11 @@ class BrandsServiceProvider extends ServiceProvider
             BrandsSocialCardContract::class => SocialCardContractPolicy::class,
             IntegrationsFacebookPage::class => FacebookPagePolicy::class,
             IntegrationsInstagramAccount::class => InstagramAccountPolicy::class,
+            BrandsIntakeBoard::class => IntakeBoardPolicy::class,
+            BrandsIntakeBlockDefinition::class => IntakeBlockDefinitionPolicy::class,
+            BrandsIntakeBoardBlock::class => IntakeBoardBlockPolicy::class,
+            BrandsIntakeSession::class => IntakeSessionPolicy::class,
+            BrandsIntakeStep::class => IntakeStepPolicy::class,
         ];
 
         foreach ($policies as $model => $policy) {
@@ -616,6 +636,44 @@ class BrandsServiceProvider extends ServiceProvider
             // Export-Tools
             $registry->register(new \Platform\Brands\Tools\ExportBrandTool());
             $registry->register(new \Platform\Brands\Tools\ExportBoardTool());
+
+            // Intake Block-Definition Tools
+            $registry->register(new \Platform\Brands\Tools\CreateIntakeBlockDefinitionTool());
+            $registry->register(new \Platform\Brands\Tools\ListIntakeBlockDefinitionsTool());
+            $registry->register(new \Platform\Brands\Tools\GetIntakeBlockDefinitionTool());
+            $registry->register(new \Platform\Brands\Tools\UpdateIntakeBlockDefinitionTool());
+            $registry->register(new \Platform\Brands\Tools\DeleteIntakeBlockDefinitionTool());
+            $registry->register(new \Platform\Brands\Tools\BulkCreateIntakeBlockDefinitionsTool());
+            $registry->register(new \Platform\Brands\Tools\BulkUpdateIntakeBlockDefinitionsTool());
+            $registry->register(new \Platform\Brands\Tools\BulkDeleteIntakeBlockDefinitionsTool());
+
+            // Intake Board Tools
+            $registry->register(new \Platform\Brands\Tools\CreateIntakeBoardTool());
+            $registry->register(new \Platform\Brands\Tools\ListIntakeBoardsTool());
+            $registry->register(new \Platform\Brands\Tools\GetIntakeBoardTool());
+            $registry->register(new \Platform\Brands\Tools\UpdateIntakeBoardTool());
+            $registry->register(new \Platform\Brands\Tools\DeleteIntakeBoardTool());
+            $registry->register(new \Platform\Brands\Tools\PublishIntakeBoardTool());
+            $registry->register(new \Platform\Brands\Tools\CloseIntakeBoardTool());
+
+            // Intake Board Block Tools
+            $registry->register(new \Platform\Brands\Tools\AddIntakeBoardBlockTool());
+            $registry->register(new \Platform\Brands\Tools\ListIntakeBoardBlocksTool());
+            $registry->register(new \Platform\Brands\Tools\UpdateIntakeBoardBlockTool());
+            $registry->register(new \Platform\Brands\Tools\DeleteIntakeBoardBlockTool());
+            $registry->register(new \Platform\Brands\Tools\BulkAddIntakeBoardBlocksTool());
+            $registry->register(new \Platform\Brands\Tools\BulkUpdateIntakeBoardBlocksTool());
+            $registry->register(new \Platform\Brands\Tools\BulkRemoveIntakeBoardBlocksTool());
+
+            // Intake Session & Step Tools (Read-Only)
+            $registry->register(new \Platform\Brands\Tools\ListIntakeSessionsTool());
+            $registry->register(new \Platform\Brands\Tools\GetIntakeSessionTool());
+            $registry->register(new \Platform\Brands\Tools\ListIntakeStepsTool());
+            $registry->register(new \Platform\Brands\Tools\GetIntakeStepTool());
+
+            // Intake Overview & Export
+            $registry->register(new \Platform\Brands\Tools\IntakeOverviewTool());
+            $registry->register(new \Platform\Brands\Tools\ExportIntakeResultsTool());
         } catch (\Throwable $e) {
             // Silent fail - Tool-Registry könnte nicht verfügbar sein
         }
