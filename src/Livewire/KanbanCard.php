@@ -25,8 +25,8 @@ class KanbanCard extends Component
         $this->title = $this->card->title ?? '';
         $this->description = $this->card->description ?? '';
 
-        // Extra-Felder laden (Definitionen vom Board, Werte von der Card)
-        $this->loadExtraFieldValuesFromParent($this->card, $this->card->kanbanBoard);
+        // Extra-Felder laden (geerbte Definitionen vom Board + eigene Werte)
+        $this->loadExtraFieldValues($this->card);
     }
 
     #[On('updateKanbanCard')]
@@ -59,8 +59,8 @@ class KanbanCard extends Component
         $this->card->refresh();
         $this->title = $this->card->title ?? '';
 
-        // Extra-Felder neu laden (Definitionen vom Board)
-        $this->loadExtraFieldValuesFromParent($this->card, $this->card->kanbanBoard);
+        // Extra-Felder neu laden
+        $this->loadExtraFieldValues($this->card);
 
         // UI can show "saved"
         $this->dispatch('brands-kanban-saved', [
