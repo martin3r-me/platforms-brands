@@ -96,11 +96,6 @@ class MarkdownExportFormat implements ExportFormatInterface
             $lines[] = $this->renderBoardContent($board);
         }
 
-        // Intake Boards
-        foreach ($brandData['intake_boards'] ?? [] as $board) {
-            $lines[] = $this->renderBoardContent($board);
-        }
-
         return implode("\n", $lines);
     }
 
@@ -117,7 +112,6 @@ class MarkdownExportFormat implements ExportFormatInterface
             'social' => $this->renderSlotBoard($data, 'Social'),
             'kanban' => $this->renderSlotBoard($data, 'Kanban'),
             'guideline' => $this->renderGuidelineBoard($data),
-            'intake' => $this->renderIntakeBoard($data),
             default => '',
         };
     }
@@ -402,51 +396,6 @@ class MarkdownExportFormat implements ExportFormatInterface
                     $lines[] = '';
                 }
             }
-        }
-
-        return implode("\n", $lines);
-    }
-
-    protected function renderIntakeBoard(array $data): string
-    {
-        $lines = [];
-        $lines[] = '## Intake: ' . ($data['name'] ?? 'Intake Board');
-        $lines[] = '';
-
-        $status = $data['status'] ?? 'draft';
-        $lines[] = '- **Status:** `' . $status . '`';
-
-        if (!empty($data['ai_personality'])) {
-            $lines[] = '- **AI-Personality:** ' . $data['ai_personality'];
-        }
-        if (!empty($data['industry_context'])) {
-            $lines[] = '- **Branchenkontext:** ' . $data['industry_context'];
-        }
-
-        $lines[] = '- **Sessions:** ' . ($data['session_count'] ?? 0) . ' gesamt, ' . ($data['completed_session_count'] ?? 0) . ' abgeschlossen';
-        $lines[] = '';
-
-        if (!empty($data['description'])) {
-            $lines[] = $data['description'];
-            $lines[] = '';
-        }
-
-        if (!empty($data['blocks'])) {
-            $lines[] = '### Fragen';
-            $lines[] = '';
-            $lines[] = '| # | Name | Typ | Pflicht | Beschreibung |';
-            $lines[] = '|---|------|-----|---------|-------------|';
-
-            foreach ($data['blocks'] as $i => $block) {
-                $def = $block['definition'] ?? [];
-                $name = $def['name'] ?? '—';
-                $type = !empty($def['block_type']) ? '`' . $def['block_type'] . '`' : '—';
-                $required = ($block['is_required'] ?? false) ? 'Ja' : 'Nein';
-                $desc = !empty($def['description']) ? $this->inlineText($def['description']) : '—';
-                $lines[] = '| ' . ($i + 1) . ' | ' . $name . ' | ' . $type . ' | ' . $required . ' | ' . $desc . ' |';
-            }
-
-            $lines[] = '';
         }
 
         return implode("\n", $lines);
