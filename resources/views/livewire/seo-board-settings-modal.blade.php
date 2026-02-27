@@ -1,53 +1,151 @@
-<x-ui-modal size="md" model="modalShow" header="SEO Board-Einstellungen">
+<x-ui-modal size="lg" model="modalShow" header="SEO Board-Einstellungen">
     @if($seoBoard)
-        <x-ui-form-grid :cols="1" :gap="4">
-            {{-- SEO Board Name --}}
-            @can('update', $seoBoard)
-                <x-ui-input-text
-                    name="seoBoard.name"
-                    label="SEO Board Name"
-                    wire:model.live.debounce.500ms="seoBoard.name"
-                    placeholder="SEO Board Name eingeben..."
-                    required
-                    :errorKey="'seoBoard.name'"
-                />
-            @else
-                <div class="flex items-center justify-between text-sm p-2 rounded border border-[var(--ui-border)] bg-white">
-                    <span class="text-[var(--ui-muted)]">SEO Board Name</span>
-                    <span class="font-medium text-[var(--ui-body-color)]">{{ $seoBoard->name }}</span>
-                </div>
-            @endcan
-
-            {{-- Beschreibung --}}
-            @can('update', $seoBoard)
-                <x-ui-input-textarea
-                    name="seoBoard.description"
-                    label="Beschreibung"
-                    wire:model.live.debounce.500ms="seoBoard.description"
-                    placeholder="Beschreibung des SEO Boards eingeben..."
-                    :errorKey="'seoBoard.description'"
-                />
-            @else
-                <div class="flex items-start justify-between text-sm p-2 rounded border border-[var(--ui-border)] bg-white">
-                    <span class="text-[var(--ui-muted)] mr-3">Beschreibung</span>
-                    <span class="font-medium text-[var(--ui-body-color)] text-right">{{ $seoBoard->description ?? '–' }}</span>
-                </div>
-            @endcan
-        </x-ui-form-grid>
-
-        {{-- SEO Board löschen --}}
-        @can('delete', $seoBoard)
-            <div class="mt-4">
-                <x-ui-confirm-button action="deleteSeoBoard" text="SEO Board löschen" confirmText="Wirklich löschen?" />
+        <div class="space-y-6">
+            {{-- Allgemein --}}
+            <div>
+                <h3 class="text-xs font-semibold uppercase tracking-wide text-[var(--ui-muted)] mb-3">Allgemein</h3>
+                <x-ui-form-grid :cols="1" :gap="4">
+                    @can('update', $seoBoard)
+                        <x-ui-input-text
+                            name="seoBoard.name"
+                            label="Board Name"
+                            wire:model.live.debounce.500ms="seoBoard.name"
+                            placeholder="SEO Board Name eingeben..."
+                            required
+                            :errorKey="'seoBoard.name'"
+                        />
+                        <x-ui-input-textarea
+                            name="seoBoard.description"
+                            label="Beschreibung"
+                            wire:model.live.debounce.500ms="seoBoard.description"
+                            placeholder="Beschreibung des SEO Boards eingeben..."
+                            :errorKey="'seoBoard.description'"
+                        />
+                    @else
+                        <div class="flex items-center justify-between text-sm p-2 rounded border border-[var(--ui-border)] bg-white">
+                            <span class="text-[var(--ui-muted)]">Board Name</span>
+                            <span class="font-medium text-[var(--ui-body-color)]">{{ $seoBoard->name }}</span>
+                        </div>
+                        <div class="flex items-start justify-between text-sm p-2 rounded border border-[var(--ui-border)] bg-white">
+                            <span class="text-[var(--ui-muted)] mr-3">Beschreibung</span>
+                            <span class="font-medium text-[var(--ui-body-color)] text-right">{{ $seoBoard->description ?? '&ndash;' }}</span>
+                        </div>
+                    @endcan
+                </x-ui-form-grid>
             </div>
-        @endcan
-    @endif
 
-    <x-slot name="footer">
-        @if($seoBoard)
+            {{-- DataForSEO Konfiguration --}}
+            @can('update', $seoBoard)
+                <div>
+                    <h3 class="text-xs font-semibold uppercase tracking-wide text-[var(--ui-muted)] mb-3">
+                        @svg('heroicon-o-globe-alt', 'w-3.5 h-3.5 inline-block mr-1')
+                        DataForSEO Konfiguration
+                    </h3>
+                    <x-ui-form-grid :cols="2" :gap="4">
+                        <x-ui-input-text
+                            name="configLocationCode"
+                            label="Location Code"
+                            wire:model.live.debounce.500ms="configLocationCode"
+                            placeholder="z.B. 2276 (Deutschland)"
+                            :errorKey="'configLocationCode'"
+                        />
+                        <x-ui-input-text
+                            name="configLanguageName"
+                            label="Sprache"
+                            wire:model.live.debounce.500ms="configLanguageName"
+                            placeholder="z.B. German"
+                            :errorKey="'configLanguageName'"
+                        />
+                        <div class="col-span-2">
+                            <x-ui-input-text
+                                name="configConnectionId"
+                                label="Connection ID (optional)"
+                                wire:model.live.debounce.500ms="configConnectionId"
+                                placeholder="Standard-Connection des Teams"
+                                :errorKey="'configConnectionId'"
+                            />
+                        </div>
+                    </x-ui-form-grid>
+                    <div class="mt-2 text-[10px] text-[var(--ui-muted)] bg-[var(--ui-muted-5)] rounded p-2 border border-[var(--ui-border)]/40">
+                        <strong>Location Codes:</strong> 2276 = Deutschland, 2040 = &Ouml;sterreich, 2756 = Schweiz, 2826 = UK, 2840 = USA
+                    </div>
+                </div>
+            @endcan
+
+            {{-- Automatischer Refresh --}}
+            @can('update', $seoBoard)
+                <div>
+                    <h3 class="text-xs font-semibold uppercase tracking-wide text-[var(--ui-muted)] mb-3">
+                        @svg('heroicon-o-arrow-path', 'w-3.5 h-3.5 inline-block mr-1')
+                        Automatischer Refresh
+                    </h3>
+                    <x-ui-form-grid :cols="1" :gap="4">
+                        <x-ui-input-select
+                            name="refreshIntervalDays"
+                            label="Refresh-Intervall"
+                            :options="$refreshIntervalOptions"
+                            optionValue="value"
+                            optionLabel="label"
+                            :nullable="true"
+                            nullLabel="Deaktiviert"
+                            wire:model.live="refreshIntervalDays"
+                            :errorKey="'refreshIntervalDays'"
+                        />
+                    </x-ui-form-grid>
+                    @if($seoBoard->last_refreshed_at)
+                        <div class="mt-2 text-[10px] text-[var(--ui-muted)]">
+                            Letzter Refresh: {{ $seoBoard->last_refreshed_at->format('d.m.Y H:i') }} ({{ $seoBoard->last_refreshed_at->diffForHumans() }})
+                        </div>
+                    @endif
+                </div>
+            @endcan
+
+            {{-- Budget --}}
+            @can('update', $seoBoard)
+                <div>
+                    <h3 class="text-xs font-semibold uppercase tracking-wide text-[var(--ui-muted)] mb-3">
+                        @svg('heroicon-o-banknotes', 'w-3.5 h-3.5 inline-block mr-1')
+                        API-Budget
+                    </h3>
+                    <x-ui-form-grid :cols="2" :gap="4">
+                        <x-ui-input-text
+                            name="budgetLimitEuro"
+                            label="Budget-Limit (&euro;)"
+                            wire:model.live.debounce.500ms="budgetLimitEuro"
+                            placeholder="z.B. 10.00 (leer = unbegrenzt)"
+                            :errorKey="'budgetLimitEuro'"
+                        />
+                        <div class="flex items-end">
+                            <div class="text-sm p-2 rounded border border-[var(--ui-border)] bg-[var(--ui-muted-5)] w-full text-center">
+                                <span class="text-[var(--ui-muted)] text-xs block">Verbraucht</span>
+                                <span class="font-semibold text-[var(--ui-secondary)]">{{ number_format(($seoBoard->budget_spent_cents ?? 0) / 100, 2) }} &euro;</span>
+                            </div>
+                        </div>
+                    </x-ui-form-grid>
+                    @if($seoBoard->budget_spent_cents > 0)
+                        <div class="mt-2">
+                            <x-ui-confirm-button action="resetBudget" text="Budget zur&uuml;cksetzen" confirmText="Wirklich zur&uuml;cksetzen?" variant="secondary-outline" size="sm" />
+                        </div>
+                    @endif
+                </div>
+            @endcan
+
+            {{-- Gefahrenzone --}}
+            @can('delete', $seoBoard)
+                <div class="pt-4 border-t border-red-200">
+                    <h3 class="text-xs font-semibold uppercase tracking-wide text-red-500 mb-3">
+                        @svg('heroicon-o-exclamation-triangle', 'w-3.5 h-3.5 inline-block mr-1')
+                        Gefahrenzone
+                    </h3>
+                    <x-ui-confirm-button action="deleteSeoBoard" text="SEO Board l&ouml;schen" confirmText="Wirklich l&ouml;schen?" />
+                </div>
+            @endcan
+        </div>
+
+        <x-slot name="footer">
             @can('update', $seoBoard)
                 <x-ui-button variant="success" wire:click="save">Speichern</x-ui-button>
             @endcan
-        @endif
-    </x-slot>
+        </x-slot>
+    @endif
 </x-ui-modal>

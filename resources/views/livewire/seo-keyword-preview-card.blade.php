@@ -59,10 +59,15 @@
         : 'gray';
 @endphp
 
-<x-ui-kanban-card :title="''">
+<div class="rounded-lg shadow-sm bg-white border border-lime-200/60 mb-2 overflow-hidden">
+    {{-- Lime Accent Top Bar --}}
+    <div class="h-1 bg-gradient-to-r from-lime-400 to-lime-500"></div>
+
+    <div class="px-3 py-2.5">
     {{-- Keyword Title --}}
     <div class="mb-2.5">
         <h4 class="text-sm font-semibold text-[var(--ui-secondary)] m-0 leading-tight">
+            @svg('heroicon-o-magnifying-glass', 'w-3 h-3 inline-block text-lime-500 mr-0.5')
             {{ $keyword->keyword }}
         </h4>
     </div>
@@ -186,11 +191,12 @@
 
     {{-- Last Fetched --}}
     @if($keyword->last_fetched_at)
-        <div class="mt-1.5 pt-1.5 border-t border-[var(--ui-border)]/30">
+        <div class="mt-1.5 pt-1.5 border-t border-lime-100">
             <span class="text-[9px] text-[var(--ui-muted)]">
                 @svg('heroicon-o-clock', 'w-2.5 h-2.5 inline-block')
                 {{ $keyword->last_fetched_at->diffForHumans() }}
             </span>
         </div>
     @endif
-</x-ui-kanban-card>
+    </div>
+</div>
