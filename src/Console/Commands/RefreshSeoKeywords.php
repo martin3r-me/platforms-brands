@@ -10,7 +10,7 @@ class RefreshSeoKeywords extends Command
 {
     protected $signature = 'brands:refresh-seo-keywords';
 
-    protected $description = 'Aktualisiert SEO-Keyword-Metriken für Boards mit fälligem Refresh';
+    protected $description = 'Aktualisiert SEO-Keyword-Metriken und Rankings für Boards mit fälligem Refresh';
 
     public function handle(SeoKeywordService $keywordService): int
     {
@@ -26,20 +26,54 @@ class RefreshSeoKeywords extends Command
 
         $this->info("Aktualisiere {$boards->count()} SEO Board(s)...");
 
+        $totalMetrics = 0;
+        $totalRankings = 0;
+        $totalCost = 0;
+
         foreach ($boards as $board) {
             $this->line("  → {$board->name} (ID: {$board->id})");
 
-            $result = $keywordService->fetchMetrics($board);
+            // 1. Metriken abrufen (Search Volume, CPC etc.)
+            $metricsResult = $keywordService->fetchMetrics($board);
 
-            if (isset($result['error'])) {
-                $this->warn("    Budget-Limit erreicht: {$result['error']}");
+            if (isset($metricsResult['error'])) {
+                $this->warn("    Budget-Limit erreicht: {$metricsResult['error']}");
                 continue;
             }
 
-            $this->info("    {$result['fetched']} Keywords aktualisiert, Kosten: {$result['cost_cents']} Cents");
+            $boardMetrics = $metricsResult['fetched'];
+            $boardCost = $metricsResult['cost_cents'];
+            $totalMetrics += $boardMetrics;
+
+            $this->info("    Metriken: {$boardMetrics} Keywords aktualisiert ({$boardCost} Cents)");
+
+            // 2. Rankings abrufen (nur wenn Keywords mit target_url vorhanden)
+            $hasTargetUrls = $board->keywords()->whereNotNull('target_url')->where('target_url', '!=', '')->exists();
+
+            if ($hasTargetUrls) {
+                $rankingsResult = $keywordService->fetchRankings($board);
+
+                if (isset($rankingsResult['error'])) {
+                    $this->warn("    Rankings: Budget-Limit erreicht: {$rankingsResult['error']}");
+                } else {
+                    $boardRankings = $rankingsResult['position_snapshots'];
+                    $rankingsCost = $rankingsResult['cost_cents'];
+                    $totalRankings += $boardRankings;
+                    $boardCost += $rankingsCost;
+
+                    $this->info("    Rankings: {$rankingsResult['fetched']} Keywords geprüft, {$boardRankings} Positionen getrackt ({$rankingsCost} Cents)");
+                }
+            } else {
+                $this->line('    Rankings: Übersprungen (keine Keywords mit target_url)');
+            }
+
+            $totalCost += $boardCost;
+            $this->info("    Gesamt: {$boardCost} Cents");
         }
 
-        $this->info('Fertig.');
+        $this->newLine();
+        $this->info("Fertig. Metriken: {$totalMetrics}, Rankings: {$totalRankings}, Kosten: {$totalCost} Cents");
+
         return self::SUCCESS;
     }
 }

@@ -3,6 +3,7 @@
 namespace Platform\Brands;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\Schedule;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
@@ -92,6 +93,7 @@ use Platform\Brands\Policies\SocialPlatformFormatPolicy;
 use Platform\Brands\Policies\SocialCardContractPolicy;
 use Platform\Brands\Policies\FacebookPagePolicy;
 use Platform\Brands\Policies\InstagramAccountPolicy;
+use Platform\Brands\Observers\ContentBoardObserver;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 
@@ -182,6 +184,12 @@ class BrandsServiceProvider extends ServiceProvider
 
         // Policies registrieren
         $this->registerPolicies();
+
+        // Observers registrieren
+        BrandsContentBoard::observe(ContentBoardObserver::class);
+
+        // Scheduler registrieren
+        $this->registerSchedule();
 
         // Morph Map für Content Board Block Types registrieren
         $this->registerMorphMap();
@@ -276,6 +284,14 @@ class BrandsServiceProvider extends ServiceProvider
                 Gate::policy($model, $policy);
             }
         }
+    }
+
+    protected function registerSchedule(): void
+    {
+        Schedule::command('brands:refresh-seo-keywords')
+            ->daily()
+            ->withoutOverlapping()
+            ->runInBackground();
     }
 
     /**

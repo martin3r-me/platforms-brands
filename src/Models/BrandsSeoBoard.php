@@ -112,6 +112,10 @@ class BrandsSeoBoard extends Model implements HasDisplayName
 
     public function isRefreshDue(): bool
     {
+        if (!$this->refresh_interval_days) {
+            return false;
+        }
+
         if (!$this->last_refreshed_at) {
             return true;
         }
