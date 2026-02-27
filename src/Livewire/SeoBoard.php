@@ -127,17 +127,35 @@ class SeoBoard extends Component
                 // Traffic-Wert = Σ SV × Ø CPC
                 $trafficValue = $sumSv * $avgCpc;
 
-                // Raw Opportunity Score
-                $rawScore = $sumSv / ($weightedKd + 1);
-
                 // Coverage: % Keywords mit content_status != 'none'
                 $withContent = $keywords->filter(fn ($kw) => $kw->content_status && $kw->content_status !== 'none')->count();
                 $coverage = $count > 0 ? round(($withContent / $count) * 100) : 0;
 
-                // Rankings
+                // Rankings & Position
                 $rankingKeywords = $keywords->whereNotNull('position');
                 $rankings = $rankingKeywords->count();
                 $avgPosition = $rankings > 0 ? round($rankingKeywords->avg('position'), 1) : null;
+
+                // Position-Boost: Low-hanging fruit (11-20) bekommen Bonus
+                $positionBoost = 1.0;
+                if ($avgPosition !== null) {
+                    if ($avgPosition <= 10) {
+                        $positionBoost = 0.3;       // schon Top-10, wenig Handlungsbedarf
+                    } elseif ($avgPosition <= 20) {
+                        $positionBoost = 1.5;       // Schlagdistanz — Low-hanging fruit!
+                    } elseif ($avgPosition <= 50) {
+                        $positionBoost = 1.2;       // erreichbar
+                    } else {
+                        $positionBoost = 0.8;       // weit weg
+                    }
+                }
+
+                // Multi-dimensionaler Opportunity Score:
+                // Wert pro Schwierigkeitseinheit × Coverage-Lücke × Position-Boost
+                $coverageGap = 1 - ($coverage / 100);
+                $rawScore = ($trafficValue / max($weightedKd + 1, 1))
+                          * max($coverageGap, 0.1)  // min 0.1 damit 100% Coverage nicht auf 0 fällt
+                          * $positionBoost;
 
                 return [
                     'cluster' => $cluster,
@@ -152,6 +170,7 @@ class SeoBoard extends Component
                     'coverage' => $coverage,
                     'rankings' => $rankings,
                     'avg_position' => $avgPosition,
+                    'position_boost' => $positionBoost,
                 ];
             });
 

@@ -42,7 +42,7 @@
                         <span class="flex-shrink-0 inline-flex items-center justify-center w-6 h-6 rounded-full bg-lime-600 text-white text-[10px] font-bold">4</span>
                         <div>
                             <span class="font-semibold">Priorisieren</span>
-                            <span class="text-[var(--ui-muted)]">&mdash; Opportunity Score zeigt, welche Cluster das beste Verh&auml;ltnis aus Potenzial und Schwierigkeit haben</span>
+                            <span class="text-[var(--ui-muted)]">&mdash; multi-dimensionaler Opportunity Score bewertet kommerziellen Wert, Schwierigkeit, Content-L&uuml;cken und Ranking-N&auml;he</span>
                         </div>
                     </div>
                     <div class="flex items-start gap-3">
@@ -178,8 +178,15 @@
                         <tr class="bg-[var(--ui-muted-5)]">
                             <td class="px-3 py-2 font-semibold w-32">Opportunity Score</td>
                             <td class="px-3 py-2 text-[var(--ui-muted)]">
-                                Normalisierter Score (0&ndash;100). Formel: <code class="px-1 py-0.5 rounded bg-white border border-[var(--ui-border)]/40 text-[10px]">&Sigma;SV / (gew.KD + 1)</code> &mdash;
-                                hoher Suchvolumen bei niedriger Schwierigkeit = hoher Score. Der beste Cluster bekommt Score 100.
+                                Normalisierter Score (0&ndash;100), der vier Dimensionen kombiniert:
+                                <code class="px-1 py-0.5 rounded bg-white border border-[var(--ui-border)]/40 text-[10px]">Wert/KD &times; Coverage-L&uuml;cke &times; Pos-Boost</code>
+                                <div class="mt-1.5 space-y-1 text-[11px]">
+                                    <div>&bull; <strong>Traffic-Wert / (KD+1)</strong> &mdash; kommerzieller Wert pro Schwierigkeitseinheit</div>
+                                    <div>&bull; <strong>Coverage-L&uuml;cke</strong> &mdash; je weniger Content vorhanden, desto h&ouml;her der Score</div>
+                                    <div>&bull; <strong>Position-Boost</strong> &mdash; Low-hanging fruit (Pos 11&ndash;20) bekommen 1,5&times; Bonus,
+                                        Top-10 wird abgewertet (0,3&times;), Pos 21&ndash;50 leicht geboostet (1,2&times;)</div>
+                                </div>
+                                <div class="mt-1.5 text-[11px]">Der beste Cluster bekommt Score 100. Ein @svg('heroicon-s-bolt', 'w-3 h-3 inline-block text-amber-500') markiert Low-hanging fruit.</div>
                             </td>
                         </tr>
                         <tr>

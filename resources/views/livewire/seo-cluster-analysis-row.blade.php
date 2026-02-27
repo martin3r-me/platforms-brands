@@ -64,11 +64,14 @@
                 {{-- Metrics row --}}
                 <div class="flex items-center gap-5 flex-shrink-0">
                     {{-- Score --}}
-                    <div class="flex items-center gap-2 w-28">
+                    <div class="flex items-center gap-2 w-32" title="Opportunity Score: Wert/KD {{ "\u{00D7}" }} Coverage-L{{ "\u{00FC}" }}cke {{ "\u{00D7}" }} Pos-Boost ({{ $data['position_boost'] ?? 1.0 }}x)">
                         <div class="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
                             <div class="h-full rounded-full bg-{{ $scoreColor }}-500 transition-all" style="width: {{ $score }}%"></div>
                         </div>
                         <span class="text-xs font-bold text-{{ $scoreColor }}-700 tabular-nums w-7 text-right">{{ $score }}</span>
+                        @if(($data['position_boost'] ?? 1.0) >= 1.5)
+                            <span class="text-amber-500 flex-shrink-0" title="Low-hanging fruit: Pos 11-20">@svg('heroicon-s-bolt', 'w-3.5 h-3.5')</span>
+                        @endif
                     </div>
 
                     {{-- SV --}}
