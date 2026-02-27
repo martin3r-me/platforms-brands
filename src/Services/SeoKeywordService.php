@@ -357,13 +357,13 @@ class SeoKeywordService
     /**
      * Location und Language aus Board-Config lesen, mit Defaults.
      *
-     * @return array{locationCode: int|null, languageCode: string|null}
+     * @return array{locationCode: int|null, languageName: string|null}
      */
     protected function resolveLocationLanguage(BrandsSeoBoard $board): array
     {
         return [
             'locationCode' => $board->dataforseo_config['location_code'] ?? null,
-            'languageCode' => $board->dataforseo_config['language_code'] ?? null,
+            'languageName' => $board->dataforseo_config['language_name'] ?? null,
         ];
     }
 
