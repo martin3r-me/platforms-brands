@@ -45,6 +45,12 @@
                 <div>
                     <h3 class="text-xs font-semibold uppercase tracking-wide text-[var(--ui-muted)] mb-3">Aktionen</h3>
                     <div class="flex flex-col gap-2">
+                        <x-ui-button variant="secondary-outline" size="sm" x-data @click="$dispatch('open-modal-seo-board-info')">
+                            <span class="inline-flex items-center gap-2">
+                                @svg('heroicon-o-information-circle','w-4 h-4')
+                                <span>Info & Konzept</span>
+                            </span>
+                        </x-ui-button>
                         @can('update', $seoBoard)
                             <x-ui-button variant="secondary-outline" size="sm" x-data @click="$dispatch('open-modal-seo-board-settings', { seoBoardId: {{ $seoBoard->id }} })">
                                 <span class="inline-flex items-center gap-2">
@@ -226,6 +232,9 @@
 
     {{-- Settings Modal --}}
     <livewire:brands.seo-board-settings-modal/>
+
+    {{-- Info Modal --}}
+    <livewire:brands.seo-board-info-modal/>
 </x-ui-page>
 
 @push('styles')
