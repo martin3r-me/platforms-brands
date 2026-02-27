@@ -140,27 +140,61 @@
 
         {{-- === ANALYSIS VIEW === --}}
         @if($viewMode === 'analysis')
-            <div class="p-6 space-y-4">
+            <div class="p-4 sm:p-6">
                 @if($clusterAnalysis->count() > 0)
-                    <x-ui-table compact="true">
-                        <x-ui-table-header>
-                            <x-ui-table-header-cell compact="true" sortable="true" sortField="name" :currentSort="$sortField" :sortDirection="$sortDirection">Cluster</x-ui-table-header-cell>
-                            <x-ui-table-header-cell compact="true" sortable="true" sortField="opportunity_score" :currentSort="$sortField" :sortDirection="$sortDirection" align="center">Score</x-ui-table-header-cell>
-                            <x-ui-table-header-cell compact="true" sortable="true" sortField="sum_sv" :currentSort="$sortField" :sortDirection="$sortDirection" align="right">&Sigma; SV</x-ui-table-header-cell>
-                            <x-ui-table-header-cell compact="true" sortable="true" sortField="weighted_kd" :currentSort="$sortField" :sortDirection="$sortDirection" align="right">&empty; KD</x-ui-table-header-cell>
-                            <x-ui-table-header-cell compact="true" sortable="true" sortField="avg_cpc" :currentSort="$sortField" :sortDirection="$sortDirection" align="right">&empty; CPC</x-ui-table-header-cell>
-                            <x-ui-table-header-cell compact="true" sortable="true" sortField="traffic_value" :currentSort="$sortField" :sortDirection="$sortDirection" align="right">Wert &euro;</x-ui-table-header-cell>
-                            <x-ui-table-header-cell compact="true" sortable="true" sortField="coverage" :currentSort="$sortField" :sortDirection="$sortDirection" align="right">Coverage</x-ui-table-header-cell>
-                            <x-ui-table-header-cell compact="true" sortable="true" sortField="rankings" :currentSort="$sortField" :sortDirection="$sortDirection" align="right">Rankings</x-ui-table-header-cell>
-                            <x-ui-table-header-cell compact="true" sortable="true" sortField="avg_position" :currentSort="$sortField" :sortDirection="$sortDirection" align="right">&empty; Pos</x-ui-table-header-cell>
-                        </x-ui-table-header>
+                    {{-- Sort-Header --}}
+                    <div class="hidden lg:flex items-center gap-1 px-4 pb-3 text-[10px] font-semibold uppercase tracking-wider text-[var(--ui-muted)]">
+                        <div class="w-8"></div>
+                        <button wire:click="sortBy('name')" class="flex-1 min-w-0 flex items-center gap-1 hover:text-[var(--ui-secondary)] transition-colors">
+                            Cluster
+                            @if($sortField === 'name')
+                                @svg($sortDirection === 'asc' ? 'heroicon-o-chevron-up' : 'heroicon-o-chevron-down', 'w-3 h-3 text-lime-600')
+                            @endif
+                        </button>
+                        <button wire:click="sortBy('opportunity_score')" class="w-24 text-center flex items-center justify-center gap-1 hover:text-[var(--ui-secondary)] transition-colors">
+                            Score
+                            @if($sortField === 'opportunity_score')
+                                @svg($sortDirection === 'asc' ? 'heroicon-o-chevron-up' : 'heroicon-o-chevron-down', 'w-3 h-3 text-lime-600')
+                            @endif
+                        </button>
+                        <button wire:click="sortBy('sum_sv')" class="w-20 text-right flex items-center justify-end gap-1 hover:text-[var(--ui-secondary)] transition-colors">
+                            &Sigma; SV
+                            @if($sortField === 'sum_sv')
+                                @svg($sortDirection === 'asc' ? 'heroicon-o-chevron-up' : 'heroicon-o-chevron-down', 'w-3 h-3 text-lime-600')
+                            @endif
+                        </button>
+                        <button wire:click="sortBy('weighted_kd')" class="w-16 text-right flex items-center justify-end gap-1 hover:text-[var(--ui-secondary)] transition-colors">
+                            KD
+                            @if($sortField === 'weighted_kd')
+                                @svg($sortDirection === 'asc' ? 'heroicon-o-chevron-up' : 'heroicon-o-chevron-down', 'w-3 h-3 text-lime-600')
+                            @endif
+                        </button>
+                        <button wire:click="sortBy('traffic_value')" class="w-20 text-right flex items-center justify-end gap-1 hover:text-[var(--ui-secondary)] transition-colors">
+                            Wert
+                            @if($sortField === 'traffic_value')
+                                @svg($sortDirection === 'asc' ? 'heroicon-o-chevron-up' : 'heroicon-o-chevron-down', 'w-3 h-3 text-lime-600')
+                            @endif
+                        </button>
+                        <button wire:click="sortBy('coverage')" class="w-24 text-right flex items-center justify-end gap-1 hover:text-[var(--ui-secondary)] transition-colors">
+                            Coverage
+                            @if($sortField === 'coverage')
+                                @svg($sortDirection === 'asc' ? 'heroicon-o-chevron-up' : 'heroicon-o-chevron-down', 'w-3 h-3 text-lime-600')
+                            @endif
+                        </button>
+                        <button wire:click="sortBy('avg_position')" class="w-16 text-right flex items-center justify-end gap-1 hover:text-[var(--ui-secondary)] transition-colors">
+                            Pos
+                            @if($sortField === 'avg_position')
+                                @svg($sortDirection === 'asc' ? 'heroicon-o-chevron-up' : 'heroicon-o-chevron-down', 'w-3 h-3 text-lime-600')
+                            @endif
+                        </button>
+                    </div>
 
-                        <x-ui-table-body>
-                            @foreach($clusterAnalysis as $data)
-                                @include('brands::livewire.seo-cluster-analysis-row', ['data' => $data])
-                            @endforeach
-                        </x-ui-table-body>
-                    </x-ui-table>
+                    {{-- Cluster Cards --}}
+                    <div class="space-y-2">
+                        @foreach($clusterAnalysis as $data)
+                            @include('brands::livewire.seo-cluster-analysis-row', ['data' => $data])
+                        @endforeach
+                    </div>
                 @else
                     <div class="flex items-center justify-center py-12">
                         <div class="text-center">
