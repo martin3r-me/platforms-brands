@@ -24,6 +24,23 @@
                     </div>
                 </div>
 
+                {{-- Ansicht --}}
+                <div>
+                    <h3 class="text-xs font-semibold uppercase tracking-wide text-[var(--ui-muted)] mb-3">Ansicht</h3>
+                    <div class="flex gap-1 p-1 bg-[var(--ui-muted-5)] rounded-lg border border-[var(--ui-border)]/40">
+                        <button wire:click="switchView('analysis')"
+                                class="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md transition-all {{ $viewMode === 'analysis' ? 'bg-white text-lime-700 shadow-sm border border-lime-200' : 'text-[var(--ui-muted)] hover:text-[var(--ui-secondary)]' }}">
+                            @svg('heroicon-o-table-cells', 'w-3.5 h-3.5')
+                            Analyse
+                        </button>
+                        <button wire:click="switchView('kanban')"
+                                class="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md transition-all {{ $viewMode === 'kanban' ? 'bg-white text-lime-700 shadow-sm border border-lime-200' : 'text-[var(--ui-muted)] hover:text-[var(--ui-secondary)]' }}">
+                            @svg('heroicon-o-view-columns', 'w-3.5 h-3.5')
+                            Kanban
+                        </button>
+                    </div>
+                </div>
+
                 {{-- Aktionen --}}
                 <div>
                     <h3 class="text-xs font-semibold uppercase tracking-wide text-[var(--ui-muted)] mb-3">Aktionen</h3>
@@ -114,41 +131,81 @@
 
     {{-- Board Content --}}
     @if($clusters->count() > 0 || $unclusteredKeywords->count() > 0)
-        <div class="seo-board-kanban-container flex-1 min-w-0 min-h-0 h-full">
-            <x-ui-kanban-container>
-                {{-- Unzugeordnete Keywords --}}
-                @if($unclusteredKeywords->count() > 0)
-                    <x-ui-kanban-column title="Ohne Cluster" :scrollable="true">
-                        <x-slot name="headerActions">
-                            <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-gray-100 text-gray-600">
-                                {{ $unclusteredKeywords->count() }}
-                            </span>
-                        </x-slot>
-                        @foreach($unclusteredKeywords as $keyword)
-                            @include('brands::livewire.seo-keyword-preview-card', ['keyword' => $keyword, 'maxSearchVolume' => $maxSearchVolume])
-                        @endforeach
-                    </x-ui-kanban-column>
-                @endif
 
-                {{-- Cluster als Spalten --}}
-                @foreach($clusters as $cluster)
-                    @php $clusterColor = $cluster->color ?? 'gray'; @endphp
-                    <x-ui-kanban-column :title="$cluster->name" :scrollable="true">
-                        <x-slot name="headerActions">
-                            <div class="flex items-center gap-1.5">
-                                <span class="w-2.5 h-2.5 rounded-full bg-{{ $clusterColor }}-500"></span>
-                                <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-{{ $clusterColor }}-50 text-{{ $clusterColor }}-700">
-                                    {{ $cluster->keywords->count() }}
-                                </span>
+        {{-- === ANALYSIS VIEW === --}}
+        @if($viewMode === 'analysis')
+            <div class="p-6 space-y-4">
+                @if($clusterAnalysis->count() > 0)
+                    <x-ui-table compact="true">
+                        <x-ui-table-header>
+                            <x-ui-table-header-cell compact="true" sortable="true" sortField="name" :currentSort="$sortField" :sortDirection="$sortDirection">Cluster</x-ui-table-header-cell>
+                            <x-ui-table-header-cell compact="true" sortable="true" sortField="opportunity_score" :currentSort="$sortField" :sortDirection="$sortDirection" align="center">Score</x-ui-table-header-cell>
+                            <x-ui-table-header-cell compact="true" sortable="true" sortField="sum_sv" :currentSort="$sortField" :sortDirection="$sortDirection" align="right">&Sigma; SV</x-ui-table-header-cell>
+                            <x-ui-table-header-cell compact="true" sortable="true" sortField="weighted_kd" :currentSort="$sortField" :sortDirection="$sortDirection" align="right">&empty; KD</x-ui-table-header-cell>
+                            <x-ui-table-header-cell compact="true" sortable="true" sortField="avg_cpc" :currentSort="$sortField" :sortDirection="$sortDirection" align="right">&empty; CPC</x-ui-table-header-cell>
+                            <x-ui-table-header-cell compact="true" sortable="true" sortField="traffic_value" :currentSort="$sortField" :sortDirection="$sortDirection" align="right">Wert &euro;</x-ui-table-header-cell>
+                            <x-ui-table-header-cell compact="true" sortable="true" sortField="coverage" :currentSort="$sortField" :sortDirection="$sortDirection" align="right">Coverage</x-ui-table-header-cell>
+                            <x-ui-table-header-cell compact="true" sortable="true" sortField="rankings" :currentSort="$sortField" :sortDirection="$sortDirection" align="right">Rankings</x-ui-table-header-cell>
+                            <x-ui-table-header-cell compact="true" sortable="true" sortField="avg_position" :currentSort="$sortField" :sortDirection="$sortDirection" align="right">&empty; Pos</x-ui-table-header-cell>
+                        </x-ui-table-header>
+
+                        <x-ui-table-body>
+                            @foreach($clusterAnalysis as $data)
+                                @include('brands::livewire.seo-cluster-analysis-row', ['data' => $data])
+                            @endforeach
+                        </x-ui-table-body>
+                    </x-ui-table>
+                @else
+                    <div class="flex items-center justify-center py-12">
+                        <div class="text-center">
+                            <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-lime-50 mb-3">
+                                @svg('heroicon-o-table-cells', 'w-6 h-6 text-lime-600')
                             </div>
-                        </x-slot>
-                        @foreach($cluster->keywords as $keyword)
-                            @include('brands::livewire.seo-keyword-preview-card', ['keyword' => $keyword, 'maxSearchVolume' => $maxSearchVolume])
-                        @endforeach
-                    </x-ui-kanban-column>
-                @endforeach
-            </x-ui-kanban-container>
-        </div>
+                            <p class="text-sm text-[var(--ui-muted)]">Erstelle Cluster, um die Analyse-Ansicht zu nutzen.</p>
+                        </div>
+                    </div>
+                @endif
+            </div>
+
+        {{-- === KANBAN VIEW === --}}
+        @else
+            <div class="seo-board-kanban-container flex-1 min-w-0 min-h-0 h-full">
+                <x-ui-kanban-container>
+                    {{-- Unzugeordnete Keywords --}}
+                    @if($unclusteredKeywords->count() > 0)
+                        <x-ui-kanban-column title="Ohne Cluster" :scrollable="true">
+                            <x-slot name="headerActions">
+                                <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-gray-100 text-gray-600">
+                                    {{ $unclusteredKeywords->count() }}
+                                </span>
+                            </x-slot>
+                            @foreach($unclusteredKeywords as $keyword)
+                                @include('brands::livewire.seo-keyword-preview-card', ['keyword' => $keyword, 'maxSearchVolume' => $maxSearchVolume])
+                            @endforeach
+                        </x-ui-kanban-column>
+                    @endif
+
+                    {{-- Cluster als Spalten --}}
+                    @foreach($clusters as $cluster)
+                        @php $clusterColor = $cluster->color ?? 'gray'; @endphp
+                        <x-ui-kanban-column :title="$cluster->name" :scrollable="true">
+                            <x-slot name="headerActions">
+                                <div class="flex items-center gap-1.5">
+                                    <span class="w-2.5 h-2.5 rounded-full bg-{{ $clusterColor }}-500"></span>
+                                    <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-{{ $clusterColor }}-50 text-{{ $clusterColor }}-700">
+                                        {{ $cluster->keywords->count() }}
+                                    </span>
+                                </div>
+                            </x-slot>
+                            @foreach($cluster->keywords as $keyword)
+                                @include('brands::livewire.seo-keyword-preview-card', ['keyword' => $keyword, 'maxSearchVolume' => $maxSearchVolume])
+                            @endforeach
+                        </x-ui-kanban-column>
+                    @endforeach
+                </x-ui-kanban-container>
+            </div>
+        @endif
+
     @else
         <div class="flex items-center justify-center h-full">
             <div class="bg-white rounded-xl border border-[var(--ui-border)]/60 shadow-sm p-12 text-center max-w-md">
