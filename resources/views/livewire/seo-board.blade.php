@@ -114,7 +114,7 @@
 
     {{-- Board Content --}}
     @if($clusters->count() > 0 || $unclusteredKeywords->count() > 0)
-        <div class="seo-board-kanban-container">
+        <div class="seo-board-kanban-container flex-1 min-w-0 min-h-0 h-full">
             <x-ui-kanban-container>
                 {{-- Unzugeordnete Keywords --}}
                 @if($unclusteredKeywords->count() > 0)
