@@ -20,12 +20,12 @@ class CurateSeoKeywordsTool implements ToolContract, ToolMetadataContract
 
     public function getDescription(): string
     {
-        return 'POST /brands/seo_boards/{seo_board_id}/keywords/curate - Bereinigt Keywords eines SEO Boards regelbasiert. '
-            . 'Entfernt automatisch: Competitor-Markennamen, Job/Karriere-Keywords, Personen-Namen, lokale Suchen (Stadt+Dienstleister), '
-            . 'Vermittlungs-Intent (finden/suchen/buchen — User sucht Dienstleister, nicht Software). '
-            . 'WICHTIG: Standardmäßig dry_run=true — zeigt nur was entfernt würde. Mit dry_run=false werden Keywords tatsächlich gelöscht. '
-            . 'Nutze custom_exclude für branchen-spezifische Ausschlüsse (z.B. ["sql", "excel"] wenn irrelevant). '
-            . 'Nutze custom_include um bestimmte Keywords vor dem Löschen zu schützen.';
+        return 'POST /brands/seo_boards/{seo_board_id}/keywords/curate - Bereinigt Keywords eines SEO Boards. '
+            . 'Zwei Stufen: 1) BLACKLIST (Competitor-Marken, Jobs, Personen, lokale Suchen, Vermittlungs-Intent, Navigational) '
+            . '2) WHITELIST via relevance_topics — Keywords die keinem Thema zugeordnet werden können, fliegen raus. '
+            . 'WICHTIG: Nutze relevance_topics mit den Kernthemen der Brand (z.B. ["arbeitsmedizin", "vorsorge", "software", "betriebsarzt"]). '
+            . 'Keywords die keinem Topic matchen UND KD=0 haben, sind fast immer Arzt-/Klinik-/Personensuchen. '
+            . 'Standardmäßig dry_run=true — zeigt nur was entfernt würde.';
     }
 
     public function getSchema(): array
@@ -40,6 +40,13 @@ class CurateSeoKeywordsTool implements ToolContract, ToolMetadataContract
                 'dry_run' => [
                     'type' => 'boolean',
                     'description' => 'Wenn true (Standard): zeigt nur was entfernt würde. Wenn false: löscht Keywords tatsächlich.',
+                ],
+                'relevance_topics' => [
+                    'type' => 'array',
+                    'items' => ['type' => 'string'],
+                    'description' => 'KERNFEATURE: Liste von Themen-Keywords für die Brand. Nur Keywords die mindestens einem Topic entsprechen (Substring-Match) werden behalten. '
+                        . 'Beispiel für Arbeitsmedizin-Software: ["arbeitsmedizin", "betriebsarzt", "vorsorge", "dguv", "software", "praxis", "bgm", "bem", "arbeitsschutz", "untersuchung", "eignungs"]. '
+                        . 'Wenn leer, wird kein Relevanz-Filter angewendet (nur Blacklist-Regeln).',
                 ],
                 'exclude_competitor_brands' => [
                     'type' => 'boolean',
@@ -59,8 +66,12 @@ class CurateSeoKeywordsTool implements ToolContract, ToolMetadataContract
                 ],
                 'exclude_brokers' => [
                     'type' => 'boolean',
-                    'description' => 'Vermittlungs-Intent filtern: "finden", "suchen", "vermittlung", "buchen", "termin" (Standard: true). '
-                        . 'Für Software-Unternehmen: User die Dienstleister suchen sind keine Zielgruppe.',
+                    'description' => 'Vermittlungs-Intent filtern: "finden", "suchen", "vermittlung", "buchen" als ganze Wörter (Standard: true). '
+                        . 'Word-Boundary-Match: "betriebsarzt finden" matcht, "gefahrstoffverzeichnis" nicht.',
+                ],
+                'exclude_navigational' => [
+                    'type' => 'boolean',
+                    'description' => 'Patienten-/Navigational-Suchen filtern: "arztpraxis", "klinik", "hautarzt", "zahnarzt", "online termin" etc. (Standard: true).',
                 ],
                 'min_search_volume' => [
                     'type' => 'integer',
@@ -69,12 +80,12 @@ class CurateSeoKeywordsTool implements ToolContract, ToolMetadataContract
                 'custom_exclude' => [
                     'type' => 'array',
                     'items' => ['type' => 'string'],
-                    'description' => 'Zusätzliche Ausschluss-Patterns (Teilwort-Match). Z.B. ["sql", "excel", "tomedo"].',
+                    'description' => 'Zusätzliche Ausschluss-Patterns (Teilwort-Match). Z.B. ["sql", "excel", "icd"].',
                 ],
                 'custom_include' => [
                     'type' => 'array',
                     'items' => ['type' => 'string'],
-                    'description' => 'Schutz-Liste: Diese Keywords werden NIE entfernt, auch wenn eine Regel greift. Exakter Match (case-insensitive).',
+                    'description' => 'Schutz-Liste: Diese Keywords werden NIE entfernt. Exakter Match (case-insensitive).',
                 ],
             ],
             'required' => ['seo_board_id'],
@@ -112,9 +123,11 @@ class CurateSeoKeywordsTool implements ToolContract, ToolMetadataContract
                 'exclude_persons' => $arguments['exclude_persons'] ?? true,
                 'exclude_locations' => $arguments['exclude_locations'] ?? true,
                 'exclude_brokers' => $arguments['exclude_brokers'] ?? true,
+                'exclude_navigational' => $arguments['exclude_navigational'] ?? true,
                 'min_search_volume' => $arguments['min_search_volume'] ?? 0,
                 'custom_exclude' => $arguments['custom_exclude'] ?? [],
                 'custom_include' => $arguments['custom_include'] ?? [],
+                'relevance_topics' => $arguments['relevance_topics'] ?? [],
                 'dry_run' => $arguments['dry_run'] ?? true,
             ]);
 
@@ -128,7 +141,7 @@ class CurateSeoKeywordsTool implements ToolContract, ToolMetadataContract
     {
         return [
             'category' => 'action',
-            'tags' => ['brands', 'seo_keyword', 'curate', 'cleanup', 'filter'],
+            'tags' => ['brands', 'seo_keyword', 'curate', 'cleanup', 'filter', 'relevance'],
             'read_only' => false,
             'requires_auth' => true,
             'requires_team' => false,
