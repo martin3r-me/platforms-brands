@@ -29,7 +29,7 @@
                     <h3 class="text-xs font-semibold uppercase tracking-wide text-[var(--ui-muted)] mb-3">Aktionen</h3>
                     <div class="flex flex-col gap-2">
                         @can('update', $seoBoard)
-                            <x-ui-button variant="secondary-outline" size="sm" x-data @click="Livewire.dispatch('open-modal-seo-board-settings', { seoBoardId: {{ $seoBoard->id }} })">
+                            <x-ui-button variant="secondary-outline" size="sm" x-data @click="$dispatch('open-modal-seo-board-settings', { seoBoardId: {{ $seoBoard->id }} })">
                                 <span class="inline-flex items-center gap-2">
                                     @svg('heroicon-o-cog-6-tooth','w-4 h-4')
                                     <span>Einstellungen</span>
@@ -114,8 +114,8 @@
 
     {{-- Board Content --}}
     @if($clusters->count() > 0 || $unclusteredKeywords->count() > 0)
-        <div class="flex-grow overflow-x-auto">
-            <x-ui-kanban-board>
+        <div class="seo-board-kanban-container">
+            <x-ui-kanban-container>
                 {{-- Unzugeordnete Keywords --}}
                 @if($unclusteredKeywords->count() > 0)
                     <x-ui-kanban-column title="Ohne Cluster" :scrollable="true">
@@ -147,7 +147,7 @@
                         @endforeach
                     </x-ui-kanban-column>
                 @endforeach
-            </x-ui-kanban-board>
+            </x-ui-kanban-container>
         </div>
     @else
         <div class="flex items-center justify-center h-full">
@@ -170,3 +170,20 @@
     {{-- Settings Modal --}}
     <livewire:brands.seo-board-settings-modal/>
 </x-ui-page>
+
+@push('styles')
+<style>
+    /* Toggle-Button im SEO Board verstecken */
+    .seo-board-kanban-container .absolute.bottom-6 {
+        display: none !important;
+    }
+    /* SEO Keyword Cards: lime accent */
+    .seo-board-kanban-container .seo-keyword-card {
+        border-left: 3px solid rgb(132 204 22); /* lime-500 */
+        background: white;
+    }
+    .seo-board-kanban-container .seo-keyword-card:hover {
+        background: rgb(247 254 231) !important; /* lime-50 */
+    }
+</style>
+@endpush
