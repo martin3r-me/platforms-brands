@@ -53,6 +53,15 @@ class UpdateSeoBoardTool implements ToolContract
                     'type' => 'integer',
                     'description' => 'Optional: Refresh-Intervall in Tagen.'
                 ],
+                'dataforseo_config' => [
+                    'type' => 'object',
+                    'description' => 'Optional: DataForSEO-Konfiguration. Enthält connection_id (integer), location_code (integer, z.B. 2276), language_code (integer, z.B. 1001).',
+                    'properties' => [
+                        'connection_id' => ['type' => 'integer', 'description' => 'ID der DataForSEO IntegrationConnection.'],
+                        'location_code' => ['type' => 'integer', 'description' => 'Location Code (z.B. 2276 = Germany).'],
+                        'language_code' => ['type' => 'integer', 'description' => 'Language Code (z.B. 1001 = German).'],
+                    ],
+                ],
             ],
             'required' => ['seo_board_id']
         ];
@@ -80,7 +89,7 @@ class UpdateSeoBoardTool implements ToolContract
 
             $updateData = [];
 
-            foreach (['name', 'description', 'budget_limit_cents', 'refresh_interval_days'] as $field) {
+            foreach (['name', 'description', 'budget_limit_cents', 'refresh_interval_days', 'dataforseo_config'] as $field) {
                 if (isset($arguments[$field])) {
                     $updateData[$field] = $arguments[$field];
                 }

@@ -7,12 +7,13 @@ use Platform\Brands\Models\BrandsSeoKeyword;
 use Platform\Brands\Models\BrandsSeoKeywordCluster;
 use Platform\Brands\Models\BrandsSeoKeywordPosition;
 use Platform\Core\Models\User;
+use Platform\Integrations\Services\DataForSeoApiService;
 use Illuminate\Support\Collection;
 
 class SeoKeywordService
 {
     public function __construct(
-        protected DataForSeoClientService $dataForSeoClient,
+        protected DataForSeoApiService $dataForSeoApi,
         protected SeoBudgetGuardService $budgetGuard,
     ) {}
 
@@ -132,65 +133,250 @@ class SeoKeywordService
             return ['fetched' => 0, 'cost_cents' => 0];
         }
 
+        $user = $this->resolveUser($board, $user);
         $keywordTexts = $keywords->pluck('keyword')->toArray();
-        $estimatedCost = $this->dataForSeoClient->estimateCost(count($keywordTexts));
+        $estimatedCost = $this->estimateCost('search_volume', count($keywordTexts));
 
         if (!$this->budgetGuard->canFetch($board, $estimatedCost)) {
             return ['fetched' => 0, 'cost_cents' => 0, 'error' => 'Budget limit exceeded'];
         }
 
-        $metrics = $this->dataForSeoClient->fetchKeywordMetrics($keywordTexts);
+        $api = $this->resolveApiService($board);
+        $volumeResults = $api->getSearchVolume($user, $keywordTexts, ...array_values($this->resolveLocationLanguage($board)));
 
-        if (empty($metrics)) {
+        if (empty($volumeResults)) {
             return ['fetched' => 0, 'cost_cents' => 0];
+        }
+
+        // Index nach Keyword für schnelles Lookup
+        $metricsMap = [];
+        foreach ($volumeResults as $result) {
+            $metricsMap[$result->keyword] = $result;
         }
 
         $fetchedCount = 0;
         $positionSnapshots = 0;
         foreach ($keywords as $keyword) {
-            if (isset($metrics[$keyword->keyword])) {
-                $m = $metrics[$keyword->keyword];
-                $newPosition = $m['position'] ?? null;
+            if (isset($metricsMap[$keyword->keyword])) {
+                $m = $metricsMap[$keyword->keyword];
 
                 $keyword->update([
-                    'search_volume' => $m['search_volume'] ?? $keyword->search_volume,
-                    'keyword_difficulty' => $m['keyword_difficulty'] ?? $keyword->keyword_difficulty,
-                    'cpc_cents' => $m['cpc'] ?? $keyword->cpc_cents,
-                    'position' => $newPosition ?? $keyword->position,
+                    'search_volume' => $m->searchVolume ?? $keyword->search_volume,
+                    'keyword_difficulty' => $keyword->keyword_difficulty, // Not in search_volume endpoint
+                    'cpc_cents' => $m->cpcHigh !== null ? (int) round($m->cpcHigh * 100) : $keyword->cpc_cents,
                     'last_fetched_at' => now(),
-                    'dataforseo_raw' => $m,
+                    'dataforseo_raw' => $m->toArray(),
                 ]);
-
-                // Position-Snapshot schreiben wenn Position vorhanden
-                if ($newPosition !== null) {
-                    $lastSnapshot = BrandsSeoKeywordPosition::where('seo_keyword_id', $keyword->id)
-                        ->where('search_engine', 'google')
-                        ->where('device', 'desktop')
-                        ->orderByDesc('tracked_at')
-                        ->first();
-
-                    BrandsSeoKeywordPosition::create([
-                        'seo_keyword_id' => $keyword->id,
-                        'position' => $newPosition,
-                        'previous_position' => $lastSnapshot?->position,
-                        'serp_features' => $m['serp_features'] ?? null,
-                        'tracked_at' => now(),
-                        'search_engine' => 'google',
-                        'device' => 'desktop',
-                        'location' => $keyword->location,
-                    ]);
-                    $positionSnapshots++;
-                }
 
                 $fetchedCount++;
             }
         }
 
-        $actualCost = $this->dataForSeoClient->estimateCost($fetchedCount);
+        $actualCost = $this->estimateCost('search_volume', $fetchedCount);
         $this->budgetGuard->recordCost($board, 'fetch_metrics', $fetchedCount, $actualCost, $user);
 
         $board->update(['last_refreshed_at' => now()]);
 
         return ['fetched' => $fetchedCount, 'cost_cents' => $actualCost, 'position_snapshots' => $positionSnapshots];
+    }
+
+    /**
+     * SERP-Rankings für alle Keywords eines Boards abrufen und Position-Snapshots erstellen.
+     */
+    public function fetchRankings(BrandsSeoBoard $board, ?User $user = null): array
+    {
+        $keywords = $board->keywords;
+
+        if ($keywords->isEmpty()) {
+            return ['fetched' => 0, 'cost_cents' => 0, 'position_snapshots' => 0];
+        }
+
+        $user = $this->resolveUser($board, $user);
+        $estimatedCost = $this->estimateCost('serp', $keywords->count());
+
+        if (!$this->budgetGuard->canFetch($board, $estimatedCost)) {
+            return ['fetched' => 0, 'cost_cents' => 0, 'position_snapshots' => 0, 'error' => 'Budget limit exceeded'];
+        }
+
+        $api = $this->resolveApiService($board);
+        [$locationCode, $languageCode] = array_values($this->resolveLocationLanguage($board));
+
+        $fetchedCount = 0;
+        $positionSnapshots = 0;
+        $competitorEntries = [];
+
+        foreach ($keywords as $keyword) {
+            $serpResults = $api->getSerpOrganic($user, $keyword->keyword, $locationCode, $languageCode);
+
+            if (empty($serpResults)) {
+                continue;
+            }
+
+            // Eigene Position finden (falls target_url gesetzt)
+            $ownPosition = null;
+            $serpFeatures = [];
+            foreach ($serpResults as $serpResult) {
+                $serpFeatures[] = $serpResult->domain;
+                if ($keyword->target_url && str_contains($serpResult->url ?? '', parse_url($keyword->target_url, PHP_URL_HOST) ?? '')) {
+                    $ownPosition = $serpResult->position;
+                }
+            }
+
+            if ($ownPosition !== null) {
+                $lastSnapshot = BrandsSeoKeywordPosition::where('seo_keyword_id', $keyword->id)
+                    ->where('search_engine', 'google')
+                    ->where('device', 'desktop')
+                    ->orderByDesc('tracked_at')
+                    ->first();
+
+                BrandsSeoKeywordPosition::create([
+                    'seo_keyword_id' => $keyword->id,
+                    'position' => $ownPosition,
+                    'previous_position' => $lastSnapshot?->position,
+                    'serp_features' => array_unique(array_slice($serpFeatures, 0, 10)),
+                    'tracked_at' => now(),
+                    'search_engine' => 'google',
+                    'device' => 'desktop',
+                    'location' => $keyword->location,
+                ]);
+                $positionSnapshots++;
+
+                $keyword->update(['position' => $ownPosition]);
+            }
+
+            // Top-Competitor-Domains extrahieren
+            foreach (array_slice($serpResults, 0, 10) as $serpResult) {
+                if ($serpResult->domain) {
+                    $competitorEntries[$serpResult->domain] = ($competitorEntries[$serpResult->domain] ?? 0) + 1;
+                }
+            }
+
+            $fetchedCount++;
+        }
+
+        $actualCost = $this->estimateCost('serp', $fetchedCount);
+        $this->budgetGuard->recordCost($board, 'fetch_rankings', $fetchedCount, $actualCost, $user);
+
+        $board->update(['last_refreshed_at' => now()]);
+
+        return [
+            'fetched' => $fetchedCount,
+            'cost_cents' => $actualCost,
+            'position_snapshots' => $positionSnapshots,
+            'top_competitors' => collect($competitorEntries)
+                ->sortDesc()
+                ->take(20)
+                ->map(fn($count, $domain) => ['domain' => $domain, 'keyword_overlaps' => $count])
+                ->values()
+                ->toArray(),
+        ];
+    }
+
+    /**
+     * Keyword-Vorschläge über Labs API abrufen.
+     *
+     * @return array{keywords: array, cost_cents: int}
+     */
+    public function discoverKeywords(BrandsSeoBoard $board, array $seedKeywords, ?User $user = null, int $limit = 100): array
+    {
+        if (empty($seedKeywords)) {
+            return ['keywords' => [], 'cost_cents' => 0];
+        }
+
+        $user = $this->resolveUser($board, $user);
+        $estimatedCost = $this->estimateCost('labs_suggestions', 1);
+
+        if (!$this->budgetGuard->canFetch($board, $estimatedCost)) {
+            return ['keywords' => [], 'cost_cents' => 0, 'error' => 'Budget limit exceeded'];
+        }
+
+        $api = $this->resolveApiService($board);
+        [$locationCode, $languageCode] = array_values($this->resolveLocationLanguage($board));
+
+        $labsResults = $api->getLabsKeywordSuggestions($user, $seedKeywords, $locationCode, $languageCode, $limit);
+
+        $keywords = array_map(fn($r) => $r->toArray(), $labsResults);
+
+        $actualCost = $this->estimateCost('labs_suggestions', 1);
+        $this->budgetGuard->recordCost($board, 'discover_keywords', count($keywords), $actualCost, $user);
+
+        return ['keywords' => $keywords, 'cost_cents' => $actualCost];
+    }
+
+    /**
+     * Keywords entdecken, für die eine Domain rankt.
+     *
+     * @return array{keywords: array, cost_cents: int}
+     */
+    public function discoverFromDomain(BrandsSeoBoard $board, string $domain, ?User $user = null, int $limit = 100): array
+    {
+        $user = $this->resolveUser($board, $user);
+        $estimatedCost = $this->estimateCost('labs_ranked', 1);
+
+        if (!$this->budgetGuard->canFetch($board, $estimatedCost)) {
+            return ['keywords' => [], 'cost_cents' => 0, 'error' => 'Budget limit exceeded'];
+        }
+
+        $api = $this->resolveApiService($board);
+        [$locationCode, $languageCode] = array_values($this->resolveLocationLanguage($board));
+
+        $rankedResults = $api->getRankedKeywords($user, $domain, $locationCode, $languageCode, $limit);
+
+        $keywords = array_map(fn($r) => $r->toArray(), $rankedResults);
+
+        $actualCost = $this->estimateCost('labs_ranked', 1);
+        $this->budgetGuard->recordCost($board, 'discover_from_domain', count($keywords), $actualCost, $user);
+
+        return ['keywords' => $keywords, 'cost_cents' => $actualCost];
+    }
+
+    // =========================================================================
+    // HELPERS
+    // =========================================================================
+
+    protected function resolveUser(BrandsSeoBoard $board, ?User $user): User
+    {
+        return $user ?? $board->user;
+    }
+
+    protected function resolveConnectionId(BrandsSeoBoard $board): ?int
+    {
+        return $board->dataforseo_config['connection_id'] ?? null;
+    }
+
+    /**
+     * Gibt den DataForSeoApiService zurück, ggf. mit spezifischer Connection.
+     */
+    protected function resolveApiService(BrandsSeoBoard $board): DataForSeoApiService
+    {
+        $connectionId = $this->resolveConnectionId($board);
+
+        return $this->dataForSeoApi->forConnection($connectionId);
+    }
+
+    /**
+     * Location und Language aus Board-Config lesen, mit Defaults.
+     *
+     * @return array{locationCode: int|null, languageCode: int|null}
+     */
+    protected function resolveLocationLanguage(BrandsSeoBoard $board): array
+    {
+        return [
+            'locationCode' => $board->dataforseo_config['location_code'] ?? null,
+            'languageCode' => $board->dataforseo_config['language_code'] ?? null,
+        ];
+    }
+
+    protected function estimateCost(string $action, int $count): int
+    {
+        return match ($action) {
+            'search_volume' => (int) ceil($count * 5),   // ~$0.05/keyword
+            'serp' => (int) ceil($count * 10),            // ~$0.10/keyword
+            'labs_suggestions' => (int) ceil($count * 8), // ~$0.08/request
+            'labs_ranked' => (int) ceil($count * 10),     // ~$0.10/request
+            'competitors' => (int) ceil($count * 10),     // ~$0.10/request
+            'on_page' => (int) ceil($count * 15),         // ~$0.15/page
+            default => (int) ceil($count * 5),
+        };
     }
 }

@@ -118,9 +118,13 @@ class BrandsServiceProvider extends ServiceProvider
 
         // SEO Services als Singletons registrieren
         $this->app->singleton(\Platform\Brands\Services\SeoBudgetGuardService::class);
-        $this->app->singleton(\Platform\Brands\Services\DataForSeoClientService::class);
         $this->app->singleton(\Platform\Brands\Services\SeoBoardService::class);
-        $this->app->singleton(\Platform\Brands\Services\SeoKeywordService::class);
+        $this->app->singleton(\Platform\Brands\Services\SeoKeywordService::class, function ($app) {
+            return new \Platform\Brands\Services\SeoKeywordService(
+                $app->make(\Platform\Integrations\Services\DataForSeoApiService::class),
+                $app->make(\Platform\Brands\Services\SeoBudgetGuardService::class),
+            );
+        });
         $this->app->singleton(\Platform\Brands\Services\SeoAnalysisService::class);
 
         // CTA Analysis Service
@@ -588,6 +592,13 @@ class BrandsServiceProvider extends ServiceProvider
             $registry->register(new \Platform\Brands\Tools\GetSeoBudgetTool());
             $registry->register(new \Platform\Brands\Tools\AnalyzeSeoKeywordsTool());
             $registry->register(new \Platform\Brands\Tools\ResetSeoBudgetTool());
+
+            // SEO DataForSEO Integration-Tools
+            $registry->register(new \Platform\Brands\Tools\FetchSeoRankingsTool());
+            $registry->register(new \Platform\Brands\Tools\DiscoverSeoKeywordsTool());
+            $registry->register(new \Platform\Brands\Tools\DiscoverSeoKeywordsFromDomainTool());
+            $registry->register(new \Platform\Brands\Tools\FindSeoCompetitorsTool());
+            $registry->register(new \Platform\Brands\Tools\AnalyzeSeoPageTool());
 
             // SocialPlatform-Tools (Lookup-Tabellen für Social Publishing)
             $registry->register(new \Platform\Brands\Tools\CreateSocialPlatformTool());

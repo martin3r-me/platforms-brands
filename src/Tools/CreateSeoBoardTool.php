@@ -48,6 +48,15 @@ class CreateSeoBoardTool implements ToolContract, ToolMetadataContract
                     'type' => 'integer',
                     'description' => 'Optional: Intervall in Tagen für automatischen Keyword-Refresh (Standard: 30).'
                 ],
+                'dataforseo_config' => [
+                    'type' => 'object',
+                    'description' => 'Optional: DataForSEO-Konfiguration. Enthält connection_id (integer, ID der IntegrationConnection), location_code (integer, z.B. 2276 für Deutschland), language_code (integer, z.B. 1001 für Deutsch).',
+                    'properties' => [
+                        'connection_id' => ['type' => 'integer', 'description' => 'ID der DataForSEO IntegrationConnection.'],
+                        'location_code' => ['type' => 'integer', 'description' => 'Location Code (z.B. 2276 = Germany, 2840 = USA).'],
+                        'language_code' => ['type' => 'integer', 'description' => 'Language Code (z.B. 1001 = German, 1000 = English).'],
+                    ],
+                ],
             ],
             'required' => ['brand_id']
         ];
@@ -84,6 +93,7 @@ class CreateSeoBoardTool implements ToolContract, ToolMetadataContract
                 'brand_id' => $brand->id,
                 'budget_limit_cents' => $arguments['budget_limit_cents'] ?? null,
                 'refresh_interval_days' => $arguments['refresh_interval_days'] ?? 30,
+                'dataforseo_config' => $arguments['dataforseo_config'] ?? null,
             ]);
 
             $seoBoard->load(['brand', 'user', 'team']);
