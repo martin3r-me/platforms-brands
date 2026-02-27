@@ -135,6 +135,7 @@ class BrandsServiceProvider extends ServiceProvider
                 $app->make(\Platform\Brands\Services\SeoKeywordService::class),
             );
         });
+        $this->app->singleton(\Platform\Brands\Services\SeoKeywordCurationService::class);
 
         // CTA Analysis Service
         $this->app->singleton(\Platform\Brands\Services\CtaAnalysisService::class);
@@ -623,8 +624,9 @@ class BrandsServiceProvider extends ServiceProvider
             $registry->register(new \Platform\Brands\Tools\FindSeoCompetitorsTool());
             $registry->register(new \Platform\Brands\Tools\AnalyzeSeoPageTool());
 
-            // SEO Auto-Discovery & Clustering Tools
+            // SEO Auto-Discovery, Curation & Clustering Tools
             $registry->register(new \Platform\Brands\Tools\DiscoverSeoKeywordsFromCompetitorsTool());
+            $registry->register(new \Platform\Brands\Tools\CurateSeoKeywordsTool());
             $registry->register(new \Platform\Brands\Tools\AutoClusterSeoKeywordsTool());
 
             // SocialPlatform-Tools (Lookup-Tabellen für Social Publishing)
