@@ -357,7 +357,7 @@ class SeoKeywordService
     /**
      * Location und Language aus Board-Config lesen, mit Defaults.
      *
-     * @return array{locationCode: int|null, languageCode: int|null}
+     * @return array{locationCode: int|null, languageCode: string|null}
      */
     protected function resolveLocationLanguage(BrandsSeoBoard $board): array
     {
