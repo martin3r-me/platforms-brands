@@ -26,10 +26,6 @@
                             <span class="text-[var(--ui-muted)]">Board Name</span>
                             <span class="font-medium text-[var(--ui-body-color)]">{{ $seoBoard->name }}</span>
                         </div>
-                        <div class="flex items-start justify-between text-sm p-2 rounded border border-[var(--ui-border)] bg-white">
-                            <span class="text-[var(--ui-muted)] mr-3">Beschreibung</span>
-                            <span class="font-medium text-[var(--ui-body-color)] text-right">{{ $seoBoard->description ?? '&ndash;' }}</span>
-                        </div>
                     @endcan
                 </x-ui-form-grid>
             </div>
@@ -41,7 +37,7 @@
                         @svg('heroicon-o-globe-alt', 'w-3.5 h-3.5 inline-block mr-1')
                         DataForSEO Konfiguration
                     </h3>
-                    <x-ui-form-grid :cols="2" :gap="4">
+                    <x-ui-form-grid :cols="1" :gap="4">
                         <x-ui-input-text
                             name="configLocationCode"
                             label="Location Code"
@@ -56,24 +52,20 @@
                             placeholder="z.B. German"
                             :errorKey="'configLanguageName'"
                         />
-                        <div class="col-span-2">
-                            <x-ui-input-text
-                                name="configConnectionId"
-                                label="Connection ID (optional)"
-                                wire:model.live.debounce.500ms="configConnectionId"
-                                placeholder="Standard-Connection des Teams"
-                                :errorKey="'configConnectionId'"
-                            />
-                        </div>
+                        <x-ui-input-text
+                            name="configConnectionId"
+                            label="Connection ID (optional)"
+                            wire:model.live.debounce.500ms="configConnectionId"
+                            placeholder="Standard-Connection des Teams"
+                            :errorKey="'configConnectionId'"
+                        />
                     </x-ui-form-grid>
                     <div class="mt-2 text-[10px] text-[var(--ui-muted)] bg-[var(--ui-muted-5)] rounded p-2 border border-[var(--ui-border)]/40">
                         <strong>Location Codes:</strong> 2276 = Deutschland, 2040 = &Ouml;sterreich, 2756 = Schweiz, 2826 = UK, 2840 = USA
                     </div>
                 </div>
-            @endcan
 
-            {{-- Automatischer Refresh --}}
-            @can('update', $seoBoard)
+                {{-- Automatischer Refresh --}}
                 <div>
                     <h3 class="text-xs font-semibold uppercase tracking-wide text-[var(--ui-muted)] mb-3">
                         @svg('heroicon-o-arrow-path', 'w-3.5 h-3.5 inline-block mr-1')
@@ -98,45 +90,37 @@
                         </div>
                     @endif
                 </div>
-            @endcan
 
-            {{-- Budget --}}
-            @can('update', $seoBoard)
+                {{-- Budget --}}
                 <div>
                     <h3 class="text-xs font-semibold uppercase tracking-wide text-[var(--ui-muted)] mb-3">
                         @svg('heroicon-o-banknotes', 'w-3.5 h-3.5 inline-block mr-1')
                         API-Budget
                     </h3>
-                    <x-ui-form-grid :cols="2" :gap="4">
+                    <x-ui-form-grid :cols="1" :gap="4">
                         <x-ui-input-text
                             name="budgetLimitEuro"
-                            label="Budget-Limit (&euro;)"
+                            label="Budget-Limit in Euro (leer = unbegrenzt)"
                             wire:model.live.debounce.500ms="budgetLimitEuro"
-                            placeholder="z.B. 10.00 (leer = unbegrenzt)"
+                            placeholder="z.B. 10.00"
                             :errorKey="'budgetLimitEuro'"
                         />
-                        <div class="flex items-end">
-                            <div class="text-sm p-2 rounded border border-[var(--ui-border)] bg-[var(--ui-muted-5)] w-full text-center">
-                                <span class="text-[var(--ui-muted)] text-xs block">Verbraucht</span>
-                                <span class="font-semibold text-[var(--ui-secondary)]">{{ number_format(($seoBoard->budget_spent_cents ?? 0) / 100, 2) }} &euro;</span>
-                            </div>
-                        </div>
                     </x-ui-form-grid>
+                    <div class="mt-2 flex items-center justify-between text-sm p-2 rounded border border-[var(--ui-border)] bg-[var(--ui-muted-5)]">
+                        <span class="text-[var(--ui-muted)]">Verbraucht</span>
+                        <span class="font-semibold text-[var(--ui-secondary)]">{{ number_format(($seoBoard->budget_spent_cents ?? 0) / 100, 2) }} &euro;</span>
+                    </div>
                     @if($seoBoard->budget_spent_cents > 0)
                         <div class="mt-2">
-                            <x-ui-confirm-button action="resetBudget" text="Budget zur&uuml;cksetzen" confirmText="Wirklich zur&uuml;cksetzen?" variant="secondary-outline" size="sm" />
+                            <x-ui-confirm-button action="resetBudget" text="Budget zur&uuml;cksetzen" confirmText="Wirklich zur&uuml;cksetzen?" />
                         </div>
                     @endif
                 </div>
             @endcan
 
-            {{-- Gefahrenzone --}}
+            {{-- Board l&ouml;schen --}}
             @can('delete', $seoBoard)
                 <div class="pt-4 border-t border-red-200">
-                    <h3 class="text-xs font-semibold uppercase tracking-wide text-red-500 mb-3">
-                        @svg('heroicon-o-exclamation-triangle', 'w-3.5 h-3.5 inline-block mr-1')
-                        Gefahrenzone
-                    </h3>
                     <x-ui-confirm-button action="deleteSeoBoard" text="SEO Board l&ouml;schen" confirmText="Wirklich l&ouml;schen?" />
                 </div>
             @endcan

@@ -29,7 +29,7 @@
                     <h3 class="text-xs font-semibold uppercase tracking-wide text-[var(--ui-muted)] mb-3">Aktionen</h3>
                     <div class="flex flex-col gap-2">
                         @can('update', $seoBoard)
-                            <x-ui-button variant="secondary-outline" size="sm" x-data @click="$dispatch('open-modal-seo-board-settings', { seoBoardId: {{ $seoBoard->id }} })">
+                            <x-ui-button variant="secondary-outline" size="sm" x-data @click="Livewire.dispatch('open-modal-seo-board-settings', { seoBoardId: {{ $seoBoard->id }} })">
                                 <span class="inline-flex items-center gap-2">
                                     @svg('heroicon-o-cog-6-tooth','w-4 h-4')
                                     <span>Einstellungen</span>
