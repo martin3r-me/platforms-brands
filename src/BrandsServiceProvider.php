@@ -128,6 +128,13 @@ class BrandsServiceProvider extends ServiceProvider
             );
         });
         $this->app->singleton(\Platform\Brands\Services\SeoAnalysisService::class);
+        $this->app->singleton(\Platform\Brands\Services\SeoClusteringService::class, function ($app) {
+            return new \Platform\Brands\Services\SeoClusteringService(
+                $app->make(\Platform\Integrations\Services\DataForSeoApiService::class),
+                $app->make(\Platform\Brands\Services\SeoBudgetGuardService::class),
+                $app->make(\Platform\Brands\Services\SeoKeywordService::class),
+            );
+        });
 
         // CTA Analysis Service
         $this->app->singleton(\Platform\Brands\Services\CtaAnalysisService::class);
@@ -615,6 +622,10 @@ class BrandsServiceProvider extends ServiceProvider
             $registry->register(new \Platform\Brands\Tools\DiscoverSeoKeywordsFromDomainTool());
             $registry->register(new \Platform\Brands\Tools\FindSeoCompetitorsTool());
             $registry->register(new \Platform\Brands\Tools\AnalyzeSeoPageTool());
+
+            // SEO Auto-Discovery & Clustering Tools
+            $registry->register(new \Platform\Brands\Tools\DiscoverSeoKeywordsFromCompetitorsTool());
+            $registry->register(new \Platform\Brands\Tools\AutoClusterSeoKeywordsTool());
 
             // SocialPlatform-Tools (Lookup-Tabellen für Social Publishing)
             $registry->register(new \Platform\Brands\Tools\CreateSocialPlatformTool());
