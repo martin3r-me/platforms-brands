@@ -142,51 +142,52 @@
         @if($viewMode === 'analysis')
             <div class="p-4 sm:p-6">
                 @if($clusterAnalysis->count() > 0)
-                    {{-- Sort-Header --}}
-                    <div class="hidden lg:flex items-center gap-1 px-4 pb-3 text-[10px] font-semibold uppercase tracking-wider text-[var(--ui-muted)]">
-                        <div class="w-8"></div>
+                    {{-- Sort-Header (matches card layout) --}}
+                    <div class="hidden lg:flex items-center gap-4 pl-9 pr-4 pb-3 text-[10px] font-semibold uppercase tracking-wider text-[var(--ui-muted)]">
                         <button wire:click="sortBy('name')" class="flex-1 min-w-0 flex items-center gap-1 hover:text-[var(--ui-secondary)] transition-colors">
                             Cluster
                             @if($sortField === 'name')
                                 @svg($sortDirection === 'asc' ? 'heroicon-o-chevron-up' : 'heroicon-o-chevron-down', 'w-3 h-3 text-lime-600')
                             @endif
                         </button>
-                        <button wire:click="sortBy('opportunity_score')" class="w-24 text-center flex items-center justify-center gap-1 hover:text-[var(--ui-secondary)] transition-colors">
-                            Score
-                            @if($sortField === 'opportunity_score')
-                                @svg($sortDirection === 'asc' ? 'heroicon-o-chevron-up' : 'heroicon-o-chevron-down', 'w-3 h-3 text-lime-600')
-                            @endif
-                        </button>
-                        <button wire:click="sortBy('sum_sv')" class="w-20 text-right flex items-center justify-end gap-1 hover:text-[var(--ui-secondary)] transition-colors">
-                            &Sigma; SV
-                            @if($sortField === 'sum_sv')
-                                @svg($sortDirection === 'asc' ? 'heroicon-o-chevron-up' : 'heroicon-o-chevron-down', 'w-3 h-3 text-lime-600')
-                            @endif
-                        </button>
-                        <button wire:click="sortBy('weighted_kd')" class="w-16 text-right flex items-center justify-end gap-1 hover:text-[var(--ui-secondary)] transition-colors">
-                            KD
-                            @if($sortField === 'weighted_kd')
-                                @svg($sortDirection === 'asc' ? 'heroicon-o-chevron-up' : 'heroicon-o-chevron-down', 'w-3 h-3 text-lime-600')
-                            @endif
-                        </button>
-                        <button wire:click="sortBy('traffic_value')" class="w-20 text-right flex items-center justify-end gap-1 hover:text-[var(--ui-secondary)] transition-colors">
-                            Wert
-                            @if($sortField === 'traffic_value')
-                                @svg($sortDirection === 'asc' ? 'heroicon-o-chevron-up' : 'heroicon-o-chevron-down', 'w-3 h-3 text-lime-600')
-                            @endif
-                        </button>
-                        <button wire:click="sortBy('coverage')" class="w-24 text-right flex items-center justify-end gap-1 hover:text-[var(--ui-secondary)] transition-colors">
-                            Coverage
-                            @if($sortField === 'coverage')
-                                @svg($sortDirection === 'asc' ? 'heroicon-o-chevron-up' : 'heroicon-o-chevron-down', 'w-3 h-3 text-lime-600')
-                            @endif
-                        </button>
-                        <button wire:click="sortBy('avg_position')" class="w-16 text-right flex items-center justify-end gap-1 hover:text-[var(--ui-secondary)] transition-colors">
-                            Pos
-                            @if($sortField === 'avg_position')
-                                @svg($sortDirection === 'asc' ? 'heroicon-o-chevron-up' : 'heroicon-o-chevron-down', 'w-3 h-3 text-lime-600')
-                            @endif
-                        </button>
+                        <div class="flex items-center gap-5 flex-shrink-0">
+                            <button wire:click="sortBy('opportunity_score')" class="w-28 flex items-center justify-center gap-1 hover:text-[var(--ui-secondary)] transition-colors">
+                                Score
+                                @if($sortField === 'opportunity_score')
+                                    @svg($sortDirection === 'asc' ? 'heroicon-o-chevron-up' : 'heroicon-o-chevron-down', 'w-3 h-3 text-lime-600')
+                                @endif
+                            </button>
+                            <button wire:click="sortBy('sum_sv')" class="w-16 flex items-center justify-end gap-1 hover:text-[var(--ui-secondary)] transition-colors">
+                                &Sigma; SV
+                                @if($sortField === 'sum_sv')
+                                    @svg($sortDirection === 'asc' ? 'heroicon-o-chevron-up' : 'heroicon-o-chevron-down', 'w-3 h-3 text-lime-600')
+                                @endif
+                            </button>
+                            <button wire:click="sortBy('weighted_kd')" class="w-12 flex items-center justify-end gap-1 hover:text-[var(--ui-secondary)] transition-colors">
+                                KD
+                                @if($sortField === 'weighted_kd')
+                                    @svg($sortDirection === 'asc' ? 'heroicon-o-chevron-up' : 'heroicon-o-chevron-down', 'w-3 h-3 text-lime-600')
+                                @endif
+                            </button>
+                            <button wire:click="sortBy('traffic_value')" class="w-16 flex items-center justify-end gap-1 hover:text-[var(--ui-secondary)] transition-colors">
+                                Wert
+                                @if($sortField === 'traffic_value')
+                                    @svg($sortDirection === 'asc' ? 'heroicon-o-chevron-up' : 'heroicon-o-chevron-down', 'w-3 h-3 text-lime-600')
+                                @endif
+                            </button>
+                            <button wire:click="sortBy('coverage')" class="w-24 flex items-center justify-end gap-1 hover:text-[var(--ui-secondary)] transition-colors">
+                                Coverage
+                                @if($sortField === 'coverage')
+                                    @svg($sortDirection === 'asc' ? 'heroicon-o-chevron-up' : 'heroicon-o-chevron-down', 'w-3 h-3 text-lime-600')
+                                @endif
+                            </button>
+                            <button wire:click="sortBy('avg_position')" class="w-12 flex items-center justify-end gap-1 hover:text-[var(--ui-secondary)] transition-colors">
+                                Pos
+                                @if($sortField === 'avg_position')
+                                    @svg($sortDirection === 'asc' ? 'heroicon-o-chevron-up' : 'heroicon-o-chevron-down', 'w-3 h-3 text-lime-600')
+                                @endif
+                            </button>
+                        </div>
                     </div>
 
                     {{-- Cluster Cards --}}
