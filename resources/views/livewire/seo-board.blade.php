@@ -140,7 +140,7 @@
 
         {{-- === ANALYSIS VIEW === --}}
         @if($viewMode === 'analysis')
-            <div class="p-4 sm:p-6">
+            <div class="flex-1 min-w-0 overflow-y-auto p-4 sm:p-6">
                 @if($clusterAnalysis->count() > 0)
                     {{-- Sort-Header (matches card layout) --}}
                     <div class="hidden lg:flex items-center gap-4 pl-9 pr-4 pb-3 text-[10px] font-semibold uppercase tracking-wider text-[var(--ui-muted)]">
@@ -248,7 +248,7 @@
         @endif
 
     @else
-        <div class="flex items-center justify-center h-full">
+        <div class="flex-1 min-w-0 flex items-center justify-center">
             <div class="bg-white rounded-xl border border-[var(--ui-border)]/60 shadow-sm p-12 text-center max-w-md">
                 <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-lime-50 mb-4">
                     @svg('heroicon-o-magnifying-glass', 'w-8 h-8 text-lime-600')
