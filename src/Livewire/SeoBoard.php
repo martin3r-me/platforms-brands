@@ -35,11 +35,21 @@ class SeoBoard extends Component
             ->orderBy('order')
             ->get();
 
+        // Alle Keywords flat für die Tabelle, nach Cluster gruppiert
+        $allKeywords = $this->seoBoard->keywords()
+            ->with(['cluster'])
+            ->orderByRaw('COALESCE(keyword_cluster_id, 0)')
+            ->orderBy('order')
+            ->get();
+
         // Unzugeordnete Keywords (ohne Cluster)
         $unclusteredKeywords = $this->seoBoard->keywords()
             ->whereNull('keyword_cluster_id')
             ->orderBy('order')
             ->get();
+
+        // Max Search Volume für relative Balken
+        $maxSearchVolume = $allKeywords->max('search_volume') ?: 1;
 
         // Budget-Summary
         $budgetGuard = app(SeoBudgetGuardService::class);
@@ -48,7 +58,9 @@ class SeoBoard extends Component
         return view('brands::livewire.seo-board', [
             'user' => $user,
             'clusters' => $clusters,
+            'allKeywords' => $allKeywords,
             'unclusteredKeywords' => $unclusteredKeywords,
+            'maxSearchVolume' => $maxSearchVolume,
             'budgetSummary' => $budgetSummary,
         ])->layout('platform::layouts.app');
     }
