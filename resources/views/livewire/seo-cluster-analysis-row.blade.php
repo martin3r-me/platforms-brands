@@ -47,13 +47,18 @@
                     </span>
                 </div>
 
-                {{-- Cluster name --}}
+                {{-- Cluster name + value badge --}}
                 <div class="flex-1 min-w-0 flex items-center gap-2.5">
                     <span class="w-2.5 h-2.5 rounded-full bg-{{ $clusterColor }}-500 flex-shrink-0 ring-2 ring-{{ $clusterColor }}-500/20"></span>
                     <span class="text-sm font-semibold text-[var(--ui-secondary)] truncate">{{ $cluster->name }}</span>
                     <span class="inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-{{ $clusterColor }}-50 text-{{ $clusterColor }}-700 tabular-nums flex-shrink-0">
                         {{ $data['count'] }} KW
                     </span>
+                    @if($data['traffic_value'] > 0)
+                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 tabular-nums flex-shrink-0">
+                            {{ number_format($data['traffic_value'], 0) }} {{ "\u{20AC}" }}
+                        </span>
+                    @endif
                 </div>
 
                 {{-- Metrics row --}}
@@ -116,9 +121,16 @@
                     <div class="flex-1 min-w-0">
                         <span class="text-sm font-semibold text-[var(--ui-secondary)] truncate block">{{ $cluster->name }}</span>
                     </div>
-                    <span class="inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-{{ $clusterColor }}-50 text-{{ $clusterColor }}-700 tabular-nums">
-                        {{ $data['count'] }}
-                    </span>
+                    <div class="flex items-center gap-1.5 flex-shrink-0">
+                        @if($data['traffic_value'] > 0)
+                            <span class="inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 tabular-nums">
+                                {{ number_format($data['traffic_value'], 0) }} {{ "\u{20AC}" }}
+                            </span>
+                        @endif
+                        <span class="inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-{{ $clusterColor }}-50 text-{{ $clusterColor }}-700 tabular-nums">
+                            {{ $data['count'] }}
+                        </span>
+                    </div>
                 </div>
 
                 {{-- Metrics grid --}}

@@ -142,6 +142,54 @@
         @if($viewMode === 'analysis')
             <div class="flex-1 min-w-0 overflow-y-auto p-4 sm:p-6">
                 @if($clusterAnalysis->count() > 0)
+                    {{-- Gesamt-Summary --}}
+                    @php
+                        $totalKeywords = $clusterAnalysis->sum('count');
+                        $totalSv = $clusterAnalysis->sum('sum_sv');
+                        $totalTrafficValue = $clusterAnalysis->sum('traffic_value');
+                        $totalRankings = $clusterAnalysis->sum('rankings');
+                        $avgCoverage = $totalKeywords > 0 ? round($clusterAnalysis->sum(fn($c) => $c['coverage'] * $c['count']) / $totalKeywords) : 0;
+                        $avgKd = $totalSv > 0 ? round($clusterAnalysis->sum(fn($c) => $c['weighted_kd'] * $c['sum_sv']) / $totalSv, 1) : 0;
+                    @endphp
+                    <div class="mb-5 rounded-xl border border-emerald-200/60 bg-gradient-to-r from-emerald-50/60 to-white p-4">
+                        <div class="flex flex-wrap items-center gap-x-6 gap-y-3">
+                            <div class="flex items-center gap-2">
+                                @svg('heroicon-o-chart-bar', 'w-5 h-5 text-emerald-600')
+                                <span class="text-sm font-bold text-emerald-800">Gesamt</span>
+                            </div>
+                            <div class="flex flex-wrap items-center gap-x-5 gap-y-2">
+                                <div>
+                                    <span class="text-[10px] uppercase tracking-wide text-[var(--ui-muted)]">Cluster</span>
+                                    <span class="ml-1 text-sm font-bold text-[var(--ui-secondary)] tabular-nums">{{ $clusterAnalysis->count() }}</span>
+                                </div>
+                                <div>
+                                    <span class="text-[10px] uppercase tracking-wide text-[var(--ui-muted)]">Keywords</span>
+                                    <span class="ml-1 text-sm font-bold text-[var(--ui-secondary)] tabular-nums">{{ number_format($totalKeywords) }}</span>
+                                </div>
+                                <div>
+                                    <span class="text-[10px] uppercase tracking-wide text-[var(--ui-muted)]">SV</span>
+                                    <span class="ml-1 text-sm font-bold text-[var(--ui-secondary)] tabular-nums">{{ number_format($totalSv) }}</span>
+                                </div>
+                                <div>
+                                    <span class="text-[10px] uppercase tracking-wide text-[var(--ui-muted)]">KD</span>
+                                    <span class="ml-1 text-sm font-bold text-[var(--ui-secondary)] tabular-nums">{{ $avgKd }}</span>
+                                </div>
+                                <div class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100/80 border border-emerald-200">
+                                    <span class="text-[10px] uppercase tracking-wide text-emerald-700">Traffic-Wert</span>
+                                    <span class="text-sm font-extrabold text-emerald-800 tabular-nums">{{ number_format($totalTrafficValue, 0) }} {{ "\u{20AC}" }}</span>
+                                </div>
+                                <div>
+                                    <span class="text-[10px] uppercase tracking-wide text-[var(--ui-muted)]">Rankings</span>
+                                    <span class="ml-1 text-sm font-bold text-[var(--ui-secondary)] tabular-nums">{{ $totalRankings }}/{{ $totalKeywords }}</span>
+                                </div>
+                                <div>
+                                    <span class="text-[10px] uppercase tracking-wide text-[var(--ui-muted)]">Coverage</span>
+                                    <span class="ml-1 text-sm font-bold text-[var(--ui-secondary)] tabular-nums">{{ $avgCoverage }}%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     {{-- Sort-Header (matches card layout) --}}
                     <div class="hidden lg:flex items-center gap-4 pl-9 pr-4 pb-3 text-[10px] font-semibold uppercase tracking-wider text-[var(--ui-muted)]">
                         <button wire:click="sortBy('name')" class="flex-1 min-w-0 flex items-center gap-1 hover:text-[var(--ui-secondary)] transition-colors">
