@@ -16,7 +16,7 @@ class AutoClusterSeoKeywordsJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public $timeout = 600;
+    public $timeout = 1200;
     public $tries = 1;
 
     public function __construct(
