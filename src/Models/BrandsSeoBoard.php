@@ -31,6 +31,10 @@ class BrandsSeoBoard extends Model implements HasDisplayName
         'refresh_interval_days',
         'last_refreshed_at',
         'dataforseo_config',
+        'clustering_status',
+        'clustering_result',
+        'clustering_started_at',
+        'clustering_completed_at',
     ];
 
     protected $casts = [
@@ -44,6 +48,9 @@ class BrandsSeoBoard extends Model implements HasDisplayName
         'refresh_interval_days' => 'integer',
         'last_refreshed_at' => 'datetime',
         'dataforseo_config' => 'array',
+        'clustering_result' => 'array',
+        'clustering_started_at' => 'datetime',
+        'clustering_completed_at' => 'datetime',
     ];
 
     protected static function booted(): void

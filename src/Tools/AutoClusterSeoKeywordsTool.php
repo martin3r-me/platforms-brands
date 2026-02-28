@@ -7,7 +7,7 @@ use Platform\Core\Contracts\ToolContext;
 use Platform\Core\Contracts\ToolResult;
 use Platform\Core\Contracts\ToolMetadataContract;
 use Platform\Brands\Models\BrandsSeoBoard;
-use Platform\Brands\Services\SeoClusteringService;
+use Platform\Brands\Jobs\AutoClusterSeoKeywordsJob;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Auth\Access\AuthorizationException;
 
@@ -20,7 +20,7 @@ class AutoClusterSeoKeywordsTool implements ToolContract, ToolMetadataContract
 
     public function getDescription(): string
     {
-        return 'POST /brands/seo_boards/{seo_board_id}/keywords/auto_cluster - Clustert ungeclusterte Keywords automatisch per SERP-URL-Overlap (Google zeigt gleiche Seiten → gleiches Thema). ACHTUNG: Kostenintensiv! Jedes Keyword = 1 SERP-Abruf (~10 Cents). 300 Keywords ≈ 30€. Budget-Limit des Boards beachten. REST-Parameter: seo_board_id (required, integer), min_overlap (optional, integer, default: 3, range: 1-10), max_keywords (optional, integer, default: 300, max: 500).';
+        return 'POST /brands/seo_boards/{seo_board_id}/keywords/auto_cluster - Clustert ungeclusterte Keywords automatisch per SERP-URL-Overlap (Google zeigt gleiche Seiten → gleiches Thema). Läuft als Background-Job (kann mehrere Minuten dauern). ACHTUNG: Kostenintensiv! Jedes Keyword = 1 SERP-Abruf (~10 Cents). 300 Keywords ≈ 30€. Budget-Limit des Boards beachten. REST-Parameter: seo_board_id (required, integer), min_overlap (optional, integer, default: 3, range: 1-10), max_keywords (optional, integer, default: 300, max: 500), check_status (optional, boolean) - wenn true, wird nur der aktuelle Job-Status zurückgegeben (kein neuer Job).';
     }
 
     public function getSchema(): array
@@ -39,6 +39,10 @@ class AutoClusterSeoKeywordsTool implements ToolContract, ToolMetadataContract
                 'max_keywords' => [
                     'type' => 'integer',
                     'description' => 'Maximale Anzahl Keywords für Clustering (Standard: 300, max: 500). Sortiert nach Search Volume (wichtigste zuerst).',
+                ],
+                'check_status' => [
+                    'type' => 'boolean',
+                    'description' => 'Wenn true: Gibt nur den aktuellen Clustering-Status zurück, ohne einen neuen Job zu starten. Nutze dies zum Pollen des Fortschritts.',
                 ],
             ],
             'required' => ['seo_board_id'],
@@ -68,35 +72,99 @@ class AutoClusterSeoKeywordsTool implements ToolContract, ToolMetadataContract
                 return ToolResult::error('ACCESS_DENIED', 'Du darfst keine Keywords für dieses SEO Board clustern (Policy).');
             }
 
+            // Status-Check Mode
+            if (!empty($arguments['check_status'])) {
+                return $this->checkStatus($seoBoard);
+            }
+
+            // Prevent duplicate jobs
+            if (in_array($seoBoard->clustering_status, ['pending', 'processing'])) {
+                return ToolResult::success([
+                    'status' => 'already_running',
+                    'clustering_status' => $seoBoard->clustering_status,
+                    'clustering_started_at' => $seoBoard->clustering_started_at?->toIso8601String(),
+                    'message' => 'Ein Clustering-Job läuft bereits. Nutze check_status=true um den Fortschritt zu prüfen.',
+                ]);
+            }
+
             $minOverlap = max(1, min(10, $arguments['min_overlap'] ?? 3));
             $maxKeywords = max(1, min(500, $arguments['max_keywords'] ?? 300));
 
-            $clusteringService = app(SeoClusteringService::class);
-            $result = $clusteringService->clusterBySerp($seoBoard, $context->user, $minOverlap, $maxKeywords);
+            // Count unclustered keywords for estimate
+            $unclusteredCount = $seoBoard->keywords()
+                ->whereNull('keyword_cluster_id')
+                ->count();
 
-            if (isset($result['error'])) {
-                return ToolResult::error('BUDGET_EXCEEDED', $result['error']);
+            if ($unclusteredCount === 0) {
+                return ToolResult::success([
+                    'status' => 'no_keywords',
+                    'message' => 'Keine ungeclusterten Keywords vorhanden.',
+                ]);
             }
 
-            $message = $result['clusters_created'] > 0
-                ? "{$result['clusters_created']} Cluster erstellt, {$result['keywords_clustered']} Keywords zugeordnet. {$result['singletons_remaining']} Keywords bleiben ungeclustert. Kosten: {$result['cost_cents']} Cents."
-                : "Keine Cluster erstellt. {$result['singletons_remaining']} Keywords bleiben ungeclustert." .
-                  ($result['keywords_fetched'] > 0 ? ' Tipp: min_overlap senken für größere Cluster.' : '');
+            $keywordsToProcess = min($unclusteredCount, $maxKeywords);
+            $estimatedCostCents = (int) ceil($keywordsToProcess * 10);
+
+            // Set status to pending and dispatch job
+            $seoBoard->update([
+                'clustering_status' => 'pending',
+                'clustering_result' => null,
+                'clustering_started_at' => null,
+                'clustering_completed_at' => null,
+            ]);
+
+            AutoClusterSeoKeywordsJob::dispatch(
+                $seoBoard->id,
+                $context->user->id,
+                $minOverlap,
+                $maxKeywords,
+            );
 
             return ToolResult::success([
+                'status' => 'dispatched',
                 'seo_board_id' => $seoBoard->id,
                 'seo_board_name' => $seoBoard->name,
-                'clusters_created' => $result['clusters_created'],
-                'keywords_clustered' => $result['keywords_clustered'],
-                'keywords_fetched' => $result['keywords_fetched'],
-                'singletons_remaining' => $result['singletons_remaining'],
-                'cost_cents' => $result['cost_cents'],
-                'clusters' => $result['clusters'],
-                'message' => $message,
+                'keywords_count' => $keywordsToProcess,
+                'estimated_cost_cents' => $estimatedCostCents,
+                'min_overlap' => $minOverlap,
+                'max_keywords' => $maxKeywords,
+                'message' => "Clustering-Job gestartet für {$keywordsToProcess} Keywords. Geschätzte Kosten: {$estimatedCostCents} Cents (~" . number_format($estimatedCostCents / 100, 2) . " EUR). Nutze check_status=true um den Fortschritt zu prüfen.",
             ]);
         } catch (\Throwable $e) {
             return ToolResult::error('EXECUTION_ERROR', 'Fehler beim Auto-Clustering: ' . $e->getMessage());
         }
+    }
+
+    private function checkStatus(BrandsSeoBoard $seoBoard): ToolResult
+    {
+        $data = [
+            'seo_board_id' => $seoBoard->id,
+            'seo_board_name' => $seoBoard->name,
+            'clustering_status' => $seoBoard->clustering_status,
+            'clustering_started_at' => $seoBoard->clustering_started_at?->toIso8601String(),
+            'clustering_completed_at' => $seoBoard->clustering_completed_at?->toIso8601String(),
+        ];
+
+        if ($seoBoard->clustering_status === 'completed' && $seoBoard->clustering_result) {
+            $result = $seoBoard->clustering_result;
+            $data['clusters_created'] = $result['clusters_created'] ?? 0;
+            $data['keywords_clustered'] = $result['keywords_clustered'] ?? 0;
+            $data['keywords_fetched'] = $result['keywords_fetched'] ?? 0;
+            $data['singletons_remaining'] = $result['singletons_remaining'] ?? 0;
+            $data['cost_cents'] = $result['cost_cents'] ?? 0;
+            $data['message'] = "{$data['clusters_created']} Cluster erstellt, {$data['keywords_clustered']} Keywords zugeordnet. Kosten: {$data['cost_cents']} Cents.";
+        } elseif ($seoBoard->clustering_status === 'failed' && $seoBoard->clustering_result) {
+            $data['error'] = $seoBoard->clustering_result['error'] ?? 'Unbekannter Fehler';
+            $data['message'] = 'Clustering fehlgeschlagen: ' . $data['error'];
+        } elseif ($seoBoard->clustering_status === 'processing') {
+            $data['message'] = 'Clustering läuft noch. Bitte später erneut prüfen.';
+        } elseif ($seoBoard->clustering_status === 'pending') {
+            $data['message'] = 'Clustering-Job wartet auf Ausführung (Queue).';
+        } else {
+            $data['message'] = 'Kein Clustering-Job aktiv.';
+        }
+
+        return ToolResult::success($data);
     }
 
     public function getMetadata(): array
