@@ -66,15 +66,20 @@ class AutoClusterSeoKeywordsTool implements ToolContract, ToolMetadataContract
                 return ToolResult::error('SEO_BOARD_NOT_FOUND', 'Das angegebene SEO Board wurde nicht gefunden.');
             }
 
+            // Status-Check Mode (nur view-Permission nötig)
+            if (!empty($arguments['check_status'])) {
+                try {
+                    Gate::forUser($context->user)->authorize('view', $seoBoard);
+                } catch (AuthorizationException $e) {
+                    return ToolResult::error('ACCESS_DENIED', 'Du darfst dieses SEO Board nicht einsehen (Policy).');
+                }
+                return $this->checkStatus($seoBoard);
+            }
+
             try {
                 Gate::forUser($context->user)->authorize('update', $seoBoard);
             } catch (AuthorizationException $e) {
                 return ToolResult::error('ACCESS_DENIED', 'Du darfst keine Keywords für dieses SEO Board clustern (Policy).');
-            }
-
-            // Status-Check Mode
-            if (!empty($arguments['check_status'])) {
-                return $this->checkStatus($seoBoard);
             }
 
             // Prevent duplicate jobs
