@@ -688,6 +688,12 @@ class BrandsServiceProvider extends ServiceProvider
             $registry->register(new \Platform\Brands\Tools\BulkCreateContentBriefSectionsTool());
             $registry->register(new \Platform\Brands\Tools\BulkUpdateContentBriefSectionsTool());
 
+            // ContentBriefNote-Tools (Briefing Notes & Constraints – Anweisungen, Quellen, Einschränkungen)
+            $registry->register(new \Platform\Brands\Tools\CreateContentBriefNoteTool());
+            $registry->register(new \Platform\Brands\Tools\ListContentBriefNotesTool());
+            $registry->register(new \Platform\Brands\Tools\UpdateContentBriefNoteTool());
+            $registry->register(new \Platform\Brands\Tools\DeleteContentBriefNoteTool());
+
             // Topic Cluster Map
             $registry->register(new \Platform\Brands\Tools\GetTopicClusterMapTool());
 

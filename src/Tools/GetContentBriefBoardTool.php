@@ -9,6 +9,7 @@ use Platform\Core\Contracts\ToolMetadataContract;
 use Platform\Brands\Models\BrandsContentBriefBoard;
 use Platform\Brands\Models\BrandsContentBriefKeywordCluster;
 use Platform\Brands\Models\BrandsContentBriefLink;
+use Platform\Brands\Models\BrandsContentBriefNote;
 use Platform\Brands\Models\BrandsContentBriefSection;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -55,6 +56,7 @@ class GetContentBriefBoardTool implements ToolContract, ToolMetadataContract
                     'outgoingLinks.targetContentBrief', 'incomingLinks.sourceContentBrief',
                     'briefKeywordClusters.keywordCluster.keywords', 'briefKeywordClusters.keywordCluster.seoBoard',
                     'sections',
+                    'notes',
                 ])
                 ->find($arguments['id']);
 
@@ -132,6 +134,25 @@ class GetContentBriefBoardTool implements ToolContract, ToolMetadataContract
                     ];
                 })->values()->toArray();
 
+            // Notes grouped by note_type
+            $notesGrouped = [];
+            foreach (array_keys(BrandsContentBriefNote::NOTE_TYPES) as $type) {
+                $typeNotes = $board->notes->where('note_type', $type)->sortBy('order')->values();
+                if ($typeNotes->isNotEmpty()) {
+                    $notesGrouped[$type] = [
+                        'label' => BrandsContentBriefNote::NOTE_TYPES[$type],
+                        'notes' => $typeNotes->map(function ($note) {
+                            return [
+                                'id' => $note->id,
+                                'content' => $note->content,
+                                'order' => $note->order,
+                            ];
+                        })->values()->toArray(),
+                        'count' => $typeNotes->count(),
+                    ];
+                }
+            }
+
             $sections = $board->sections->map(function ($section) {
                 return [
                     'id' => $section->id,
@@ -170,6 +191,7 @@ class GetContentBriefBoardTool implements ToolContract, ToolMetadataContract
                 'incoming_links' => $incomingLinks,
                 'keyword_clusters' => $keywordClusters,
                 'sections' => $sections,
+                'notes' => $notesGrouped,
                 'created_at' => $board->created_at->toIso8601String(),
                 'updated_at' => $board->updated_at->toIso8601String(),
             ];

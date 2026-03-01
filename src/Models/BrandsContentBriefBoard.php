@@ -132,6 +132,11 @@ class BrandsContentBriefBoard extends Model implements HasDisplayName
         return $this->hasMany(BrandsContentBriefSection::class, 'content_brief_id')->orderBy('order');
     }
 
+    public function notes(): HasMany
+    {
+        return $this->hasMany(BrandsContentBriefNote::class, 'content_brief_id')->orderBy('note_type')->orderBy('order');
+    }
+
     public function getDisplayName(): ?string
     {
         return $this->name;
