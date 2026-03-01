@@ -7,6 +7,7 @@ use Platform\Core\Contracts\ToolContext;
 use Platform\Core\Contracts\ToolResult;
 use Platform\Core\Contracts\ToolMetadataContract;
 use Platform\Brands\Models\BrandsContentBriefBoard;
+use Platform\Brands\Models\BrandsContentBriefKeywordCluster;
 use Platform\Brands\Models\BrandsContentBriefLink;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -48,7 +49,11 @@ class GetContentBriefBoardTool implements ToolContract, ToolMetadataContract
                 return ToolResult::error('VALIDATION_ERROR', 'Content Brief Board-ID ist erforderlich.');
             }
 
-            $board = BrandsContentBriefBoard::with(['brand', 'user', 'team', 'seoBoard', 'outgoingLinks.targetContentBrief', 'incomingLinks.sourceContentBrief'])
+            $board = BrandsContentBriefBoard::with([
+                    'brand', 'user', 'team', 'seoBoard',
+                    'outgoingLinks.targetContentBrief', 'incomingLinks.sourceContentBrief',
+                    'briefKeywordClusters.keywordCluster.keywords', 'briefKeywordClusters.keywordCluster.seoBoard',
+                ])
                 ->find($arguments['id']);
 
             if (!$board) {
@@ -85,6 +90,46 @@ class GetContentBriefBoardTool implements ToolContract, ToolMetadataContract
                 ];
             })->values()->toArray();
 
+            $keywordClusters = $board->briefKeywordClusters
+                ->sortBy(function ($link) {
+                    return match ($link->role) {
+                        'primary' => 0,
+                        'secondary' => 1,
+                        default => 2,
+                    };
+                })
+                ->map(function ($link) {
+                    $cluster = $link->keywordCluster;
+                    $keywords = $cluster->keywords->map(function ($kw) {
+                        return [
+                            'id' => $kw->id,
+                            'keyword' => $kw->keyword,
+                            'search_volume' => $kw->search_volume,
+                            'keyword_difficulty' => $kw->keyword_difficulty,
+                            'cpc_cents' => $kw->cpc_cents,
+                            'search_intent' => $kw->search_intent,
+                            'position' => $kw->position,
+                        ];
+                    })->values()->toArray();
+
+                    return [
+                        'id' => $link->id,
+                        'seo_keyword_cluster_id' => $link->seo_keyword_cluster_id,
+                        'cluster_name' => $cluster->name,
+                        'cluster_color' => $cluster->color,
+                        'seo_board_id' => $cluster->seo_board_id,
+                        'seo_board_name' => $cluster->seoBoard?->name,
+                        'role' => $link->role,
+                        'role_label' => BrandsContentBriefKeywordCluster::ROLES[$link->role] ?? $link->role,
+                        'keywords' => $keywords,
+                        'keyword_count' => count($keywords),
+                        'total_search_volume' => $cluster->keywords->sum('search_volume'),
+                        'avg_keyword_difficulty' => $cluster->keywords->avg('keyword_difficulty')
+                            ? round($cluster->keywords->avg('keyword_difficulty'), 1)
+                            : null,
+                    ];
+                })->values()->toArray();
+
             $data = [
                 'id' => $board->id,
                 'uuid' => $board->uuid,
@@ -108,6 +153,7 @@ class GetContentBriefBoardTool implements ToolContract, ToolMetadataContract
                 'done_at' => $board->done_at?->toIso8601String(),
                 'outgoing_links' => $outgoingLinks,
                 'incoming_links' => $incomingLinks,
+                'keyword_clusters' => $keywordClusters,
                 'created_at' => $board->created_at->toIso8601String(),
                 'updated_at' => $board->updated_at->toIso8601String(),
             ];

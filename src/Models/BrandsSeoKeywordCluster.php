@@ -4,6 +4,7 @@ namespace Platform\Brands\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Symfony\Component\Uid\UuidV7;
 use Platform\Core\Contracts\HasDisplayName;
@@ -56,6 +57,18 @@ class BrandsSeoKeywordCluster extends Model implements HasDisplayName
     public function keywords(): HasMany
     {
         return $this->hasMany(BrandsSeoKeyword::class, 'keyword_cluster_id')->orderBy('order');
+    }
+
+    public function contentBriefs(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            BrandsContentBriefBoard::class,
+            'brands_content_brief_keyword_clusters',
+            'seo_keyword_cluster_id',
+            'content_brief_id'
+        )
+        ->withPivot('role')
+        ->withTimestamps();
     }
 
     public function user(): BelongsTo

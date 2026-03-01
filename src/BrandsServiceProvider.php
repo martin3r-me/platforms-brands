@@ -668,6 +668,19 @@ class BrandsServiceProvider extends ServiceProvider
             $registry->register(new \Platform\Brands\Tools\BulkCreateContentBriefBoardsTool());
             $registry->register(new \Platform\Brands\Tools\BulkUpdateContentBriefBoardsTool());
 
+            // ContentBriefKeywordCluster-Tools (m:n Verknüpfung Content Brief ↔ SEO Keyword Cluster)
+            $registry->register(new \Platform\Brands\Tools\CreateContentBriefKeywordClusterTool());
+            $registry->register(new \Platform\Brands\Tools\ListContentBriefKeywordClustersTool());
+            $registry->register(new \Platform\Brands\Tools\DeleteContentBriefKeywordClusterTool());
+
+            // ContentBriefLink-Tools (Internal Linking / Cross-References)
+            $registry->register(new \Platform\Brands\Tools\CreateContentBriefLinkTool());
+            $registry->register(new \Platform\Brands\Tools\ListContentBriefLinksTool());
+            $registry->register(new \Platform\Brands\Tools\DeleteContentBriefLinkTool());
+
+            // Topic Cluster Map
+            $registry->register(new \Platform\Brands\Tools\GetTopicClusterMapTool());
+
             // Editorial Plan (Redaktionsplan-Ansicht)
             $registry->register(new \Platform\Brands\Tools\GetEditorialPlanTool());
 

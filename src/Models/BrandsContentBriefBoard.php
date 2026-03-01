@@ -4,6 +4,7 @@ namespace Platform\Brands\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Symfony\Component\Uid\UuidV7;
 use Platform\Core\Contracts\HasDisplayName;
@@ -107,6 +108,23 @@ class BrandsContentBriefBoard extends Model implements HasDisplayName
     public function incomingLinks(): HasMany
     {
         return $this->hasMany(BrandsContentBriefLink::class, 'target_content_brief_id');
+    }
+
+    public function keywordClusters(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            BrandsSeoKeywordCluster::class,
+            'brands_content_brief_keyword_clusters',
+            'content_brief_id',
+            'seo_keyword_cluster_id'
+        )
+        ->withPivot('role')
+        ->withTimestamps();
+    }
+
+    public function briefKeywordClusters(): HasMany
+    {
+        return $this->hasMany(BrandsContentBriefKeywordCluster::class, 'content_brief_id');
     }
 
     public function getDisplayName(): ?string
