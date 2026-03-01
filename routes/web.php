@@ -21,6 +21,7 @@ use Platform\Brands\Livewire\AssetBoard;
 use Platform\Brands\Livewire\MultiContentBoard;
 use Platform\Brands\Livewire\SeoBoard as SeoBoardComponent;
 use Platform\Brands\Livewire\CtaBoard as CtaBoardComponent;
+use Platform\Brands\Livewire\ContentBriefBoard as ContentBriefBoardComponent;
 use Platform\Brands\Livewire\FacebookPage;
 use Platform\Brands\Livewire\InstagramAccount;
 use Platform\Brands\Livewire\Export;
@@ -43,6 +44,7 @@ use Platform\Brands\Models\BrandsAssetBoard as BrandsAssetBoardModel;
 use Platform\Brands\Models\BrandsMultiContentBoard;
 use Platform\Brands\Models\BrandsSeoBoard as BrandsSeoBoardModel;
 use Platform\Brands\Models\BrandsCtaBoard as BrandsCtaBoardModel;
+use Platform\Brands\Models\BrandsContentBriefBoard as BrandsContentBriefBoardModel;
 use Platform\Brands\Models\BrandsContentBoardBlock;
 use Platform\Integrations\Models\IntegrationsFacebookPage;
 use Platform\Integrations\Models\IntegrationsInstagramAccount;
@@ -128,6 +130,10 @@ Route::get('/seo-boards/{brandsSeoBoard}', SeoBoardComponent::class)
 // CTA Board Routes
 Route::get('/cta-boards/{brandsCtaBoard}', CtaBoardComponent::class)
     ->name('brands.cta-boards.show');
+
+// Content Brief Board Routes
+Route::get('/content-brief-boards/{brandsContentBriefBoard}', ContentBriefBoardComponent::class)
+    ->name('brands.content-brief-boards.show');
 
 // Facebook Page Routes
 Route::get('/facebook-pages/{facebookPage}', FacebookPage::class)

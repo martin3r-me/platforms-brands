@@ -216,6 +216,19 @@
                                         <div class="text-xs text-[var(--ui-muted)]">Keyword-Recherche & SEO-Analyse</div>
                                     </div>
                                 </button>
+                                <button
+                                    wire:click="createContentBriefBoard"
+                                    @click="open = false"
+                                    class="w-full text-left px-4 py-2.5 text-sm text-[var(--ui-secondary)] hover:bg-[var(--ui-muted-5)] transition-colors flex items-center gap-3"
+                                >
+                                    <div class="flex items-center justify-center w-8 h-8 rounded-md bg-fuchsia-50">
+                                        @svg('heroicon-o-document-magnifying-glass', 'w-4 h-4 text-fuchsia-600')
+                                    </div>
+                                    <div>
+                                        <div class="font-medium">Content Brief Board</div>
+                                        <div class="text-xs text-[var(--ui-muted)]">Content-Planung & Briefings</div>
+                                    </div>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -250,7 +263,7 @@
                                     <tbody class="divide-y divide-[var(--ui-border)]/30">
                                         @foreach($group['boards'] as $board)
                                             @php
-                                                $entryCount = $board->{$group['entryRelation']}->count();
+                                                $entryCount = $group['entryRelation'] ? $board->{$group['entryRelation']}->count() : 1;
                                             @endphp
                                             <tr class="group hover:bg-{{ $group['color'] }}-50/30 transition-colors">
                                                 <td class="px-4 py-3">

@@ -375,6 +375,31 @@ class Brand extends Component
         return $this->redirect(route('brands.seo-boards.show', $seoBoard), navigate: true);
     }
 
+    public function createContentBriefBoard()
+    {
+        $this->authorize('update', $this->brand);
+
+        $user = Auth::user();
+        $team = $user->currentTeam;
+
+        if (!$team) {
+            session()->flash('error', 'Kein Team ausgewählt.');
+            return;
+        }
+
+        $contentBriefBoard = \Platform\Brands\Models\BrandsContentBriefBoard::create([
+            'name' => 'Neues Content Brief',
+            'description' => null,
+            'user_id' => $user->id,
+            'team_id' => $team->id,
+            'brand_id' => $this->brand->id,
+        ]);
+
+        $this->brand->refresh();
+
+        return $this->redirect(route('brands.content-brief-boards.show', $contentBriefBoard), navigate: true);
+    }
+
     public function rendered()
     {
         $this->dispatch('comms', [
@@ -581,6 +606,7 @@ class Brand extends Component
         $moodboardBoards = $this->brand->moodboardBoards;
         $assetBoards = $this->brand->assetBoards;
         $seoBoards = $this->brand->seoBoards;
+        $contentBriefBoards = $this->brand->contentBriefBoards;
 
         // Board-Gruppen für tabellarische Darstellung
         $boardGroups = collect([
@@ -738,6 +764,17 @@ class Brand extends Component
                 'entryRelation' => 'keywords',
                 'entryLabel' => 'Keywords',
             ],
+            [
+                'key' => 'content-brief',
+                'label' => 'Content Brief Boards',
+                'icon' => 'heroicon-o-document-magnifying-glass',
+                'color' => 'fuchsia',
+                'boards' => $contentBriefBoards,
+                'routePrefix' => 'brands.content-brief-boards.show',
+                'boardType' => 'content-brief-board',
+                'entryRelation' => null,
+                'entryLabel' => 'Briefs',
+            ],
         ])->filter(fn($group) => $group['boards']->count() > 0);
 
         // Meta Connection laden
@@ -789,6 +826,7 @@ class Brand extends Component
             'moodboardBoards' => $moodboardBoards,
             'assetBoards' => $assetBoards,
             'seoBoards' => $seoBoards,
+            'contentBriefBoards' => $contentBriefBoards,
             'facebookPages' => $facebookPages,
             'instagramAccounts' => $instagramAccounts,
             'availableFacebookPages' => $availableFacebookPages,

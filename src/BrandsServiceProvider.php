@@ -49,6 +49,7 @@ use Platform\Brands\Models\BrandsSeoKeywordContext;
 use Platform\Brands\Models\BrandsSeoKeywordCompetitor;
 use Platform\Brands\Models\BrandsCta;
 use Platform\Brands\Models\BrandsCtaBoard;
+use Platform\Brands\Models\BrandsContentBriefBoard;
 use Platform\Brands\Models\BrandsSocialPlatform;
 use Platform\Brands\Models\BrandsSocialPlatformFormat;
 use Platform\Brands\Models\BrandsSocialCardContract;
@@ -88,6 +89,7 @@ use Platform\Brands\Policies\SeoKeywordContextPolicy;
 use Platform\Brands\Policies\SeoKeywordCompetitorPolicy;
 use Platform\Brands\Policies\CtaPolicy;
 use Platform\Brands\Policies\CtaBoardPolicy;
+use Platform\Brands\Policies\ContentBriefBoardPolicy;
 use Platform\Brands\Policies\SocialPlatformPolicy;
 use Platform\Brands\Policies\SocialPlatformFormatPolicy;
 use Platform\Brands\Policies\SocialCardContractPolicy;
@@ -280,6 +282,7 @@ class BrandsServiceProvider extends ServiceProvider
             BrandsSeoKeywordCompetitor::class => SeoKeywordCompetitorPolicy::class,
             BrandsCta::class => CtaPolicy::class,
             BrandsCtaBoard::class => CtaBoardPolicy::class,
+            BrandsContentBriefBoard::class => ContentBriefBoardPolicy::class,
             BrandsSocialPlatform::class => SocialPlatformPolicy::class,
             BrandsSocialPlatformFormat::class => SocialPlatformFormatPolicy::class,
             BrandsSocialCardContract::class => SocialCardContractPolicy::class,
@@ -653,6 +656,17 @@ class BrandsServiceProvider extends ServiceProvider
             $registry->register(new \Platform\Brands\Tools\ListSocialCardContractsTool());
             $registry->register(new \Platform\Brands\Tools\UpdateSocialCardContractTool());
             $registry->register(new \Platform\Brands\Tools\PublishSocialCardTool());
+
+            // ContentBriefBoard-Tools
+            $registry->register(new \Platform\Brands\Tools\CreateContentBriefBoardTool());
+            $registry->register(new \Platform\Brands\Tools\ListContentBriefBoardsTool());
+            $registry->register(new \Platform\Brands\Tools\GetContentBriefBoardTool());
+            $registry->register(new \Platform\Brands\Tools\UpdateContentBriefBoardTool());
+            $registry->register(new \Platform\Brands\Tools\DeleteContentBriefBoardTool());
+
+            // ContentBriefBoard Bulk-Tools
+            $registry->register(new \Platform\Brands\Tools\BulkCreateContentBriefBoardsTool());
+            $registry->register(new \Platform\Brands\Tools\BulkUpdateContentBriefBoardsTool());
 
             // Editorial Plan (Redaktionsplan-Ansicht)
             $registry->register(new \Platform\Brands\Tools\GetEditorialPlanTool());

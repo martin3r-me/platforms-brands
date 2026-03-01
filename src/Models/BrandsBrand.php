@@ -196,6 +196,14 @@ class BrandsBrand extends Model implements HasTimeAncestors, HasKeyResultAncesto
     }
 
     /**
+     * Content Brief Boards dieser Marke
+     */
+    public function contentBriefBoards()
+    {
+        return $this->hasMany(BrandsContentBriefBoard::class, 'brand_id')->orderBy('order');
+    }
+
+    /**
      * CTAs (Call-to-Actions) dieser Marke
      */
     public function ctas()
