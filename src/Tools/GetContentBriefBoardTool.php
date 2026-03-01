@@ -7,6 +7,7 @@ use Platform\Core\Contracts\ToolContext;
 use Platform\Core\Contracts\ToolResult;
 use Platform\Core\Contracts\ToolMetadataContract;
 use Platform\Brands\Models\BrandsContentBriefBoard;
+use Platform\Brands\Models\BrandsContentBriefLink;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Auth\Access\AuthorizationException;
 
@@ -47,7 +48,7 @@ class GetContentBriefBoardTool implements ToolContract, ToolMetadataContract
                 return ToolResult::error('VALIDATION_ERROR', 'Content Brief Board-ID ist erforderlich.');
             }
 
-            $board = BrandsContentBriefBoard::with(['brand', 'user', 'team', 'seoBoard'])
+            $board = BrandsContentBriefBoard::with(['brand', 'user', 'team', 'seoBoard', 'outgoingLinks.targetContentBrief', 'incomingLinks.sourceContentBrief'])
                 ->find($arguments['id']);
 
             if (!$board) {
@@ -59,6 +60,30 @@ class GetContentBriefBoardTool implements ToolContract, ToolMetadataContract
             } catch (AuthorizationException $e) {
                 return ToolResult::error('ACCESS_DENIED', 'Du hast keinen Zugriff auf dieses Content Brief Board (Policy).');
             }
+
+            $outgoingLinks = $board->outgoingLinks->map(function ($link) {
+                return [
+                    'id' => $link->id,
+                    'target_content_brief_id' => $link->target_content_brief_id,
+                    'target_content_brief_name' => $link->targetContentBrief->name,
+                    'target_content_type' => $link->targetContentBrief->content_type,
+                    'link_type' => $link->link_type,
+                    'link_type_label' => BrandsContentBriefLink::LINK_TYPES[$link->link_type] ?? $link->link_type,
+                    'anchor_hint' => $link->anchor_hint,
+                ];
+            })->values()->toArray();
+
+            $incomingLinks = $board->incomingLinks->map(function ($link) {
+                return [
+                    'id' => $link->id,
+                    'source_content_brief_id' => $link->source_content_brief_id,
+                    'source_content_brief_name' => $link->sourceContentBrief->name,
+                    'source_content_type' => $link->sourceContentBrief->content_type,
+                    'link_type' => $link->link_type,
+                    'link_type_label' => BrandsContentBriefLink::LINK_TYPES[$link->link_type] ?? $link->link_type,
+                    'anchor_hint' => $link->anchor_hint,
+                ];
+            })->values()->toArray();
 
             $data = [
                 'id' => $board->id,
@@ -81,6 +106,8 @@ class GetContentBriefBoardTool implements ToolContract, ToolMetadataContract
                 'user_id' => $board->user_id,
                 'done' => $board->done,
                 'done_at' => $board->done_at?->toIso8601String(),
+                'outgoing_links' => $outgoingLinks,
+                'incoming_links' => $incomingLinks,
                 'created_at' => $board->created_at->toIso8601String(),
                 'updated_at' => $board->updated_at->toIso8601String(),
             ];
