@@ -9,6 +9,7 @@ use Platform\Core\Contracts\ToolMetadataContract;
 use Platform\Brands\Models\BrandsContentBriefBoard;
 use Platform\Brands\Models\BrandsContentBriefKeywordCluster;
 use Platform\Brands\Models\BrandsContentBriefLink;
+use Platform\Brands\Models\BrandsContentBriefSection;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Auth\Access\AuthorizationException;
 
@@ -53,6 +54,7 @@ class GetContentBriefBoardTool implements ToolContract, ToolMetadataContract
                     'brand', 'user', 'team', 'seoBoard',
                     'outgoingLinks.targetContentBrief', 'incomingLinks.sourceContentBrief',
                     'briefKeywordClusters.keywordCluster.keywords', 'briefKeywordClusters.keywordCluster.seoBoard',
+                    'sections',
                 ])
                 ->find($arguments['id']);
 
@@ -130,6 +132,19 @@ class GetContentBriefBoardTool implements ToolContract, ToolMetadataContract
                     ];
                 })->values()->toArray();
 
+            $sections = $board->sections->map(function ($section) {
+                return [
+                    'id' => $section->id,
+                    'order' => $section->order,
+                    'heading' => $section->heading,
+                    'heading_level' => $section->heading_level,
+                    'heading_level_label' => BrandsContentBriefSection::HEADING_LEVELS[$section->heading_level] ?? $section->heading_level,
+                    'description' => $section->description,
+                    'target_keywords' => $section->target_keywords,
+                    'notes' => $section->notes,
+                ];
+            })->values()->toArray();
+
             $data = [
                 'id' => $board->id,
                 'uuid' => $board->uuid,
@@ -154,6 +169,7 @@ class GetContentBriefBoardTool implements ToolContract, ToolMetadataContract
                 'outgoing_links' => $outgoingLinks,
                 'incoming_links' => $incomingLinks,
                 'keyword_clusters' => $keywordClusters,
+                'sections' => $sections,
                 'created_at' => $board->created_at->toIso8601String(),
                 'updated_at' => $board->updated_at->toIso8601String(),
             ];

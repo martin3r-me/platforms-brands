@@ -678,6 +678,16 @@ class BrandsServiceProvider extends ServiceProvider
             $registry->register(new \Platform\Brands\Tools\ListContentBriefLinksTool());
             $registry->register(new \Platform\Brands\Tools\DeleteContentBriefLinkTool());
 
+            // ContentBriefSection-Tools (Outline Sections – Struktur-Skelett, KEIN Fließtext)
+            $registry->register(new \Platform\Brands\Tools\CreateContentBriefSectionTool());
+            $registry->register(new \Platform\Brands\Tools\ListContentBriefSectionsTool());
+            $registry->register(new \Platform\Brands\Tools\UpdateContentBriefSectionTool());
+            $registry->register(new \Platform\Brands\Tools\DeleteContentBriefSectionTool());
+
+            // ContentBriefSection Bulk-Tools
+            $registry->register(new \Platform\Brands\Tools\BulkCreateContentBriefSectionsTool());
+            $registry->register(new \Platform\Brands\Tools\BulkUpdateContentBriefSectionsTool());
+
             // Topic Cluster Map
             $registry->register(new \Platform\Brands\Tools\GetTopicClusterMapTool());
 
