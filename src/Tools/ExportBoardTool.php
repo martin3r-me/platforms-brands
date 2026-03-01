@@ -7,10 +7,10 @@ use Platform\Core\Contracts\ToolContext;
 use Platform\Core\Contracts\ToolResult;
 use Platform\Core\Contracts\ToolMetadataContract;
 use Platform\Brands\Models\BrandsCiBoard;
-use Platform\Brands\Models\BrandsContentBoard;
+// Deprecated: BrandsContentBoard entfernt (Ticket #441)
+// Deprecated: BrandsMultiContentBoard entfernt (Ticket #441)
 use Platform\Brands\Models\BrandsSocialBoard;
 use Platform\Brands\Models\BrandsKanbanBoard;
-use Platform\Brands\Models\BrandsMultiContentBoard;
 use Platform\Brands\Services\BrandsExportService;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -24,7 +24,7 @@ class ExportBoardTool implements ToolContract, ToolMetadataContract
 
     public function getDescription(): string
     {
-        return 'POST /brands/boards/{type}/{id}/export - Exportiert ein einzelnes Board. REST-Parameter: type (required, string) - Board-Typ ("ci-board", "content-board", "social-board", "kanban-board", "multi-content-board"). id (required, integer) - Board-ID. format (required, string) - Export-Format ("json" oder "pdf").';
+        return 'POST /brands/boards/{type}/{id}/export - Exportiert ein einzelnes Board. REST-Parameter: type (required, string) - Board-Typ ("ci-board", "social-board", "kanban-board"). id (required, integer) - Board-ID. format (required, string) - Export-Format ("json" oder "pdf"). HINWEIS: "content-board" und "multi-content-board" sind deprecated (Ticket #441).';
     }
 
     public function getSchema(): array
@@ -35,7 +35,7 @@ class ExportBoardTool implements ToolContract, ToolMetadataContract
                 'type' => [
                     'type' => 'string',
                     'description' => 'REST-Parameter (required): Board-Typ.',
-                    'enum' => ['ci-board', 'content-board', 'social-board', 'kanban-board', 'multi-content-board'],
+                    'enum' => ['ci-board', 'social-board', 'kanban-board'],
                 ],
                 'id' => [
                     'type' => 'integer',
@@ -103,10 +103,9 @@ class ExportBoardTool implements ToolContract, ToolMetadataContract
     {
         return match ($type) {
             'ci-board' => BrandsCiBoard::with('brand', 'colors')->find($id),
-            'content-board' => BrandsContentBoard::with('brand', 'blocks.content')->find($id),
+            // Deprecated: content-board und multi-content-board entfernt (Ticket #441)
             'social-board' => BrandsSocialBoard::with('brand', 'slots.cards')->find($id),
             'kanban-board' => BrandsKanbanBoard::with('brand', 'slots.cards')->find($id),
-            'multi-content-board' => BrandsMultiContentBoard::with('brand', 'slots.contentBoards.blocks.content')->find($id),
             default => null,
         };
     }

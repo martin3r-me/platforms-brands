@@ -7,7 +7,6 @@ use Platform\Core\Contracts\ToolContext;
 use Platform\Core\Contracts\ToolResult;
 use Platform\Core\Contracts\ToolMetadataContract;
 use Platform\Brands\Models\BrandsSocialCard;
-use Platform\Brands\Models\BrandsContentBoardBlock;
 use Platform\Brands\Models\BrandsFacebookPost;
 use Platform\Brands\Models\BrandsInstagramMedia;
 use Illuminate\Support\Facades\Gate;
@@ -25,7 +24,7 @@ class GetContentTool implements ToolContract, ToolMetadataContract
 
     public function getDescription(): string
     {
-        return 'GET /brands/content - Ruft Inhalte, Captions und Texte ab. REST-Parameter: type (required, string) - Typ: "social_card", "content_board_block", "facebook_post" oder "instagram_media". id (required, integer) - ID des Elements. Gibt alle verfügbaren Inhalte zurück (body_md, description, title, name, caption, message, etc.).';
+        return 'GET /brands/content - Ruft Inhalte, Captions und Texte ab. REST-Parameter: type (required, string) - Typ: "social_card", "facebook_post" oder "instagram_media". id (required, integer) - ID des Elements. Gibt alle verfügbaren Inhalte zurück (body_md, description, title, name, caption, message, etc.). HINWEIS: "content_board_block" ist deprecated und nicht mehr verfügbar.';
     }
 
     public function getSchema(): array
@@ -35,12 +34,12 @@ class GetContentTool implements ToolContract, ToolMetadataContract
             'properties' => [
                 'type' => [
                     'type' => 'string',
-                    'enum' => ['social_card', 'content_board_block', 'facebook_post', 'instagram_media'],
-                    'description' => 'Typ des Elements (ERFORDERLICH): "social_card" für Social Cards, "content_board_block" für Content Board Blocks, "facebook_post" für Facebook Posts oder "instagram_media" für Instagram Media.'
+                    'enum' => ['social_card', 'facebook_post', 'instagram_media'],
+                    'description' => 'Typ des Elements (ERFORDERLICH): "social_card" für Social Cards, "facebook_post" für Facebook Posts oder "instagram_media" für Instagram Media. HINWEIS: "content_board_block" ist deprecated.'
                 ],
                 'id' => [
                     'type' => 'integer',
-                    'description' => 'ID des Elements (ERFORDERLICH). Nutze "brands.social_cards.GET", "brands.content_board_blocks.GET", "brands.facebook_posts.GET" oder "brands.instagram_media.GET" um IDs zu finden.'
+                    'description' => 'ID des Elements (ERFORDERLICH). Nutze "brands.social_cards.GET", "brands.facebook_posts.GET" oder "brands.instagram_media.GET" um IDs zu finden.'
                 ],
             ],
             'required' => ['type', 'id']
@@ -100,36 +99,8 @@ class GetContentTool implements ToolContract, ToolMetadataContract
                     break;
 
                 case 'content_board_block':
-                    $content = BrandsContentBoardBlock::with(['contentBoard', 'user', 'team'])
-                        ->find($id);
-
-                    if (!$content) {
-                        return ToolResult::error('CONTENT_BOARD_BLOCK_NOT_FOUND', 'Der angegebene Content Board Block wurde nicht gefunden.');
-                    }
-
-                    $contentBoard = $content->contentBoard;
-
-                    // Policy prüfen
-                    try {
-                        Gate::forUser($context->user)->authorize('view', $contentBoard);
-                    } catch (AuthorizationException $e) {
-                        return ToolResult::error('ACCESS_DENIED', 'Du hast keinen Zugriff auf diesen Content Board Block (Policy).');
-                    }
-
-                    $contentData = [
-                        'type' => 'content_board_block',
-                        'id' => $content->id,
-                        'uuid' => $content->uuid,
-                        'name' => $content->name,
-                        'description' => $content->description,
-                        'text' => $content->description, // Alias für description
-                        'content' => $content->description, // Alias für description
-                        'content_board_id' => $contentBoard->id,
-                        'content_board_name' => $contentBoard->name,
-                        'created_at' => $content->created_at->toIso8601String(),
-                        'updated_at' => $content->updated_at->toIso8601String(),
-                    ];
-                    break;
+                    // Deprecated: Content Board Blocks wurden entfernt (Ticket #441)
+                    return ToolResult::error('DEPRECATED', 'Content Board Blocks sind deprecated und wurden entfernt (Ticket #441). Nutze stattdessen Content Brief Boards.');
 
                 case 'facebook_post':
                     $content = BrandsFacebookPost::with(['facebookPage', 'user'])
@@ -207,7 +178,7 @@ class GetContentTool implements ToolContract, ToolMetadataContract
                     break;
 
                 default:
-                    return ToolResult::error('INVALID_TYPE', 'Ungültiger Typ. Erlaubt: "social_card", "content_board_block", "facebook_post" oder "instagram_media".');
+                    return ToolResult::error('INVALID_TYPE', 'Ungültiger Typ. Erlaubt: "social_card", "facebook_post" oder "instagram_media".');
             }
 
             return ToolResult::success($contentData);

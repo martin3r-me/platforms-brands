@@ -8,7 +8,6 @@ use Platform\Core\Contracts\ToolResult;
 use Platform\Core\Contracts\ToolMetadataContract;
 use Platform\Brands\Models\BrandsBrand;
 use Platform\Brands\Models\BrandsCta;
-use Platform\Brands\Models\BrandsContentBoardBlock;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Auth\Access\AuthorizationException;
 
@@ -61,7 +60,7 @@ class CreateCtaTool implements ToolContract, ToolMetadataContract
                 ],
                 'target_page_id' => [
                     'type' => 'integer',
-                    'description' => 'Optional: ID eines Content Board Blocks als Zielseite. Nutze "brands.content_board_blocks.GET" um Blocks zu finden. Der CTA gehört semantisch zur Zielseite – er verweist DORTHIN, nicht VON dort.',
+                    'description' => 'Optional (deprecated, Ticket #441): Ehemals ID eines Content Board Blocks als Zielseite. Verwende stattdessen target_url.',
                 ],
                 'target_url' => [
                     'type' => 'string',
@@ -119,14 +118,8 @@ class CreateCtaTool implements ToolContract, ToolMetadataContract
                 return ToolResult::error('VALIDATION_ERROR', 'funnel_stage ist erforderlich. Erlaubte Werte: ' . implode(', ', BrandsCta::FUNNEL_STAGES));
             }
 
-            // Target Page validieren (falls angegeben)
+            // target_page_id ist deprecated (Ticket #441) – ignoriert, aber nicht abgelehnt für Rückwärtskompatibilität
             $targetPageId = $arguments['target_page_id'] ?? null;
-            if ($targetPageId) {
-                $targetPage = BrandsContentBoardBlock::find($targetPageId);
-                if (!$targetPage) {
-                    return ToolResult::error('TARGET_PAGE_NOT_FOUND', 'Der angegebene Content Board Block (target_page_id) wurde nicht gefunden. Nutze "brands.content_board_blocks.GET" um Blocks zu finden.');
-                }
-            }
 
             // CTA erstellen
             $cta = BrandsCta::create([

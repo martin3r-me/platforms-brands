@@ -7,7 +7,6 @@ use Platform\Core\Contracts\ToolContext;
 use Platform\Core\Contracts\ToolResult;
 use Platform\Core\Tools\Concerns\HasStandardizedWriteOperations;
 use Platform\Brands\Models\BrandsCta;
-use Platform\Brands\Models\BrandsContentBoardBlock;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Auth\Access\AuthorizationException;
 
@@ -57,7 +56,7 @@ class UpdateCtaTool implements ToolContract
                 ],
                 'target_page_id' => [
                     'type' => 'integer',
-                    'description' => 'Optional: ID eines Content Board Blocks als Zielseite. Nutze "brands.content_board_blocks.GET" um Blocks zu finden.',
+                    'description' => 'Optional (deprecated, Ticket #441): Ehemals ID eines Content Board Blocks als Zielseite. Verwende stattdessen target_url.',
                 ],
                 'target_url' => [
                     'type' => 'string',
@@ -127,15 +126,9 @@ class UpdateCtaTool implements ToolContract
                 $updateData['funnel_stage'] = $arguments['funnel_stage'];
             }
 
+            // target_page_id ist deprecated (Ticket #441) – ignoriert, aber nicht abgelehnt für Rückwärtskompatibilität
             if (array_key_exists('target_page_id', $arguments)) {
-                $targetPageId = $arguments['target_page_id'];
-                if ($targetPageId !== null) {
-                    $targetPage = BrandsContentBoardBlock::find($targetPageId);
-                    if (!$targetPage) {
-                        return ToolResult::error('TARGET_PAGE_NOT_FOUND', 'Der angegebene Content Board Block (target_page_id) wurde nicht gefunden.');
-                    }
-                }
-                $updateData['target_page_id'] = $targetPageId;
+                $updateData['target_page_id'] = $arguments['target_page_id'];
             }
 
             if (array_key_exists('target_url', $arguments)) {

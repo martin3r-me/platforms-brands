@@ -50,29 +50,12 @@ class Brand extends Component
         return $this->redirect(route('brands.ci-boards.show', $ciBoard), navigate: true);
     }
 
+    /**
+     * @deprecated Content Boards wurden entfernt (Ticket #441). Verwende stattdessen createContentBriefBoard().
+     */
     public function createContentBoard()
     {
-        $this->authorize('update', $this->brand);
-        
-        $user = Auth::user();
-        $team = $user->currentTeam;
-        
-        if (!$team) {
-            session()->flash('error', 'Kein Team ausgewählt.');
-            return;
-        }
-
-        $contentBoard = \Platform\Brands\Models\BrandsContentBoard::create([
-            'name' => 'Neues Content Board',
-            'description' => null,
-            'user_id' => $user->id,
-            'team_id' => $team->id,
-            'brand_id' => $this->brand->id,
-        ]);
-
-        $this->brand->refresh();
-        
-        return $this->redirect(route('brands.content-boards.show', $contentBoard), navigate: true);
+        session()->flash('error', 'Content Boards wurden durch Content Briefs ersetzt (Ticket #441). Bitte nutze stattdessen "Content Brief Board erstellen".');
     }
 
     public function createSocialBoard()
@@ -125,29 +108,12 @@ class Brand extends Component
         return $this->redirect(route('brands.kanban-boards.show', $kanbanBoard), navigate: true);
     }
 
+    /**
+     * @deprecated Multi Content Boards wurden entfernt (Ticket #441). Verwende stattdessen createContentBriefBoard().
+     */
     public function createMultiContentBoard()
     {
-        $this->authorize('update', $this->brand);
-        
-        $user = Auth::user();
-        $team = $user->currentTeam;
-        
-        if (!$team) {
-            session()->flash('error', 'Kein Team ausgewählt.');
-            return;
-        }
-
-        $multiContentBoard = \Platform\Brands\Models\BrandsMultiContentBoard::create([
-            'name' => 'Neues Multi-Content-Board',
-            'description' => null,
-            'user_id' => $user->id,
-            'team_id' => $team->id,
-            'brand_id' => $this->brand->id,
-        ]);
-
-        $this->brand->refresh();
-        
-        return $this->redirect(route('brands.multi-content-boards.show', $multiContentBoard), navigate: true);
+        session()->flash('error', 'Multi-Content-Boards wurden durch Content Briefs ersetzt (Ticket #441). Bitte nutze stattdessen "Content Brief Board erstellen".');
     }
 
     public function createTypographyBoard()
@@ -593,10 +559,9 @@ class Brand extends Component
 
         // Alle Board-Typen laden mit Entry-Counts
         $ciBoards = $this->brand->ciBoards;
-        $contentBoards = $this->brand->contentBoards;
+        // Deprecated: contentBoards und multiContentBoards entfernt (Ticket #441)
         $socialBoards = $this->brand->socialBoards;
         $kanbanBoards = $this->brand->kanbanBoards;
-        $multiContentBoards = $this->brand->multiContentBoards;
         $typographyBoards = $this->brand->typographyBoards;
         $logoBoards = $this->brand->logoBoards;
         $toneOfVoiceBoards = $this->brand->toneOfVoiceBoards;
@@ -621,17 +586,7 @@ class Brand extends Component
                 'entryRelation' => 'colors',
                 'entryLabel' => 'Farben',
             ],
-            [
-                'key' => 'content',
-                'label' => 'Content Boards',
-                'icon' => 'heroicon-o-document-text',
-                'color' => 'blue',
-                'boards' => $contentBoards,
-                'routePrefix' => 'brands.content-boards.show',
-                'boardType' => 'content-board',
-                'entryRelation' => 'blocks',
-                'entryLabel' => 'Blöcke',
-            ],
+            // Deprecated: Content Boards entfernt (Ticket #441)
             [
                 'key' => 'social',
                 'label' => 'Social Boards',
@@ -654,17 +609,7 @@ class Brand extends Component
                 'entryRelation' => 'cards',
                 'entryLabel' => 'Cards',
             ],
-            [
-                'key' => 'multi-content',
-                'label' => 'Multi-Content-Boards',
-                'icon' => 'heroicon-o-squares-2x2',
-                'color' => 'green',
-                'boards' => $multiContentBoards,
-                'routePrefix' => 'brands.multi-content-boards.show',
-                'boardType' => 'multi-content-board',
-                'entryRelation' => 'slots',
-                'entryLabel' => 'Slots',
-            ],
+            // Deprecated: Multi-Content-Boards entfernt (Ticket #441)
             [
                 'key' => 'typography',
                 'label' => 'Typografie Boards',
@@ -813,10 +758,9 @@ class Brand extends Component
             'user' => $user,
             'boardGroups' => $boardGroups,
             'ciBoards' => $ciBoards,
-            'contentBoards' => $contentBoards,
+            // Deprecated: contentBoards und multiContentBoards entfernt (Ticket #441)
             'socialBoards' => $socialBoards,
             'kanbanBoards' => $kanbanBoards,
-            'multiContentBoards' => $multiContentBoards,
             'typographyBoards' => $typographyBoards,
             'logoBoards' => $logoBoards,
             'toneOfVoiceBoards' => $toneOfVoiceBoards,

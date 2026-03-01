@@ -34,19 +34,7 @@
                             style="display: none;"
                         >
                             <div class="py-1">
-                                <button
-                                    wire:click="createContentBoard"
-                                    @click="open = false"
-                                    class="w-full text-left px-4 py-2.5 text-sm text-[var(--ui-secondary)] hover:bg-[var(--ui-muted-5)] transition-colors flex items-center gap-3"
-                                >
-                                    <div class="flex items-center justify-center w-8 h-8 rounded-md bg-blue-50">
-                                        @svg('heroicon-o-document-text', 'w-4 h-4 text-blue-600')
-                                    </div>
-                                    <div>
-                                        <div class="font-medium">Content Board</div>
-                                        <div class="text-xs text-[var(--ui-muted)]">Für Content-Planung</div>
-                                    </div>
-                                </button>
+                                {{-- Deprecated: Content Board erstellen entfernt (Ticket #441) – ersetzt durch Content Brief Board --}}
                                 <button
                                     wire:click="createSocialBoard"
                                     @click="open = false"
@@ -86,19 +74,7 @@
                                         <div class="text-xs text-[var(--ui-muted)]">Für Aufgabenverwaltung</div>
                                     </div>
                                 </button>
-                                <button
-                                    wire:click="createMultiContentBoard"
-                                    @click="open = false"
-                                    class="w-full text-left px-4 py-2.5 text-sm text-[var(--ui-secondary)] hover:bg-[var(--ui-muted-5)] transition-colors flex items-center gap-3"
-                                >
-                                    <div class="flex items-center justify-center w-8 h-8 rounded-md bg-green-50">
-                                        @svg('heroicon-o-squares-2x2', 'w-4 h-4 text-green-600')
-                                    </div>
-                                    <div>
-                                        <div class="font-medium">Multi-Content-Board</div>
-                                        <div class="text-xs text-[var(--ui-muted)]">Kanban mit Content Boards</div>
-                                    </div>
-                                </button>
+                                {{-- Deprecated: Multi-Content-Board erstellen entfernt (Ticket #441) – ersetzt durch Content Brief Board --}}
                                 <button
                                     wire:click="createTypographyBoard"
                                     @click="open = false"
@@ -388,7 +364,7 @@
                     <h3 class="text-lg font-semibold text-[var(--ui-secondary)] mb-2">Noch keine Boards</h3>
                     <p class="text-sm text-[var(--ui-muted)] mb-6">Erstelle dein erstes Board für diese Marke.</p>
                     @can('update', $brand)
-                        <x-ui-button variant="primary" size="sm" wire:click="createContentBoard">
+                        <x-ui-button variant="primary" size="sm" wire:click="createContentBriefBoard">
                             <span class="inline-flex items-center gap-2">
                                 @svg('heroicon-o-plus', 'w-4 h-4')
                                 <span>Board erstellen</span>

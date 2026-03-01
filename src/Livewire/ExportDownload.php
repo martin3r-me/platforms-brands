@@ -6,10 +6,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Platform\Brands\Models\BrandsBrand;
 use Platform\Brands\Models\BrandsCiBoard;
-use Platform\Brands\Models\BrandsContentBoard;
+// Deprecated: BrandsContentBoard entfernt (Ticket #441)
+// Deprecated: BrandsMultiContentBoard entfernt (Ticket #441)
 use Platform\Brands\Models\BrandsSocialBoard;
 use Platform\Brands\Models\BrandsKanbanBoard;
-use Platform\Brands\Models\BrandsMultiContentBoard;
 use Platform\Brands\Models\BrandsTypographyBoard;
 use Platform\Brands\Models\BrandsToneOfVoiceBoard;
 use Platform\Brands\Models\BrandsGuidelineBoard;
@@ -59,10 +59,9 @@ class ExportDownload
     {
         return match ($type) {
             'ci-board' => BrandsCiBoard::with('brand', 'colors')->find($id),
-            'content-board' => BrandsContentBoard::with('brand', 'blocks.content')->find($id),
+            // Deprecated: content-board und multi-content-board entfernt (Ticket #441)
             'social-board' => BrandsSocialBoard::with('brand', 'slots.cards')->find($id),
             'kanban-board' => BrandsKanbanBoard::with('brand', 'slots.cards')->find($id),
-            'multi-content-board' => BrandsMultiContentBoard::with('brand', 'slots.contentBoards.blocks.content')->find($id),
             'typography-board' => BrandsTypographyBoard::with('brand', 'entries')->find($id),
             'tone-of-voice-board' => BrandsToneOfVoiceBoard::with('brand', 'entries', 'dimensions')->find($id),
             'guideline-board' => BrandsGuidelineBoard::with('brand', 'chapters.entries')->find($id),

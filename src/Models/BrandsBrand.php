@@ -125,11 +125,13 @@ class BrandsBrand extends Model implements HasTimeAncestors, HasKeyResultAncesto
     }
 
     /**
-     * Content Boards dieser Marke
+     * @deprecated Content Boards wurden entfernt (Ticket #441 – Entfernung 2026-06-01).
+     *             Verwende stattdessen contentBriefBoards().
      */
     public function contentBoards()
     {
-        return $this->hasMany(BrandsContentBoard::class, 'brand_id')->orderBy('order');
+        // Deprecated: gibt leere Collection zurück
+        return $this->hasMany(self::class, 'id')->whereRaw('1 = 0');
     }
 
     /**
@@ -145,9 +147,14 @@ class BrandsBrand extends Model implements HasTimeAncestors, HasKeyResultAncesto
         return $this->hasMany(BrandsKanbanBoard::class, 'brand_id')->orderBy('order');
     }
 
+    /**
+     * @deprecated Multi Content Boards wurden entfernt (Ticket #441 – Entfernung 2026-06-01).
+     *             Verwende stattdessen contentBriefBoards().
+     */
     public function multiContentBoards()
     {
-        return $this->hasMany(BrandsMultiContentBoard::class, 'brand_id')->orderBy('order');
+        // Deprecated: gibt leere Collection zurück
+        return $this->hasMany(self::class, 'id')->whereRaw('1 = 0');
     }
 
     public function typographyBoards()

@@ -7,7 +7,6 @@ use Illuminate\Support\Facades\Schedule;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Str;
 use Livewire\Livewire;
 use Platform\Core\PlatformCore;
@@ -16,9 +15,10 @@ use Platform\Core\Routing\ModuleRouter;
 use Platform\Brands\Models\BrandsBrand;
 use Platform\Brands\Models\BrandsCiBoard;
 use Platform\Brands\Models\BrandsCiBoardColor;
-use Platform\Brands\Models\BrandsContentBoard;
-use Platform\Brands\Models\BrandsContentBoardBlockText;
-use Platform\Brands\Models\BrandsMultiContentBoard;
+// Deprecated: Content Boards & Multi Content Boards (Ticket #441 – Entfernung 2026-06-01)
+// use Platform\Brands\Models\BrandsContentBoard;
+// use Platform\Brands\Models\BrandsContentBoardBlockText;
+// use Platform\Brands\Models\BrandsMultiContentBoard;
 use Platform\Brands\Models\BrandsSocialBoard;
 use Platform\Brands\Models\BrandsSocialCard;
 use Platform\Brands\Models\BrandsKanbanBoard;
@@ -58,8 +58,9 @@ use Platform\Integrations\Models\IntegrationsInstagramAccount;
 use Platform\Brands\Policies\BrandPolicy;
 use Platform\Brands\Policies\CiBoardPolicy;
 use Platform\Brands\Policies\CiBoardColorPolicy;
-use Platform\Brands\Policies\ContentBoardPolicy;
-use Platform\Brands\Policies\MultiContentBoardPolicy;
+// Deprecated: Content Boards & Multi Content Boards (Ticket #441 – Entfernung 2026-06-01)
+// use Platform\Brands\Policies\ContentBoardPolicy;
+// use Platform\Brands\Policies\MultiContentBoardPolicy;
 use Platform\Brands\Policies\SocialBoardPolicy;
 use Platform\Brands\Policies\SocialCardPolicy;
 use Platform\Brands\Policies\KanbanBoardPolicy;
@@ -95,7 +96,8 @@ use Platform\Brands\Policies\SocialPlatformFormatPolicy;
 use Platform\Brands\Policies\SocialCardContractPolicy;
 use Platform\Brands\Policies\FacebookPagePolicy;
 use Platform\Brands\Policies\InstagramAccountPolicy;
-use Platform\Brands\Observers\ContentBoardObserver;
+// Deprecated: Content Board Observer (Ticket #441 – Entfernung 2026-06-01)
+// use Platform\Brands\Observers\ContentBoardObserver;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 
@@ -196,13 +198,12 @@ class BrandsServiceProvider extends ServiceProvider
         $this->registerPolicies();
 
         // Observers registrieren
-        BrandsContentBoard::observe(ContentBoardObserver::class);
+        // Deprecated: ContentBoardObserver entfernt (Ticket #441)
 
         // Scheduler registrieren
         $this->registerSchedule();
 
-        // Morph Map für Content Board Block Types registrieren
-        $this->registerMorphMap();
+        // Deprecated: Morph Map für Content Board Block Types entfernt (Ticket #441)
 
         // Tools registrieren
         $this->registerTools();
@@ -251,8 +252,7 @@ class BrandsServiceProvider extends ServiceProvider
             BrandsBrand::class => BrandPolicy::class,
             BrandsCiBoard::class => CiBoardPolicy::class,
             BrandsCiBoardColor::class => CiBoardColorPolicy::class,
-            BrandsContentBoard::class => ContentBoardPolicy::class,
-            BrandsMultiContentBoard::class => MultiContentBoardPolicy::class,
+            // Deprecated: ContentBoard + MultiContentBoard Policies entfernt (Ticket #441)
             BrandsSocialBoard::class => SocialBoardPolicy::class,
             BrandsSocialCard::class => SocialCardPolicy::class,
             BrandsKanbanBoard::class => KanbanBoardPolicy::class,
@@ -306,19 +306,6 @@ class BrandsServiceProvider extends ServiceProvider
     }
 
     /**
-     * Registriert Morph Map für Content Board Block Types
-     * Verwendet morphMap() statt enforceMorphMap(), damit nur unsere Content-Typen gemappt werden
-     * und andere polymorphe Beziehungen im System nicht betroffen sind.
-     */
-    protected function registerMorphMap(): void
-    {
-        Relation::morphMap([
-            'text' => BrandsContentBoardBlockText::class,
-            // 'image' => BrandsContentBoardBlockImage::class,
-        ]);
-    }
-
-    /**
      * Registriert Tools für das Brands-Modul
      */
     protected function registerTools(): void
@@ -351,13 +338,8 @@ class BrandsServiceProvider extends ServiceProvider
             $registry->register(new \Platform\Brands\Tools\UpdateCiBoardColorTool());
             $registry->register(new \Platform\Brands\Tools\DeleteCiBoardColorTool());
             
-            // ContentBoard-Tools
-            $registry->register(new \Platform\Brands\Tools\CreateContentBoardTool());
-            $registry->register(new \Platform\Brands\Tools\ListContentBoardsTool());
-            $registry->register(new \Platform\Brands\Tools\GetContentBoardTool());
-            $registry->register(new \Platform\Brands\Tools\UpdateContentBoardTool());
-            $registry->register(new \Platform\Brands\Tools\DeleteContentBoardTool());
-            
+            // Deprecated: ContentBoard-Tools entfernt (Ticket #441 – Entfernung 2026-06-01)
+
             // SocialBoard-Tools
             $registry->register(new \Platform\Brands\Tools\CreateSocialBoardTool());
             $registry->register(new \Platform\Brands\Tools\ListSocialBoardsTool());
@@ -365,13 +347,8 @@ class BrandsServiceProvider extends ServiceProvider
             $registry->register(new \Platform\Brands\Tools\UpdateSocialBoardTool());
             $registry->register(new \Platform\Brands\Tools\DeleteSocialBoardTool());
             
-            // MultiContentBoard-Tools
-            $registry->register(new \Platform\Brands\Tools\CreateMultiContentBoardTool());
-            $registry->register(new \Platform\Brands\Tools\ListMultiContentBoardsTool());
-            $registry->register(new \Platform\Brands\Tools\GetMultiContentBoardTool());
-            $registry->register(new \Platform\Brands\Tools\UpdateMultiContentBoardTool());
-            $registry->register(new \Platform\Brands\Tools\DeleteMultiContentBoardTool());
-            
+            // Deprecated: MultiContentBoard-Tools entfernt (Ticket #441 – Entfernung 2026-06-01)
+
             // KanbanBoard-Tools
             $registry->register(new \Platform\Brands\Tools\CreateKanbanBoardTool());
             $registry->register(new \Platform\Brands\Tools\ListKanbanBoardsTool());
@@ -425,23 +402,8 @@ class BrandsServiceProvider extends ServiceProvider
             $registry->register(new \Platform\Brands\Tools\BulkCreateSocialCardsTool());
             $registry->register(new \Platform\Brands\Tools\BulkUpdateSocialCardsTool());
             
-            // ContentBoardBlock-Tools
-            $registry->register(new \Platform\Brands\Tools\CreateContentBoardBlockTool());
-            $registry->register(new \Platform\Brands\Tools\ListContentBoardBlocksTool());
-            $registry->register(new \Platform\Brands\Tools\GetContentBoardBlockTool());
-            $registry->register(new \Platform\Brands\Tools\UpdateContentBoardBlockTool());
-            $registry->register(new \Platform\Brands\Tools\DeleteContentBoardBlockTool());
-            
-            // ContentBoardBlock Bulk-Tools
-            $registry->register(new \Platform\Brands\Tools\BulkCreateContentBoardBlocksTool());
-            $registry->register(new \Platform\Brands\Tools\BulkUpdateContentBoardBlocksTool());
-            
-            // ContentBoardBlockText Tools (CRUD)
-            $registry->register(new \Platform\Brands\Tools\CreateContentBoardBlockTextTool());
-            $registry->register(new \Platform\Brands\Tools\UpdateContentBoardBlockTextTool());
-            $registry->register(new \Platform\Brands\Tools\GetContentBoardBlockTextTool());
-            $registry->register(new \Platform\Brands\Tools\DeleteContentBoardBlockTextTool());
-            
+            // Deprecated: ContentBoardBlock + ContentBoardBlockText-Tools entfernt (Ticket #441 – Entfernung 2026-06-01)
+
             // Facebook Pages-Tools
             $registry->register(new \Platform\Brands\Tools\ListFacebookPagesTool());
             $registry->register(new \Platform\Brands\Tools\GetFacebookPageTool());

@@ -73,11 +73,15 @@ class BrandsCta extends Model implements HasDisplayName
     }
 
     /**
-     * Optionale Zielseite (Content Board Block)
+     * Optionale Zielseite.
+     * @deprecated target_page_id referenzierte Content Board Blocks (Ticket #441 – deprecated).
+     *             Verwende stattdessen target_url. Diese Relation liefert null bis Entfernung 2026-06-01.
      */
     public function targetPage(): BelongsTo
     {
-        return $this->belongsTo(BrandsContentBoardBlock::class, 'target_page_id');
+        // Content Board Blocks wurden entfernt (Ticket #441).
+        // Fallback: target_url verwenden.
+        return $this->belongsTo(self::class, 'target_page_id')->withDefault(null);
     }
 
     public function user(): BelongsTo
@@ -117,35 +121,18 @@ class BrandsCta extends Model implements HasDisplayName
             return $this->target_url;
         }
 
-        if ($this->target_page_id && $this->targetPage) {
-            // Prefer published_url from the parent Content Board if available
-            $contentBoard = $this->targetPage->contentBoard;
-            if ($contentBoard && $contentBoard->published_url) {
-                return $contentBoard->published_url;
-            }
-
-            return route('brands.content-board-blocks.show', [
-                'brandsContentBoardBlock' => $this->target_page_id,
-                'type' => 'text',
-            ]);
-        }
-
+        // Deprecated: Content Board Block target_page_id ist nicht mehr auflösbar (Ticket #441)
         return null;
     }
 
     /**
      * Resolve the page context URL for this CTA.
-     * Returns the published_url of the target page's Content Board if available.
+     *
+     * @deprecated target_page_id referenzierte Content Board Blocks (Ticket #441 – deprecated).
      */
     public function getPageContextUrl(): ?string
     {
-        if ($this->target_page_id && $this->targetPage) {
-            $contentBoard = $this->targetPage->contentBoard;
-            if ($contentBoard && $contentBoard->published_url) {
-                return $contentBoard->published_url;
-            }
-        }
-
+        // Deprecated: Content Board Block target_page_id ist nicht mehr auflösbar (Ticket #441)
         return null;
     }
 }

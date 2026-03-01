@@ -4,10 +4,10 @@ namespace Platform\Brands\Services;
 
 use Platform\Brands\Models\BrandsBrand;
 use Platform\Brands\Models\BrandsCiBoard;
-use Platform\Brands\Models\BrandsContentBoard;
+// Deprecated: BrandsContentBoard entfernt (Ticket #441)
+// Deprecated: BrandsMultiContentBoard entfernt (Ticket #441)
 use Platform\Brands\Models\BrandsSocialBoard;
 use Platform\Brands\Models\BrandsKanbanBoard;
-use Platform\Brands\Models\BrandsMultiContentBoard;
 use Platform\Brands\Models\BrandsTypographyBoard;
 use Platform\Brands\Models\BrandsToneOfVoiceBoard;
 use Platform\Brands\Models\BrandsGuidelineBoard;
@@ -98,10 +98,9 @@ class BrandsExportService
     {
         $brand->load([
             'ciBoards.colors',
-            'contentBoards.blocks.content',
+            // Deprecated: contentBoards und multiContentBoards entfernt (Ticket #441)
             'socialBoards.slots.cards',
             'kanbanBoards.slots.cards',
-            'multiContentBoards.slots.contentBoards.blocks.content',
             'typographyBoards.entries',
             'toneOfVoiceBoards.entries',
             'toneOfVoiceBoards.dimensions',
@@ -124,10 +123,11 @@ class BrandsExportService
             'created_at' => $brand->created_at?->toIso8601String(),
             'settings' => $settings,
             'ci_boards' => $brand->ciBoards->map(fn ($b) => $this->collectCiBoardData($b))->toArray(),
-            'content_boards' => $brand->contentBoards->map(fn ($b) => $this->collectContentBoardData($b))->toArray(),
+            // Deprecated: content_boards und multi_content_boards entfernt (Ticket #441)
+            'content_boards' => [],
             'social_boards' => $brand->socialBoards->map(fn ($b) => $this->collectSocialBoardData($b))->toArray(),
             'kanban_boards' => $brand->kanbanBoards->map(fn ($b) => $this->collectKanbanBoardData($b))->toArray(),
-            'multi_content_boards' => $brand->multiContentBoards->map(fn ($b) => $this->collectMultiContentBoardData($b))->toArray(),
+            'multi_content_boards' => [],
             'typography_boards' => $brand->typographyBoards->map(fn ($b) => $this->collectTypographyBoardData($b))->toArray(),
             'tone_of_voice_boards' => $brand->toneOfVoiceBoards->map(fn ($b) => $this->collectToneOfVoiceBoardData($b))->toArray(),
             'guideline_boards' => $brand->guidelineBoards->map(fn ($b) => $this->collectGuidelineBoardData($b))->toArray(),
@@ -142,10 +142,9 @@ class BrandsExportService
     {
         return match (true) {
             $board instanceof BrandsCiBoard => $this->collectCiBoardData($board),
-            $board instanceof BrandsContentBoard => $this->collectContentBoardData($board),
+            // Deprecated: BrandsContentBoard und BrandsMultiContentBoard entfernt (Ticket #441)
             $board instanceof BrandsSocialBoard => $this->collectSocialBoardData($board),
             $board instanceof BrandsKanbanBoard => $this->collectKanbanBoardData($board),
-            $board instanceof BrandsMultiContentBoard => $this->collectMultiContentBoardData($board),
             $board instanceof BrandsTypographyBoard => $this->collectTypographyBoardData($board),
             $board instanceof BrandsToneOfVoiceBoard => $this->collectToneOfVoiceBoardData($board),
             $board instanceof BrandsGuidelineBoard => $this->collectGuidelineBoardData($board),
@@ -201,49 +200,7 @@ class BrandsExportService
         ];
     }
 
-    protected function collectContentBoardData(BrandsContentBoard $board): array
-    {
-        $board->loadMissing('blocks.content');
-
-        return [
-            'id' => $board->id,
-            'uuid' => $board->uuid,
-            'type' => 'content',
-            'name' => $board->name,
-            'description' => $board->description,
-            'blocks' => $board->blocks->map(fn ($block) => [
-                'id' => $block->id,
-                'uuid' => $block->uuid,
-                'name' => $block->name,
-                'description' => $block->description,
-                'order' => $block->order,
-                'content_type' => $block->content_type,
-                'content' => $this->collectBlockContent($block),
-            ])->toArray(),
-            'created_at' => $board->created_at?->toIso8601String(),
-        ];
-    }
-
-    protected function collectBlockContent($block): ?array
-    {
-        $content = $block->content;
-        if (!$content) {
-            return null;
-        }
-
-        // Polymorphic: currently only 'text'
-        if ($block->content_type === 'text') {
-            return [
-                'type' => 'text',
-                'text' => $content->content,
-            ];
-        }
-
-        return [
-            'type' => $block->content_type,
-            'id' => $content->id ?? null,
-        ];
-    }
+    // Deprecated: collectContentBoardData() und collectBlockContent() entfernt (Ticket #441)
 
     protected function collectSocialBoardData(BrandsSocialBoard $board): array
     {
@@ -300,26 +257,7 @@ class BrandsExportService
         ];
     }
 
-    protected function collectMultiContentBoardData(BrandsMultiContentBoard $board): array
-    {
-        $board->loadMissing('slots.contentBoards.blocks.content');
-
-        return [
-            'id' => $board->id,
-            'uuid' => $board->uuid,
-            'type' => 'multi_content',
-            'name' => $board->name,
-            'description' => $board->description,
-            'slots' => $board->slots->map(fn ($slot) => [
-                'id' => $slot->id,
-                'uuid' => $slot->uuid,
-                'name' => $slot->name,
-                'order' => $slot->order,
-                'content_boards' => $slot->contentBoards->map(fn ($cb) => $this->collectContentBoardData($cb))->toArray(),
-            ])->toArray(),
-            'created_at' => $board->created_at?->toIso8601String(),
-        ];
-    }
+    // Deprecated: collectMultiContentBoardData() entfernt (Ticket #441)
 
     protected function collectTypographyBoardData(BrandsTypographyBoard $board): array
     {
