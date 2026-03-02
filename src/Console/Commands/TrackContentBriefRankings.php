@@ -33,8 +33,10 @@ class TrackContentBriefRankings extends Command
         $this->newLine();
 
         foreach ($result['results'] as $briefResult) {
+            $name = $briefResult['brief_name'] ?? 'Unbekannt';
+
             if (isset($briefResult['error'])) {
-                $this->warn("  ✗ {$briefResult['brief_name'] ?? 'Unbekannt'}: {$briefResult['error']}");
+                $this->warn("  ✗ {$name}: {$briefResult['error']}");
                 continue;
             }
 
@@ -42,7 +44,6 @@ class TrackContentBriefRankings extends Command
             $matched = $briefResult['matched'];
             $notFound = $briefResult['not_found'];
             $cost = $briefResult['cost_cents'];
-            $name = $briefResult['brief_name'];
 
             $this->line("  → {$name}");
             $this->info("    Keywords: {$tracked} getrackt, {$matched} URL-Match, {$notFound} nicht gefunden ({$cost} Cents)");
