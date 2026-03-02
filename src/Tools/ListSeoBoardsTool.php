@@ -96,6 +96,7 @@ class ListSeoBoardsTool implements ToolContract, ToolMetadataContract
                     'done_at' => $seoBoard->done_at?->toIso8601String(),
                     'budget_limit_cents' => $seoBoard->budget_limit_cents,
                     'budget_spent_cents' => $seoBoard->budget_spent_cents,
+                    'locations' => $seoBoard->getLocations(),
                     'created_at' => $seoBoard->created_at->toIso8601String(),
                 ];
             })->values()->toArray();

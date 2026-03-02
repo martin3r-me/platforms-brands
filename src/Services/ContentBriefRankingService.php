@@ -20,101 +20,115 @@ class ContentBriefRankingService
     /**
      * Trackt Rankings für ein einzelnes Content Brief Board.
      * Prüft alle Keywords in den verknüpften Keyword-Clustern gegen die target_url.
+     * Unterstützt Multi-Region: Wenn auf dem SEO Board mehrere Locations konfiguriert sind,
+     * wird pro Keyword pro Location ein SERP-Call gemacht.
      *
-     * @return array{tracked: int, not_found: int, matched: int, cost_cents: int, error?: string}
+     * @return array{tracked: int, not_found: int, matched: int, cost_cents: int, locations_tracked: int, error?: string}
      */
     public function trackBriefRankings(BrandsContentBriefBoard $brief, ?User $user = null): array
     {
         $targetUrl = $brief->target_url;
 
         if (!$targetUrl) {
-            return ['tracked' => 0, 'not_found' => 0, 'matched' => 0, 'cost_cents' => 0, 'error' => 'Keine target_url gesetzt.'];
+            return ['tracked' => 0, 'not_found' => 0, 'matched' => 0, 'cost_cents' => 0, 'locations_tracked' => 0, 'error' => 'Keine target_url gesetzt.'];
         }
 
         // Keywords über Keyword-Cluster-Verknüpfungen sammeln
         $keywords = $this->collectKeywordsForBrief($brief);
 
         if ($keywords->isEmpty()) {
-            return ['tracked' => 0, 'not_found' => 0, 'matched' => 0, 'cost_cents' => 0, 'error' => 'Keine Keywords mit dem Brief verknüpft.'];
+            return ['tracked' => 0, 'not_found' => 0, 'matched' => 0, 'cost_cents' => 0, 'locations_tracked' => 0, 'error' => 'Keine Keywords mit dem Brief verknüpft.'];
         }
 
         // SEO Board für Budget + API-Config ermitteln
         $seoBoard = $this->resolveSeoBoard($brief);
         if (!$seoBoard) {
-            return ['tracked' => 0, 'not_found' => 0, 'matched' => 0, 'cost_cents' => 0, 'error' => 'Kein SEO Board gefunden.'];
+            return ['tracked' => 0, 'not_found' => 0, 'matched' => 0, 'cost_cents' => 0, 'locations_tracked' => 0, 'error' => 'Kein SEO Board gefunden.'];
+        }
+
+        // Locations ermitteln (Multi-Region oder Fallback auf einzelne Location)
+        $locations = $seoBoard->getLocations();
+        if (empty($locations)) {
+            // Kein Location konfiguriert → Default
+            $locations = [['code' => null, 'label' => 'Default']];
         }
 
         $user = $user ?? $seoBoard->user;
-        $estimatedCost = $this->estimateCost($keywords->count());
+        $totalSerpCalls = $keywords->count() * count($locations);
+        $estimatedCost = $this->estimateCost($totalSerpCalls);
 
         if (!$this->budgetGuard->canFetch($seoBoard, $estimatedCost)) {
-            return ['tracked' => 0, 'not_found' => 0, 'matched' => 0, 'cost_cents' => 0, 'error' => 'Budget-Limit erreicht.'];
+            return ['tracked' => 0, 'not_found' => 0, 'matched' => 0, 'cost_cents' => 0, 'locations_tracked' => 0, 'error' => 'Budget-Limit erreicht.'];
         }
 
         $api = $this->resolveApiService($seoBoard);
-        [$locationCode, $languageName] = array_values($this->resolveLocationLanguage($seoBoard));
-
+        $config = $seoBoard->dataforseo_config ?? [];
+        $languageName = $config['language_name'] ?? null;
         $targetHost = parse_url($targetUrl, PHP_URL_HOST);
         $trackedCount = 0;
         $notFoundCount = 0;
         $matchedCount = 0;
 
-        foreach ($keywords as $keyword) {
-            $serpResults = $api->getSerpOrganic($user, $keyword->keyword, $locationCode, $languageName);
+        foreach ($locations as $location) {
+            $locationCode = $location['code'] ?? null;
+            $locationLabel = $location['label'] ?? 'Unknown';
 
-            // Vorherige Position für dieses Brief+Keyword ermitteln
-            $lastRanking = BrandsContentBriefRanking::where('content_brief_board_id', $brief->id)
-                ->where('seo_keyword_id', $keyword->id)
-                ->orderByDesc('tracked_at')
-                ->first();
+            foreach ($keywords as $keyword) {
+                $serpResults = $api->getSerpOrganic($user, $keyword->keyword, $locationCode, $languageName);
 
-            $position = null;
-            $foundUrl = null;
-            $isTargetMatch = false;
-            $serpFeatures = [];
+                // Vorherige Position für dieses Brief+Keyword+Location ermitteln
+                $lastRanking = BrandsContentBriefRanking::where('content_brief_board_id', $brief->id)
+                    ->where('seo_keyword_id', $keyword->id)
+                    ->where('location', $locationLabel)
+                    ->orderByDesc('tracked_at')
+                    ->first();
 
-            if (!empty($serpResults)) {
-                foreach ($serpResults as $serpResult) {
-                    $serpFeatures[] = $serpResult->domain;
+                $position = null;
+                $foundUrl = null;
+                $isTargetMatch = false;
+                $serpFeatures = [];
 
-                    // Eigene Domain im SERP finden
-                    if ($targetHost && str_contains($serpResult->url ?? '', $targetHost)) {
-                        // Prüfe ob exakt unsere target_url rankt
-                        if ($position === null) {
-                            $position = $serpResult->position;
-                            $foundUrl = $serpResult->url;
+                if (!empty($serpResults)) {
+                    foreach ($serpResults as $serpResult) {
+                        $serpFeatures[] = $serpResult->domain;
 
-                            // Exakter URL-Match?
-                            $normalizedTarget = rtrim($targetUrl, '/');
-                            $normalizedFound = rtrim($serpResult->url ?? '', '/');
-                            $isTargetMatch = ($normalizedTarget === $normalizedFound);
+                        // Eigene Domain im SERP finden
+                        if ($targetHost && str_contains($serpResult->url ?? '', $targetHost)) {
+                            if ($position === null) {
+                                $position = $serpResult->position;
+                                $foundUrl = $serpResult->url;
+
+                                $normalizedTarget = rtrim($targetUrl, '/');
+                                $normalizedFound = rtrim($serpResult->url ?? '', '/');
+                                $isTargetMatch = ($normalizedTarget === $normalizedFound);
+                            }
                         }
                     }
                 }
-            }
 
-            BrandsContentBriefRanking::create([
-                'content_brief_board_id' => $brief->id,
-                'seo_keyword_id' => $keyword->id,
-                'position' => $position,
-                'previous_position' => $lastRanking?->position,
-                'target_url' => $targetUrl,
-                'found_url' => $foundUrl,
-                'is_target_match' => $isTargetMatch,
-                'serp_features' => array_unique(array_slice($serpFeatures, 0, 10)),
-                'cost_cents' => 10, // ~$0.10 pro SERP-Call
-                'search_engine' => 'google',
-                'device' => 'desktop',
-                'location' => $keyword->location,
-                'tracked_at' => now(),
-            ]);
+                BrandsContentBriefRanking::create([
+                    'content_brief_board_id' => $brief->id,
+                    'seo_keyword_id' => $keyword->id,
+                    'position' => $position,
+                    'previous_position' => $lastRanking?->position,
+                    'target_url' => $targetUrl,
+                    'found_url' => $foundUrl,
+                    'is_target_match' => $isTargetMatch,
+                    'serp_features' => array_unique(array_slice($serpFeatures, 0, 10)),
+                    'cost_cents' => 10,
+                    'search_engine' => 'google',
+                    'device' => 'desktop',
+                    'location' => $locationLabel,
+                    'tracked_at' => now(),
+                ]);
 
-            $trackedCount++;
+                $trackedCount++;
 
-            if ($position === null) {
-                $notFoundCount++;
-            } elseif ($isTargetMatch) {
-                $matchedCount++;
+                if ($position === null) {
+                    $notFoundCount++;
+                } elseif ($isTargetMatch) {
+                    $matchedCount++;
+                }
             }
         }
 
@@ -126,6 +140,7 @@ class ContentBriefRankingService
             'not_found' => $notFoundCount,
             'matched' => $matchedCount,
             'cost_cents' => $actualCost,
+            'locations_tracked' => count($locations),
             'brief_id' => $brief->id,
             'brief_name' => $brief->name,
             'target_url' => $targetUrl,
@@ -187,13 +202,13 @@ class ContentBriefRankingService
     }
 
     /**
-     * Gibt Ranking-Verlauf für ein Brief über Zeit zurück.
+     * Gibt Ranking-Verlauf für ein Brief über Zeit zurück, gruppiert nach Datum und Location.
      */
     public function getRankingHistory(BrandsContentBriefBoard $brief, int $limit = 12): Collection
     {
         return BrandsContentBriefRanking::where('content_brief_board_id', $brief->id)
-            ->selectRaw('DATE(tracked_at) as date, COUNT(*) as keywords_tracked, AVG(position) as avg_position, SUM(CASE WHEN is_target_match = 1 THEN 1 ELSE 0 END) as matched_count, SUM(CASE WHEN position IS NULL THEN 1 ELSE 0 END) as not_found_count')
-            ->groupByRaw('DATE(tracked_at)')
+            ->selectRaw('DATE(tracked_at) as date, location, COUNT(*) as keywords_tracked, AVG(position) as avg_position, SUM(CASE WHEN is_target_match = 1 THEN 1 ELSE 0 END) as matched_count, SUM(CASE WHEN position IS NULL THEN 1 ELSE 0 END) as not_found_count')
+            ->groupByRaw('DATE(tracked_at), location')
             ->orderByDesc('date')
             ->limit($limit)
             ->get();

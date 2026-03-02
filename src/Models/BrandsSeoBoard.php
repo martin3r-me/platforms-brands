@@ -130,6 +130,33 @@ class BrandsSeoBoard extends Model implements HasDisplayName
         return $this->last_refreshed_at->addDays($this->refresh_interval_days)->isPast();
     }
 
+    /**
+     * Gibt die konfigurierten Locations zurück.
+     * Wenn `locations` Array in dataforseo_config gesetzt ist, wird dieses verwendet.
+     * Ansonsten Fallback auf den einzelnen `location_code`.
+     *
+     * @return array<array{code: int, label: string}>
+     */
+    public function getLocations(): array
+    {
+        $config = $this->dataforseo_config ?? [];
+
+        if (!empty($config['locations']) && is_array($config['locations'])) {
+            return $config['locations'];
+        }
+
+        // Fallback: einzelner location_code → 1 Location
+        $locationCode = $config['location_code'] ?? null;
+
+        if ($locationCode) {
+            return [
+                ['code' => (int) $locationCode, 'label' => 'Standard'],
+            ];
+        }
+
+        return [];
+    }
+
     public function getDisplayName(): ?string
     {
         return $this->name;

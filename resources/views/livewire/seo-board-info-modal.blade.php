@@ -165,6 +165,62 @@
             </div>
         </div>
 
+        {{-- Multi-Region --}}
+        <div>
+            <h3 class="text-xs font-semibold uppercase tracking-wide text-lime-700 mb-3 flex items-center gap-2">
+                @svg('heroicon-o-map-pin', 'w-4 h-4')
+                Multi-Region &mdash; Regionale Rankings tracken
+            </h3>
+            <div class="space-y-3">
+                <p>
+                    Jedes SEO Board kann <strong>mehrere Locations</strong> f&uuml;r SERP-Tracking konfigurieren.
+                    So lassen sich Rankings f&uuml;r verschiedene Regionen oder St&auml;dte separat messen.
+                </p>
+                <div class="bg-[var(--ui-muted-5)] border border-[var(--ui-border)]/40 rounded-lg p-4 space-y-3">
+                    <div class="flex items-start gap-2">
+                        @svg('heroicon-o-globe-europe-africa', 'w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5')
+                        <div>
+                            <span class="font-semibold text-xs">Location-Suche</span>
+                            <p class="text-xs text-[var(--ui-muted)] mt-0.5">
+                                Per <code class="px-1 py-0.5 rounded bg-white border border-[var(--ui-border)]/40 text-[10px] font-mono">dataforseo_locations.GET</code>
+                                k&ouml;nnen Locations gesucht werden (z.B. &bdquo;D&uuml;sseldorf&ldquo; &rarr; Code 1004074). Kostenlos, kein Credit-Verbrauch.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-2">
+                        @svg('heroicon-o-cog-6-tooth', 'w-4 h-4 text-indigo-600 flex-shrink-0 mt-0.5')
+                        <div>
+                            <span class="font-semibold text-xs">Konfiguration auf Board-Ebene</span>
+                            <p class="text-xs text-[var(--ui-muted)] mt-0.5">
+                                Locations werden in <code class="px-1 py-0.5 rounded bg-white border border-[var(--ui-border)]/40 text-[10px] font-mono">dataforseo_config.locations</code>
+                                gespeichert. Jede Location hat <code class="text-[10px]">code</code> und <code class="text-[10px]">label</code>.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-2">
+                        @svg('heroicon-o-exclamation-triangle', 'w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5')
+                        <div>
+                            <span class="font-semibold text-xs">Kostenhinweis</span>
+                            <p class="text-xs text-[var(--ui-muted)] mt-0.5">
+                                Pro Location wird <em>jedes Keyword einzeln</em> gepr&uuml;ft. 3 Locations &times; 100 Keywords = 300 SERP-Calls (&asymp; 30 &euro;).
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white border border-[var(--ui-border)]/40 rounded-lg p-4">
+                    <p class="text-[10px] font-semibold uppercase tracking-wide text-[var(--ui-muted)] mb-2">Beispiel-Konfiguration</p>
+                    <div class="font-mono text-[11px] text-[var(--ui-muted)] space-y-1">
+                        <div class="text-[var(--ui-secondary)] font-semibold">Marke: Lokaler Dienstleister (D&uuml;sseldorf + K&ouml;ln)</div>
+                        <div class="mt-1">locations: [</div>
+                        <div class="pl-4">{code: 1004074, label: &ldquo;D&uuml;sseldorf&rdquo;},</div>
+                        <div class="pl-4">{code: 1004073, label: &ldquo;K&ouml;ln&rdquo;}</div>
+                        <div>]</div>
+                        <div class="pt-1 text-emerald-700">&rarr; Ranking-Report zeigt Positionen pro Stadt</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         {{-- Revision Log --}}
         <div>
             <h3 class="text-xs font-semibold uppercase tracking-wide text-lime-700 mb-3 flex items-center gap-2">
@@ -441,8 +497,8 @@
                             </tr>
                             <tr>
                                 <td class="px-3 py-1.5 font-medium">Brief-Ranking-Tracking</td>
-                                <td class="px-3 py-1.5 text-right tabular-nums">~10 Ct/Keyword</td>
-                                <td class="px-3 py-1.5 text-[var(--ui-muted)]">W&ouml;chentlich automatisch (So)</td>
+                                <td class="px-3 py-1.5 text-right tabular-nums">~10 Ct/KW/Location</td>
+                                <td class="px-3 py-1.5 text-[var(--ui-muted)]">W&ouml;chentlich (So), &times; Anzahl Locations</td>
                             </tr>
                         </tbody>
                     </table>
@@ -544,6 +600,7 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 @php
                     $lookupTools = [
+                        ['name' => 'dataforseo_locations.GET', 'desc' => 'Location-Codes suchen (L&auml;nder, Regionen, St&auml;dte)'],
                         ['name' => 'lookups.GET', 'desc' => 'Alle Lookup-Tabellen auflisten'],
                         ['name' => 'lookup_values.GET', 'desc' => 'Werte einer Lookup anzeigen'],
                         ['name' => 'lookup_values.POST', 'desc' => 'Neuen Lookup-Wert hinzuf&uuml;gen'],

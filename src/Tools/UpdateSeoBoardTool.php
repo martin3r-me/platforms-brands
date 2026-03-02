@@ -55,11 +55,23 @@ class UpdateSeoBoardTool implements ToolContract
                 ],
                 'dataforseo_config' => [
                     'type' => 'object',
-                    'description' => 'Optional: DataForSEO-Konfiguration. Enthält connection_id (integer), location_code (integer, z.B. 2276), language_code (integer, z.B. 1001).',
+                    'description' => 'Optional: DataForSEO-Konfiguration. Enthält connection_id, location_code (Default-Location), language_name, und locations (Multi-Region-Array). Nutze brands.dataforseo_locations.GET um gültige Location-Codes zu finden.',
                     'properties' => [
                         'connection_id' => ['type' => 'integer', 'description' => 'ID der DataForSEO IntegrationConnection.'],
-                        'location_code' => ['type' => 'integer', 'description' => 'Location Code (z.B. 2276 = Germany).'],
-                        'language_code' => ['type' => 'integer', 'description' => 'Language Code (z.B. 1001 = German).'],
+                        'location_code' => ['type' => 'integer', 'description' => 'Default Location Code (z.B. 2276 = Germany). Wird als Fallback genutzt wenn locations leer ist.'],
+                        'language_name' => ['type' => 'string', 'description' => 'Sprache (z.B. "German", "English"). Default: "German".'],
+                        'locations' => [
+                            'type' => 'array',
+                            'description' => 'Multi-Region: Array von Locations für SERP-Tracking. Jede Location: {code: integer, label: string}. Beispiel: [{code: 2276, label: "Deutschland"}, {code: 1004074, label: "Düsseldorf"}]. Wenn gesetzt, wird pro Location getrackt (Kosten multiplizieren sich!).',
+                            'items' => [
+                                'type' => 'object',
+                                'properties' => [
+                                    'code' => ['type' => 'integer', 'description' => 'DataForSEO location_code.'],
+                                    'label' => ['type' => 'string', 'description' => 'Lesbarer Name der Location.'],
+                                ],
+                                'required' => ['code', 'label'],
+                            ],
+                        ],
                     ],
                 ],
             ],
@@ -119,6 +131,8 @@ class UpdateSeoBoardTool implements ToolContract
                 'budget_limit_cents' => $seoBoard->budget_limit_cents,
                 'budget_spent_cents' => $seoBoard->budget_spent_cents,
                 'refresh_interval_days' => $seoBoard->refresh_interval_days,
+                'dataforseo_config' => $seoBoard->dataforseo_config,
+                'locations' => $seoBoard->getLocations(),
                 'updated_at' => $seoBoard->updated_at->toIso8601String(),
                 'message' => "SEO Board '{$seoBoard->name}' erfolgreich aktualisiert."
             ]);

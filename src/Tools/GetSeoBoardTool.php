@@ -77,6 +77,8 @@ class GetSeoBoardTool implements ToolContract, ToolMetadataContract
                 'budget_percentage' => $seoBoard->budget_percentage,
                 'refresh_interval_days' => $seoBoard->refresh_interval_days,
                 'last_refreshed_at' => $seoBoard->last_refreshed_at?->toIso8601String(),
+                'dataforseo_config' => $seoBoard->dataforseo_config,
+                'locations' => $seoBoard->getLocations(),
                 'clusters_count' => $seoBoard->keywordClusters->count(),
                 'keywords_count' => $seoBoard->keywords->count(),
                 'created_at' => $seoBoard->created_at->toIso8601String(),

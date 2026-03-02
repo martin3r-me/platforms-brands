@@ -21,7 +21,7 @@ class ListContentBriefRankingsTool implements ToolContract, ToolMetadataContract
 
     public function getDescription(): string
     {
-        return 'GET /brands/content_brief_boards/{id}/rankings - Zeigt SERP-Ranking-Daten eines Content Briefs. Gibt aktuelle Keyword-Positionen, URL-Matches und historische Entwicklung zurück. Rankings werden wöchentlich automatisch getrackt (Sonntag). Parameter: content_brief_board_id (required), mode: "latest" (Standard) | "history" | "detail".';
+        return 'GET /brands/content_brief_boards/{id}/rankings - Zeigt SERP-Ranking-Daten eines Content Briefs. Gibt aktuelle Keyword-Positionen, URL-Matches und historische Entwicklung zurück. Rankings werden wöchentlich automatisch getrackt (Sonntag). Unterstützt Multi-Region (location-Filter). Parameter: content_brief_board_id (required), mode: "latest" (Standard) | "history" | "detail", location (optional).';
     }
 
     public function getSchema(): array
@@ -41,6 +41,10 @@ class ListContentBriefRankingsTool implements ToolContract, ToolMetadataContract
                 'seo_keyword_id' => [
                     'type' => 'integer',
                     'description' => 'Nur für mode="detail": ID des Keywords für Detailansicht.',
+                ],
+                'location' => [
+                    'type' => 'string',
+                    'description' => 'Optional: Auf eine bestimmte Location filtern (z.B. "Düsseldorf", "Deutschland"). Wenn nicht angegeben, werden alle Locations angezeigt.',
                 ],
                 'limit' => [
                     'type' => 'integer',
@@ -76,38 +80,49 @@ class ListContentBriefRankingsTool implements ToolContract, ToolMetadataContract
 
             $mode = $arguments['mode'] ?? 'latest';
             $limit = min($arguments['limit'] ?? 50, 200);
+            $location = $arguments['location'] ?? null;
 
             return match ($mode) {
-                'history' => $this->historyMode($brief, $limit),
-                'detail' => $this->detailMode($brief, $arguments['seo_keyword_id'] ?? null, $limit),
-                default => $this->latestMode($brief, $limit),
+                'history' => $this->historyMode($brief, $limit, $location),
+                'detail' => $this->detailMode($brief, $arguments['seo_keyword_id'] ?? null, $limit, $location),
+                default => $this->latestMode($brief, $limit, $location),
             };
         } catch (\Throwable $e) {
             return ToolResult::error('EXECUTION_ERROR', 'Fehler beim Laden der Rankings: ' . $e->getMessage());
         }
     }
 
-    protected function latestMode(BrandsContentBriefBoard $brief, int $limit): ToolResult
+    protected function latestMode(BrandsContentBriefBoard $brief, int $limit, ?string $location): ToolResult
     {
-        $latestDate = BrandsContentBriefRanking::where('content_brief_board_id', $brief->id)
-            ->max('tracked_at');
+        $query = BrandsContentBriefRanking::where('content_brief_board_id', $brief->id);
+
+        if ($location) {
+            $query->where('location', $location);
+        }
+
+        $latestDate = $query->max('tracked_at');
 
         if (!$latestDate) {
             return ToolResult::success([
                 'brief_id' => $brief->id,
                 'brief_name' => $brief->name,
                 'target_url' => $brief->target_url,
+                'location_filter' => $location,
                 'rankings' => [],
                 'message' => 'Noch keine Rankings getrackt. Rankings werden wöchentlich automatisch erfasst.',
             ]);
         }
 
-        $rankings = BrandsContentBriefRanking::where('content_brief_board_id', $brief->id)
+        $rankingsQuery = BrandsContentBriefRanking::where('content_brief_board_id', $brief->id)
             ->where('tracked_at', $latestDate)
             ->with('seoKeyword')
-            ->orderByRaw('position IS NULL, position ASC') // rankt zuerst, dann nicht-gefundene
-            ->limit($limit)
-            ->get();
+            ->orderByRaw('position IS NULL, position ASC');
+
+        if ($location) {
+            $rankingsQuery->where('location', $location);
+        }
+
+        $rankings = $rankingsQuery->limit($limit)->get();
 
         $data = $rankings->map(function ($r) {
             return [
@@ -119,6 +134,7 @@ class ListContentBriefRankingsTool implements ToolContract, ToolMetadataContract
                 'delta' => $r->position_delta,
                 'found_url' => $r->found_url,
                 'is_target_match' => $r->is_target_match,
+                'location' => $r->location,
             ];
         })->toArray();
 
@@ -134,20 +150,37 @@ class ListContentBriefRankingsTool implements ToolContract, ToolMetadataContract
             'top_20' => $rankings->where('position', '<=', 20)->whereNotNull('position')->count(),
         ];
 
+        // Alle vorhandenen Locations auflisten
+        $availableLocations = BrandsContentBriefRanking::where('content_brief_board_id', $brief->id)
+            ->where('tracked_at', $latestDate)
+            ->distinct()
+            ->pluck('location')
+            ->filter()
+            ->values()
+            ->toArray();
+
         return ToolResult::success([
             'brief_id' => $brief->id,
             'brief_name' => $brief->name,
             'target_url' => $brief->target_url,
             'tracked_at' => $latestDate,
+            'location_filter' => $location,
+            'available_locations' => $availableLocations,
             'stats' => $stats,
             'rankings' => $data,
         ]);
     }
 
-    protected function historyMode(BrandsContentBriefBoard $brief, int $limit): ToolResult
+    protected function historyMode(BrandsContentBriefBoard $brief, int $limit, ?string $location): ToolResult
     {
-        $history = BrandsContentBriefRanking::where('content_brief_board_id', $brief->id)
-            ->selectRaw('DATE(tracked_at) as date')
+        $query = BrandsContentBriefRanking::where('content_brief_board_id', $brief->id);
+
+        if ($location) {
+            $query->where('location', $location);
+        }
+
+        $history = $query
+            ->selectRaw('DATE(tracked_at) as date, location')
             ->selectRaw('COUNT(*) as keywords_tracked')
             ->selectRaw('AVG(CASE WHEN position IS NOT NULL THEN position END) as avg_position')
             ->selectRaw('SUM(CASE WHEN is_target_match = 1 THEN 1 ELSE 0 END) as matched_count')
@@ -155,7 +188,7 @@ class ListContentBriefRankingsTool implements ToolContract, ToolMetadataContract
             ->selectRaw('SUM(CASE WHEN position IS NOT NULL AND position <= 10 THEN 1 ELSE 0 END) as top_10_count')
             ->selectRaw('SUM(CASE WHEN position IS NOT NULL AND position <= 20 THEN 1 ELSE 0 END) as top_20_count')
             ->selectRaw('SUM(cost_cents) as total_cost_cents')
-            ->groupByRaw('DATE(tracked_at)')
+            ->groupByRaw('DATE(tracked_at), location')
             ->orderByDesc('date')
             ->limit($limit)
             ->get();
@@ -163,6 +196,7 @@ class ListContentBriefRankingsTool implements ToolContract, ToolMetadataContract
         $data = $history->map(function ($h) {
             return [
                 'date' => $h->date,
+                'location' => $h->location,
                 'keywords_tracked' => (int) $h->keywords_tracked,
                 'avg_position' => $h->avg_position ? round((float) $h->avg_position, 1) : null,
                 'matched_count' => (int) $h->matched_count,
@@ -177,28 +211,34 @@ class ListContentBriefRankingsTool implements ToolContract, ToolMetadataContract
             'brief_id' => $brief->id,
             'brief_name' => $brief->name,
             'target_url' => $brief->target_url,
+            'location_filter' => $location,
             'tracking_weeks' => count($data),
             'history' => $data,
         ]);
     }
 
-    protected function detailMode(BrandsContentBriefBoard $brief, ?int $keywordId, int $limit): ToolResult
+    protected function detailMode(BrandsContentBriefBoard $brief, ?int $keywordId, int $limit, ?string $location): ToolResult
     {
         if (!$keywordId) {
             return ToolResult::error('VALIDATION_ERROR', 'seo_keyword_id ist für mode="detail" erforderlich.');
         }
 
-        $rankings = BrandsContentBriefRanking::where('content_brief_board_id', $brief->id)
+        $query = BrandsContentBriefRanking::where('content_brief_board_id', $brief->id)
             ->where('seo_keyword_id', $keywordId)
             ->with('seoKeyword')
-            ->orderByDesc('tracked_at')
-            ->limit($limit)
-            ->get();
+            ->orderByDesc('tracked_at');
+
+        if ($location) {
+            $query->where('location', $location);
+        }
+
+        $rankings = $query->limit($limit)->get();
 
         if ($rankings->isEmpty()) {
             return ToolResult::success([
                 'brief_id' => $brief->id,
                 'keyword_id' => $keywordId,
+                'location_filter' => $location,
                 'rankings' => [],
                 'message' => 'Keine Ranking-Daten für dieses Keyword gefunden.',
             ]);
@@ -214,6 +254,7 @@ class ListContentBriefRankingsTool implements ToolContract, ToolMetadataContract
                 'delta' => $r->position_delta,
                 'found_url' => $r->found_url,
                 'is_target_match' => $r->is_target_match,
+                'location' => $r->location,
                 'serp_features' => $r->serp_features,
             ];
         })->toArray();
@@ -224,6 +265,7 @@ class ListContentBriefRankingsTool implements ToolContract, ToolMetadataContract
             'keyword_id' => $keywordId,
             'keyword' => $keyword->keyword,
             'search_volume' => $keyword->search_volume,
+            'location_filter' => $location,
             'data_points' => count($data),
             'rankings' => $data,
         ]);

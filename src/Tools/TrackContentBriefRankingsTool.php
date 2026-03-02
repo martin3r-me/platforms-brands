@@ -20,7 +20,7 @@ class TrackContentBriefRankingsTool implements ToolContract, ToolMetadataContrac
 
     public function getDescription(): string
     {
-        return 'POST /brands/content_brief_boards/{id}/rankings/track - Startet manuelles Ranking-Tracking für ein Content Brief Board. Nutzt DataForSEO SERP API um zu prüfen, wie die target_url für jedes verknüpfte Keyword rankt. Achtung: Verursacht API-Kosten (~10 Cents pro Keyword). Parameter: content_brief_board_id (required).';
+        return 'POST /brands/content_brief_boards/{id}/rankings/track - Startet manuelles Ranking-Tracking für ein Content Brief Board. Nutzt DataForSEO SERP API um zu prüfen, wie die target_url für jedes verknüpfte Keyword rankt. Bei Multi-Region: pro Keyword pro Location ein SERP-Call. Achtung: Verursacht API-Kosten (~10 Cents pro Keyword pro Location). Parameter: content_brief_board_id (required).';
     }
 
     public function getSchema(): array
@@ -73,6 +73,9 @@ class TrackContentBriefRankingsTool implements ToolContract, ToolMetadataContrac
                 return ToolResult::error('TRACKING_ERROR', $result['error']);
             }
 
+            $locationsTracked = $result['locations_tracked'] ?? 1;
+            $locationHint = $locationsTracked > 1 ? " ({$locationsTracked} Locations)" : '';
+
             return ToolResult::success([
                 'brief_id' => $brief->id,
                 'brief_name' => $brief->name,
@@ -80,8 +83,9 @@ class TrackContentBriefRankingsTool implements ToolContract, ToolMetadataContrac
                 'tracked' => $result['tracked'],
                 'matched' => $result['matched'],
                 'not_found' => $result['not_found'],
+                'locations_tracked' => $locationsTracked,
                 'cost_cents' => $result['cost_cents'],
-                'message' => "{$result['tracked']} Keywords getrackt für '{$brief->name}'. {$result['matched']} URLs matchen, {$result['not_found']} nicht im SERP gefunden. Kosten: {$result['cost_cents']} Cents.",
+                'message' => "{$result['tracked']} Keywords getrackt{$locationHint} für '{$brief->name}'. {$result['matched']} URLs matchen, {$result['not_found']} nicht im SERP gefunden. Kosten: {$result['cost_cents']} Cents.",
             ]);
         } catch (\Throwable $e) {
             return ToolResult::error('EXECUTION_ERROR', 'Fehler beim Ranking-Tracking: ' . $e->getMessage());

@@ -681,6 +681,9 @@ class BrandsServiceProvider extends ServiceProvider
             $registry->register(new \Platform\Brands\Tools\ListContentBriefRankingsTool());
             $registry->register(new \Platform\Brands\Tools\TrackContentBriefRankingsTool());
 
+            // DataForSEO Location-Lookup (für Multi-Region-Konfiguration)
+            $registry->register(new \Platform\Brands\Tools\SearchDataForSeoLocationsTool());
+
             // Topic Cluster Map
             $registry->register(new \Platform\Brands\Tools\GetTopicClusterMapTool());
 
