@@ -5,7 +5,7 @@
         <div>
             <p class="text-[var(--ui-muted)]">
                 Das SEO Board ist das zentrale Cockpit f&uuml;r die Keyword-Strategie einer Marke. Es kombiniert Keyword-Research,
-                Wettbewerbs-Analyse und Content-Planung in einem datengetriebenen Workflow.
+                Wettbewerbs-Analyse, Content-Planung, Ranking-Monitoring und Revisions-Tracking in einem datengetriebenen Workflow.
             </p>
         </div>
 
@@ -48,8 +48,182 @@
                     <div class="flex items-start gap-3">
                         <span class="flex-shrink-0 inline-flex items-center justify-center w-6 h-6 rounded-full bg-lime-600 text-white text-[10px] font-bold">5</span>
                         <div>
-                            <span class="font-semibold">Content erstellen & tracken</span>
-                            <span class="text-[var(--ui-muted)]">&mdash; Status pro Keyword verfolgen, Rankings monitoren</span>
+                            <span class="font-semibold">Content Briefs erstellen</span>
+                            <span class="text-[var(--ui-muted)]">&mdash; Seitenstruktur (H1&ndash;H5), Content-Typ, Such-Intent und Ziel-URL pro Cluster definieren</span>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-3">
+                        <span class="flex-shrink-0 inline-flex items-center justify-center w-6 h-6 rounded-full bg-lime-600 text-white text-[10px] font-bold">6</span>
+                        <div>
+                            <span class="font-semibold">Ver&ouml;ffentlichen & tracken</span>
+                            <span class="text-[var(--ui-muted)]">&mdash; wöchentliches Ranking-Monitoring, Ursache-Wirkung durch Revisions-Log</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {{-- Content Briefs --}}
+        <div>
+            <h3 class="text-xs font-semibold uppercase tracking-wide text-lime-700 mb-3 flex items-center gap-2">
+                @svg('heroicon-o-document-text', 'w-4 h-4')
+                Content Brief Boards &mdash; Von Cluster zu Seite
+            </h3>
+            <div class="space-y-3">
+                <p>
+                    Jeder Keyword-Cluster wird zu einem <strong>Content Brief Board</strong> &mdash; dem Bauplan f&uuml;r eine Seite.
+                    Ein Brief definiert die Seitenstruktur, <em>nicht</em> den Flie&szlig;text.
+                </p>
+                <div class="bg-[var(--ui-muted-5)] border border-[var(--ui-border)]/40 rounded-lg p-4 space-y-3">
+                    <div class="flex items-start gap-2">
+                        @svg('heroicon-o-document-check', 'w-4 h-4 text-lime-600 flex-shrink-0 mt-0.5')
+                        <div>
+                            <span class="font-semibold text-xs">Kern-Felder</span>
+                            <p class="text-xs text-[var(--ui-muted)] mt-0.5">
+                                Name (H1-Kandidat), Content-Typ, Such-Intent, Status, Ziel-Slug, qualifizierte Ziel-URL, Ziel-Wortanzahl
+                            </p>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-2">
+                        @svg('heroicon-o-bars-3-bottom-left', 'w-4 h-4 text-lime-600 flex-shrink-0 mt-0.5')
+                        <div>
+                            <span class="font-semibold text-xs">Sections (Outline)</span>
+                            <p class="text-xs text-[var(--ui-muted)] mt-0.5">
+                                Seitenstruktur als H2/H3/H4-Ger&uuml;st mit kurzer Beschreibung je Section &mdash; der rote Faden f&uuml;r den Text
+                            </p>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-2">
+                        @svg('heroicon-o-link', 'w-4 h-4 text-lime-600 flex-shrink-0 mt-0.5')
+                        <div>
+                            <span class="font-semibold text-xs">Keyword-Cluster & Internal Links</span>
+                            <p class="text-xs text-[var(--ui-muted)] mt-0.5">
+                                Jeder Brief ist mit Keyword-Clustern verkn&uuml;pft (prim&auml;r/sekund&auml;r) und enth&auml;lt geplante interne Verlinkungen zu anderen Briefs
+                            </p>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-2">
+                        @svg('heroicon-o-clipboard-document-list', 'w-4 h-4 text-lime-600 flex-shrink-0 mt-0.5')
+                        <div>
+                            <span class="font-semibold text-xs">Notes & Constraints</span>
+                            <p class="text-xs text-[var(--ui-muted)] mt-0.5">
+                                Briefing-Notizen, Tone-of-Voice-Hinweise, Quellen, Einschr&auml;nkungen &mdash; alles was der Autor wissen muss
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <p class="text-xs text-[var(--ui-muted)]">
+                    Content-Typen, Such-Intents und Status werden &uuml;ber <strong>Lookup-Tabellen</strong> verwaltet und sind pro Team konfigurierbar
+                    (<code class="px-1 py-0.5 rounded bg-[var(--ui-muted-5)] border border-[var(--ui-border)]/40 text-[10px] font-mono">brands.lookups.GET</code>).
+                </p>
+            </div>
+        </div>
+
+        {{-- Ranking-Tracking --}}
+        <div>
+            <h3 class="text-xs font-semibold uppercase tracking-wide text-lime-700 mb-3 flex items-center gap-2">
+                @svg('heroicon-o-chart-bar', 'w-4 h-4')
+                Ranking-Tracking &mdash; Erfolg messen
+            </h3>
+            <div class="space-y-3">
+                <p>
+                    Sobald ein Content Brief eine <strong>target_url</strong> hat und auf <em>Ver&ouml;ffentlicht</em> steht,
+                    wird das Ranking <strong>jeden Sonntag automatisch</strong> getrackt.
+                </p>
+                <div class="bg-[var(--ui-muted-5)] border border-[var(--ui-border)]/40 rounded-lg p-4 space-y-3">
+                    <div class="flex items-start gap-2">
+                        @svg('heroicon-o-clock', 'w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5')
+                        <div>
+                            <span class="font-semibold text-xs">Automatisch (Sonntag 03:00)</span>
+                            <p class="text-xs text-[var(--ui-muted)] mt-0.5">
+                                F&uuml;r jeden ver&ouml;ffentlichten Brief: alle Keywords aus den verkn&uuml;pften Clustern werden per
+                                DataForSEO SERP API gepr&uuml;ft. Jeder Durchlauf erzeugt immutable Snapshots.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-2">
+                        @svg('heroicon-o-check-badge', 'w-4 h-4 text-emerald-600 flex-shrink-0 mt-0.5')
+                        <div>
+                            <span class="font-semibold text-xs">is_target_match</span>
+                            <p class="text-xs text-[var(--ui-muted)] mt-0.5">
+                                Zeigt ob <em>exakt</em> die Ziel-URL rankt, oder eine andere Seite der Domain.
+                                So erkennst du Keyword-Kannibalisierung sofort.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-2">
+                        @svg('heroicon-o-arrow-trending-up', 'w-4 h-4 text-purple-600 flex-shrink-0 mt-0.5')
+                        <div>
+                            <span class="font-semibold text-xs">Verlaufs-Analyse</span>
+                            <p class="text-xs text-[var(--ui-muted)] mt-0.5">
+                                Drei Ansichten: <em>latest</em> (aktuelle Positionen), <em>history</em> (Wochenverlauf mit &empty; Position, Top-10-Quote),
+                                <em>detail</em> (ein Keyword &uuml;ber Zeit). Position-Delta zeigt Verbesserung/Verschlechterung.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {{-- Revision Log --}}
+        <div>
+            <h3 class="text-xs font-semibold uppercase tracking-wide text-lime-700 mb-3 flex items-center gap-2">
+                @svg('heroicon-o-pencil-square', 'w-4 h-4')
+                Revision-Log &mdash; &Auml;nderungen dokumentieren
+            </h3>
+            <div class="space-y-3">
+                <p>
+                    Jede Content-&Auml;nderung an einem ver&ouml;ffentlichten Brief wird als <strong>Revision</strong> dokumentiert.
+                    So l&auml;sst sich direkt korrelieren: <em>&bdquo;Nach welcher &Auml;nderung hat sich das Ranking verbessert?&ldquo;</em>
+                </p>
+                <div class="bg-[var(--ui-muted-5)] border border-[var(--ui-border)]/40 rounded-lg p-4 space-y-2">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                        <div>
+                            <span class="font-semibold">Erfasste Daten</span>
+                            <ul class="mt-1 space-y-0.5 text-[var(--ui-muted)]">
+                                <li>&bull; Revisions-Typ (Optimierung, Erweiterung, Umschreibung, SEO-Fix, ...)</li>
+                                <li>&bull; Zusammenfassung (Freitext)</li>
+                                <li>&bull; Einzelne &Auml;nderungen (z.B. &bdquo;H2 hinzugef&uuml;gt&ldquo;, &bdquo;Absatz umgeschrieben&ldquo;)</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <span class="font-semibold">Metriken vorher/nachher</span>
+                            <ul class="mt-1 space-y-0.5 text-[var(--ui-muted)]">
+                                <li>&bull; Wortanzahl, Anzahl H2/H3/H4</li>
+                                <li>&bull; Abs&auml;tze, Bilder</li>
+                                <li>&bull; Interne / externe Links</li>
+                                <li>&bull; Automatisches Delta (Differenz)</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white border border-[var(--ui-border)]/40 rounded-lg p-4">
+                    <p class="text-[10px] font-semibold uppercase tracking-wide text-[var(--ui-muted)] mb-2">Beispiel-Timeline</p>
+                    <div class="font-mono text-[11px] text-[var(--ui-muted)] space-y-1.5">
+                        <div class="flex items-center gap-2">
+                            <span class="w-16 text-right tabular-nums">03.03.</span>
+                            <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+                            <span>Rankings: &empty; Pos 22, 3&times; Top-20</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="w-16 text-right tabular-nums">05.03.</span>
+                            <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+                            <span>Revision: +300 W&ouml;rter, +1 H2, 2 interne Links</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="w-16 text-right tabular-nums">10.03.</span>
+                            <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+                            <span>Rankings: &empty; Pos 16, 8&times; Top-20 <span class="text-emerald-600 font-semibold">&uarr;</span></span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="w-16 text-right tabular-nums">18.03.</span>
+                            <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+                            <span>Revision: Meta-Title optimiert, 3 Cluster-Links</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="w-16 text-right tabular-nums">24.03.</span>
+                            <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+                            <span>Rankings: &empty; Pos 11, 14&times; Top-20 <span class="text-emerald-600 font-semibold">&uarr;&uarr;</span></span>
                         </div>
                     </div>
                 </div>
@@ -217,7 +391,7 @@
                         </tr>
                         <tr class="bg-[var(--ui-muted-5)]">
                             <td class="px-3 py-2 font-semibold">Rankings</td>
-                            <td class="px-3 py-2 text-[var(--ui-muted)]">Anzahl Keywords mit bekannter Position in den SERPs (Verhltnis zu Gesamtzahl).</td>
+                            <td class="px-3 py-2 text-[var(--ui-muted)]">Anzahl Keywords mit bekannter Position in den SERPs (Verh&auml;ltnis zu Gesamtzahl).</td>
                         </tr>
                         <tr>
                             <td class="px-3 py-2 font-semibold">&empty; Pos</td>
@@ -265,6 +439,11 @@
                                 <td class="px-3 py-1.5 text-right tabular-nums font-semibold text-amber-800">~10 Ct/Keyword</td>
                                 <td class="px-3 py-1.5 text-amber-700">300 KW &asymp; 30 &euro;</td>
                             </tr>
+                            <tr>
+                                <td class="px-3 py-1.5 font-medium">Brief-Ranking-Tracking</td>
+                                <td class="px-3 py-1.5 text-right tabular-nums">~10 Ct/Keyword</td>
+                                <td class="px-3 py-1.5 text-[var(--ui-muted)]">W&ouml;chentlich automatisch (So)</td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -281,9 +460,14 @@
                 @svg('heroicon-o-wrench-screwdriver', 'w-4 h-4')
                 Verf&uuml;gbare MCP-Tools
             </h3>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+
+            <p class="text-xs text-[var(--ui-muted)] mb-3">Alle Tools sind per LLM-Chat oder MCP-API aufrufbar.</p>
+
+            {{-- SEO Keywords --}}
+            <p class="text-[10px] font-semibold uppercase tracking-wide text-[var(--ui-muted)] mb-2">Keywords & Clustering</p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-4">
                 @php
-                    $tools = [
+                    $seoTools = [
                         ['name' => 'seo_keywords.POST', 'desc' => 'Keyword manuell anlegen'],
                         ['name' => 'seo_keywords.BULK_POST', 'desc' => 'Mehrere Keywords auf einmal anlegen'],
                         ['name' => 'seo_keyword_clusters.POST', 'desc' => 'Cluster manuell erstellen'],
@@ -296,12 +480,82 @@
                         ['name' => 'seo_keywords.ANALYZE', 'desc' => 'Keyword-Analyse & Empfehlungen'],
                     ];
                 @endphp
-                @foreach($tools as $tool)
+                @foreach($seoTools as $tool)
                     <div class="flex items-start gap-2 p-2 rounded border border-[var(--ui-border)]/40 bg-[var(--ui-muted-5)]">
                         <span class="flex-shrink-0 mt-0.5 w-1.5 h-1.5 rounded-full bg-lime-500"></span>
                         <div>
                             <code class="text-[10px] font-mono font-semibold text-[var(--ui-secondary)]">{{ $tool['name'] }}</code>
                             <div class="text-[10px] text-[var(--ui-muted)]">{{ $tool['desc'] }}</div>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+
+            {{-- Content Briefs --}}
+            <p class="text-[10px] font-semibold uppercase tracking-wide text-[var(--ui-muted)] mb-2">Content Briefs & Planung</p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-4">
+                @php
+                    $briefTools = [
+                        ['name' => 'content_brief_boards.POST', 'desc' => 'Content Brief erstellen'],
+                        ['name' => 'content_brief_boards.bulk.POST', 'desc' => 'Mehrere Briefs auf einmal erstellen'],
+                        ['name' => 'content_brief_sections.POST', 'desc' => 'Outline-Section (H2/H3/H4) anlegen'],
+                        ['name' => 'content_brief_sections.bulk.POST', 'desc' => 'Mehrere Sections auf einmal'],
+                        ['name' => 'content_brief_keyword_clusters.POST', 'desc' => 'Keyword-Cluster an Brief koppeln'],
+                        ['name' => 'content_brief_links.POST', 'desc' => 'Interne Verlinkung planen'],
+                        ['name' => 'content_brief_notes.POST', 'desc' => 'Briefing-Notizen & Constraints'],
+                        ['name' => 'topic_cluster_map.GET', 'desc' => 'Topic-Cluster-Map visualisieren'],
+                    ];
+                @endphp
+                @foreach($briefTools as $tool)
+                    <div class="flex items-start gap-2 p-2 rounded border border-[var(--ui-border)]/40 bg-[var(--ui-muted-5)]">
+                        <span class="flex-shrink-0 mt-0.5 w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+                        <div>
+                            <code class="text-[10px] font-mono font-semibold text-[var(--ui-secondary)]">{{ $tool['name'] }}</code>
+                            <div class="text-[10px] text-[var(--ui-muted)]">{{ $tool['desc'] }}</div>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+
+            {{-- Tracking & Revisions --}}
+            <p class="text-[10px] font-semibold uppercase tracking-wide text-[var(--ui-muted)] mb-2">Ranking-Tracking & Revisions</p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-4">
+                @php
+                    $trackTools = [
+                        ['name' => 'content_brief_rankings.GET', 'desc' => 'Rankings abrufen (latest/history/detail)'],
+                        ['name' => 'content_brief_rankings.TRACK', 'desc' => 'Manuelles Ranking-Tracking starten'],
+                        ['name' => 'content_brief_revisions.POST', 'desc' => 'Content-&Auml;nderung dokumentieren'],
+                        ['name' => 'content_brief_revisions.GET', 'desc' => 'Revisions-Historie abrufen'],
+                    ];
+                @endphp
+                @foreach($trackTools as $tool)
+                    <div class="flex items-start gap-2 p-2 rounded border border-[var(--ui-border)]/40 bg-[var(--ui-muted-5)]">
+                        <span class="flex-shrink-0 mt-0.5 w-1.5 h-1.5 rounded-full bg-purple-500"></span>
+                        <div>
+                            <code class="text-[10px] font-mono font-semibold text-[var(--ui-secondary)]">{{ $tool['name'] }}</code>
+                            <div class="text-[10px] text-[var(--ui-muted)]">{{ $tool['desc'] }}</div>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+
+            {{-- Lookups --}}
+            <p class="text-[10px] font-semibold uppercase tracking-wide text-[var(--ui-muted)] mb-2">Konfiguration (Lookups)</p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                @php
+                    $lookupTools = [
+                        ['name' => 'lookups.GET', 'desc' => 'Alle Lookup-Tabellen auflisten'],
+                        ['name' => 'lookup_values.GET', 'desc' => 'Werte einer Lookup anzeigen'],
+                        ['name' => 'lookup_values.POST', 'desc' => 'Neuen Lookup-Wert hinzuf&uuml;gen'],
+                        ['name' => 'lookup_values.PUT', 'desc' => 'Lookup-Wert bearbeiten / deaktivieren'],
+                    ];
+                @endphp
+                @foreach($lookupTools as $tool)
+                    <div class="flex items-start gap-2 p-2 rounded border border-[var(--ui-border)]/40 bg-[var(--ui-muted-5)]">
+                        <span class="flex-shrink-0 mt-0.5 w-1.5 h-1.5 rounded-full bg-gray-400"></span>
+                        <div>
+                            <code class="text-[10px] font-mono font-semibold text-[var(--ui-secondary)]">{{ $tool['name'] }}</code>
+                            <div class="text-[10px] text-[var(--ui-muted)]">{!! $tool['desc'] !!}</div>
                         </div>
                     </div>
                 @endforeach
