@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Symfony\Component\Uid\UuidV7;
 use Platform\Core\Contracts\HasDisplayName;
+use Platform\Brands\Models\BrandsLookup;
 
 class BrandsContentBriefBoard extends Model implements HasDisplayName
 {
@@ -48,6 +49,7 @@ class BrandsContentBriefBoard extends Model implements HasDisplayName
         'search_intent',
         'status',
         'target_slug',
+        'target_url',
         'target_word_count',
         'order',
         'user_id',
@@ -135,6 +137,55 @@ class BrandsContentBriefBoard extends Model implements HasDisplayName
     public function notes(): HasMany
     {
         return $this->hasMany(BrandsContentBriefNote::class, 'content_brief_id')->orderBy('note_type')->orderBy('order');
+    }
+
+    public function rankings(): HasMany
+    {
+        return $this->hasMany(BrandsContentBriefRanking::class, 'content_brief_board_id')->orderByDesc('tracked_at');
+    }
+
+    public function revisions(): HasMany
+    {
+        return $this->hasMany(BrandsContentBriefRevision::class, 'content_brief_board_id')->orderByDesc('revised_at');
+    }
+
+    /**
+     * Validiert einen Wert gegen die Lookup-Tabelle (mit Fallback auf Konstanten).
+     */
+    public static function isValidLookupValue(string $lookupName, string $value, int $teamId): bool
+    {
+        $lookup = BrandsLookup::resolve($lookupName, $teamId);
+
+        if ($lookup) {
+            return $lookup->isValidValue($value);
+        }
+
+        // Fallback auf Konstanten
+        return match ($lookupName) {
+            'content_type' => array_key_exists($value, self::CONTENT_TYPES),
+            'search_intent' => array_key_exists($value, self::SEARCH_INTENTS),
+            'content_brief_status' => array_key_exists($value, self::STATUSES),
+            default => false,
+        };
+    }
+
+    /**
+     * Gibt die erlaubten Werte für eine Lookup zurück (Lookup-first, Fallback Konstanten).
+     */
+    public static function getAllowedValues(string $lookupName, int $teamId): array
+    {
+        $lookup = BrandsLookup::resolve($lookupName, $teamId);
+
+        if ($lookup) {
+            return array_keys($lookup->getOptionsArray());
+        }
+
+        return match ($lookupName) {
+            'content_type' => array_keys(self::CONTENT_TYPES),
+            'search_intent' => array_keys(self::SEARCH_INTENTS),
+            'content_brief_status' => array_keys(self::STATUSES),
+            default => [],
+        };
     }
 
     public function getDisplayName(): ?string

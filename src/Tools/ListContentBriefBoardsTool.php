@@ -92,6 +92,7 @@ class ListContentBriefBoardsTool implements ToolContract, ToolMetadataContract
                     'search_intent' => $board->search_intent,
                     'status' => $board->status,
                     'target_slug' => $board->target_slug,
+                    'target_url' => $board->target_url,
                     'target_word_count' => $board->target_word_count,
                     'brand_id' => $board->brand_id,
                     'brand_name' => $board->brand->name,

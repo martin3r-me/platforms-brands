@@ -178,6 +178,7 @@ class GetContentBriefBoardTool implements ToolContract, ToolMetadataContract
                 'status' => $board->status,
                 'status_label' => BrandsContentBriefBoard::STATUSES[$board->status] ?? $board->status,
                 'target_slug' => $board->target_slug,
+                'target_url' => $board->target_url,
                 'target_word_count' => $board->target_word_count,
                 'brand_id' => $board->brand_id,
                 'brand_name' => $board->brand->name,

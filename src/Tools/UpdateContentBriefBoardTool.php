@@ -43,22 +43,23 @@ class UpdateContentBriefBoardTool implements ToolContract
                 ],
                 'content_type' => [
                     'type' => 'string',
-                    'enum' => ['pillar', 'how-to', 'listicle', 'faq', 'comparison', 'deep-dive', 'guide'],
-                    'description' => 'Content-Typ.'
+                    'description' => 'Content-Typ. Erlaubte Werte per Lookup-Tabelle (brands.lookup_values.GET name="content_type").'
                 ],
                 'search_intent' => [
                     'type' => 'string',
-                    'enum' => ['informational', 'commercial', 'transactional', 'navigational'],
-                    'description' => 'Such-Intent.'
+                    'description' => 'Such-Intent. Erlaubte Werte per Lookup-Tabelle (brands.lookup_values.GET name="search_intent").'
                 ],
                 'status' => [
                     'type' => 'string',
-                    'enum' => ['draft', 'briefed', 'in_production', 'review', 'published'],
-                    'description' => 'Status des Briefs.'
+                    'description' => 'Status des Briefs. Erlaubte Werte per Lookup-Tabelle (brands.lookup_values.GET name="content_brief_status").'
                 ],
                 'target_slug' => [
                     'type' => 'string',
                     'description' => 'Geplante URL / Slug.'
+                ],
+                'target_url' => [
+                    'type' => 'string',
+                    'description' => 'Qualifizierte Ziel-URL (z.B. https://example.com/guide/keyword).'
                 ],
                 'target_word_count' => [
                     'type' => 'integer',
@@ -97,22 +98,27 @@ class UpdateContentBriefBoardTool implements ToolContract
                 return ToolResult::error('ACCESS_DENIED', 'Du darfst dieses Content Brief Board nicht bearbeiten (Policy).');
             }
 
-            // Validate enum values
-            if (isset($arguments['content_type']) && !array_key_exists($arguments['content_type'], BrandsContentBriefBoard::CONTENT_TYPES)) {
-                return ToolResult::error('VALIDATION_ERROR', 'Ungültiger content_type. Erlaubt: ' . implode(', ', array_keys(BrandsContentBriefBoard::CONTENT_TYPES)));
+            // Validate gegen Lookup-Tabellen (mit Fallback auf Konstanten)
+            $teamId = $board->team_id;
+
+            if (isset($arguments['content_type']) && !BrandsContentBriefBoard::isValidLookupValue('content_type', $arguments['content_type'], $teamId)) {
+                $allowed = BrandsContentBriefBoard::getAllowedValues('content_type', $teamId);
+                return ToolResult::error('VALIDATION_ERROR', 'Ungültiger content_type. Erlaubt: ' . implode(', ', $allowed));
             }
 
-            if (isset($arguments['search_intent']) && !array_key_exists($arguments['search_intent'], BrandsContentBriefBoard::SEARCH_INTENTS)) {
-                return ToolResult::error('VALIDATION_ERROR', 'Ungültiger search_intent. Erlaubt: ' . implode(', ', array_keys(BrandsContentBriefBoard::SEARCH_INTENTS)));
+            if (isset($arguments['search_intent']) && !BrandsContentBriefBoard::isValidLookupValue('search_intent', $arguments['search_intent'], $teamId)) {
+                $allowed = BrandsContentBriefBoard::getAllowedValues('search_intent', $teamId);
+                return ToolResult::error('VALIDATION_ERROR', 'Ungültiger search_intent. Erlaubt: ' . implode(', ', $allowed));
             }
 
-            if (isset($arguments['status']) && !array_key_exists($arguments['status'], BrandsContentBriefBoard::STATUSES)) {
-                return ToolResult::error('VALIDATION_ERROR', 'Ungültiger status. Erlaubt: ' . implode(', ', array_keys(BrandsContentBriefBoard::STATUSES)));
+            if (isset($arguments['status']) && !BrandsContentBriefBoard::isValidLookupValue('content_brief_status', $arguments['status'], $teamId)) {
+                $allowed = BrandsContentBriefBoard::getAllowedValues('content_brief_status', $teamId);
+                return ToolResult::error('VALIDATION_ERROR', 'Ungültiger status. Erlaubt: ' . implode(', ', $allowed));
             }
 
             $updateData = [];
 
-            foreach (['name', 'description', 'content_type', 'search_intent', 'status', 'target_slug', 'target_word_count', 'seo_board_id'] as $field) {
+            foreach (['name', 'description', 'content_type', 'search_intent', 'status', 'target_slug', 'target_url', 'target_word_count', 'seo_board_id'] as $field) {
                 if (isset($arguments[$field])) {
                     $updateData[$field] = $arguments[$field];
                 }
@@ -138,6 +144,7 @@ class UpdateContentBriefBoardTool implements ToolContract
                 'search_intent' => $board->search_intent,
                 'status' => $board->status,
                 'target_slug' => $board->target_slug,
+                'target_url' => $board->target_url,
                 'target_word_count' => $board->target_word_count,
                 'brand_id' => $board->brand_id,
                 'brand_name' => $board->brand->name,

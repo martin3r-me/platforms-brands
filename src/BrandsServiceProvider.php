@@ -116,6 +116,7 @@ class BrandsServiceProvider extends ServiceProvider
                 \Platform\Brands\Console\Commands\SyncAll::class,
                 \Platform\Brands\Console\Commands\TruncateIntegrationsData::class,
                 \Platform\Brands\Console\Commands\RefreshSeoKeywords::class,
+                \Platform\Brands\Console\Commands\TrackContentBriefRankings::class,
             ]);
         }
 
@@ -301,6 +302,11 @@ class BrandsServiceProvider extends ServiceProvider
     {
         Schedule::command('brands:refresh-seo-keywords')
             ->daily()
+            ->withoutOverlapping()
+            ->runInBackground();
+
+        Schedule::command('brands:track-brief-rankings')
+            ->weeklyOn(0, '03:00') // Sonntag 03:00 Uhr
             ->withoutOverlapping()
             ->runInBackground();
     }
@@ -619,6 +625,14 @@ class BrandsServiceProvider extends ServiceProvider
             $registry->register(new \Platform\Brands\Tools\UpdateSocialCardContractTool());
             $registry->register(new \Platform\Brands\Tools\PublishSocialCardTool());
 
+            // Lookup-Tools (Content-Typ, Such-Intent, Status etc.)
+            $registry->register(new \Platform\Brands\Tools\ListBrandsLookupsTool());
+            $registry->register(new \Platform\Brands\Tools\GetBrandsLookupValuesTool());
+            $registry->register(new \Platform\Brands\Tools\CreateBrandsLookupTool());
+            $registry->register(new \Platform\Brands\Tools\CreateBrandsLookupValueTool());
+            $registry->register(new \Platform\Brands\Tools\UpdateBrandsLookupValueTool());
+            $registry->register(new \Platform\Brands\Tools\DeleteBrandsLookupValueTool());
+
             // ContentBriefBoard-Tools
             $registry->register(new \Platform\Brands\Tools\CreateContentBriefBoardTool());
             $registry->register(new \Platform\Brands\Tools\ListContentBriefBoardsTool());
@@ -655,6 +669,17 @@ class BrandsServiceProvider extends ServiceProvider
             $registry->register(new \Platform\Brands\Tools\ListContentBriefNotesTool());
             $registry->register(new \Platform\Brands\Tools\UpdateContentBriefNoteTool());
             $registry->register(new \Platform\Brands\Tools\DeleteContentBriefNoteTool());
+
+            // ContentBriefRevision-Tools (Änderungs-Log für Ranking-Korrelation)
+            $registry->register(new \Platform\Brands\Tools\CreateContentBriefRevisionTool());
+            $registry->register(new \Platform\Brands\Tools\ListContentBriefRevisionsTool());
+            $registry->register(new \Platform\Brands\Tools\GetContentBriefRevisionTool());
+            $registry->register(new \Platform\Brands\Tools\UpdateContentBriefRevisionTool());
+            $registry->register(new \Platform\Brands\Tools\DeleteContentBriefRevisionTool());
+
+            // ContentBriefRanking-Tools (SERP-Tracking pro Brief)
+            $registry->register(new \Platform\Brands\Tools\ListContentBriefRankingsTool());
+            $registry->register(new \Platform\Brands\Tools\TrackContentBriefRankingsTool());
 
             // Topic Cluster Map
             $registry->register(new \Platform\Brands\Tools\GetTopicClusterMapTool());
