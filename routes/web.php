@@ -3,9 +3,6 @@
 use Platform\Brands\Livewire\Brand;
 use Platform\Brands\Livewire\Dashboard;
 use Platform\Brands\Livewire\CiBoard;
-// Deprecated: Content Board Livewire-Komponenten entfernt (Ticket #441 – Entfernung 2026-06-01)
-// use Platform\Brands\Livewire\ContentBoard;
-// use Platform\Brands\Livewire\ContentBoardBlockTextEdit;
 use Platform\Brands\Livewire\SocialBoard;
 use Platform\Brands\Livewire\EditorialPlanBoard;
 use Platform\Brands\Livewire\SocialCard;
@@ -19,8 +16,6 @@ use Platform\Brands\Livewire\CompetitorBoard;
 use Platform\Brands\Livewire\GuidelineBoard;
 use Platform\Brands\Livewire\MoodboardBoard;
 use Platform\Brands\Livewire\AssetBoard;
-// Deprecated: Multi-Content-Board Livewire-Komponente entfernt (Ticket #441 – Entfernung 2026-06-01)
-// use Platform\Brands\Livewire\MultiContentBoard;
 use Platform\Brands\Livewire\SeoBoard as SeoBoardComponent;
 use Platform\Brands\Livewire\CtaBoard as CtaBoardComponent;
 use Platform\Brands\Livewire\ContentBriefBoard as ContentBriefBoardComponent;
@@ -30,8 +25,6 @@ use Platform\Brands\Livewire\Export;
 use Platform\Brands\Livewire\ExportDownload;
 use Platform\Brands\Models\BrandsBrand;
 use Platform\Brands\Models\BrandsCiBoard;
-// Deprecated: BrandsContentBoard Model entfernt (Ticket #441)
-// use Platform\Brands\Models\BrandsContentBoard;
 use Platform\Brands\Models\BrandsSocialBoard;
 use Platform\Brands\Models\BrandsSocialCard;
 use Platform\Brands\Models\BrandsKanbanBoard as BrandsKanbanBoardModel;
@@ -44,13 +37,9 @@ use Platform\Brands\Models\BrandsCompetitorBoard as BrandsCompetitorBoardModel;
 use Platform\Brands\Models\BrandsGuidelineBoard as BrandsGuidelineBoardModel;
 use Platform\Brands\Models\BrandsMoodboardBoard as BrandsMoodboardBoardModel;
 use Platform\Brands\Models\BrandsAssetBoard as BrandsAssetBoardModel;
-// Deprecated: BrandsMultiContentBoard Model entfernt (Ticket #441)
-// use Platform\Brands\Models\BrandsMultiContentBoard;
 use Platform\Brands\Models\BrandsSeoBoard as BrandsSeoBoardModel;
 use Platform\Brands\Models\BrandsCtaBoard as BrandsCtaBoardModel;
 use Platform\Brands\Models\BrandsContentBriefBoard as BrandsContentBriefBoardModel;
-// Deprecated: BrandsContentBoardBlock Model entfernt (Ticket #441)
-// use Platform\Brands\Models\BrandsContentBoardBlock;
 use Platform\Integrations\Models\IntegrationsFacebookPage;
 use Platform\Integrations\Models\IntegrationsInstagramAccount;
 
@@ -63,8 +52,6 @@ Route::get('/brands/{brandsBrand}', Brand::class)
 // CI Board Routes
 Route::get('/ci-boards/{brandsCiBoard}', CiBoard::class)
     ->name('brands.ci-boards.show');
-
-// Deprecated: Content Board + Content Board Block Routes entfernt (Ticket #441 – Entfernung 2026-06-01)
 
 // Social Board Routes
 Route::get('/social-boards/{brandsSocialBoard}', SocialBoard::class)
@@ -117,8 +104,6 @@ Route::get('/moodboard-boards/{brandsMoodboardBoard}', MoodboardBoard::class)
 // Asset Board Routes
 Route::get('/asset-boards/{brandsAssetBoard}', AssetBoard::class)
     ->name('brands.asset-boards.show');
-
-// Deprecated: Multi-Content-Board Routes entfernt (Ticket #441 – Entfernung 2026-06-01)
 
 // SEO Board Routes
 Route::get('/seo-boards/{brandsSeoBoard}', SeoBoardComponent::class)

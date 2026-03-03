@@ -34,7 +34,6 @@
                             style="display: none;"
                         >
                             <div class="py-1">
-                                {{-- Deprecated: Content Board erstellen entfernt (Ticket #441) – ersetzt durch Content Brief Board --}}
                                 <button
                                     wire:click="createSocialBoard"
                                     @click="open = false"
@@ -74,7 +73,6 @@
                                         <div class="text-xs text-[var(--ui-muted)]">Für Aufgabenverwaltung</div>
                                     </div>
                                 </button>
-                                {{-- Deprecated: Multi-Content-Board erstellen entfernt (Ticket #441) – ersetzt durch Content Brief Board --}}
                                 <button
                                     wire:click="createTypographyBoard"
                                     @click="open = false"

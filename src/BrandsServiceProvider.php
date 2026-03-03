@@ -15,10 +15,6 @@ use Platform\Core\Routing\ModuleRouter;
 use Platform\Brands\Models\BrandsBrand;
 use Platform\Brands\Models\BrandsCiBoard;
 use Platform\Brands\Models\BrandsCiBoardColor;
-// Deprecated: Content Boards & Multi Content Boards (Ticket #441 – Entfernung 2026-06-01)
-// use Platform\Brands\Models\BrandsContentBoard;
-// use Platform\Brands\Models\BrandsContentBoardBlockText;
-// use Platform\Brands\Models\BrandsMultiContentBoard;
 use Platform\Brands\Models\BrandsSocialBoard;
 use Platform\Brands\Models\BrandsSocialCard;
 use Platform\Brands\Models\BrandsKanbanBoard;
@@ -58,9 +54,6 @@ use Platform\Integrations\Models\IntegrationsInstagramAccount;
 use Platform\Brands\Policies\BrandPolicy;
 use Platform\Brands\Policies\CiBoardPolicy;
 use Platform\Brands\Policies\CiBoardColorPolicy;
-// Deprecated: Content Boards & Multi Content Boards (Ticket #441 – Entfernung 2026-06-01)
-// use Platform\Brands\Policies\ContentBoardPolicy;
-// use Platform\Brands\Policies\MultiContentBoardPolicy;
 use Platform\Brands\Policies\SocialBoardPolicy;
 use Platform\Brands\Policies\SocialCardPolicy;
 use Platform\Brands\Policies\KanbanBoardPolicy;
@@ -96,8 +89,6 @@ use Platform\Brands\Policies\SocialPlatformFormatPolicy;
 use Platform\Brands\Policies\SocialCardContractPolicy;
 use Platform\Brands\Policies\FacebookPagePolicy;
 use Platform\Brands\Policies\InstagramAccountPolicy;
-// Deprecated: Content Board Observer (Ticket #441 – Entfernung 2026-06-01)
-// use Platform\Brands\Observers\ContentBoardObserver;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 
@@ -198,13 +189,8 @@ class BrandsServiceProvider extends ServiceProvider
         // Policies registrieren
         $this->registerPolicies();
 
-        // Observers registrieren
-        // Deprecated: ContentBoardObserver entfernt (Ticket #441)
-
         // Scheduler registrieren
         $this->registerSchedule();
-
-        // Deprecated: Morph Map für Content Board Block Types entfernt (Ticket #441)
 
         // Tools registrieren
         $this->registerTools();
@@ -253,7 +239,6 @@ class BrandsServiceProvider extends ServiceProvider
             BrandsBrand::class => BrandPolicy::class,
             BrandsCiBoard::class => CiBoardPolicy::class,
             BrandsCiBoardColor::class => CiBoardColorPolicy::class,
-            // Deprecated: ContentBoard + MultiContentBoard Policies entfernt (Ticket #441)
             BrandsSocialBoard::class => SocialBoardPolicy::class,
             BrandsSocialCard::class => SocialCardPolicy::class,
             BrandsKanbanBoard::class => KanbanBoardPolicy::class,
@@ -344,8 +329,6 @@ class BrandsServiceProvider extends ServiceProvider
             $registry->register(new \Platform\Brands\Tools\UpdateCiBoardColorTool());
             $registry->register(new \Platform\Brands\Tools\DeleteCiBoardColorTool());
             
-            // Deprecated: ContentBoard-Tools entfernt (Ticket #441 – Entfernung 2026-06-01)
-
             // SocialBoard-Tools
             $registry->register(new \Platform\Brands\Tools\CreateSocialBoardTool());
             $registry->register(new \Platform\Brands\Tools\ListSocialBoardsTool());
@@ -353,8 +336,6 @@ class BrandsServiceProvider extends ServiceProvider
             $registry->register(new \Platform\Brands\Tools\UpdateSocialBoardTool());
             $registry->register(new \Platform\Brands\Tools\DeleteSocialBoardTool());
             
-            // Deprecated: MultiContentBoard-Tools entfernt (Ticket #441 – Entfernung 2026-06-01)
-
             // KanbanBoard-Tools
             $registry->register(new \Platform\Brands\Tools\CreateKanbanBoardTool());
             $registry->register(new \Platform\Brands\Tools\ListKanbanBoardsTool());
@@ -408,8 +389,6 @@ class BrandsServiceProvider extends ServiceProvider
             $registry->register(new \Platform\Brands\Tools\BulkCreateSocialCardsTool());
             $registry->register(new \Platform\Brands\Tools\BulkUpdateSocialCardsTool());
             
-            // Deprecated: ContentBoardBlock + ContentBoardBlockText-Tools entfernt (Ticket #441 – Entfernung 2026-06-01)
-
             // Facebook Pages-Tools
             $registry->register(new \Platform\Brands\Tools\ListFacebookPagesTool());
             $registry->register(new \Platform\Brands\Tools\GetFacebookPageTool());

@@ -50,14 +50,6 @@ class Brand extends Component
         return $this->redirect(route('brands.ci-boards.show', $ciBoard), navigate: true);
     }
 
-    /**
-     * @deprecated Content Boards wurden entfernt (Ticket #441). Verwende stattdessen createContentBriefBoard().
-     */
-    public function createContentBoard()
-    {
-        session()->flash('error', 'Content Boards wurden durch Content Briefs ersetzt (Ticket #441). Bitte nutze stattdessen "Content Brief Board erstellen".');
-    }
-
     public function createSocialBoard()
     {
         $this->authorize('update', $this->brand);
@@ -106,14 +98,6 @@ class Brand extends Component
         $this->brand->refresh();
 
         return $this->redirect(route('brands.kanban-boards.show', $kanbanBoard), navigate: true);
-    }
-
-    /**
-     * @deprecated Multi Content Boards wurden entfernt (Ticket #441). Verwende stattdessen createContentBriefBoard().
-     */
-    public function createMultiContentBoard()
-    {
-        session()->flash('error', 'Multi-Content-Boards wurden durch Content Briefs ersetzt (Ticket #441). Bitte nutze stattdessen "Content Brief Board erstellen".');
     }
 
     public function createTypographyBoard()
@@ -559,7 +543,6 @@ class Brand extends Component
 
         // Alle Board-Typen laden mit Entry-Counts
         $ciBoards = $this->brand->ciBoards;
-        // Deprecated: contentBoards und multiContentBoards entfernt (Ticket #441)
         $socialBoards = $this->brand->socialBoards;
         $kanbanBoards = $this->brand->kanbanBoards;
         $typographyBoards = $this->brand->typographyBoards;
@@ -586,7 +569,6 @@ class Brand extends Component
                 'entryRelation' => 'colors',
                 'entryLabel' => 'Farben',
             ],
-            // Deprecated: Content Boards entfernt (Ticket #441)
             [
                 'key' => 'social',
                 'label' => 'Social Boards',
@@ -609,7 +591,6 @@ class Brand extends Component
                 'entryRelation' => 'cards',
                 'entryLabel' => 'Cards',
             ],
-            // Deprecated: Multi-Content-Boards entfernt (Ticket #441)
             [
                 'key' => 'typography',
                 'label' => 'Typografie Boards',
@@ -758,7 +739,6 @@ class Brand extends Component
             'user' => $user,
             'boardGroups' => $boardGroups,
             'ciBoards' => $ciBoards,
-            // Deprecated: contentBoards und multiContentBoards entfernt (Ticket #441)
             'socialBoards' => $socialBoards,
             'kanbanBoards' => $kanbanBoards,
             'typographyBoards' => $typographyBoards,
