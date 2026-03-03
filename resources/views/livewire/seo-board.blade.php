@@ -27,16 +27,23 @@
                 {{-- Ansicht --}}
                 <div>
                     <h3 class="text-xs font-semibold uppercase tracking-wide text-[var(--ui-muted)] mb-3">Ansicht</h3>
-                    <div class="flex gap-1 p-1 bg-[var(--ui-muted-5)] rounded-lg border border-[var(--ui-border)]/40">
-                        <button wire:click="switchView('analysis')"
-                                class="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md transition-all {{ $viewMode === 'analysis' ? 'bg-white text-lime-700 shadow-sm border border-lime-200' : 'text-[var(--ui-muted)] hover:text-[var(--ui-secondary)]' }}">
-                            @svg('heroicon-o-table-cells', 'w-3.5 h-3.5')
-                            Analyse
-                        </button>
-                        <button wire:click="switchView('kanban')"
-                                class="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md transition-all {{ $viewMode === 'kanban' ? 'bg-white text-lime-700 shadow-sm border border-lime-200' : 'text-[var(--ui-muted)] hover:text-[var(--ui-secondary)]' }}">
-                            @svg('heroicon-o-view-columns', 'w-3.5 h-3.5')
-                            Kanban
+                    <div class="flex flex-col gap-1 p-1 bg-[var(--ui-muted-5)] rounded-lg border border-[var(--ui-border)]/40">
+                        <div class="flex gap-1">
+                            <button wire:click="switchView('analysis')"
+                                    class="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md transition-all {{ $viewMode === 'analysis' ? 'bg-white text-lime-700 shadow-sm border border-lime-200' : 'text-[var(--ui-muted)] hover:text-[var(--ui-secondary)]' }}">
+                                @svg('heroicon-o-table-cells', 'w-3.5 h-3.5')
+                                Analyse
+                            </button>
+                            <button wire:click="switchView('kanban')"
+                                    class="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md transition-all {{ $viewMode === 'kanban' ? 'bg-white text-lime-700 shadow-sm border border-lime-200' : 'text-[var(--ui-muted)] hover:text-[var(--ui-secondary)]' }}">
+                                @svg('heroicon-o-view-columns', 'w-3.5 h-3.5')
+                                Kanban
+                            </button>
+                        </div>
+                        <button wire:click="switchView('competitors')"
+                                class="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md transition-all {{ $viewMode === 'competitors' ? 'bg-white text-lime-700 shadow-sm border border-lime-200' : 'text-[var(--ui-muted)] hover:text-[var(--ui-secondary)]' }}">
+                            @svg('heroicon-o-globe-alt', 'w-3.5 h-3.5')
+                            Wettbewerber
                         </button>
                     </div>
                 </div>
@@ -251,6 +258,108 @@
                                 @svg('heroicon-o-table-cells', 'w-6 h-6 text-lime-600')
                             </div>
                             <p class="text-sm text-[var(--ui-muted)]">Erstelle Cluster, um die Analyse-Ansicht zu nutzen.</p>
+                        </div>
+                    </div>
+                @endif
+            </div>
+
+        {{-- === COMPETITOR VIEW === --}}
+        @elseif($viewMode === 'competitors')
+            <div class="flex-1 min-w-0 overflow-y-auto p-4 sm:p-6">
+                @if($competitorAnalysis->count() > 0)
+                    {{-- Gesamt-Summary --}}
+                    @php
+                        $totalDomains = $competitorAnalysis->count();
+                        $totalGaps = $competitorAnalysis->sum('gap_count');
+                        $totalOverlap = $competitorAnalysis->sum('overlap_count');
+                        $totalVisibility = $competitorAnalysis->sum('visibility_score');
+                    @endphp
+                    <div class="mb-5 rounded-xl border border-lime-200/60 bg-gradient-to-r from-lime-50/60 to-white p-4">
+                        <div class="flex flex-wrap items-center gap-x-6 gap-y-3">
+                            <div class="flex items-center gap-2">
+                                @svg('heroicon-o-globe-alt', 'w-5 h-5 text-lime-600')
+                                <span class="text-sm font-bold text-lime-800">Wettbewerber</span>
+                            </div>
+                            <div class="flex flex-wrap items-center gap-x-5 gap-y-2">
+                                <div>
+                                    <span class="text-[10px] uppercase tracking-wide text-[var(--ui-muted)]">Domains</span>
+                                    <span class="ml-1 text-sm font-bold text-[var(--ui-secondary)] tabular-nums">{{ $totalDomains }}</span>
+                                </div>
+                                <div>
+                                    <span class="text-[10px] uppercase tracking-wide text-[var(--ui-muted)]">Overlap</span>
+                                    <span class="ml-1 text-sm font-bold text-[var(--ui-secondary)] tabular-nums">{{ number_format($totalOverlap) }}</span>
+                                </div>
+                                <div class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-100/80 border border-red-200">
+                                    <span class="text-[10px] uppercase tracking-wide text-red-700">Gaps</span>
+                                    <span class="text-sm font-extrabold text-red-800 tabular-nums">{{ number_format($totalGaps) }}</span>
+                                </div>
+                                <div class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-lime-100/80 border border-lime-200">
+                                    <span class="text-[10px] uppercase tracking-wide text-lime-700">Visibility</span>
+                                    <span class="text-sm font-extrabold text-lime-800 tabular-nums">{{ number_format($totalVisibility) }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Sort-Header --}}
+                    <div class="hidden lg:flex items-center gap-4 pl-9 pr-4 pb-3 text-[10px] font-semibold uppercase tracking-wider text-[var(--ui-muted)]">
+                        <button wire:click="sortBy('domain')" class="flex-1 min-w-0 flex items-center gap-1 hover:text-[var(--ui-secondary)] transition-colors">
+                            Domain
+                            @if($sortField === 'domain')
+                                @svg($sortDirection === 'asc' ? 'heroicon-o-chevron-up' : 'heroicon-o-chevron-down', 'w-3 h-3 text-lime-600')
+                            @endif
+                        </button>
+                        <div class="flex items-center gap-5 flex-shrink-0">
+                            <button wire:click="sortBy('keyword_count')" class="w-16 flex items-center justify-end gap-1 hover:text-[var(--ui-secondary)] transition-colors">
+                                Keywords
+                                @if($sortField === 'keyword_count')
+                                    @svg($sortDirection === 'asc' ? 'heroicon-o-chevron-up' : 'heroicon-o-chevron-down', 'w-3 h-3 text-lime-600')
+                                @endif
+                            </button>
+                            <button wire:click="sortBy('avg_serp_position')" class="w-12 flex items-center justify-end gap-1 hover:text-[var(--ui-secondary)] transition-colors">
+                                {{ "\u{00D8}" }} Pos
+                                @if($sortField === 'avg_serp_position')
+                                    @svg($sortDirection === 'asc' ? 'heroicon-o-chevron-up' : 'heroicon-o-chevron-down', 'w-3 h-3 text-lime-600')
+                                @endif
+                            </button>
+                            <button wire:click="sortBy('overlap_count')" class="w-16 flex items-center justify-end gap-1 hover:text-[var(--ui-secondary)] transition-colors">
+                                Overlap
+                                @if($sortField === 'overlap_count')
+                                    @svg($sortDirection === 'asc' ? 'heroicon-o-chevron-up' : 'heroicon-o-chevron-down', 'w-3 h-3 text-lime-600')
+                                @endif
+                            </button>
+                            <button wire:click="sortBy('gap_count')" class="w-12 flex items-center justify-end gap-1 hover:text-[var(--ui-secondary)] transition-colors">
+                                Gaps
+                                @if($sortField === 'gap_count')
+                                    @svg($sortDirection === 'asc' ? 'heroicon-o-chevron-up' : 'heroicon-o-chevron-down', 'w-3 h-3 text-lime-600')
+                                @endif
+                            </button>
+                            <button wire:click="sortBy('visibility_score')" class="w-20 flex items-center justify-end gap-1 hover:text-[var(--ui-secondary)] transition-colors">
+                                Visibility
+                                @if($sortField === 'visibility_score')
+                                    @svg($sortDirection === 'asc' ? 'heroicon-o-chevron-up' : 'heroicon-o-chevron-down', 'w-3 h-3 text-lime-600')
+                                @endif
+                            </button>
+                        </div>
+                    </div>
+
+                    {{-- Domain Rows --}}
+                    <div class="space-y-2">
+                        @foreach($competitorAnalysis as $domainData)
+                            @include('brands::livewire.seo-competitor-domain-row', [
+                                'data' => $domainData,
+                                'strategicCompetitorMap' => $strategicCompetitorMap,
+                            ])
+                        @endforeach
+                    </div>
+                @else
+                    <div class="flex items-center justify-center py-12">
+                        <div class="text-center">
+                            <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-lime-50 mb-3">
+                                @svg('heroicon-o-globe-alt', 'w-6 h-6 text-lime-600')
+                            </div>
+                            <p class="text-sm text-[var(--ui-muted)]">Keine Wettbewerber-Daten vorhanden.</p>
+                            <p class="text-xs text-[var(--ui-muted)] mt-1">Competitor-Daten werden automatisch beim Keyword-Refresh erfasst.</p>
                         </div>
                     </div>
                 @endif

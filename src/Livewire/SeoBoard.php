@@ -32,8 +32,20 @@ class SeoBoard extends Component
 
     public function switchView(string $mode): void
     {
-        if (in_array($mode, ['kanban', 'analysis'])) {
+        if (in_array($mode, ['kanban', 'analysis', 'competitors'])) {
             $this->viewMode = $mode;
+
+            // Reset sort to view-appropriate default
+            if ($mode === 'competitors') {
+                $this->sortField = 'visibility_score';
+                $this->sortDirection = 'desc';
+            } elseif ($mode === 'analysis' && ! in_array($this->sortField, [
+                'name', 'opportunity_score', 'sum_sv', 'weighted_kd',
+                'avg_cpc', 'traffic_value', 'coverage', 'rankings', 'avg_position',
+            ])) {
+                $this->sortField = 'opportunity_score';
+                $this->sortDirection = 'desc';
+            }
         }
     }
 
@@ -42,6 +54,7 @@ class SeoBoard extends Component
         $allowedFields = [
             'name', 'opportunity_score', 'sum_sv', 'weighted_kd',
             'avg_cpc', 'traffic_value', 'coverage', 'rankings', 'avg_position',
+            'domain', 'keyword_count', 'avg_serp_position', 'overlap_count', 'gap_count', 'visibility_score',
         ];
 
         if (! in_array($field, $allowedFields)) {
@@ -193,6 +206,116 @@ class SeoBoard extends Component
             )->values();
         }
 
+        // Competitor Domain Analysis
+        $competitorAnalysis = collect();
+        $strategicCompetitorMap = collect();
+
+        if ($this->viewMode === 'competitors') {
+            $keywordsWithCompetitors = $this->seoBoard->keywords()
+                ->with('competitors')
+                ->get();
+
+            // CTR estimates by SERP position
+            $ctrEstimates = [
+                1 => 0.316, 2 => 0.241, 3 => 0.189, 4 => 0.107, 5 => 0.078,
+                6 => 0.057, 7 => 0.044, 8 => 0.033, 9 => 0.028, 10 => 0.024,
+            ];
+
+            $domainData = [];
+
+            foreach ($keywordsWithCompetitors as $keyword) {
+                $ourPosition = $keyword->position;
+                $sv = $keyword->search_volume ?? 0;
+
+                foreach ($keyword->competitors as $competitor) {
+                    $domain = $competitor->domain;
+
+                    if (! isset($domainData[$domain])) {
+                        $domainData[$domain] = [
+                            'domain' => $domain,
+                            'keyword_count' => 0,
+                            'total_position' => 0,
+                            'overlap_count' => 0,
+                            'gap_count' => 0,
+                            'visibility_score' => 0,
+                            'keywords' => [],
+                        ];
+                    }
+
+                    $domainData[$domain]['keyword_count']++;
+                    $theirPosition = $competitor->position;
+                    $domainData[$domain]['total_position'] += $theirPosition;
+
+                    // Overlap: both rank
+                    if ($ourPosition !== null && $theirPosition !== null) {
+                        $domainData[$domain]['overlap_count']++;
+                    }
+
+                    // Gap: they rank, we don't
+                    if ($ourPosition === null && $theirPosition !== null) {
+                        $domainData[$domain]['gap_count']++;
+                    }
+
+                    // Visibility score: SV * CTR estimate
+                    $ctr = $ctrEstimates[$theirPosition] ?? ($theirPosition <= 20 ? 0.015 : 0.005);
+                    $domainData[$domain]['visibility_score'] += $sv * $ctr;
+
+                    $domainData[$domain]['keywords'][] = [
+                        'keyword' => $keyword->keyword,
+                        'search_volume' => $sv,
+                        'their_position' => $theirPosition,
+                        'our_position' => $ourPosition,
+                        'search_intent' => $keyword->search_intent,
+                        'url' => $competitor->url,
+                    ];
+                }
+            }
+
+            // Calculate averages and convert to collection
+            $competitorAnalysis = collect($domainData)->map(function ($data) {
+                $data['avg_serp_position'] = $data['keyword_count'] > 0
+                    ? round($data['total_position'] / $data['keyword_count'], 1)
+                    : 0;
+                $data['visibility_score'] = round($data['visibility_score']);
+                $data['keywords'] = collect($data['keywords']);
+                unset($data['total_position']);
+
+                return $data;
+            });
+
+            // Sort
+            $competitorAnalysis = $competitorAnalysis->sortBy(
+                fn ($item) => $item[$this->sortField] ?? 0,
+                SORT_REGULAR,
+                $this->sortDirection === 'desc'
+            )->values();
+
+            // Strategic Competitor Matching
+            $brand = $this->seoBoard->brand;
+            $competitorBoards = $brand->competitorBoards()->with('competitors')->get();
+
+            $strategicMap = [];
+            foreach ($competitorBoards as $board) {
+                foreach ($board->competitors as $comp) {
+                    if (! $comp->website_url) {
+                        continue;
+                    }
+
+                    $normalizedDomain = preg_replace('#^https?://(www\.)?#', '', rtrim($comp->website_url, '/'));
+                    $normalizedDomain = strtolower(explode('/', $normalizedDomain)[0]);
+
+                    if ($normalizedDomain) {
+                        $strategicMap[$normalizedDomain] = [
+                            'name' => $comp->name,
+                            'logo_url' => $comp->logo_url,
+                        ];
+                    }
+                }
+            }
+
+            $strategicCompetitorMap = collect($strategicMap);
+        }
+
         return view('brands::livewire.seo-board', [
             'user' => $user,
             'clusters' => $clusters,
@@ -201,6 +324,8 @@ class SeoBoard extends Component
             'maxSearchVolume' => $maxSearchVolume,
             'budgetSummary' => $budgetSummary,
             'clusterAnalysis' => $clusterAnalysis,
+            'competitorAnalysis' => $competitorAnalysis,
+            'strategicCompetitorMap' => $strategicCompetitorMap,
         ])->layout('platform::layouts.app');
     }
 }
