@@ -3,6 +3,21 @@
         <x-ui-page-navbar :title="'@' . $instagramAccount->username" icon="heroicon-o-camera" />
     </x-slot>
 
+    <x-slot name="actionbar">
+        <x-ui-page-actionbar :breadcrumbs="[
+            ['label' => 'Marken', 'href' => route('brands.dashboard'), 'icon' => 'tag'],
+            ['label' => $instagramAccount->brand->name ?? 'Marke', 'href' => $instagramAccount->brand ? route('brands.brands.show', $instagramAccount->brand) : '#'],
+            ['label' => '@' . $instagramAccount->username],
+        ]">
+            @can('update', $instagramAccount)
+                <x-ui-button variant="primary" size="sm" wire:click="syncMedia">
+                    @svg('heroicon-o-arrow-path', 'w-4 h-4')
+                    <span>Media synchronisieren</span>
+                </x-ui-button>
+            @endcan
+        </x-ui-page-actionbar>
+    </x-slot>
+
     <x-ui-page-container spacing="space-y-6">
         {{-- Hero Section --}}
         <div class="border-b border-[var(--ui-border)]/60 bg-white">
@@ -900,25 +915,6 @@
                     </div>
                 </div>
 
-                {{-- Aktionen --}}
-                @can('update', $instagramAccount)
-                    <div>
-                        <h3 class="text-xs font-semibold uppercase tracking-wide text-[var(--ui-muted)] mb-3">Aktionen</h3>
-                        <div class="space-y-2">
-                            <x-ui-button 
-                                variant="primary" 
-                                size="sm"
-                                wire:click="syncMedia"
-                                class="w-full"
-                            >
-                                <span class="inline-flex items-center gap-2">
-                                    @svg('heroicon-o-arrow-path', 'w-4 h-4')
-                                    <span>Media synchronisieren</span>
-                                </span>
-                            </x-ui-button>
-                        </div>
-                    </div>
-                @endcan
             </div>
         </x-ui-page-sidebar>
     </x-slot>

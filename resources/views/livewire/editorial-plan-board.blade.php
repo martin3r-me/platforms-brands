@@ -1,33 +1,20 @@
 <x-ui-page>
     <x-slot name="navbar">
-        <x-ui-page-navbar :title="'Redaktionsplan: ' . $socialBoard->name" icon="heroicon-o-calendar-days">
-            <x-slot name="actions">
-                <a href="{{ route('brands.social-boards.show', $socialBoard) }}" class="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-[var(--ui-secondary)] hover:text-[var(--ui-primary)] transition-colors">
-                    @svg('heroicon-o-arrow-left', 'w-4 h-4')
-                    <span>Zurück zum Board</span>
-                </a>
-            </x-slot>
-        </x-ui-page-navbar>
+        <x-ui-page-navbar :title="'Redaktionsplan: ' . $socialBoard->name" icon="heroicon-o-calendar-days" />
+    </x-slot>
+
+    <x-slot name="actionbar">
+        <x-ui-page-actionbar :breadcrumbs="[
+            ['label' => 'Marken', 'href' => route('brands.dashboard'), 'icon' => 'tag'],
+            ['label' => $socialBoard->brand->name, 'href' => route('brands.brands.show', $socialBoard->brand)],
+            ['label' => $socialBoard->name, 'href' => route('brands.social-boards.show', $socialBoard)],
+            ['label' => 'Redaktionsplan'],
+        ]" />
     </x-slot>
 
     <x-slot name="sidebar">
         <x-ui-page-sidebar title="Filter" width="w-72" :defaultOpen="true">
             <div class="p-4 space-y-6">
-                {{-- Navigation --}}
-                <div>
-                    <h3 class="text-xs font-semibold uppercase tracking-wide text-[var(--ui-muted)] mb-3">Navigation</h3>
-                    <div class="flex flex-col gap-2">
-                        <a href="{{ route('brands.social-boards.show', $socialBoard) }}" class="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-[var(--ui-secondary)] hover:text-[var(--ui-primary)] transition-colors rounded-lg border border-[var(--ui-border)]/40 hover:bg-[var(--ui-muted-5)]">
-                            @svg('heroicon-o-view-columns', 'w-4 h-4')
-                            <span>Board-Ansicht</span>
-                        </a>
-                        <a href="{{ route('brands.brands.show', $socialBoard->brand) }}" class="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-[var(--ui-secondary)] hover:text-[var(--ui-primary)] transition-colors rounded-lg border border-[var(--ui-border)]/40 hover:bg-[var(--ui-muted-5)]">
-                            @svg('heroicon-o-arrow-left', 'w-4 h-4')
-                            <span>Zurück zur Marke</span>
-                        </a>
-                    </div>
-                </div>
-
                 {{-- Status Filter --}}
                 <div>
                     <h3 class="text-xs font-semibold uppercase tracking-wide text-[var(--ui-muted)] mb-3">Status</h3>

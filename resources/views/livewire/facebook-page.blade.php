@@ -3,6 +3,21 @@
         <x-ui-page-navbar :title="$facebookPage->name" icon="heroicon-o-globe-alt" />
     </x-slot>
 
+    <x-slot name="actionbar">
+        <x-ui-page-actionbar :breadcrumbs="[
+            ['label' => 'Marken', 'href' => route('brands.dashboard'), 'icon' => 'tag'],
+            ['label' => $facebookPage->brand->name ?? 'Marke', 'href' => $facebookPage->brand ? route('brands.brands.show', $facebookPage->brand) : '#'],
+            ['label' => $facebookPage->name],
+        ]">
+            @can('update', $facebookPage)
+                <x-ui-button variant="primary" size="sm" wire:click="syncPosts">
+                    @svg('heroicon-o-arrow-path', 'w-4 h-4')
+                    <span>Posts synchronisieren</span>
+                </x-ui-button>
+            @endcan
+        </x-ui-page-actionbar>
+    </x-slot>
+
     <x-ui-page-container spacing="space-y-6">
         {{-- Post Details Section --}}
         <section class="bg-white rounded-xl border border-[var(--ui-border)]/60 shadow-sm p-6">
@@ -293,26 +308,6 @@
                         @endif
                     </div>
                 </div>
-
-                {{-- Aktionen --}}
-                @can('update', $facebookPage)
-                    <div>
-                        <h3 class="text-xs font-semibold uppercase tracking-wide text-[var(--ui-muted)] mb-3">Aktionen</h3>
-                        <div class="space-y-2">
-                            <x-ui-button 
-                                variant="primary" 
-                                size="sm"
-                                wire:click="syncPosts"
-                                class="w-full"
-                            >
-                                <span class="inline-flex items-center gap-2">
-                                    @svg('heroicon-o-arrow-path', 'w-4 h-4')
-                                    <span>Posts synchronisieren</span>
-                                </span>
-                            </x-ui-button>
-                        </div>
-                    </div>
-                @endcan
 
                 {{-- Instagram Accounts --}}
                 @if($facebookPage->instagramAccounts->count() > 0)

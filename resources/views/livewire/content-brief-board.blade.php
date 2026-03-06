@@ -1,13 +1,27 @@
 <x-ui-page>
     <x-slot name="navbar">
-        <x-ui-page-navbar :title="$contentBriefBoard->name" icon="heroicon-o-document-magnifying-glass">
-            <x-slot name="actions">
-                <a href="{{ route('brands.brands.show', $contentBriefBoard->brand) }}" class="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-[var(--ui-secondary)] hover:text-[var(--ui-primary)] transition-colors">
-                    @svg('heroicon-o-arrow-left', 'w-4 h-4')
-                    <span>Zurück zur Marke</span>
-                </a>
-            </x-slot>
-        </x-ui-page-navbar>
+        <x-ui-page-navbar :title="$contentBriefBoard->name" icon="heroicon-o-document-magnifying-glass" />
+    </x-slot>
+
+    <x-slot name="actionbar">
+        <x-ui-page-actionbar :breadcrumbs="[
+            ['label' => 'Marken', 'href' => route('brands.dashboard'), 'icon' => 'tag'],
+            ['label' => $contentBriefBoard->brand->name, 'href' => route('brands.brands.show', $contentBriefBoard->brand)],
+            ['label' => $contentBriefBoard->name],
+        ]">
+            @can('update', $contentBriefBoard)
+                <x-ui-button variant="ghost" size="sm" wire:click="startEditing">
+                    @svg('heroicon-o-pencil', 'w-4 h-4')
+                    <span>Bearbeiten</span>
+                </x-ui-button>
+            @endcan
+            @can('delete', $contentBriefBoard)
+                <x-ui-button variant="ghost" size="sm" wire:click="deleteBoard" wire:confirm="Content Brief wirklich löschen?" class="text-red-600 hover:text-red-700">
+                    @svg('heroicon-o-trash', 'w-4 h-4')
+                    <span>Löschen</span>
+                </x-ui-button>
+            @endcan
+        </x-ui-page-actionbar>
     </x-slot>
 
     <x-slot name="sidebar">
@@ -70,28 +84,6 @@
                     </div>
                 </div>
 
-                {{-- Aktionen --}}
-                <div>
-                    <h3 class="text-xs font-semibold uppercase tracking-wide text-[var(--ui-muted)] mb-3">Aktionen</h3>
-                    <div class="flex flex-col gap-2">
-                        @can('update', $contentBriefBoard)
-                            <x-ui-button variant="secondary-outline" size="sm" wire:click="startEditing" class="w-full">
-                                <span class="inline-flex items-center gap-2">
-                                    @svg('heroicon-o-pencil', 'w-4 h-4')
-                                    <span>Bearbeiten</span>
-                                </span>
-                            </x-ui-button>
-                        @endcan
-                        @can('delete', $contentBriefBoard)
-                            <x-ui-button variant="secondary-outline" size="sm" wire:click="deleteBoard" wire:confirm="Content Brief wirklich löschen?" class="w-full text-red-600 hover:text-red-700">
-                                <span class="inline-flex items-center gap-2">
-                                    @svg('heroicon-o-trash', 'w-4 h-4')
-                                    <span>Löschen</span>
-                                </span>
-                            </x-ui-button>
-                        @endcan
-                    </div>
-                </div>
             </div>
         </x-ui-page-sidebar>
     </x-slot>

@@ -1,13 +1,30 @@
 <x-ui-page>
     <x-slot name="navbar">
-        <x-ui-page-navbar :title="$competitorBoard->name" icon="heroicon-o-scale">
-            <x-slot name="actions">
-                <a href="{{ route('brands.brands.show', $competitorBoard->brand) }}" class="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-[var(--ui-secondary)] hover:text-[var(--ui-primary)] transition-colors">
-                    @svg('heroicon-o-arrow-left', 'w-4 h-4')
-                    <span>Zurück zur Marke</span>
-                </a>
+        <x-ui-page-navbar :title="$competitorBoard->name" icon="heroicon-o-scale" />
+    </x-slot>
+
+    <x-slot name="actionbar">
+        <x-ui-page-actionbar :breadcrumbs="[
+            ['label' => 'Marken', 'href' => route('brands.dashboard'), 'icon' => 'tag'],
+            ['label' => $competitorBoard->brand->name, 'href' => route('brands.brands.show', $competitorBoard->brand)],
+            ['label' => $competitorBoard->name],
+        ]">
+            <x-slot name="left">
+                @can('update', $competitorBoard)
+                    <x-ui-button variant="ghost" size="sm" x-data @click="$dispatch('open-modal-competitor-board-settings', { competitorBoardId: {{ $competitorBoard->id }} })">
+                        @svg('heroicon-o-cog-6-tooth', 'w-4 h-4')
+                        <span>Einstellungen</span>
+                    </x-ui-button>
+                @endcan
             </x-slot>
-        </x-ui-page-navbar>
+
+            @can('update', $competitorBoard)
+                <x-ui-button variant="primary" size="sm" x-data @click="$dispatch('open-modal-competitor', { competitorBoardId: {{ $competitorBoard->id }} })">
+                    @svg('heroicon-o-plus', 'w-4 h-4')
+                    <span>Wettbewerber hinzufügen</span>
+                </x-ui-button>
+            @endcan
+        </x-ui-page-actionbar>
     </x-slot>
 
     <x-ui-page-container spacing="space-y-8">
@@ -429,44 +446,6 @@
     <x-slot name="sidebar">
         <x-ui-page-sidebar title="Board-Übersicht" width="w-80" :defaultOpen="true">
             <div class="p-6 space-y-6">
-                {{-- Navigation --}}
-                <div>
-                    <h3 class="text-xs font-semibold uppercase tracking-wide text-[var(--ui-muted)] mb-3">Navigation</h3>
-                    <div class="flex flex-col gap-2">
-                        <a href="{{ route('brands.brands.show', $competitorBoard->brand) }}" class="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-[var(--ui-secondary)] hover:text-[var(--ui-primary)] transition-colors rounded-lg border border-[var(--ui-border)]/40 hover:bg-[var(--ui-muted-5)]">
-                            @svg('heroicon-o-arrow-left', 'w-4 h-4')
-                            <span>Zurück zur Marke</span>
-                        </a>
-                    </div>
-                </div>
-
-                {{-- Aktionen --}}
-                <div>
-                    <h3 class="text-xs font-semibold uppercase tracking-wide text-[var(--ui-muted)] mb-3">Aktionen</h3>
-                    <div class="flex flex-col gap-2">
-                        @can('update', $competitorBoard)
-                            <x-ui-button
-                                variant="primary"
-                                size="sm"
-                                x-data
-                                @click="$dispatch('open-modal-competitor', { competitorBoardId: {{ $competitorBoard->id }} })"
-                                class="w-full"
-                            >
-                                <span class="inline-flex items-center gap-2">
-                                    @svg('heroicon-o-plus', 'w-4 h-4')
-                                    <span>Wettbewerber hinzufügen</span>
-                                </span>
-                            </x-ui-button>
-                            <x-ui-button variant="secondary-outline" size="sm" x-data @click="$dispatch('open-modal-competitor-board-settings', { competitorBoardId: {{ $competitorBoard->id }} })" class="w-full">
-                                <span class="inline-flex items-center gap-2">
-                                    @svg('heroicon-o-cog-6-tooth', 'w-4 h-4')
-                                    <span>Einstellungen</span>
-                                </span>
-                            </x-ui-button>
-                        @endcan
-                    </div>
-                </div>
-
                 {{-- Board-Details --}}
                 <div>
                     <h3 class="text-xs font-semibold uppercase tracking-wide text-[var(--ui-muted)] mb-3">Details</h3>

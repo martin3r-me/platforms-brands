@@ -1,44 +1,28 @@
 <x-ui-page>
     <x-slot name="navbar">
-        <x-ui-page-navbar :title="$ctaBoard->name" icon="heroicon-o-cursor-arrow-rays">
-            <x-slot name="actions">
-                <a href="{{ route('brands.brands.show', $ctaBoard->brand) }}" class="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-[var(--ui-secondary)] hover:text-[var(--ui-primary)] transition-colors">
-                    @svg('heroicon-o-arrow-left', 'w-4 h-4')
-                    <span>Zurück zur Marke</span>
-                </a>
+        <x-ui-page-navbar :title="$ctaBoard->name" icon="heroicon-o-cursor-arrow-rays" />
+    </x-slot>
+
+    <x-slot name="actionbar">
+        <x-ui-page-actionbar :breadcrumbs="[
+            ['label' => 'Marken', 'href' => route('brands.dashboard'), 'icon' => 'tag'],
+            ['label' => $ctaBoard->brand->name, 'href' => route('brands.brands.show', $ctaBoard->brand)],
+            ['label' => $ctaBoard->name],
+        ]">
+            <x-slot name="left">
+                @can('update', $ctaBoard)
+                    <x-ui-button variant="ghost" size="sm" x-data @click="$dispatch('open-modal-cta-board-settings', { ctaBoardId: {{ $ctaBoard->id }} })">
+                        @svg('heroicon-o-cog-6-tooth', 'w-4 h-4')
+                        <span>Einstellungen</span>
+                    </x-ui-button>
+                @endcan
             </x-slot>
-        </x-ui-page-navbar>
+        </x-ui-page-actionbar>
     </x-slot>
 
     <x-slot name="sidebar">
         <x-ui-page-sidebar title="Board-Übersicht" width="w-80" :defaultOpen="true">
             <div class="p-4 space-y-6">
-                {{-- Navigation --}}
-                <div>
-                    <h3 class="text-xs font-semibold uppercase tracking-wide text-[var(--ui-muted)] mb-3">Navigation</h3>
-                    <div class="flex flex-col gap-2">
-                        <a href="{{ route('brands.brands.show', $ctaBoard->brand) }}" class="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-[var(--ui-secondary)] hover:text-[var(--ui-primary)] transition-colors rounded-lg border border-[var(--ui-border)]/40 hover:bg-[var(--ui-muted-5)]">
-                            @svg('heroicon-o-arrow-left', 'w-4 h-4')
-                            <span>Zurück zur Marke</span>
-                        </a>
-                    </div>
-                </div>
-
-                {{-- Aktionen --}}
-                <div>
-                    <h3 class="text-xs font-semibold uppercase tracking-wide text-[var(--ui-muted)] mb-3">Aktionen</h3>
-                    <div class="flex flex-col gap-2">
-                        @can('update', $ctaBoard)
-                            <x-ui-button variant="secondary-outline" size="sm" x-data @click="$dispatch('open-modal-cta-board-settings', { ctaBoardId: {{ $ctaBoard->id }} })">
-                                <span class="inline-flex items-center gap-2">
-                                    @svg('heroicon-o-cog-6-tooth','w-4 h-4')
-                                    <span>Einstellungen</span>
-                                </span>
-                            </x-ui-button>
-                        @endcan
-                    </div>
-                </div>
-
                 {{-- Board-Details --}}
                 <div>
                     <h3 class="text-xs font-semibold uppercase tracking-wide text-[var(--ui-muted)] mb-3">Details</h3>

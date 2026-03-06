@@ -1,12 +1,14 @@
 <x-ui-page>
     <x-slot name="navbar">
-        <x-ui-page-navbar title="Export" icon="heroicon-o-arrow-down-tray">
-            <x-slot name="breadcrumbs">
-                <a href="{{ route('brands.brands.show', $brand) }}" class="text-[var(--ui-muted)] hover:text-[var(--ui-primary)] transition-colors">
-                    {{ $brand->name }}
-                </a>
-            </x-slot>
-        </x-ui-page-navbar>
+        <x-ui-page-navbar title="Export" icon="heroicon-o-arrow-down-tray" />
+    </x-slot>
+
+    <x-slot name="actionbar">
+        <x-ui-page-actionbar :breadcrumbs="[
+            ['label' => 'Marken', 'href' => route('brands.dashboard'), 'icon' => 'tag'],
+            ['label' => $brand->name, 'href' => route('brands.brands.show', $brand)],
+            ['label' => 'Export'],
+        ]" />
     </x-slot>
 
     <x-ui-page-container spacing="space-y-8">
