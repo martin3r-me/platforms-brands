@@ -5,7 +5,7 @@
 
     <x-slot name="actionbar">
         <x-ui-page-actionbar :breadcrumbs="[
-            ['label' => 'Marken', 'href' => route('brands.brands.index'), 'icon' => 'tag'],
+            ['label' => 'Marken', 'href' => route('brands.dashboard'), 'icon' => 'tag'],
             ['label' => $brand->name],
         ]">
             @can('update', $brand)
