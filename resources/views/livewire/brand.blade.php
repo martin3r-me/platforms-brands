@@ -3,6 +3,20 @@
         <x-ui-page-navbar :title="$brand->name" icon="heroicon-o-tag" />
     </x-slot>
 
+    <x-slot name="actionbar">
+        <x-ui-page-actionbar :breadcrumbs="[
+            ['label' => 'Marken', 'href' => route('brands.brands.index'), 'icon' => 'tag'],
+            ['label' => $brand->name],
+        ]">
+            @can('update', $brand)
+                <x-ui-button variant="ghost" size="sm" @click="$dispatch('open-modal-brand-settings', { brandId: {{ $brand->id }} })">
+                    @svg('heroicon-o-cog-6-tooth', 'w-4 h-4')
+                    <span>Einstellungen</span>
+                </x-ui-button>
+            @endcan
+        </x-ui-page-actionbar>
+    </x-slot>
+
     <x-ui-page-container spacing="space-y-6">
         {{-- Boards Section --}}
         <div>
