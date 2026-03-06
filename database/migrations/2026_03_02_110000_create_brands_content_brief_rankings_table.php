@@ -8,6 +8,10 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (Schema::hasTable('brands_content_brief_rankings')) {
+            return;
+        }
+
         Schema::create('brands_content_brief_rankings', function (Blueprint $table) {
             $table->id();
             $table->string('uuid')->unique();
