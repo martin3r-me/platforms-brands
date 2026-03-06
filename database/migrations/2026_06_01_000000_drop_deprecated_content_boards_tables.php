@@ -27,6 +27,14 @@ return new class extends Migration
     {
         // Reihenfolge beachten: FK-Abhängigkeiten von innen nach außen auflösen
 
+        // 0. FK auf brand_ctas.target_page_id entfernen (referenziert brands_content_board_blocks, deprecated #441)
+        if (Schema::hasTable('brand_ctas') && Schema::hasColumn('brand_ctas', 'target_page_id')) {
+            Schema::table('brand_ctas', function (Blueprint $table) {
+                $table->dropForeign('brand_ctas_target_page_id_foreign');
+                $table->dropColumn('target_page_id');
+            });
+        }
+
         // 1. Text-Content (polymorphe Beziehung zu Blocks)
         Schema::dropIfExists('brands_content_board_block_texts');
 
