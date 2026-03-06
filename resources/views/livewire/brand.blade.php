@@ -8,11 +8,164 @@
             ['label' => 'Marken', 'href' => route('brands.dashboard'), 'icon' => 'tag'],
             ['label' => $brand->name],
         ]">
+            {{-- Left: Settings & Export --}}
+            <x-slot name="left">
+                @can('update', $brand)
+                    <x-ui-button variant="ghost" size="sm" @click="$dispatch('open-modal-brand-settings', { brandId: {{ $brand->id }} })">
+                        @svg('heroicon-o-cog-6-tooth', 'w-4 h-4')
+                        <span>Einstellungen</span>
+                    </x-ui-button>
+                @endcan
+                <a href="{{ route('brands.export.show', $brand) }}" wire:navigate>
+                    <x-ui-button variant="ghost" size="sm">
+                        @svg('heroicon-o-arrow-down-tray', 'w-4 h-4')
+                        <span>Export</span>
+                    </x-ui-button>
+                </a>
+            </x-slot>
+
+            {{-- Right: Board erstellen Dropdown --}}
             @can('update', $brand)
-                <x-ui-button variant="ghost" size="sm" @click="$dispatch('open-modal-brand-settings', { brandId: {{ $brand->id }} })">
-                    @svg('heroicon-o-cog-6-tooth', 'w-4 h-4')
-                    <span>Einstellungen</span>
-                </x-ui-button>
+                <div class="relative" x-data="{ open: false }">
+                    <x-ui-button variant="primary" size="sm" @click="open = !open">
+                        @svg('heroicon-o-plus', 'w-4 h-4')
+                        <span>Board erstellen</span>
+                        @svg('heroicon-o-chevron-down', 'w-4 h-4')
+                    </x-ui-button>
+
+                    <div
+                        x-show="open"
+                        @click.away="open = false"
+                        x-transition:enter="transition ease-out duration-100"
+                        x-transition:enter-start="transform opacity-0 scale-95"
+                        x-transition:enter-end="transform opacity-100 scale-100"
+                        x-transition:leave="transition ease-in duration-75"
+                        x-transition:leave-start="transform opacity-100 scale-100"
+                        x-transition:leave-end="transform opacity-0 scale-95"
+                        class="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-[var(--ui-border)]/60 z-10 overflow-hidden"
+                        style="display: none;"
+                    >
+                        <div class="py-1 max-h-96 overflow-y-auto">
+                            <button wire:click="createSocialBoard" @click="open = false" class="w-full text-left px-4 py-2.5 text-sm text-[var(--ui-secondary)] hover:bg-[var(--ui-muted-5)] transition-colors flex items-center gap-3">
+                                <div class="flex items-center justify-center w-8 h-8 rounded-md bg-purple-50">
+                                    @svg('heroicon-o-share', 'w-4 h-4 text-purple-600')
+                                </div>
+                                <div>
+                                    <div class="font-medium">Social Board</div>
+                                    <div class="text-xs text-[var(--ui-muted)]">Für Social Media</div>
+                                </div>
+                            </button>
+                            <button wire:click="createCiBoard" @click="open = false" class="w-full text-left px-4 py-2.5 text-sm text-[var(--ui-secondary)] hover:bg-[var(--ui-muted-5)] transition-colors flex items-center gap-3">
+                                <div class="flex items-center justify-center w-8 h-8 rounded-md bg-amber-50">
+                                    @svg('heroicon-o-paint-brush', 'w-4 h-4 text-amber-600')
+                                </div>
+                                <div>
+                                    <div class="font-medium">CI Board</div>
+                                    <div class="text-xs text-[var(--ui-muted)]">Für Corporate Identity</div>
+                                </div>
+                            </button>
+                            <button wire:click="createKanbanBoard" @click="open = false" class="w-full text-left px-4 py-2.5 text-sm text-[var(--ui-secondary)] hover:bg-[var(--ui-muted-5)] transition-colors flex items-center gap-3">
+                                <div class="flex items-center justify-center w-8 h-8 rounded-md bg-indigo-50">
+                                    @svg('heroicon-o-view-columns', 'w-4 h-4 text-indigo-600')
+                                </div>
+                                <div>
+                                    <div class="font-medium">Kanban Board</div>
+                                    <div class="text-xs text-[var(--ui-muted)]">Für Aufgabenverwaltung</div>
+                                </div>
+                            </button>
+                            <button wire:click="createTypographyBoard" @click="open = false" class="w-full text-left px-4 py-2.5 text-sm text-[var(--ui-secondary)] hover:bg-[var(--ui-muted-5)] transition-colors flex items-center gap-3">
+                                <div class="flex items-center justify-center w-8 h-8 rounded-md bg-rose-50">
+                                    @svg('heroicon-o-language', 'w-4 h-4 text-rose-600')
+                                </div>
+                                <div>
+                                    <div class="font-medium">Typografie Board</div>
+                                    <div class="text-xs text-[var(--ui-muted)]">Schriften & Hierarchien</div>
+                                </div>
+                            </button>
+                            <button wire:click="createLogoBoard" @click="open = false" class="w-full text-left px-4 py-2.5 text-sm text-[var(--ui-secondary)] hover:bg-[var(--ui-muted-5)] transition-colors flex items-center gap-3">
+                                <div class="flex items-center justify-center w-8 h-8 rounded-md bg-emerald-50">
+                                    @svg('heroicon-o-photo', 'w-4 h-4 text-emerald-600')
+                                </div>
+                                <div>
+                                    <div class="font-medium">Logo Board</div>
+                                    <div class="text-xs text-[var(--ui-muted)]">Logo-Varianten verwalten</div>
+                                </div>
+                            </button>
+                            <button wire:click="createToneOfVoiceBoard" @click="open = false" class="w-full text-left px-4 py-2.5 text-sm text-[var(--ui-secondary)] hover:bg-[var(--ui-muted-5)] transition-colors flex items-center gap-3">
+                                <div class="flex items-center justify-center w-8 h-8 rounded-md bg-violet-50">
+                                    @svg('heroicon-o-megaphone', 'w-4 h-4 text-violet-600')
+                                </div>
+                                <div>
+                                    <div class="font-medium">Tone of Voice Board</div>
+                                    <div class="text-xs text-[var(--ui-muted)]">Markenstimme & Messaging</div>
+                                </div>
+                            </button>
+                            <button wire:click="createPersonaBoard" @click="open = false" class="w-full text-left px-4 py-2.5 text-sm text-[var(--ui-secondary)] hover:bg-[var(--ui-muted-5)] transition-colors flex items-center gap-3">
+                                <div class="flex items-center justify-center w-8 h-8 rounded-md bg-teal-50">
+                                    @svg('heroicon-o-user-group', 'w-4 h-4 text-teal-600')
+                                </div>
+                                <div>
+                                    <div class="font-medium">Persona Board</div>
+                                    <div class="text-xs text-[var(--ui-muted)]">Zielgruppen & Personas</div>
+                                </div>
+                            </button>
+                            <button wire:click="createCompetitorBoard" @click="open = false" class="w-full text-left px-4 py-2.5 text-sm text-[var(--ui-secondary)] hover:bg-[var(--ui-muted-5)] transition-colors flex items-center gap-3">
+                                <div class="flex items-center justify-center w-8 h-8 rounded-md bg-orange-50">
+                                    @svg('heroicon-o-scale', 'w-4 h-4 text-orange-600')
+                                </div>
+                                <div>
+                                    <div class="font-medium">Wettbewerber Board</div>
+                                    <div class="text-xs text-[var(--ui-muted)]">Wettbewerber-Analyse & Positionierung</div>
+                                </div>
+                            </button>
+                            <button wire:click="createGuidelineBoard" @click="open = false" class="w-full text-left px-4 py-2.5 text-sm text-[var(--ui-secondary)] hover:bg-[var(--ui-muted-5)] transition-colors flex items-center gap-3">
+                                <div class="flex items-center justify-center w-8 h-8 rounded-md bg-cyan-50">
+                                    @svg('heroicon-o-book-open', 'w-4 h-4 text-cyan-600')
+                                </div>
+                                <div>
+                                    <div class="font-medium">Guidelines Board</div>
+                                    <div class="text-xs text-[var(--ui-muted)]">Markenregeln & Dos/Don'ts</div>
+                                </div>
+                            </button>
+                            <button wire:click="createMoodboardBoard" @click="open = false" class="w-full text-left px-4 py-2.5 text-sm text-[var(--ui-secondary)] hover:bg-[var(--ui-muted-5)] transition-colors flex items-center gap-3">
+                                <div class="flex items-center justify-center w-8 h-8 rounded-md bg-rose-50">
+                                    @svg('heroicon-o-photo', 'w-4 h-4 text-rose-600')
+                                </div>
+                                <div>
+                                    <div class="font-medium">Moodboard</div>
+                                    <div class="text-xs text-[var(--ui-muted)]">Bildsprache & Stilrichtung</div>
+                                </div>
+                            </button>
+                            <button wire:click="createAssetBoard" @click="open = false" class="w-full text-left px-4 py-2.5 text-sm text-[var(--ui-secondary)] hover:bg-[var(--ui-muted-5)] transition-colors flex items-center gap-3">
+                                <div class="flex items-center justify-center w-8 h-8 rounded-md bg-sky-50">
+                                    @svg('heroicon-o-folder-open', 'w-4 h-4 text-sky-600')
+                                </div>
+                                <div>
+                                    <div class="font-medium">Asset Board</div>
+                                    <div class="text-xs text-[var(--ui-muted)]">Templates & Brand Assets</div>
+                                </div>
+                            </button>
+                            <button wire:click="createSeoBoard" @click="open = false" class="w-full text-left px-4 py-2.5 text-sm text-[var(--ui-secondary)] hover:bg-[var(--ui-muted-5)] transition-colors flex items-center gap-3">
+                                <div class="flex items-center justify-center w-8 h-8 rounded-md bg-lime-50">
+                                    @svg('heroicon-o-magnifying-glass', 'w-4 h-4 text-lime-600')
+                                </div>
+                                <div>
+                                    <div class="font-medium">SEO Board</div>
+                                    <div class="text-xs text-[var(--ui-muted)]">Keyword-Recherche & SEO-Analyse</div>
+                                </div>
+                            </button>
+                            <button wire:click="createContentBriefBoard" @click="open = false" class="w-full text-left px-4 py-2.5 text-sm text-[var(--ui-secondary)] hover:bg-[var(--ui-muted-5)] transition-colors flex items-center gap-3">
+                                <div class="flex items-center justify-center w-8 h-8 rounded-md bg-fuchsia-50">
+                                    @svg('heroicon-o-document-magnifying-glass', 'w-4 h-4 text-fuchsia-600')
+                                </div>
+                                <div>
+                                    <div class="font-medium">Content Brief Board</div>
+                                    <div class="text-xs text-[var(--ui-muted)]">Content-Planung & Briefings</div>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+                </div>
             @endcan
         </x-ui-page-actionbar>
     </x-slot>
@@ -20,209 +173,6 @@
     <x-ui-page-container spacing="space-y-6">
         {{-- Boards Section --}}
         <div>
-            <div class="flex items-center justify-between mb-6">
-                <h2 class="text-xl font-semibold text-[var(--ui-secondary)]">Boards</h2>
-                @can('update', $brand)
-                    <div class="relative" x-data="{ open: false }">
-                        <x-ui-button 
-                            variant="primary" 
-                            size="sm" 
-                            @click="open = !open"
-                            class="inline-flex items-center gap-2"
-                        >
-                            @svg('heroicon-o-plus', 'w-4 h-4')
-                            <span>Board erstellen</span>
-                            @svg('heroicon-o-chevron-down', 'w-4 h-4')
-                        </x-ui-button>
-                        
-                        <div 
-                            x-show="open"
-                            @click.away="open = false"
-                            x-transition:enter="transition ease-out duration-100"
-                            x-transition:enter-start="transform opacity-0 scale-95"
-                            x-transition:enter-end="transform opacity-100 scale-100"
-                            x-transition:leave="transition ease-in duration-75"
-                            x-transition:leave-start="transform opacity-100 scale-100"
-                            x-transition:leave-end="transform opacity-0 scale-95"
-                            class="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-[var(--ui-border)]/60 z-10 overflow-hidden"
-                            style="display: none;"
-                        >
-                            <div class="py-1">
-                                <button
-                                    wire:click="createSocialBoard"
-                                    @click="open = false"
-                                    class="w-full text-left px-4 py-2.5 text-sm text-[var(--ui-secondary)] hover:bg-[var(--ui-muted-5)] transition-colors flex items-center gap-3"
-                                >
-                                    <div class="flex items-center justify-center w-8 h-8 rounded-md bg-purple-50">
-                                        @svg('heroicon-o-share', 'w-4 h-4 text-purple-600')
-                                    </div>
-                                    <div>
-                                        <div class="font-medium">Social Board</div>
-                                        <div class="text-xs text-[var(--ui-muted)]">Für Social Media</div>
-                                    </div>
-                                </button>
-                                <button
-                                    wire:click="createCiBoard"
-                                    @click="open = false"
-                                    class="w-full text-left px-4 py-2.5 text-sm text-[var(--ui-secondary)] hover:bg-[var(--ui-muted-5)] transition-colors flex items-center gap-3"
-                                >
-                                    <div class="flex items-center justify-center w-8 h-8 rounded-md bg-amber-50">
-                                        @svg('heroicon-o-paint-brush', 'w-4 h-4 text-amber-600')
-                                    </div>
-                                    <div>
-                                        <div class="font-medium">CI Board</div>
-                                        <div class="text-xs text-[var(--ui-muted)]">Für Corporate Identity</div>
-                                    </div>
-                                </button>
-                                <button
-                                    wire:click="createKanbanBoard"
-                                    @click="open = false"
-                                    class="w-full text-left px-4 py-2.5 text-sm text-[var(--ui-secondary)] hover:bg-[var(--ui-muted-5)] transition-colors flex items-center gap-3"
-                                >
-                                    <div class="flex items-center justify-center w-8 h-8 rounded-md bg-indigo-50">
-                                        @svg('heroicon-o-view-columns', 'w-4 h-4 text-indigo-600')
-                                    </div>
-                                    <div>
-                                        <div class="font-medium">Kanban Board</div>
-                                        <div class="text-xs text-[var(--ui-muted)]">Für Aufgabenverwaltung</div>
-                                    </div>
-                                </button>
-                                <button
-                                    wire:click="createTypographyBoard"
-                                    @click="open = false"
-                                    class="w-full text-left px-4 py-2.5 text-sm text-[var(--ui-secondary)] hover:bg-[var(--ui-muted-5)] transition-colors flex items-center gap-3"
-                                >
-                                    <div class="flex items-center justify-center w-8 h-8 rounded-md bg-rose-50">
-                                        @svg('heroicon-o-language', 'w-4 h-4 text-rose-600')
-                                    </div>
-                                    <div>
-                                        <div class="font-medium">Typografie Board</div>
-                                        <div class="text-xs text-[var(--ui-muted)]">Schriften & Hierarchien</div>
-                                    </div>
-                                </button>
-                                <button
-                                    wire:click="createLogoBoard"
-                                    @click="open = false"
-                                    class="w-full text-left px-4 py-2.5 text-sm text-[var(--ui-secondary)] hover:bg-[var(--ui-muted-5)] transition-colors flex items-center gap-3"
-                                >
-                                    <div class="flex items-center justify-center w-8 h-8 rounded-md bg-emerald-50">
-                                        @svg('heroicon-o-photo', 'w-4 h-4 text-emerald-600')
-                                    </div>
-                                    <div>
-                                        <div class="font-medium">Logo Board</div>
-                                        <div class="text-xs text-[var(--ui-muted)]">Logo-Varianten verwalten</div>
-                                    </div>
-                                </button>
-                                <button
-                                    wire:click="createToneOfVoiceBoard"
-                                    @click="open = false"
-                                    class="w-full text-left px-4 py-2.5 text-sm text-[var(--ui-secondary)] hover:bg-[var(--ui-muted-5)] transition-colors flex items-center gap-3"
-                                >
-                                    <div class="flex items-center justify-center w-8 h-8 rounded-md bg-violet-50">
-                                        @svg('heroicon-o-megaphone', 'w-4 h-4 text-violet-600')
-                                    </div>
-                                    <div>
-                                        <div class="font-medium">Tone of Voice Board</div>
-                                        <div class="text-xs text-[var(--ui-muted)]">Markenstimme & Messaging</div>
-                                    </div>
-                                </button>
-                                <button
-                                    wire:click="createPersonaBoard"
-                                    @click="open = false"
-                                    class="w-full text-left px-4 py-2.5 text-sm text-[var(--ui-secondary)] hover:bg-[var(--ui-muted-5)] transition-colors flex items-center gap-3"
-                                >
-                                    <div class="flex items-center justify-center w-8 h-8 rounded-md bg-teal-50">
-                                        @svg('heroicon-o-user-group', 'w-4 h-4 text-teal-600')
-                                    </div>
-                                    <div>
-                                        <div class="font-medium">Persona Board</div>
-                                        <div class="text-xs text-[var(--ui-muted)]">Zielgruppen & Personas</div>
-                                    </div>
-                                </button>
-                                <button
-                                    wire:click="createCompetitorBoard"
-                                    @click="open = false"
-                                    class="w-full text-left px-4 py-2.5 text-sm text-[var(--ui-secondary)] hover:bg-[var(--ui-muted-5)] transition-colors flex items-center gap-3"
-                                >
-                                    <div class="flex items-center justify-center w-8 h-8 rounded-md bg-orange-50">
-                                        @svg('heroicon-o-scale', 'w-4 h-4 text-orange-600')
-                                    </div>
-                                    <div>
-                                        <div class="font-medium">Wettbewerber Board</div>
-                                        <div class="text-xs text-[var(--ui-muted)]">Wettbewerber-Analyse & Positionierung</div>
-                                    </div>
-                                </button>
-                                <button
-                                    wire:click="createGuidelineBoard"
-                                    @click="open = false"
-                                    class="w-full text-left px-4 py-2.5 text-sm text-[var(--ui-secondary)] hover:bg-[var(--ui-muted-5)] transition-colors flex items-center gap-3"
-                                >
-                                    <div class="flex items-center justify-center w-8 h-8 rounded-md bg-cyan-50">
-                                        @svg('heroicon-o-book-open', 'w-4 h-4 text-cyan-600')
-                                    </div>
-                                    <div>
-                                        <div class="font-medium">Guidelines Board</div>
-                                        <div class="text-xs text-[var(--ui-muted)]">Markenregeln & Dos/Don'ts</div>
-                                    </div>
-                                </button>
-                                <button
-                                    wire:click="createMoodboardBoard"
-                                    @click="open = false"
-                                    class="w-full text-left px-4 py-2.5 text-sm text-[var(--ui-secondary)] hover:bg-[var(--ui-muted-5)] transition-colors flex items-center gap-3"
-                                >
-                                    <div class="flex items-center justify-center w-8 h-8 rounded-md bg-rose-50">
-                                        @svg('heroicon-o-photo', 'w-4 h-4 text-rose-600')
-                                    </div>
-                                    <div>
-                                        <div class="font-medium">Moodboard</div>
-                                        <div class="text-xs text-[var(--ui-muted)]">Bildsprache & Stilrichtung</div>
-                                    </div>
-                                </button>
-                                <button
-                                    wire:click="createAssetBoard"
-                                    @click="open = false"
-                                    class="w-full text-left px-4 py-2.5 text-sm text-[var(--ui-secondary)] hover:bg-[var(--ui-muted-5)] transition-colors flex items-center gap-3"
-                                >
-                                    <div class="flex items-center justify-center w-8 h-8 rounded-md bg-sky-50">
-                                        @svg('heroicon-o-folder-open', 'w-4 h-4 text-sky-600')
-                                    </div>
-                                    <div>
-                                        <div class="font-medium">Asset Board</div>
-                                        <div class="text-xs text-[var(--ui-muted)]">Templates & Brand Assets</div>
-                                    </div>
-                                </button>
-                                <button
-                                    wire:click="createSeoBoard"
-                                    @click="open = false"
-                                    class="w-full text-left px-4 py-2.5 text-sm text-[var(--ui-secondary)] hover:bg-[var(--ui-muted-5)] transition-colors flex items-center gap-3"
-                                >
-                                    <div class="flex items-center justify-center w-8 h-8 rounded-md bg-lime-50">
-                                        @svg('heroicon-o-magnifying-glass', 'w-4 h-4 text-lime-600')
-                                    </div>
-                                    <div>
-                                        <div class="font-medium">SEO Board</div>
-                                        <div class="text-xs text-[var(--ui-muted)]">Keyword-Recherche & SEO-Analyse</div>
-                                    </div>
-                                </button>
-                                <button
-                                    wire:click="createContentBriefBoard"
-                                    @click="open = false"
-                                    class="w-full text-left px-4 py-2.5 text-sm text-[var(--ui-secondary)] hover:bg-[var(--ui-muted-5)] transition-colors flex items-center gap-3"
-                                >
-                                    <div class="flex items-center justify-center w-8 h-8 rounded-md bg-fuchsia-50">
-                                        @svg('heroicon-o-document-magnifying-glass', 'w-4 h-4 text-fuchsia-600')
-                                    </div>
-                                    <div>
-                                        <div class="font-medium">Content Brief Board</div>
-                                        <div class="text-xs text-[var(--ui-muted)]">Content-Planung & Briefings</div>
-                                    </div>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                @endcan
-            </div>
-
             @if($boardGroups->count() > 0 || $facebookPages->count() > 0 || $instagramAccounts->count() > 0)
                 <div class="space-y-6">
                     @foreach($boardGroups as $group)
@@ -608,29 +558,6 @@
                                 @endif
                             </div>
                         </div>
-                    </div>
-                </div>
-
-                {{-- Aktionen --}}
-                <div>
-                    <h3 class="text-xs font-semibold uppercase tracking-wide text-[var(--ui-muted)] mb-3">Aktionen</h3>
-                    <div class="flex flex-col gap-2">
-                        @can('update', $brand)
-                            <x-ui-button variant="secondary-outline" size="sm" x-data @click="$dispatch('open-modal-brand-settings', { brandId: {{ $brand->id }} })" class="w-full">
-                                <span class="inline-flex items-center gap-2">
-                                    @svg('heroicon-o-cog-6-tooth','w-4 h-4')
-                                    <span>Einstellungen</span>
-                                </span>
-                            </x-ui-button>
-                        @endcan
-                        <a href="{{ route('brands.export.show', $brand) }}" wire:navigate class="block">
-                            <x-ui-button variant="secondary-outline" size="sm" class="w-full">
-                                <span class="inline-flex items-center gap-2">
-                                    @svg('heroicon-o-arrow-down-tray','w-4 h-4')
-                                    <span>Export</span>
-                                </span>
-                            </x-ui-button>
-                        </a>
                     </div>
                 </div>
 
