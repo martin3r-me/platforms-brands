@@ -30,8 +30,8 @@ return new class extends Migration
             $table->timestamp('tracked_at');
             $table->timestamps();
 
-            $table->index(['content_brief_board_id', 'tracked_at']);
-            $table->index(['seo_keyword_id', 'tracked_at']);
+            $table->index(['content_brief_board_id', 'tracked_at'], 'cbr_ranking_board_tracked_at_index');
+            $table->index(['seo_keyword_id', 'tracked_at'], 'cbr_ranking_keyword_tracked_at_index');
             $table->index(['tracked_at']);
             $table->index(['is_target_match']);
         });

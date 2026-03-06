@@ -8,6 +8,10 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (Schema::hasTable('brands_content_brief_revisions')) {
+            return;
+        }
+
         Schema::create('brands_content_brief_revisions', function (Blueprint $table) {
             $table->id();
             $table->string('uuid')->unique();
@@ -21,7 +25,7 @@ return new class extends Migration
             $table->timestamp('revised_at');
             $table->timestamps();
 
-            $table->index(['content_brief_board_id', 'revised_at']);
+            $table->index(['content_brief_board_id', 'revised_at'], 'cbr_board_revised_at_index');
             $table->index(['revised_at']);
             $table->index(['revision_type']);
         });
