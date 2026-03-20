@@ -1,8 +1,7 @@
-{{-- Brands Sidebar - Struktur nach Planner-Vorbild --}}
-<div 
+{{-- Brands Sidebar - Organisationsstruktur-Gruppierung --}}
+<div
     x-data="{
         init() {
-            // Zustand aus localStorage laden beim Initialisieren
             const savedState = localStorage.getItem('brands.showAllBrands');
             if (savedState !== null) {
                 @this.set('showAllBrands', savedState === 'true');
@@ -14,18 +13,13 @@
     <div x-show="!collapsed" class="p-3 text-sm italic text-[var(--ui-secondary)] uppercase border-b border-[var(--ui-border)] mb-2">
         Marken
     </div>
-    
-    {{-- Abschnitt: Allgemein (über UI-Komponenten) --}}
+
+    {{-- Abschnitt: Allgemein --}}
     <x-ui-sidebar-list label="Allgemein">
         <x-ui-sidebar-item :href="route('brands.dashboard')">
             @svg('heroicon-o-home', 'w-4 h-4 text-[var(--ui-secondary)]')
             <span class="ml-2 text-sm">Dashboard</span>
         </x-ui-sidebar-item>
-        {{-- Weitere Items werden später hinzugefügt --}}
-        {{-- <x-ui-sidebar-item :href="route('brands.xxx')">
-            @svg('heroicon-o-xxx', 'w-4 h-4 text-[var(--ui-secondary)]')
-            <span class="ml-2 text-sm">XXX</span>
-        </x-ui-sidebar-item> --}}
     </x-ui-sidebar-list>
 
     {{-- Neue Marke --}}
@@ -42,7 +36,6 @@
             <a href="{{ route('brands.dashboard') }}" wire:navigate class="flex items-center justify-center p-2 rounded-md text-[var(--ui-secondary)] hover:bg-[var(--ui-muted-5)]">
                 @svg('heroicon-o-home', 'w-5 h-5')
             </a>
-            {{-- Weitere Icons werden später hinzugefügt --}}
         </div>
     </div>
     <div x-show="collapsed" class="px-2 py-2 border-b border-[var(--ui-border)]">
@@ -51,17 +44,55 @@
         </button>
     </div>
 
-    {{-- Abschnitt: Marken --}}
+    {{-- Abschnitt: Marken (Entity-basierte Gruppierung) --}}
     <div>
         <div class="mt-2" x-show="!collapsed">
-            {{-- Marken nur anzeigen, wenn welche vorhanden sind --}}
-            @if($brands->isNotEmpty())
-                <x-ui-sidebar-list :label="'Marken' . ($showAllBrands ? ' (' . $allBrandsCount . ')' : '')">
-                    @foreach($brands as $brand)
-                        <x-ui-sidebar-item :href="route('brands.brands.show', ['brandsBrand' => $brand])">
+            {{-- Entity Type Gruppen --}}
+            @foreach($entityTypeGroups as $typeGroup)
+                <x-ui-sidebar-list :label="$typeGroup['type_name']">
+                    @foreach($typeGroup['entities'] as $entityGroup)
+                        {{-- Entity mit aufklappbaren Marken --}}
+                        <div x-data="{ open: localStorage.getItem('brands.entity.' + {{ $entityGroup['entity_id'] }}) === 'true' }"
+                             class="flex flex-col">
+                            <button type="button"
+                                    @click="open = !open; localStorage.setItem('brands.entity.' + {{ $entityGroup['entity_id'] }}, open)"
+                                    class="flex items-center p-2 rounded-md text-[var(--ui-secondary)] hover:bg-[var(--ui-muted-5)] transition w-full text-left">
+                                <span class="w-4 h-4 flex-shrink-0 flex items-center justify-center transition-transform"
+                                      :class="open ? 'rotate-90' : ''">
+                                    @svg('heroicon-o-chevron-right', 'w-3 h-3')
+                                </span>
+                                @php $icon = $typeGroup['type_icon'] ?? null; @endphp
+                                @if($icon && str_starts_with($icon, 'heroicon-'))
+                                    @svg($icon, 'w-4 h-4 flex-shrink-0 ml-1 text-[var(--ui-muted)]')
+                                @else
+                                    @svg('heroicon-o-rectangle-group', 'w-4 h-4 flex-shrink-0 ml-1 text-[var(--ui-muted)]')
+                                @endif
+                                <span class="ml-1.5 text-sm font-medium truncate">{{ $entityGroup['entity_name'] }}</span>
+                                <span class="ml-auto text-xs text-[var(--ui-muted)]">{{ $entityGroup['brands']->count() }}</span>
+                            </button>
+                            <div x-show="open" x-collapse class="flex flex-col gap-0.5 pl-4">
+                                @foreach($entityGroup['brands'] as $brand)
+                                    <x-ui-sidebar-item :href="route('brands.brands.show', ['brandsBrand' => $brand])" :title="$brand->name">
+                                        @svg('heroicon-o-tag', 'w-5 h-5 flex-shrink-0 text-[var(--ui-secondary)]')
+                                        <div class="flex-1 min-w-0 ml-2">
+                                            <span class="truncate text-sm font-medium">{{ $brand->name }}</span>
+                                        </div>
+                                    </x-ui-sidebar-item>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endforeach
+                </x-ui-sidebar-list>
+            @endforeach
+
+            {{-- Unverknüpfte Marken --}}
+            @if($unlinkedBrands->isNotEmpty())
+                <x-ui-sidebar-list label="Unverknüpft">
+                    @foreach($unlinkedBrands as $brand)
+                        <x-ui-sidebar-item :href="route('brands.brands.show', ['brandsBrand' => $brand])" :title="$brand->name">
                             @svg('heroicon-o-tag', 'w-5 h-5 flex-shrink-0 text-[var(--ui-secondary)]')
                             <div class="flex-1 min-w-0 ml-2">
-                                <div class="truncate text-sm font-medium">{{ $brand->name }}</div>
+                                <span class="truncate text-sm font-medium">{{ $brand->name }}</span>
                             </div>
                         </x-ui-sidebar-item>
                     @endforeach
@@ -71,8 +102,8 @@
             {{-- Button zum Ein-/Ausblenden aller Marken --}}
             @if($hasMoreBrands)
                 <div class="px-3 py-2">
-                    <button 
-                        type="button" 
+                    <button
+                        type="button"
                         wire:click="toggleShowAllBrands"
                         x-on:click="localStorage.setItem('brands.showAllBrands', (!$wire.showAllBrands).toString())"
                         class="flex items-center gap-2 text-xs text-[var(--ui-muted)] hover:text-[var(--ui-secondary)] transition-colors"
@@ -89,13 +120,9 @@
             @endif
 
             {{-- Keine Marken --}}
-            @if($brands->isEmpty())
+            @if($entityTypeGroups->isEmpty() && $unlinkedBrands->isEmpty())
                 <div class="px-3 py-1 text-xs text-[var(--ui-muted)]">
-                    @if($showAllBrands)
-                        Keine Marken
-                    @else
-                        Keine Marken vorhanden
-                    @endif
+                    Keine Marken vorhanden
                 </div>
             @endif
         </div>
