@@ -6,6 +6,7 @@ use Platform\Core\Contracts\ToolContract;
 use Platform\Core\Contracts\ToolContext;
 use Platform\Core\Contracts\ToolResult;
 use Platform\Core\Tools\Concerns\HasStandardizedWriteOperations;
+use Platform\Core\Services\ContextFileService;
 use Platform\Brands\Models\BrandsMoodboardImage;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -21,7 +22,7 @@ class UpdateMoodboardImageTool implements ToolContract
 
     public function getDescription(): string
     {
-        return 'PUT /brands/moodboard_images/{id} - Aktualisiert ein Moodboard-Bild. REST-Parameter: moodboard_image_id (required), title (optional), annotation (optional), tags (optional, array), type (optional, "do"|"dont"), image_path (optional).';
+        return 'PUT /brands/moodboard_images/{id} - Aktualisiert ein Moodboard-Bild. REST-Parameter: moodboard_image_id (required), title (optional), annotation (optional), tags (optional, array), type (optional, "do"|"dont"), context_file_id (optional, ID eines neuen ContextFiles zum Ersetzen des Bildes).';
     }
 
     public function getSchema(): array
@@ -42,7 +43,7 @@ class UpdateMoodboardImageTool implements ToolContract
                     'description' => 'Optional: "do" (passend) oder "dont" (unpassend).',
                     'enum' => ['do', 'dont'],
                 ],
-                'image_path' => ['type' => 'string', 'description' => 'Optional: Neuer Bildpfad.'],
+                'context_file_id' => ['type' => 'integer', 'description' => 'Optional: ID eines neuen ContextFiles zum Ersetzen des Bildes.'],
             ],
             'required' => ['moodboard_image_id']
         ];
@@ -79,7 +80,25 @@ class UpdateMoodboardImageTool implements ToolContract
             if (isset($arguments['annotation'])) $updateData['annotation'] = $arguments['annotation'];
             if (isset($arguments['tags'])) $updateData['tags'] = $arguments['tags'];
             if (isset($arguments['type'])) $updateData['type'] = $arguments['type'];
-            if (isset($arguments['image_path'])) $updateData['image_path'] = $arguments['image_path'];
+
+            // Neues ContextFile zuweisen (ersetzt altes)
+            if (isset($arguments['context_file_id'])) {
+                $contextFile = \Platform\Core\Models\ContextFile::find($arguments['context_file_id']);
+                if (!$contextFile) {
+                    return ToolResult::error('CONTEXT_FILE_NOT_FOUND', 'Das angegebene ContextFile wurde nicht gefunden.');
+                }
+
+                // Alte ContextFile-Referenzen und Files löschen
+                $contextFileService = app(ContextFileService::class);
+                foreach ($image->getOrderedFileReferences() as $ref) {
+                    if ($ref->context_file_id) {
+                        $contextFileService->delete($ref->context_file_id);
+                    }
+                    $image->removeFileReference($ref->id);
+                }
+
+                $image->addFileReference($arguments['context_file_id']);
+            }
 
             if (!empty($updateData)) {
                 $image->update($updateData);
@@ -91,7 +110,7 @@ class UpdateMoodboardImageTool implements ToolContract
                 'id' => $image->id,
                 'uuid' => $image->uuid,
                 'title' => $image->title,
-                'image_path' => $image->image_path,
+                'image_url' => $image->image_url,
                 'annotation' => $image->annotation,
                 'tags' => $image->tags,
                 'type' => $image->type,

@@ -7,7 +7,7 @@
             </label>
             @if($image && !$imageFile)
                 <div class="mb-3 rounded-xl overflow-hidden border border-[var(--ui-border)]/60 max-w-xs">
-                    <img src="{{ asset('storage/' . $image->image_path) }}" alt="{{ $image->title }}" class="w-full block">
+                    <img src="{{ $image->image_url }}" alt="{{ $image->title }}" class="w-full block">
                 </div>
             @endif
             @if($imageFile)

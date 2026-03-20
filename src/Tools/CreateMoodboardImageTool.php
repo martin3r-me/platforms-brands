@@ -20,7 +20,7 @@ class CreateMoodboardImageTool implements ToolContract, ToolMetadataContract
 
     public function getDescription(): string
     {
-        return 'POST /brands/moodboard_boards/{moodboard_board_id}/images - Erstellt einen neuen Moodboard-Bild-Eintrag. REST-Parameter: moodboard_board_id (required), image_path (required), title (optional), annotation (optional), tags (optional, array), type (optional, "do"|"dont").';
+        return 'POST /brands/moodboard_boards/{moodboard_board_id}/images - Erstellt einen neuen Moodboard-Bild-Eintrag. REST-Parameter: moodboard_board_id (required), context_file_id (required, ID eines bereits hochgeladenen ContextFiles), title (optional), annotation (optional), tags (optional, array), type (optional, "do"|"dont").';
     }
 
     public function getSchema(): array
@@ -29,7 +29,7 @@ class CreateMoodboardImageTool implements ToolContract, ToolMetadataContract
             'type' => 'object',
             'properties' => [
                 'moodboard_board_id' => ['type' => 'integer', 'description' => 'ID des Moodboards (ERFORDERLICH).'],
-                'image_path' => ['type' => 'string', 'description' => 'Pfad zum Bild (ERFORDERLICH).'],
+                'context_file_id' => ['type' => 'integer', 'description' => 'ID eines bereits hochgeladenen ContextFiles (ERFORDERLICH).'],
                 'title' => ['type' => 'string', 'description' => 'Titel des Bildes.'],
                 'annotation' => ['type' => 'string', 'description' => 'Annotation: Warum passt dieses Bild zur Marke (oder nicht).'],
                 'tags' => [
@@ -43,7 +43,7 @@ class CreateMoodboardImageTool implements ToolContract, ToolMetadataContract
                     'enum' => ['do', 'dont'],
                 ],
             ],
-            'required' => ['moodboard_board_id', 'image_path']
+            'required' => ['moodboard_board_id', 'context_file_id']
         ];
     }
 
@@ -70,32 +70,38 @@ class CreateMoodboardImageTool implements ToolContract, ToolMetadataContract
                 return ToolResult::error('ACCESS_DENIED', 'Du darfst keine Bilder für dieses Moodboard erstellen.');
             }
 
-            $imagePath = $arguments['image_path'] ?? null;
-            if (!$imagePath) {
-                return ToolResult::error('VALIDATION_ERROR', 'image_path ist erforderlich.');
+            $contextFileId = $arguments['context_file_id'] ?? null;
+            if (!$contextFileId) {
+                return ToolResult::error('VALIDATION_ERROR', 'context_file_id ist erforderlich.');
+            }
+
+            $contextFile = \Platform\Core\Models\ContextFile::find($contextFileId);
+            if (!$contextFile) {
+                return ToolResult::error('CONTEXT_FILE_NOT_FOUND', 'Das angegebene ContextFile wurde nicht gefunden.');
             }
 
             $image = BrandsMoodboardImage::create([
                 'moodboard_board_id' => $board->id,
                 'title' => $arguments['title'] ?? null,
-                'image_path' => $imagePath,
                 'annotation' => $arguments['annotation'] ?? null,
                 'tags' => $arguments['tags'] ?? null,
                 'type' => $arguments['type'] ?? 'do',
             ]);
 
+            $image->addFileReference($contextFileId);
             $image->load('moodboardBoard');
 
             return ToolResult::success([
                 'id' => $image->id,
                 'uuid' => $image->uuid,
                 'title' => $image->title,
-                'image_path' => $image->image_path,
+                'image_url' => $image->image_url,
                 'annotation' => $image->annotation,
                 'tags' => $image->tags,
                 'type' => $image->type,
                 'order' => $image->order,
                 'moodboard_board_id' => $image->moodboard_board_id,
+                'context_file_id' => $contextFileId,
                 'created_at' => $image->created_at->toIso8601String(),
                 'message' => "Moodboard-Bild erfolgreich erstellt."
             ]);

@@ -6,12 +6,16 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Symfony\Component\Uid\UuidV7;
 use Platform\Core\Contracts\HasDisplayName;
+use Platform\Core\Traits\HasContextFileReferences;
+use Platform\Core\Services\ContextFileService;
 
 /**
  * Model für einzelne Moodboard-Bilder mit Tags und Annotationen
  */
 class BrandsMoodboardImage extends Model implements HasDisplayName
 {
+    use HasContextFileReferences;
+
     protected $table = 'brands_moodboard_images';
 
     protected $fillable = [
@@ -55,5 +59,35 @@ class BrandsMoodboardImage extends Model implements HasDisplayName
     public function getDisplayName(): ?string
     {
         return $this->title ?? 'Bild #' . $this->id;
+    }
+
+    /**
+     * Bild-URL: ContextFile bevorzugt, Fallback auf legacy image_path
+     */
+    public function getImageUrlAttribute(): ?string
+    {
+        $ref = $this->getOrderedFileReferences()->first();
+        if ($ref && $ref->url) {
+            return $ref->url;
+        }
+
+        if ($this->image_path) {
+            return asset('storage/' . $this->image_path);
+        }
+
+        return null;
+    }
+
+    /**
+     * Thumbnail-URL: ContextFile-Variante bevorzugt, Fallback auf image_url
+     */
+    public function getThumbnailUrlAttribute(): ?string
+    {
+        $ref = $this->getOrderedFileReferences()->first();
+        if ($ref && $ref->thumbnail_url) {
+            return $ref->thumbnail_url;
+        }
+
+        return $this->image_url;
     }
 }

@@ -7,6 +7,7 @@ use Livewire\WithFileUploads;
 use Illuminate\Support\Facades\Auth;
 use Platform\Brands\Models\BrandsMoodboardBoard;
 use Platform\Brands\Models\BrandsMoodboardImage;
+use Platform\Core\Services\ContextFileService;
 use Livewire\Attributes\On;
 
 class MoodboardBoard extends Component
@@ -37,15 +38,23 @@ class MoodboardBoard extends Component
             'newImages.*' => 'image|max:10240', // Max 10MB pro Bild
         ]);
 
-        foreach ($this->newImages as $image) {
-            $path = $image->store('brands/moodboard/' . $this->moodboardBoard->id, 'public');
+        $contextFileService = app(ContextFileService::class);
 
-            BrandsMoodboardImage::create([
+        foreach ($this->newImages as $image) {
+            $contextFile = $contextFileService->uploadForContext(
+                $image,
+                BrandsMoodboardBoard::class,
+                $this->moodboardBoard->id,
+                ['team_id' => $this->moodboardBoard->team_id, 'user_id' => Auth::id()],
+            );
+
+            $moodboardImage = BrandsMoodboardImage::create([
                 'moodboard_board_id' => $this->moodboardBoard->id,
                 'title' => pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME),
-                'image_path' => $path,
                 'type' => 'do',
             ]);
+
+            $moodboardImage->addFileReference($contextFile['id']);
         }
 
         $this->newImages = [];
@@ -58,6 +67,15 @@ class MoodboardBoard extends Component
         $this->authorize('update', $this->moodboardBoard);
 
         $image = BrandsMoodboardImage::findOrFail($imageId);
+
+        // ContextFiles löschen
+        $contextFileService = app(ContextFileService::class);
+        foreach ($image->getOrderedFileReferences() as $ref) {
+            if ($ref->context_file_id) {
+                $contextFileService->delete($ref->context_file_id);
+            }
+        }
+
         $image->delete();
 
         $this->moodboardBoard->refresh();

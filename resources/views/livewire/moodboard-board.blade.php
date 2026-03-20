@@ -104,7 +104,7 @@
                 <div class="columns-2 md:columns-3 lg:columns-4 gap-4 space-y-4">
                     @foreach($doImages as $img)
                         <div class="group relative break-inside-avoid rounded-xl overflow-hidden border border-[var(--ui-border)]/60 bg-white shadow-sm hover:shadow-lg transition-all duration-200">
-                            <img src="{{ asset('storage/' . $img->image_path) }}" alt="{{ $img->title ?? 'Moodboard Bild' }}" class="w-full block" loading="lazy">
+                            <img src="{{ $img->image_url }}" alt="{{ $img->title ?? 'Moodboard Bild' }}" class="w-full block" loading="lazy">
 
                             {{-- Overlay --}}
                             <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200">
@@ -169,7 +169,7 @@
                     @foreach($dontImages as $img)
                         <div class="group relative break-inside-avoid rounded-xl overflow-hidden border-2 border-red-200 bg-white shadow-sm hover:shadow-lg transition-all duration-200">
                             <div class="relative">
-                                <img src="{{ asset('storage/' . $img->image_path) }}" alt="{{ $img->title ?? 'Don\'t Beispiel' }}" class="w-full block opacity-75" loading="lazy">
+                                <img src="{{ $img->image_url }}" alt="{{ $img->title ?? 'Don\'t Beispiel' }}" class="w-full block opacity-75" loading="lazy">
                                 {{-- Don't Badge --}}
                                 <div class="absolute top-2 left-2">
                                     <span class="inline-flex items-center gap-1 px-2 py-1 text-[10px] font-bold uppercase tracking-wider bg-red-500 text-white rounded-full">

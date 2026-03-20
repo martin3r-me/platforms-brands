@@ -4,8 +4,10 @@ namespace Platform\Brands\Livewire;
 
 use Livewire\Component;
 use Livewire\WithFileUploads;
+use Illuminate\Support\Facades\Auth;
 use Platform\Brands\Models\BrandsMoodboardBoard;
 use Platform\Brands\Models\BrandsMoodboardImage;
+use Platform\Core\Services\ContextFileService;
 use Livewire\Attributes\On;
 
 class MoodboardImageModal extends Component
@@ -100,22 +102,44 @@ class MoodboardImageModal extends Component
             'type' => $this->imageType,
         ];
 
+        $contextFileService = app(ContextFileService::class);
+
         if ($this->image) {
             // Update
             if ($this->imageFile) {
-                $path = $this->imageFile->store('brands/moodboard/' . $this->moodboardBoardId, 'public');
-                $data['image_path'] = $path;
+                // Altes ContextFile löschen
+                foreach ($this->image->getOrderedFileReferences() as $ref) {
+                    if ($ref->context_file_id) {
+                        $contextFileService->delete($ref->context_file_id);
+                    }
+                    $this->image->removeFileReference($ref->id);
+                }
+
+                // Neues ContextFile hochladen
+                $contextFile = $contextFileService->uploadForContext(
+                    $this->imageFile,
+                    BrandsMoodboardBoard::class,
+                    $this->moodboardBoardId,
+                    ['team_id' => $board->team_id, 'user_id' => Auth::id()],
+                );
+                $this->image->addFileReference($contextFile['id']);
             }
             $this->image->update($data);
         } else {
             // Create
-            $path = $this->imageFile->store('brands/moodboard/' . $this->moodboardBoardId, 'public');
+            $contextFile = $contextFileService->uploadForContext(
+                $this->imageFile,
+                BrandsMoodboardBoard::class,
+                $this->moodboardBoardId,
+                ['team_id' => $board->team_id, 'user_id' => Auth::id()],
+            );
+
             $data['moodboard_board_id'] = $this->moodboardBoardId;
-            $data['image_path'] = $path;
             if (!$data['title']) {
                 $data['title'] = pathinfo($this->imageFile->getClientOriginalName(), PATHINFO_FILENAME);
             }
-            BrandsMoodboardImage::create($data);
+            $moodboardImage = BrandsMoodboardImage::create($data);
+            $moodboardImage->addFileReference($contextFile['id']);
         }
 
         $this->dispatch('updateMoodboardBoard');
