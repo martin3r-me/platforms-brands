@@ -8,7 +8,6 @@ use Symfony\Component\Uid\UuidV7;
 use Illuminate\Support\Facades\Log;
 use Platform\Organization\Traits\HasOrganizationContexts;
 use Platform\Core\Traits\HasColors;
-use Platform\Core\Contracts\HasTimeAncestors;
 use Platform\Core\Contracts\HasKeyResultAncestors;
 use Platform\Core\Contracts\HasDisplayName;
 use Platform\Crm\Traits\HasCompanyLinksTrait;
@@ -19,7 +18,7 @@ use Platform\Integrations\Contracts\SocialMediaAccountLinkableInterface;
 /**
  * @ai.description Marke dient als Container für Brand-Management im Team.
  */
-class BrandsBrand extends Model implements HasTimeAncestors, HasKeyResultAncestors, HasDisplayName, SocialMediaAccountLinkableInterface
+class BrandsBrand extends Model implements HasKeyResultAncestors, HasDisplayName, SocialMediaAccountLinkableInterface
 {
     use HasOrganizationContexts, HasColors, HasCompanyLinksTrait;
 
@@ -88,15 +87,6 @@ class BrandsBrand extends Model implements HasTimeAncestors, HasKeyResultAncesto
     public function getContact(): ?ContactInterface
     {
         return $this->crmContactLinks()->first()?->contact;
-    }
-
-    /**
-     * Gibt alle Vorfahren-Kontexte für die Zeitkaskade zurück.
-     * Brand → Brand selbst (als Root)
-     */
-    public function timeAncestors(): array
-    {
-        return [];
     }
 
     /**
