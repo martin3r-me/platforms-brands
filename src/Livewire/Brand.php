@@ -541,19 +541,19 @@ class Brand extends Component
         $user = Auth::user();
         $team = $user->currentTeam;
 
-        // Alle Board-Typen laden mit Entry-Counts
-        $ciBoards = $this->brand->ciBoards;
-        $socialBoards = $this->brand->socialBoards;
-        $kanbanBoards = $this->brand->kanbanBoards;
-        $typographyBoards = $this->brand->typographyBoards;
-        $logoBoards = $this->brand->logoBoards;
-        $toneOfVoiceBoards = $this->brand->toneOfVoiceBoards;
-        $personaBoards = $this->brand->personaBoards;
-        $competitorBoards = $this->brand->competitorBoards;
-        $guidelineBoards = $this->brand->guidelineBoards;
-        $moodboardBoards = $this->brand->moodboardBoards;
-        $assetBoards = $this->brand->assetBoards;
-        $seoBoards = $this->brand->seoBoards;
+        // Alle Board-Typen laden mit Preview-Relationen
+        $ciBoards = $this->brand->ciBoards()->with(['colors' => fn($q) => $q->limit(5)])->get();
+        $socialBoards = $this->brand->socialBoards()->with(['slots' => fn($q) => $q->withCount('cards')])->get();
+        $kanbanBoards = $this->brand->kanbanBoards()->with(['slots' => fn($q) => $q->withCount('cards')])->get();
+        $typographyBoards = $this->brand->typographyBoards()->with(['entries' => fn($q) => $q->limit(3)])->get();
+        $logoBoards = $this->brand->logoBoards()->withCount('variants')->get();
+        $toneOfVoiceBoards = $this->brand->toneOfVoiceBoards()->withCount('entries')->get();
+        $personaBoards = $this->brand->personaBoards()->with(['personas' => fn($q) => $q->limit(3)])->get();
+        $competitorBoards = $this->brand->competitorBoards()->with(['competitors' => fn($q) => $q->limit(3)])->get();
+        $guidelineBoards = $this->brand->guidelineBoards()->with(['chapters' => fn($q) => $q->limit(3)])->get();
+        $moodboardBoards = $this->brand->moodboardBoards()->with(['images' => fn($q) => $q->limit(3)])->get();
+        $assetBoards = $this->brand->assetBoards()->withCount('assets')->get();
+        $seoBoards = $this->brand->seoBoards()->with(['keywords' => fn($q) => $q->limit(3)])->get();
         $contentBriefBoards = $this->brand->contentBriefBoards;
 
         // Board-Gruppen für tabellarische Darstellung
