@@ -46,7 +46,6 @@ class BulkUpdateCtasTool implements ToolContract, ToolMetadataContract
                             'description' => ['type' => 'string'],
                             'type' => ['type' => 'string', 'enum' => ['primary', 'secondary', 'micro']],
                             'funnel_stage' => ['type' => 'string', 'enum' => ['awareness', 'consideration', 'decision']],
-                            'target_page_id' => ['type' => 'integer'],
                             'target_url' => ['type' => 'string'],
                             'is_active' => ['type' => 'boolean'],
                         ],

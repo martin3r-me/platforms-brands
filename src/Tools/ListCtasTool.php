@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Gate;
 /**
  * Tool zum Auflisten von CTAs (Call-to-Actions) im Brands-Modul.
  *
- * Unterstützt Filterung nach brand_id, type, funnel_stage, target_page_id und is_active.
+ * Unterstützt Filterung nach brand_id, type, funnel_stage und is_active.
  */
 class ListCtasTool implements ToolContract, ToolMetadataContract
 {
@@ -27,7 +27,7 @@ class ListCtasTool implements ToolContract, ToolMetadataContract
 
     public function getDescription(): string
     {
-        return 'GET /brands/ctas - Listet CTAs (Call-to-Actions) einer Brand auf. Ein CTA ist eine Handlungsaufforderung (z.B. "Jetzt anfragen") mit Typ und Funnel-Stage. Filterbar nach brand_id, type (primary|secondary|micro), funnel_stage (awareness|consideration|decision), target_page_id, is_active. REST-Parameter: brand_id (required), filters (optional), search (optional), sort (optional), limit/offset (optional).';
+        return 'GET /brands/ctas - Listet CTAs (Call-to-Actions) einer Brand auf. Ein CTA ist eine Handlungsaufforderung (z.B. "Jetzt anfragen") mit Typ und Funnel-Stage. Filterbar nach brand_id, type (primary|secondary|micro), funnel_stage (awareness|consideration|decision), is_active. REST-Parameter: brand_id (required), filters (optional), search (optional), sort (optional), limit/offset (optional).';
     }
 
     public function getSchema(): array
@@ -49,10 +49,6 @@ class ListCtasTool implements ToolContract, ToolMetadataContract
                         'type' => 'string',
                         'description' => 'Optional: Filter nach Funnel-Stage. Mögliche Werte: "awareness", "consideration", "decision".',
                         'enum' => ['awareness', 'consideration', 'decision'],
-                    ],
-                    'target_page_id' => [
-                        'type' => 'integer',
-                        'description' => 'Optional: Filter nach Zielseite (Content Board Block-ID).',
                     ],
                     'is_active' => [
                         'type' => 'boolean',
@@ -88,7 +84,7 @@ class ListCtasTool implements ToolContract, ToolMetadataContract
             // Query aufbauen
             $query = BrandsCta::query()
                 ->where('brand_id', $brandId)
-                ->with(['brand', 'targetPage.contentBoard', 'user', 'team']);
+                ->with(['brand', 'user', 'team']);
 
             // Spezifische Filter
             if (isset($arguments['type'])) {
@@ -97,10 +93,6 @@ class ListCtasTool implements ToolContract, ToolMetadataContract
 
             if (isset($arguments['funnel_stage'])) {
                 $query->where('funnel_stage', $arguments['funnel_stage']);
-            }
-
-            if (isset($arguments['target_page_id'])) {
-                $query->where('target_page_id', $arguments['target_page_id']);
             }
 
             if (isset($arguments['is_active'])) {
@@ -141,8 +133,6 @@ class ListCtasTool implements ToolContract, ToolMetadataContract
                     'description' => $cta->description,
                     'type' => $cta->type,
                     'funnel_stage' => $cta->funnel_stage,
-                    'target_page_id' => $cta->target_page_id,
-                    'target_page_name' => $cta->targetPage?->name,
                     'target_url' => $cta->target_url,
                     'is_active' => $cta->is_active,
                     'brand_id' => $cta->brand_id,
@@ -152,7 +142,6 @@ class ListCtasTool implements ToolContract, ToolMetadataContract
                     'impressions' => $cta->impressions,
                     'clicks' => $cta->clicks,
                     'conversion_rate' => $cta->conversion_rate,
-                    'page_context_url' => $cta->getPageContextUrl(),
                     'last_clicked_at' => $cta->last_clicked_at?->toIso8601String(),
                     'created_at' => $cta->created_at->toIso8601String(),
                 ];

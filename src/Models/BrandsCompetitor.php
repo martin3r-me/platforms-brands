@@ -42,13 +42,17 @@ class BrandsCompetitor extends Model implements HasDisplayName
     public function getStrengthsAttribute($value): array
     {
         $decoded = $this->fromJson($value);
-        return is_array($decoded) ? $decoded : [];
+        if (!is_array($decoded)) return [];
+
+        return array_map(fn($item) => is_string($item) ? ['text' => $item] : $item, $decoded);
     }
 
     public function getWeaknessesAttribute($value): array
     {
         $decoded = $this->fromJson($value);
-        return is_array($decoded) ? $decoded : [];
+        if (!is_array($decoded)) return [];
+
+        return array_map(fn($item) => is_string($item) ? ['text' => $item] : $item, $decoded);
     }
 
     public function getDifferentiationAttribute($value): array

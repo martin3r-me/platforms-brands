@@ -12,7 +12,7 @@ class CtaBoard extends Component
 {
     public BrandsCtaBoard $ctaBoard;
 
-    public string $groupBy = 'target_page';
+    public string $groupBy = 'funnel_stage';
     public string $filterType = '';
     public string $filterFunnelStage = '';
     public string $filterIsActive = '';
@@ -24,7 +24,7 @@ class CtaBoard extends Component
 
     public function mount(BrandsCtaBoard $brandsCtaBoard)
     {
-        $this->ctaBoard = $brandsCtaBoard->fresh()->load('ctas.targetPage');
+        $this->ctaBoard = $brandsCtaBoard->fresh()->load('ctas');
 
         $this->authorize('view', $this->ctaBoard);
     }
@@ -33,12 +33,12 @@ class CtaBoard extends Component
     public function updateCtaBoard()
     {
         $this->ctaBoard->refresh();
-        $this->ctaBoard->load('ctas.targetPage');
+        $this->ctaBoard->load('ctas');
     }
 
     public function setGroupBy(string $groupBy)
     {
-        if (in_array($groupBy, ['target_page', 'funnel_stage'])) {
+        if (in_array($groupBy, ['funnel_stage', 'type'])) {
             $this->groupBy = $groupBy;
         }
     }
@@ -101,7 +101,7 @@ class CtaBoard extends Component
 
     protected function getFilteredCtas()
     {
-        $query = $this->ctaBoard->ctas()->with('targetPage');
+        $query = $this->ctaBoard->ctas();
 
         if ($this->filterType !== '') {
             $query->where('type', $this->filterType);
@@ -132,16 +132,8 @@ class CtaBoard extends Component
             }
             $grouped = $orderedGroups;
         } else {
-            // Group by target_page
-            $grouped = $ctas->groupBy(function ($cta) {
-                if ($cta->target_page_id && $cta->targetPage) {
-                    return 'page_' . $cta->target_page_id;
-                }
-                if ($cta->target_url) {
-                    return 'url_' . $cta->target_url;
-                }
-                return 'no_target';
-            });
+            // Group by type
+            $grouped = $ctas->groupBy('type');
         }
 
         return view('brands::livewire.cta-board', [

@@ -28,7 +28,7 @@ class CreateCtaTool implements ToolContract, ToolMetadataContract
 
     public function getDescription(): string
     {
-        return 'POST /brands/ctas - Erstellt einen neuen CTA (Call-to-Action) für eine Brand. Ein CTA ist eine Handlungsaufforderung (z.B. "Jetzt anfragen", "Mehr erfahren") mit Typ (primary/secondary/micro) und Funnel-Stage (awareness/consideration/decision). Der CTA kann optional auf eine Zielseite (Content Board Block) oder eine externe URL verweisen. REST-Parameter: brand_id (required), label (required), type (required: primary|secondary|micro), funnel_stage (required: awareness|consideration|decision), description (optional), target_page_id (optional, FK auf Content Board Block), target_url (optional), is_active (optional, default true).';
+        return 'POST /brands/ctas - Erstellt einen neuen CTA (Call-to-Action) für eine Brand. Ein CTA ist eine Handlungsaufforderung (z.B. "Jetzt anfragen", "Mehr erfahren") mit Typ (primary/secondary/micro) und Funnel-Stage (awareness/consideration/decision). Der CTA kann optional auf eine externe URL verweisen. REST-Parameter: brand_id (required), label (required), type (required: primary|secondary|micro), funnel_stage (required: awareness|consideration|decision), description (optional), target_url (optional), is_active (optional, default true).';
     }
 
     public function getSchema(): array
@@ -57,10 +57,6 @@ class CreateCtaTool implements ToolContract, ToolMetadataContract
                 'description' => [
                     'type' => 'string',
                     'description' => 'Optional: Interne Beschreibung/Kontext zum CTA.',
-                ],
-                'target_page_id' => [
-                    'type' => 'integer',
-                    'description' => 'Optional (deprecated, Ticket #441): Ehemals ID eines Content Board Blocks als Zielseite. Verwende stattdessen target_url.',
                 ],
                 'target_url' => [
                     'type' => 'string',
@@ -118,8 +114,7 @@ class CreateCtaTool implements ToolContract, ToolMetadataContract
                 return ToolResult::error('VALIDATION_ERROR', 'funnel_stage ist erforderlich. Erlaubte Werte: ' . implode(', ', BrandsCta::FUNNEL_STAGES));
             }
 
-            // target_page_id ist deprecated (Ticket #441) – ignoriert, aber nicht abgelehnt für Rückwärtskompatibilität
-            $targetPageId = $arguments['target_page_id'] ?? null;
+            // target_page_id ist deprecated (Ticket #441) – wird nicht mehr gesetzt
 
             // CTA erstellen
             $cta = BrandsCta::create([
@@ -128,14 +123,13 @@ class CreateCtaTool implements ToolContract, ToolMetadataContract
                 'description' => $arguments['description'] ?? null,
                 'type' => $type,
                 'funnel_stage' => $funnelStage,
-                'target_page_id' => $targetPageId,
                 'target_url' => $arguments['target_url'] ?? null,
                 'is_active' => $arguments['is_active'] ?? true,
                 'user_id' => $context->user->id,
                 'team_id' => $brand->team_id,
             ]);
 
-            $cta->load(['brand', 'targetPage', 'user', 'team']);
+            $cta->load(['brand', 'user', 'team']);
 
             $result = [
                 'id' => $cta->id,
@@ -144,8 +138,6 @@ class CreateCtaTool implements ToolContract, ToolMetadataContract
                 'description' => $cta->description,
                 'type' => $cta->type,
                 'funnel_stage' => $cta->funnel_stage,
-                'target_page_id' => $cta->target_page_id,
-                'target_page_name' => $cta->targetPage?->name,
                 'target_url' => $cta->target_url,
                 'is_active' => $cta->is_active,
                 'brand_id' => $cta->brand_id,

@@ -10,8 +10,8 @@ use Platform\Core\Contracts\HasDisplayName;
 /**
  * Model für Brand CTAs (Call-to-Actions)
  *
- * Ein CTA gehört zu einer Brand und kann optional auf eine Zielseite (Content Board Block)
- * oder eine externe URL verweisen. CTAs werden nach Typ (primary/secondary/micro) und
+ * Ein CTA gehört zu einer Brand und kann optional auf eine externe URL verweisen.
+ * CTAs werden nach Typ (primary/secondary/micro) und
  * Funnel-Stage (awareness/consideration/decision) kategorisiert.
  */
 class BrandsCta extends Model implements HasDisplayName
@@ -26,7 +26,6 @@ class BrandsCta extends Model implements HasDisplayName
         'description',
         'type',
         'funnel_stage',
-        'target_page_id',
         'target_url',
         'is_active',
         'order',
@@ -72,18 +71,6 @@ class BrandsCta extends Model implements HasDisplayName
         return $this->belongsTo(BrandsCtaBoard::class, 'cta_board_id');
     }
 
-    /**
-     * Optionale Zielseite.
-     * @deprecated target_page_id referenzierte Content Board Blocks (Ticket #441 – deprecated).
-     *             Verwende stattdessen target_url. Diese Relation liefert null bis Entfernung 2026-06-01.
-     */
-    public function targetPage(): BelongsTo
-    {
-        // Content Board Blocks wurden entfernt (Ticket #441).
-        // Fallback: target_url verwenden.
-        return $this->belongsTo(self::class, 'target_page_id')->withDefault(null);
-    }
-
     public function user(): BelongsTo
     {
         return $this->belongsTo(\Platform\Core\Models\User::class);
@@ -113,26 +100,9 @@ class BrandsCta extends Model implements HasDisplayName
 
     /**
      * Resolve the redirect URL for click tracking.
-     * Prefers target_url, then published_url of the target page's Content Board, then internal route.
      */
     public function getRedirectUrl(): ?string
     {
-        if ($this->target_url) {
-            return $this->target_url;
-        }
-
-        // Deprecated: Content Board Block target_page_id ist nicht mehr auflösbar (Ticket #441)
-        return null;
-    }
-
-    /**
-     * Resolve the page context URL for this CTA.
-     *
-     * @deprecated target_page_id referenzierte Content Board Blocks (Ticket #441 – deprecated).
-     */
-    public function getPageContextUrl(): ?string
-    {
-        // Deprecated: Content Board Block target_page_id ist nicht mehr auflösbar (Ticket #441)
-        return null;
+        return $this->target_url;
     }
 }

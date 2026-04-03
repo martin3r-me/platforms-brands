@@ -58,13 +58,13 @@
                 <div>
                     <h3 class="text-xs font-semibold uppercase tracking-wide text-[var(--ui-muted)] mb-3">Gruppierung</h3>
                     <div class="flex gap-2">
-                        <button wire:click="setGroupBy('target_page')"
-                            class="px-3 py-1.5 text-xs font-medium rounded-lg border transition-colors {{ $groupBy === 'target_page' ? 'bg-violet-50 text-violet-700 border-violet-200' : 'text-[var(--ui-muted)] border-[var(--ui-border)]/40 hover:bg-[var(--ui-muted-5)]' }}">
-                            Zielseite
-                        </button>
                         <button wire:click="setGroupBy('funnel_stage')"
                             class="px-3 py-1.5 text-xs font-medium rounded-lg border transition-colors {{ $groupBy === 'funnel_stage' ? 'bg-violet-50 text-violet-700 border-violet-200' : 'text-[var(--ui-muted)] border-[var(--ui-border)]/40 hover:bg-[var(--ui-muted-5)]' }}">
                             Funnel Stage
+                        </button>
+                        <button wire:click="setGroupBy('type')"
+                            class="px-3 py-1.5 text-xs font-medium rounded-lg border transition-colors {{ $groupBy === 'type' ? 'bg-violet-50 text-violet-700 border-violet-200' : 'text-[var(--ui-muted)] border-[var(--ui-border)]/40 hover:bg-[var(--ui-muted-5)]' }}">
+                            Typ
                         </button>
                     </div>
                 </div>
@@ -158,21 +158,18 @@
                         </x-ui-kanban-column>
                     @endforeach
                 @else
-                    {{-- Group by target_page --}}
-                    @foreach($grouped as $groupKey => $groupCtas)
+                    {{-- Group by type --}}
+                    @foreach($grouped as $typeKey => $typeCtas)
                         @php
-                            if (str_starts_with($groupKey, 'page_')) {
-                                $firstCta = $groupCtas->first();
-                                $columnTitle = $firstCta?->targetPage?->title ?? $firstCta?->targetPage?->name ?? 'Seite #' . str_replace('page_', '', $groupKey);
-                            } elseif (str_starts_with($groupKey, 'url_')) {
-                                $columnTitle = str_replace('url_', '', $groupKey);
-                                $columnTitle = Str::limit($columnTitle, 40);
-                            } else {
-                                $columnTitle = 'Ohne Zielseite';
-                            }
+                            $typeLabels = [
+                                'primary' => 'Primary',
+                                'secondary' => 'Secondary',
+                                'micro' => 'Micro',
+                            ];
+                            $typeLabel = $typeLabels[$typeKey] ?? ucfirst($typeKey);
                         @endphp
-                        <x-ui-kanban-column :title="$columnTitle" :scrollable="true">
-                            @foreach($groupCtas as $cta)
+                        <x-ui-kanban-column :title="$typeLabel" :scrollable="true">
+                            @foreach($typeCtas as $cta)
                                 @include('brands::livewire.cta-preview-card', ['cta' => $cta])
                             @endforeach
                         </x-ui-kanban-column>

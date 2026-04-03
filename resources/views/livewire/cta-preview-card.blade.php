@@ -72,14 +72,9 @@
         @endif
     </div>
 
-    {{-- Zielseite / URL --}}
+    {{-- Ziel-URL --}}
     <div class="mb-2">
-        @if($cta->target_page_id && $cta->targetPage)
-            <div class="flex items-center gap-1 text-[10px] text-[var(--ui-muted)]">
-                @svg('heroicon-o-document-text', 'w-3 h-3')
-                <span class="truncate">{{ $cta->targetPage->title ?? $cta->targetPage->name ?? 'Seite #' . $cta->target_page_id }}</span>
-            </div>
-        @elseif($cta->target_url)
+        @if($cta->target_url)
             <div class="flex items-center gap-1 text-[10px] text-[var(--ui-muted)]">
                 @svg('heroicon-o-link', 'w-3 h-3')
                 <span class="truncate">{{ Str::limit($cta->target_url, 40) }}</span>

@@ -47,7 +47,7 @@ class GetCtaBoardTool implements ToolContract, ToolMetadataContract
                 return ToolResult::error('VALIDATION_ERROR', 'CTA Board-ID ist erforderlich. Nutze "brands.cta_boards.GET" um CTA Boards zu finden.');
             }
 
-            $ctaBoard = BrandsCtaBoard::with(['brand', 'user', 'team', 'ctas.targetPage'])
+            $ctaBoard = BrandsCtaBoard::with(['brand', 'user', 'team', 'ctas'])
                 ->find($arguments['id']);
 
             if (!$ctaBoard) {
@@ -68,8 +68,6 @@ class GetCtaBoardTool implements ToolContract, ToolMetadataContract
                     'description' => $cta->description,
                     'type' => $cta->type,
                     'funnel_stage' => $cta->funnel_stage,
-                    'target_page_id' => $cta->target_page_id,
-                    'target_page_title' => $cta->targetPage?->title ?? $cta->targetPage?->name ?? null,
                     'target_url' => $cta->target_url,
                     'is_active' => $cta->is_active,
                     'order' => $cta->order,

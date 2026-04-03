@@ -24,7 +24,7 @@ class UpdateCtaTool implements ToolContract
 
     public function getDescription(): string
     {
-        return 'PUT /brands/ctas/{id} - Aktualisiert einen CTA (Call-to-Action). REST-Parameter: cta_id (required), label (optional), description (optional), type (optional: primary|secondary|micro), funnel_stage (optional: awareness|consideration|decision), target_page_id (optional, FK auf Content Board Block), target_url (optional), is_active (optional).';
+        return 'PUT /brands/ctas/{id} - Aktualisiert einen CTA (Call-to-Action). REST-Parameter: cta_id (required), label (optional), description (optional), type (optional: primary|secondary|micro), funnel_stage (optional: awareness|consideration|decision), target_url (optional), is_active (optional).';
     }
 
     public function getSchema(): array
@@ -53,10 +53,6 @@ class UpdateCtaTool implements ToolContract
                     'type' => 'string',
                     'description' => 'Optional: Funnel-Stage. Mögliche Werte: "awareness", "consideration", "decision".',
                     'enum' => ['awareness', 'consideration', 'decision'],
-                ],
-                'target_page_id' => [
-                    'type' => 'integer',
-                    'description' => 'Optional (deprecated, Ticket #441): Ehemals ID eines Content Board Blocks als Zielseite. Verwende stattdessen target_url.',
                 ],
                 'target_url' => [
                     'type' => 'string',
@@ -126,10 +122,7 @@ class UpdateCtaTool implements ToolContract
                 $updateData['funnel_stage'] = $arguments['funnel_stage'];
             }
 
-            // target_page_id ist deprecated (Ticket #441) – ignoriert, aber nicht abgelehnt für Rückwärtskompatibilität
-            if (array_key_exists('target_page_id', $arguments)) {
-                $updateData['target_page_id'] = $arguments['target_page_id'];
-            }
+            // target_page_id ist deprecated (Ticket #441) – wird nicht mehr gesetzt
 
             if (array_key_exists('target_url', $arguments)) {
                 $updateData['target_url'] = $arguments['target_url'];
@@ -145,7 +138,7 @@ class UpdateCtaTool implements ToolContract
             }
 
             $cta->refresh();
-            $cta->load(['brand', 'targetPage', 'user', 'team']);
+            $cta->load(['brand', 'user', 'team']);
 
             return ToolResult::success([
                 'id' => $cta->id,
@@ -154,8 +147,6 @@ class UpdateCtaTool implements ToolContract
                 'description' => $cta->description,
                 'type' => $cta->type,
                 'funnel_stage' => $cta->funnel_stage,
-                'target_page_id' => $cta->target_page_id,
-                'target_page_name' => $cta->targetPage?->name,
                 'target_url' => $cta->target_url,
                 'is_active' => $cta->is_active,
                 'brand_id' => $cta->brand_id,
