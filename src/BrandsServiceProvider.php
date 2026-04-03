@@ -158,6 +158,7 @@ class BrandsServiceProvider extends ServiceProvider
             PlatformCore::registerModule([
                 'key'        => 'brands',
                 'title'      => 'Marken',
+                'group'      => 'marketing',
                 'routing'    => config('brands.routing'),
                 'guard'      => config('brands.guard'),
                 'navigation' => config('brands.navigation'),
