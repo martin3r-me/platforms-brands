@@ -56,30 +56,45 @@ class Dashboard extends Component
         $user = Auth::user();
         $team = $user->currentTeam;
         
-        // === MARKEN (nur Team-Marken) ===
-        $brands = BrandsBrand::where('team_id', $team->id)->orderBy('name')->get();
-        $activeBrands = $brands->filter(function($brand) {
-            return $brand->done === null || $brand->done === false;
-        })->count();
-        $totalBrands = $brands->count();
+        // === MARKEN mit Board-Daten für Preview ===
+        $brands = BrandsBrand::where('team_id', $team->id)
+            ->with([
+                'ciBoards' => fn($q) => $q->with(['colors' => fn($c) => $c->limit(5)])->limit(1),
+                'moodboardBoards' => fn($q) => $q->with(['images' => fn($i) => $i->limit(4)])->limit(1),
+                'personaBoards' => fn($q) => $q->withCount('personas')->limit(1),
+                'typographyBoards' => fn($q) => $q->with(['entries' => fn($e) => $e->limit(2)])->limit(1),
+                'socialBoards',
+                'kanbanBoards',
+                'logoBoards',
+                'toneOfVoiceBoards',
+                'competitorBoards',
+                'guidelineBoards',
+                'seoBoards',
+                'assetBoards',
+                'contentBriefBoards',
+            ])
+            ->orderBy('name')
+            ->get();
 
-        // === MARKEN-ÜBERSICHT (nur aktive Marken) ===
-        $activeBrandsList = $brands->filter(function($brand) {
-            return $brand->done === null || $brand->done === false;
-        })
-        ->map(function ($brand) {
-            return [
-                'id' => $brand->id,
-                'name' => $brand->name,
-                'subtitle' => $brand->description ? mb_substr($brand->description, 0, 50) . '...' : '',
-            ];
-        })
-        ->take(5);
+        $activeBrands = $brands->filter(fn($b) => !$b->done)->count();
+        $totalBrands = $brands->count();
+        $totalBoards = $brands->sum(function($brand) {
+            return $brand->ciBoards->count() + $brand->socialBoards->count() + $brand->kanbanBoards->count()
+                + $brand->typographyBoards->count() + $brand->logoBoards->count() + $brand->toneOfVoiceBoards->count()
+                + $brand->personaBoards->count() + $brand->competitorBoards->count() + $brand->guidelineBoards->count()
+                + $brand->moodboardBoards->count() + $brand->seoBoards->count() + $brand->assetBoards->count()
+                + $brand->contentBriefBoards->count();
+        });
+
+        $activeBrandsList = $brands->filter(fn($b) => !$b->done);
+        $doneBrandsList = $brands->filter(fn($b) => $b->done);
 
         return view('brands::livewire.dashboard', [
             'activeBrands' => $activeBrands,
             'totalBrands' => $totalBrands,
+            'totalBoards' => $totalBoards,
             'activeBrandsList' => $activeBrandsList,
+            'doneBrandsList' => $doneBrandsList,
         ])->layout('platform::layouts.app');
     }
 }

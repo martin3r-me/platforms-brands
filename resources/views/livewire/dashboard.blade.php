@@ -1,6 +1,6 @@
 <x-ui-page>
     <x-slot name="navbar">
-        <x-ui-page-navbar title="Dashboard" icon="heroicon-o-home" />
+        <x-ui-page-navbar title="Marken" icon="heroicon-o-tag" />
     </x-slot>
 
     <x-slot name="actionbar">
@@ -14,83 +14,148 @@
         </x-ui-page-actionbar>
     </x-slot>
 
-    <x-ui-page-container>
+    <x-ui-page-container spacing="space-y-0">
 
-            {{-- Main Stats Grid --}}
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                <x-ui-dashboard-tile
-                    title="Aktive Marken"
-                    :count="$activeBrands"
-                    subtitle="von {{ $totalBrands }}"
-                    icon="tag"
-                    variant="secondary"
-                    size="lg"
-                />
+        {{-- Hero Stats --}}
+        <div class="py-12 md:py-16">
+            <div class="flex items-baseline gap-6 flex-wrap">
+                <div>
+                    <span class="text-5xl md:text-6xl font-light text-gray-900 tracking-tight">{{ $activeBrands }}</span>
+                    <span class="text-lg text-gray-400 ml-2">{{ $activeBrands === 1 ? 'Marke' : 'Marken' }}</span>
+                </div>
+                <div class="flex items-baseline gap-6 text-base text-gray-300">
+                    @if($totalBrands > $activeBrands)
+                        <span>{{ $totalBrands - $activeBrands }} archiviert</span>
+                    @endif
+                    <span>{{ $totalBoards }} Boards</span>
+                </div>
             </div>
+        </div>
 
-            <x-ui-panel title="Meine aktiven Marken" subtitle="Top 5 Marken">
-                <div class="grid grid-cols-1 gap-3">
-                    @forelse($activeBrandsList as $brand)
-                        @php
-                            $href = route('brands.brands.show', ['brandsBrand' => $brand['id'] ?? null]);
-                        @endphp
-                        <a href="{{ $href }}" class="flex items-center gap-3 p-3 rounded-md border border-[var(--ui-border)] bg-white hover:bg-[var(--ui-muted-5)] transition">
-                            <div class="w-8 h-8 bg-[var(--ui-primary)] text-[var(--ui-on-primary)] rounded flex items-center justify-center">
-                                @svg('heroicon-o-tag', 'w-5 h-5')
-                            </div>
-                            <div class="flex-1 min-w-0">
-                                <div class="font-medium truncate">{{ $brand['name'] ?? 'Marke' }}</div>
-                                <div class="text-xs text-[var(--ui-muted)] truncate">
-                                    {{ $brand['subtitle'] ?? '' }}
+        {{-- Brand Cards --}}
+        @if($activeBrandsList->isNotEmpty())
+            <div class="space-y-0 divide-y divide-gray-100">
+                @foreach($activeBrandsList as $brand)
+                    @php
+                        $ciBoard = $brand->ciBoards->first();
+                        $moodboard = $brand->moodboardBoards->first();
+                        $personaBoard = $brand->personaBoards->first();
+                        $typographyBoard = $brand->typographyBoards->first();
+                        $boardCount = $brand->ciBoards->count() + $brand->socialBoards->count() + $brand->kanbanBoards->count()
+                            + $brand->typographyBoards->count() + $brand->logoBoards->count() + $brand->toneOfVoiceBoards->count()
+                            + $brand->personaBoards->count() + $brand->competitorBoards->count() + $brand->guidelineBoards->count()
+                            + $brand->moodboardBoards->count() + $brand->seoBoards->count() + $brand->assetBoards->count()
+                            + $brand->contentBriefBoards->count();
+                    @endphp
+                    <a href="{{ route('brands.brands.show', $brand) }}" wire:navigate
+                       class="group relative block py-10 md:py-14 px-2 md:px-6 hover:bg-gray-50/50 transition-colors duration-300">
+
+                        {{-- Brand Name --}}
+                        <h2 class="text-3xl md:text-4xl font-light tracking-tight text-gray-900">{{ $brand->name }}</h2>
+
+                        @if($brand->description)
+                            <p class="text-base text-gray-400 leading-relaxed max-w-3xl mt-2">{{ Str::limit($brand->description, 200) }}</p>
+                        @endif
+
+                        {{-- Preview Row --}}
+                        <div class="mt-8 flex flex-wrap items-start gap-8">
+
+                            {{-- CI-Farben --}}
+                            @if($ciBoard)
+                                <div class="flex items-center flex-shrink-0">
+                                    @if($ciBoard->primary_color)
+                                        <div class="w-10 h-10 rounded-full ring-2 ring-white shadow-sm" style="background-color: {{ $ciBoard->primary_color }};"></div>
+                                    @endif
+                                    @if($ciBoard->secondary_color)
+                                        <div class="w-10 h-10 rounded-full ring-2 ring-white shadow-sm -ml-2" style="background-color: {{ $ciBoard->secondary_color }};"></div>
+                                    @endif
+                                    @if($ciBoard->accent_color)
+                                        <div class="w-10 h-10 rounded-full ring-2 ring-white shadow-sm -ml-2" style="background-color: {{ $ciBoard->accent_color }};"></div>
+                                    @endif
+                                    @foreach($ciBoard->colors->take(3) as $color)
+                                        <div class="w-10 h-10 rounded-full ring-2 ring-white shadow-sm -ml-2" style="background-color: {{ $color->color }};"></div>
+                                    @endforeach
                                 </div>
+                            @endif
+
+                            {{-- Typografie --}}
+                            @if($typographyBoard && $typographyBoard->entries->isNotEmpty())
+                                <div class="flex-shrink-0">
+                                    @foreach($typographyBoard->entries->take(2) as $entry)
+                                        <span class="text-lg font-semibold text-gray-600 block leading-snug">{{ $entry->font_family }}</span>
+                                    @endforeach
+                                </div>
+                            @endif
+
+                            {{-- Moodboard Thumbnails --}}
+                            @if($moodboard && $moodboard->images->isNotEmpty())
+                                <div class="flex items-center gap-2 flex-shrink-0">
+                                    @foreach($moodboard->images->take(4) as $image)
+                                        @if($image->thumbnail_url)
+                                            <div class="w-12 h-12 rounded-xl overflow-hidden bg-gray-100">
+                                                <img src="{{ $image->thumbnail_url }}" alt="{{ $image->title }}" class="w-full h-full object-cover">
+                                            </div>
+                                        @endif
+                                    @endforeach
+                                </div>
+                            @endif
+
+                            {{-- Slogan --}}
+                            @if($ciBoard && ($ciBoard->slogan || $ciBoard->tagline))
+                                <p class="text-base text-gray-400 italic flex-shrink min-w-0 truncate max-w-xs">&ldquo;{{ Str::limit($ciBoard->slogan ?: $ciBoard->tagline, 50) }}&rdquo;</p>
+                            @endif
+                        </div>
+
+                        {{-- Footer --}}
+                        <div class="flex items-center justify-between mt-8">
+                            <div class="flex items-center gap-4 text-[12px] text-gray-300">
+                                <span>{{ $boardCount }} {{ $boardCount === 1 ? 'Board' : 'Boards' }}</span>
+                                <span>{{ $brand->updated_at->format('d. M Y') }}</span>
                             </div>
+                            <span class="text-sm text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                                Öffnen &rarr;
+                            </span>
+                        </div>
+                    </a>
+                @endforeach
+            </div>
+        @else
+            {{-- Empty State --}}
+            <div class="py-20 text-center">
+                <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gray-50 mb-6">
+                    @svg('heroicon-o-tag', 'w-10 h-10 text-gray-300')
+                </div>
+                <h3 class="text-2xl font-light text-gray-900 mb-2">Noch keine Marken</h3>
+                <p class="text-base text-gray-400 mb-8">Erstelle deine erste Marke, um loszulegen.</p>
+                <x-ui-button variant="primary" size="sm" wire:click="createBrand">
+                    @svg('heroicon-o-plus', 'w-4 h-4')
+                    <span>Neue Marke</span>
+                </x-ui-button>
+            </div>
+        @endif
+
+        {{-- Archivierte Marken --}}
+        @if($doneBrandsList->isNotEmpty())
+            <div class="border-t border-gray-100 pt-12 mt-4">
+                <span class="text-[11px] uppercase tracking-[0.2em] font-medium text-gray-300">Archiviert</span>
+                <div class="mt-4 space-y-0 divide-y divide-gray-50">
+                    @foreach($doneBrandsList as $brand)
+                        <a href="{{ route('brands.brands.show', $brand) }}" wire:navigate
+                           class="group flex items-center justify-between py-4 px-2 md:px-6 hover:bg-gray-50/50 transition-colors duration-300">
+                            <div class="min-w-0">
+                                <span class="text-lg text-gray-400 font-light">{{ $brand->name }}</span>
+                                @if($brand->description)
+                                    <span class="text-sm text-gray-300 ml-3 hidden md:inline">{{ Str::limit($brand->description, 60) }}</span>
+                                @endif
+                            </div>
+                            <span class="text-sm text-gray-300 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex-shrink-0">
+                                Öffnen &rarr;
+                            </span>
                         </a>
-                    @empty
-                        <div class="p-3 text-sm text-[var(--ui-muted)] bg-white rounded-md border border-[var(--ui-border)]">Keine Marken gefunden.</div>
-                    @endforelse
+                    @endforeach
                 </div>
-            </x-ui-panel>
+            </div>
+        @endif
+
     </x-ui-page-container>
-
-    <x-slot name="sidebar">
-        <x-ui-page-sidebar title="Schnellzugriff" width="w-80" :defaultOpen="true">
-            <div class="p-6 space-y-6">
-                {{-- Quick Stats --}}
-                <div>
-                    <h3 class="text-sm font-bold text-[var(--ui-secondary)] uppercase tracking-wider mb-3">Schnellstatistiken</h3>
-                    <div class="space-y-3">
-                        <div class="p-3 bg-[var(--ui-muted-5)] rounded-lg border border-[var(--ui-border)]/40">
-                            <div class="text-xs text-[var(--ui-muted)]">Aktive Marken</div>
-                            <div class="text-lg font-bold text-[var(--ui-secondary)]">{{ $activeBrands ?? 0 }} Marken</div>
-                        </div>
-                    </div>
-                </div>
-
-                {{-- Recent Activity (Dummy) --}}
-                <div>
-                    <h3 class="text-sm font-bold text-[var(--ui-secondary)] uppercase tracking-wider mb-3">Letzte Aktivitäten</h3>
-                    <div class="space-y-2 text-sm">
-                        <div class="p-2 rounded border border-[var(--ui-border)]/60 bg-[var(--ui-muted-5)]">
-                            <div class="font-medium text-[var(--ui-secondary)] truncate">Dashboard geladen</div>
-                            <div class="text-[var(--ui-muted)] text-xs">vor 1 Minute</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </x-ui-page-sidebar>
-    </x-slot>
-
-    <x-slot name="activity">
-        <x-ui-page-sidebar title="Aktivitäten" width="w-80" :defaultOpen="false" storeKey="activityOpen" side="right">
-            <div class="p-4 space-y-4">
-                <div class="text-sm text-[var(--ui-muted)]">Letzte Aktivitäten</div>
-                <div class="space-y-3 text-sm">
-                    <div class="p-2 rounded border border-[var(--ui-border)]/60 bg-[var(--ui-muted-5)]">
-                        <div class="font-medium text-[var(--ui-secondary)] truncate">Dashboard geladen</div>
-                        <div class="text-[var(--ui-muted)]">vor 1 Minute</div>
-                    </div>
-                </div>
-            </div>
-        </x-ui-page-sidebar>
-    </x-slot>
 </x-ui-page>
