@@ -116,7 +116,26 @@ class Sidebar extends Component
         }
         $linkedBrandIds = array_unique($linkedBrandIds);
 
-        // Gruppieren: EntityType → Entity → Brands
+        // Aufwärts-Traversierung: Ancestors ins Entity-Set aufnehmen
+        $directEntityIds = array_keys($entityBrandMap);
+        if (!empty($directEntityIds)) {
+            $directEntities = OrganizationEntity::with(['allParents.type'])
+                ->whereIn('id', $directEntityIds)
+                ->get()
+                ->keyBy('id');
+
+            foreach ($directEntities as $entityId => $entity) {
+                $ancestor = $entity->allParents;
+                while ($ancestor) {
+                    if (!isset($entityBrandMap[$ancestor->id])) {
+                        $entityBrandMap[$ancestor->id] = [];
+                    }
+                    $ancestor = $ancestor->allParents;
+                }
+            }
+        }
+
+        // Gruppieren: EntityType → Entity-Baum → Brands
         $entityTypeGroups = collect();
         $entityIds = array_keys($entityBrandMap);
 
@@ -126,12 +145,83 @@ class Sidebar extends Component
                 ->get()
                 ->keyBy('id');
 
+            $entityChildrenMap = [];
+            $rootEntityIds = [];
+
+            foreach ($entities as $entity) {
+                $parentId = $entity->parent_entity_id;
+                if ($parentId && $entities->has($parentId)) {
+                    $entityChildrenMap[$parentId][] = $entity->id;
+                } else {
+                    $rootEntityIds[] = $entity->id;
+                }
+            }
+
+            $buildTree = function (int $entityId) use (&$buildTree, $entities, $entityChildrenMap, $entityBrandMap, $brandsToShow): ?array {
+                $entity = $entities->get($entityId);
+                if (!$entity) {
+                    return null;
+                }
+
+                $childIds = $entityChildrenMap[$entityId] ?? [];
+                $childNodes = collect($childIds)
+                    ->map(fn ($childId) => $buildTree($childId))
+                    ->filter();
+
+                $childrenByType = $childNodes
+                    ->groupBy(fn ($child) => $child['type_id'])
+                    ->map(function ($group) use ($entities) {
+                        $firstChild = $group->first();
+                        $typeEntity = $entities->get($firstChild['entity_id']);
+                        $type = $typeEntity?->type;
+
+                        return [
+                            'type_id' => $firstChild['type_id'],
+                            'type_name' => $type?->name ?? 'Sonstige',
+                            'type_icon' => $type?->icon ?? null,
+                            'sort_order' => $type?->sort_order ?? 999,
+                            'children' => $group->sortBy('entity_name')->values(),
+                        ];
+                    })
+                    ->sortBy('sort_order')
+                    ->values();
+
+                $items = collect($entityBrandMap[$entityId] ?? [])
+                    ->map(fn ($bid) => $brandsToShow->firstWhere('id', $bid))
+                    ->filter()
+                    ->values();
+
+                $totalItems = $items->count();
+                foreach ($childNodes as $child) {
+                    $totalItems += $child['total_items'];
+                }
+
+                if ($totalItems === 0) {
+                    return null;
+                }
+
+                return [
+                    'entity_id' => $entityId,
+                    'entity_name' => $entity->name,
+                    'type_id' => $entity->type?->id,
+                    'items' => $items,
+                    'children_by_type' => $childrenByType,
+                    'total_items' => $totalItems,
+                ];
+            };
+
             $groupedByType = [];
-            foreach ($entityBrandMap as $entityId => $brandIdsList) {
+            foreach ($rootEntityIds as $entityId) {
                 $entity = $entities->get($entityId);
                 if (!$entity || !$entity->type) {
                     continue;
                 }
+
+                $tree = $buildTree($entityId);
+                if (!$tree) {
+                    continue;
+                }
+
                 $typeId = $entity->type->id;
                 if (!isset($groupedByType[$typeId])) {
                     $groupedByType[$typeId] = [
@@ -142,19 +232,7 @@ class Sidebar extends Component
                         'entities' => [],
                     ];
                 }
-                if (!isset($groupedByType[$typeId]['entities'][$entityId])) {
-                    $groupedByType[$typeId]['entities'][$entityId] = [
-                        'entity_id' => $entityId,
-                        'entity_name' => $entity->name,
-                        'brands' => collect(),
-                    ];
-                }
-                foreach ($brandIdsList as $bid) {
-                    $brand = $brandsToShow->firstWhere('id', $bid);
-                    if ($brand) {
-                        $groupedByType[$typeId]['entities'][$entityId]['brands']->push($brand);
-                    }
-                }
+                $groupedByType[$typeId]['entities'][] = $tree;
             }
 
             $entityTypeGroups = collect($groupedByType)

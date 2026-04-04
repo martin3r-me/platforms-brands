@@ -47,40 +47,14 @@
     {{-- Abschnitt: Marken (Entity-basierte Gruppierung) --}}
     <div>
         <div class="mt-2" x-show="!collapsed">
-            {{-- Entity Type Gruppen --}}
+            {{-- Entity Type Gruppen (Baum-Darstellung) --}}
             @foreach($entityTypeGroups as $typeGroup)
-                <x-ui-sidebar-list :label="$typeGroup['type_name']">
-                    @foreach($typeGroup['entities'] as $entityGroup)
-                        {{-- Entity mit aufklappbaren Marken --}}
-                        <div x-data="{ open: localStorage.getItem('brands.entity.' + {{ $entityGroup['entity_id'] }}) === 'true' }"
-                             class="flex flex-col">
-                            <button type="button"
-                                    @click="open = !open; localStorage.setItem('brands.entity.' + {{ $entityGroup['entity_id'] }}, open)"
-                                    class="flex items-center p-2 rounded-md text-[var(--ui-secondary)] hover:bg-[var(--ui-muted-5)] transition w-full text-left">
-                                <span class="w-4 h-4 flex-shrink-0 flex items-center justify-center transition-transform"
-                                      :class="open ? 'rotate-90' : ''">
-                                    @svg('heroicon-o-chevron-right', 'w-3 h-3')
-                                </span>
-                                @php $icon = $typeGroup['type_icon'] ?? null; @endphp
-                                @if($icon && str_starts_with($icon, 'heroicon-'))
-                                    @svg($icon, 'w-4 h-4 flex-shrink-0 ml-1 text-[var(--ui-muted)]')
-                                @else
-                                    @svg('heroicon-o-rectangle-group', 'w-4 h-4 flex-shrink-0 ml-1 text-[var(--ui-muted)]')
-                                @endif
-                                <span class="ml-1.5 text-sm font-medium truncate">{{ $entityGroup['entity_name'] }}</span>
-                                <span class="ml-auto text-xs text-[var(--ui-muted)]">{{ $entityGroup['brands']->count() }}</span>
-                            </button>
-                            <div x-show="open" x-collapse class="flex flex-col gap-0.5 pl-4">
-                                @foreach($entityGroup['brands'] as $brand)
-                                    <x-ui-sidebar-item :href="route('brands.brands.show', ['brandsBrand' => $brand])" :title="$brand->name">
-                                        @svg('heroicon-o-tag', 'w-5 h-5 flex-shrink-0 text-[var(--ui-secondary)]')
-                                        <div class="flex-1 min-w-0 ml-2">
-                                            <span class="truncate text-sm font-medium">{{ $brand->name }}</span>
-                                        </div>
-                                    </x-ui-sidebar-item>
-                                @endforeach
-                            </div>
-                        </div>
+                <x-ui-sidebar-list wire:key="type-group-{{ $typeGroup['type_id'] }}" :label="$typeGroup['type_name']">
+                    @foreach($typeGroup['entities'] as $entityNode)
+                        @include('brands::livewire.partials.sidebar-entity-node', [
+                            'node' => $entityNode,
+                            'typeIcon' => $typeGroup['type_icon'] ?? null,
+                        ])
                     @endforeach
                 </x-ui-sidebar-list>
             @endforeach
@@ -89,12 +63,14 @@
             @if($unlinkedBrands->isNotEmpty())
                 <x-ui-sidebar-list label="Unverknüpft">
                     @foreach($unlinkedBrands as $brand)
-                        <x-ui-sidebar-item :href="route('brands.brands.show', ['brandsBrand' => $brand])" :title="$brand->name">
-                            @svg('heroicon-o-tag', 'w-5 h-5 flex-shrink-0 text-[var(--ui-secondary)]')
-                            <div class="flex-1 min-w-0 ml-2">
-                                <span class="truncate text-sm font-medium">{{ $brand->name }}</span>
-                            </div>
-                        </x-ui-sidebar-item>
+                        <a wire:key="unlinked-brand-{{ $brand->id }}"
+                           href="{{ route('brands.brands.show', ['brandsBrand' => $brand]) }}"
+                           wire:navigate
+                           title="{{ $brand->name }}"
+                           class="flex items-center gap-1.5 py-0.5 pl-3 pr-2 text-[var(--ui-secondary)] hover:text-[var(--ui-primary)] transition truncate">
+                            <span class="w-1 h-1 rounded-full flex-shrink-0 bg-[var(--ui-muted)] opacity-40"></span>
+                            <span class="truncate text-[11px]">{{ $brand->name }}</span>
+                        </a>
                     @endforeach
                 </x-ui-sidebar-list>
             @endif
