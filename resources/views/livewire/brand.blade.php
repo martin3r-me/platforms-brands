@@ -204,238 +204,241 @@
                                     {{-- Preview Content --}}
                                     <div class="mt-8">
                                         @if($group['key'] === 'ci')
-                                            {{-- Farbpalette groß --}}
-                                            <div class="flex items-center">
+                                            {{-- Farbpalette --}}
+                                            <div class="flex items-center flex-wrap gap-3">
                                                 @if($board->primary_color)
-                                                    <div class="w-12 h-12 rounded-full border-[3px] border-white shadow-sm" style="background-color: {{ $board->primary_color }};"></div>
+                                                    <div class="w-16 h-16 md:w-20 md:h-20 rounded-full shadow-sm ring-4 ring-white" style="background-color: {{ $board->primary_color }};"></div>
                                                 @endif
                                                 @if($board->secondary_color)
-                                                    <div class="w-12 h-12 rounded-full border-[3px] border-white shadow-sm -ml-3" style="background-color: {{ $board->secondary_color }};"></div>
+                                                    <div class="w-16 h-16 md:w-20 md:h-20 rounded-full shadow-sm ring-4 ring-white -ml-4" style="background-color: {{ $board->secondary_color }};"></div>
                                                 @endif
                                                 @if($board->accent_color)
-                                                    <div class="w-12 h-12 rounded-full border-[3px] border-white shadow-sm -ml-3" style="background-color: {{ $board->accent_color }};"></div>
+                                                    <div class="w-16 h-16 md:w-20 md:h-20 rounded-full shadow-sm ring-4 ring-white -ml-4" style="background-color: {{ $board->accent_color }};"></div>
                                                 @endif
-                                                @foreach($board->colors->take(4) as $color)
-                                                    <div class="w-12 h-12 rounded-full border-[3px] border-white shadow-sm -ml-3" style="background-color: {{ $color->color }};"></div>
+                                                @foreach($board->colors->take(5) as $color)
+                                                    <div class="w-16 h-16 md:w-20 md:h-20 rounded-full shadow-sm ring-4 ring-white -ml-4" style="background-color: {{ $color->color }};"></div>
                                                 @endforeach
                                             </div>
-                                            <div class="mt-4 space-y-1.5">
+                                            <div class="mt-5 space-y-2">
                                                 @if($board->slogan)
-                                                    <p class="text-lg text-gray-500 italic">&ldquo;{{ Str::limit($board->slogan, 80) }}&rdquo;</p>
+                                                    <p class="text-xl md:text-2xl text-gray-500 italic font-light">&ldquo;{{ Str::limit($board->slogan, 120) }}&rdquo;</p>
                                                 @elseif($board->tagline)
-                                                    <p class="text-lg text-gray-500 italic">&ldquo;{{ Str::limit($board->tagline, 80) }}&rdquo;</p>
+                                                    <p class="text-xl md:text-2xl text-gray-500 italic font-light">&ldquo;{{ Str::limit($board->tagline, 120) }}&rdquo;</p>
                                                 @endif
                                                 @if($board->font_family)
-                                                    <p class="text-sm text-gray-400">Schrift: {{ $board->font_family }}</p>
+                                                    <p class="text-base text-gray-400">Schrift: {{ $board->font_family }}</p>
                                                 @endif
                                             </div>
 
                                         @elseif($group['key'] === 'social' || $group['key'] === 'kanban')
-                                            {{-- Slots mit Card-Counts --}}
-                                            <div class="flex flex-wrap gap-2.5">
-                                                @forelse($board->slots->take(5) as $slot)
-                                                    <span class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-gray-50 text-[13px] text-gray-600">
-                                                        {{ Str::limit($slot->name, 18) }}
-                                                        <span class="text-gray-400">{{ $slot->cards_count }}</span>
+                                            {{-- Slots als große Chips --}}
+                                            <div class="flex flex-wrap gap-3">
+                                                @forelse($board->slots->take(6) as $slot)
+                                                    <span class="inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full bg-gray-50 text-[15px] text-gray-600">
+                                                        {{ Str::limit($slot->name, 22) }}
+                                                        <span class="text-gray-400 text-sm">{{ $slot->cards_count }}</span>
                                                     </span>
                                                 @empty
-                                                    <span class="text-sm text-gray-300">Keine Spalten</span>
+                                                    <span class="text-base text-gray-300">Keine Spalten</span>
                                                 @endforelse
-                                                @if($board->slots->count() > 5)
-                                                    <span class="self-center text-sm text-gray-300">+{{ $board->slots->count() - 5 }}</span>
+                                                @if($board->slots->count() > 6)
+                                                    <span class="self-center text-base text-gray-300">+{{ $board->slots->count() - 6 }}</span>
                                                 @endif
                                             </div>
 
                                         @elseif($group['key'] === 'typography')
-                                            {{-- Font-Namen als große Textbeispiele --}}
-                                            <div class="space-y-3">
+                                            {{-- Schriften als echte Textbeispiele --}}
+                                            <div class="space-y-5">
                                                 @forelse($board->entries->take(3) as $entry)
-                                                    <div class="flex items-baseline gap-3">
-                                                        <span class="text-xl font-semibold text-gray-700">{{ $entry->font_family }}</span>
-                                                        <span class="text-sm text-gray-300">·</span>
-                                                        @if($entry->role)
-                                                            <span class="text-sm text-gray-400">{{ $entry->role }}</span>
-                                                        @endif
-                                                        @if($entry->font_weight)
-                                                            <span class="text-sm text-gray-300">· {{ $entry->font_weight }}</span>
-                                                        @endif
+                                                    <div>
+                                                        <span class="text-2xl md:text-3xl font-semibold text-gray-700 block">{{ $entry->font_family }}</span>
+                                                        <div class="flex items-center gap-2 mt-1">
+                                                            @if($entry->role)
+                                                                <span class="text-base text-gray-400">{{ $entry->role }}</span>
+                                                            @endif
+                                                            @if($entry->font_weight)
+                                                                <span class="text-base text-gray-300">· {{ $entry->font_weight }}</span>
+                                                            @endif
+                                                        </div>
                                                     </div>
                                                 @empty
-                                                    <span class="text-sm text-gray-300">Keine Schriften</span>
+                                                    <span class="text-base text-gray-300">Keine Schriften</span>
                                                 @endforelse
                                             </div>
 
                                         @elseif($group['key'] === 'logo')
-                                            {{-- Logo-Varianten mit mehr Abstand --}}
-                                            <div class="space-y-2.5">
-                                                @forelse($board->variants->take(4) as $variant)
-                                                    <div class="flex items-center gap-3">
-                                                        <span class="text-[15px] text-gray-600">{{ $variant->name }}</span>
+                                            {{-- Logo-Varianten --}}
+                                            <div class="space-y-3">
+                                                @forelse($board->variants->take(5) as $variant)
+                                                    <div class="flex items-baseline gap-4">
+                                                        <span class="text-lg text-gray-600">{{ $variant->name }}</span>
                                                         @if($variant->type)
-                                                            <span class="text-sm text-gray-300">{{ $variant->type }}</span>
+                                                            <span class="text-base text-gray-300">{{ $variant->type }}</span>
                                                         @endif
                                                     </div>
                                                 @empty
-                                                    <span class="text-sm text-gray-300">Keine Varianten</span>
+                                                    <span class="text-base text-gray-300">Keine Varianten</span>
                                                 @endforelse
-                                                @if($board->variants_count > 4)
-                                                    <span class="text-sm text-gray-300">+{{ $board->variants_count - 4 }} weitere</span>
+                                                @if($board->variants_count > 5)
+                                                    <span class="text-base text-gray-300 mt-2 block">+{{ $board->variants_count - 5 }} weitere</span>
                                                 @endif
                                             </div>
 
                                         @elseif($group['key'] === 'tone-of-voice')
-                                            {{-- Dimensionen als breitere Skalen --}}
+                                            {{-- Dimensionen volle Breite --}}
                                             @if($board->dimensions->isNotEmpty())
-                                                <div class="space-y-4 max-w-lg">
-                                                    @foreach($board->dimensions->take(3) as $dim)
+                                                <div class="space-y-5 max-w-2xl">
+                                                    @foreach($board->dimensions->take(4) as $dim)
                                                         <div>
-                                                            <div class="flex items-center justify-between mb-1">
-                                                                <span class="text-sm text-gray-400">{{ $dim->label_left }}</span>
-                                                                <span class="text-sm text-gray-400">{{ $dim->label_right }}</span>
+                                                            <div class="flex items-center justify-between mb-1.5">
+                                                                <span class="text-base text-gray-500">{{ $dim->label_left }}</span>
+                                                                <span class="text-base text-gray-500">{{ $dim->label_right }}</span>
                                                             </div>
-                                                            <div class="h-1.5 bg-gray-100 rounded-full relative">
-                                                                <div class="absolute top-1/2 -translate-y-1/2 w-3 h-3 bg-gray-400 rounded-full shadow-sm" style="left: {{ ($dim->value ?? 50) }}%;"></div>
+                                                            <div class="h-2 bg-gray-100 rounded-full relative">
+                                                                <div class="absolute top-1/2 -translate-y-1/2 w-4 h-4 bg-gray-500 rounded-full shadow-sm" style="left: {{ ($dim->value ?? 50) }}%;"></div>
                                                             </div>
                                                         </div>
                                                     @endforeach
                                                 </div>
                                             @elseif($board->entries->isNotEmpty())
-                                                <div class="flex flex-wrap gap-2.5">
-                                                    @foreach($board->entries->take(4) as $entry)
-                                                        <span class="px-3.5 py-1.5 rounded-full bg-gray-50 text-[13px] text-gray-600">{{ Str::limit($entry->name, 22) }}</span>
+                                                <div class="flex flex-wrap gap-3">
+                                                    @foreach($board->entries->take(5) as $entry)
+                                                        <span class="px-5 py-2.5 rounded-full bg-gray-50 text-[15px] text-gray-600">{{ Str::limit($entry->name, 26) }}</span>
                                                     @endforeach
                                                 </div>
                                             @else
-                                                <span class="text-sm text-gray-300">Keine Einträge</span>
+                                                <span class="text-base text-gray-300">Keine Einträge</span>
                                             @endif
 
                                         @elseif($group['key'] === 'persona')
-                                            {{-- Personas prominenter --}}
-                                            <div class="space-y-2.5">
+                                            {{-- Personas groß --}}
+                                            <div class="space-y-4">
                                                 @forelse($board->personas->take(3) as $persona)
-                                                    <div class="flex items-baseline gap-3">
-                                                        <span class="text-[17px] text-gray-700 font-medium">{{ $persona->name }}</span>
-                                                        @if($persona->occupation)
-                                                            <span class="text-sm text-gray-400">{{ Str::limit($persona->occupation, 25) }}</span>
-                                                        @endif
-                                                        @if($persona->age)
-                                                            <span class="text-sm text-gray-300">{{ $persona->age }} J.</span>
-                                                        @endif
+                                                    <div>
+                                                        <span class="text-xl text-gray-700 font-medium block">{{ $persona->name }}</span>
+                                                        <div class="flex items-center gap-2 mt-0.5">
+                                                            @if($persona->occupation)
+                                                                <span class="text-base text-gray-400">{{ Str::limit($persona->occupation, 35) }}</span>
+                                                            @endif
+                                                            @if($persona->age)
+                                                                <span class="text-base text-gray-300">· {{ $persona->age }} Jahre</span>
+                                                            @endif
+                                                        </div>
                                                     </div>
                                                 @empty
-                                                    <span class="text-sm text-gray-300">Keine Personas</span>
+                                                    <span class="text-base text-gray-300">Keine Personas</span>
                                                 @endforelse
                                                 @if($entryCount > 3)
-                                                    <span class="text-sm text-gray-300">+{{ $entryCount - 3 }} weitere</span>
+                                                    <span class="text-base text-gray-300">+{{ $entryCount - 3 }} weitere</span>
                                                 @endif
                                             </div>
 
                                         @elseif($group['key'] === 'competitor')
                                             {{-- Wettbewerber --}}
-                                            <div class="space-y-2.5">
-                                                @forelse($board->competitors->take(3) as $competitor)
-                                                    <div class="flex items-center gap-3">
-                                                        <span class="text-[15px] text-gray-700 font-medium">{{ $competitor->name }}</span>
+                                            <div class="space-y-3">
+                                                @forelse($board->competitors->take(4) as $competitor)
+                                                    <div class="flex items-baseline gap-4">
+                                                        <span class="text-lg text-gray-700 font-medium">{{ $competitor->name }}</span>
                                                         @if($competitor->website_url)
-                                                            <span class="text-sm text-gray-300 truncate max-w-[200px]">{{ parse_url($competitor->website_url, PHP_URL_HOST) }}</span>
+                                                            <span class="text-base text-gray-300 truncate max-w-xs">{{ parse_url($competitor->website_url, PHP_URL_HOST) }}</span>
                                                         @endif
                                                     </div>
                                                 @empty
-                                                    <span class="text-sm text-gray-300">Keine Wettbewerber</span>
+                                                    <span class="text-base text-gray-300">Keine Wettbewerber</span>
                                                 @endforelse
-                                                @if($entryCount > 3)
-                                                    <span class="text-sm text-gray-300">+{{ $entryCount - 3 }} weitere</span>
+                                                @if($entryCount > 4)
+                                                    <span class="text-base text-gray-300">+{{ $entryCount - 4 }} weitere</span>
                                                 @endif
                                             </div>
 
                                         @elseif($group['key'] === 'guideline')
                                             {{-- Kapitel --}}
-                                            <div class="space-y-2">
-                                                @forelse($board->chapters->take(3) as $chapter)
-                                                    <div class="text-[15px] text-gray-500">{{ Str::limit($chapter->title, 50) }}</div>
+                                            <div class="space-y-3">
+                                                @forelse($board->chapters->take(4) as $chapter)
+                                                    <div class="text-lg text-gray-500">{{ Str::limit($chapter->title, 70) }}</div>
                                                 @empty
-                                                    <span class="text-sm text-gray-300">Keine Kapitel</span>
+                                                    <span class="text-base text-gray-300">Keine Kapitel</span>
                                                 @endforelse
                                             </div>
 
                                         @elseif($group['key'] === 'moodboard')
-                                            {{-- Thumbnails größer --}}
-                                            <div class="flex items-center gap-2.5">
-                                                @forelse($board->images->take(5) as $image)
+                                            {{-- Bild-Galerie --}}
+                                            <div class="flex items-center gap-3 flex-wrap">
+                                                @forelse($board->images->take(6) as $image)
                                                     @if($image->thumbnail_url)
-                                                        <div class="w-16 h-16 rounded-2xl overflow-hidden bg-gray-100">
+                                                        <div class="w-24 h-24 md:w-32 md:h-32 rounded-2xl overflow-hidden bg-gray-100">
                                                             <img src="{{ $image->thumbnail_url }}" alt="{{ $image->title }}" class="w-full h-full object-cover">
                                                         </div>
                                                     @else
-                                                        <div class="w-16 h-16 rounded-2xl bg-gray-50 flex items-center justify-center">
-                                                            @svg('heroicon-o-photo', 'w-5 h-5 text-gray-300')
+                                                        <div class="w-24 h-24 md:w-32 md:h-32 rounded-2xl bg-gray-50 flex items-center justify-center">
+                                                            @svg('heroicon-o-photo', 'w-8 h-8 text-gray-300')
                                                         </div>
                                                     @endif
                                                 @empty
-                                                    <span class="text-sm text-gray-300">Keine Bilder</span>
+                                                    <span class="text-base text-gray-300">Keine Bilder</span>
                                                 @endforelse
-                                                @if($entryCount > 5)
-                                                    <span class="text-sm text-gray-300 ml-1">+{{ $entryCount - 5 }}</span>
+                                                @if($entryCount > 6)
+                                                    <span class="text-base text-gray-300 ml-2">+{{ $entryCount - 6 }}</span>
                                                 @endif
                                             </div>
 
                                         @elseif($group['key'] === 'asset')
                                             {{-- Assets --}}
-                                            <div class="space-y-2.5">
-                                                @forelse($board->assets->take(3) as $asset)
-                                                    <div class="flex items-center gap-3">
-                                                        <span class="text-[15px] text-gray-600">{{ Str::limit($asset->name, 30) }}</span>
+                                            <div class="space-y-3">
+                                                @forelse($board->assets->take(4) as $asset)
+                                                    <div class="flex items-baseline gap-4">
+                                                        <span class="text-lg text-gray-600">{{ Str::limit($asset->name, 40) }}</span>
                                                         @if($asset->asset_type)
-                                                            <span class="text-sm text-gray-300 uppercase">{{ $asset->asset_type }}</span>
+                                                            <span class="text-base text-gray-300 uppercase tracking-wide">{{ $asset->asset_type }}</span>
                                                         @endif
                                                     </div>
                                                 @empty
-                                                    <span class="text-sm text-gray-300">Keine Assets</span>
+                                                    <span class="text-base text-gray-300">Keine Assets</span>
                                                 @endforelse
-                                                @if($board->assets_count > 3)
-                                                    <span class="text-sm text-gray-300">+{{ $board->assets_count - 3 }} weitere</span>
+                                                @if($board->assets_count > 4)
+                                                    <span class="text-base text-gray-300">+{{ $board->assets_count - 4 }} weitere</span>
                                                 @endif
                                             </div>
 
                                         @elseif($group['key'] === 'seo')
-                                            {{-- Keywords mit mehr Luft --}}
-                                            <div class="flex flex-wrap gap-2.5">
-                                                @forelse($board->keywords->take(5) as $keyword)
-                                                    <span class="px-3.5 py-1.5 rounded-full bg-gray-50 text-[13px] text-gray-600">
-                                                        {{ Str::limit($keyword->keyword, 24) }}
+                                            {{-- Keywords groß --}}
+                                            <div class="flex flex-wrap gap-3">
+                                                @forelse($board->keywords->take(6) as $keyword)
+                                                    <span class="px-5 py-2.5 rounded-full bg-gray-50 text-[15px] text-gray-600">
+                                                        {{ Str::limit($keyword->keyword, 28) }}
                                                         @if($keyword->search_volume)
-                                                            <span class="text-gray-300 ml-1.5">{{ number_format($keyword->search_volume) }}</span>
+                                                            <span class="text-gray-300 ml-2">{{ number_format($keyword->search_volume) }}</span>
                                                         @endif
                                                     </span>
                                                 @empty
-                                                    <span class="text-sm text-gray-300">Keine Keywords</span>
+                                                    <span class="text-base text-gray-300">Keine Keywords</span>
                                                 @endforelse
-                                                @if($board->keywords_count > 5)
-                                                    <span class="self-center text-sm text-gray-300">+{{ $board->keywords_count - 5 }}</span>
+                                                @if($board->keywords_count > 6)
+                                                    <span class="self-center text-base text-gray-300">+{{ $board->keywords_count - 6 }}</span>
                                                 @endif
                                             </div>
                                             @if($board->keywordClusters->isNotEmpty())
-                                                <p class="text-sm text-gray-400 mt-3">{{ $board->keywordClusters->count() }} Cluster</p>
+                                                <p class="text-base text-gray-400 mt-4">{{ $board->keywordClusters->count() }} Cluster</p>
                                             @endif
 
                                         @elseif($group['key'] === 'content-brief')
                                             {{-- Content Brief --}}
-                                            <div class="space-y-1.5">
+                                            <div class="space-y-2">
                                                 @if($board->content_type || $board->search_intent)
-                                                    <div class="flex items-center gap-3">
+                                                    <div class="flex items-center gap-4">
                                                         @if($board->content_type)
-                                                            <span class="text-sm text-gray-500">{{ $board->content_type }}</span>
+                                                            <span class="text-lg text-gray-500">{{ $board->content_type }}</span>
                                                         @endif
                                                         @if($board->search_intent)
-                                                            <span class="text-sm text-gray-300">{{ $board->search_intent }}</span>
+                                                            <span class="text-base text-gray-300">{{ $board->search_intent }}</span>
                                                         @endif
                                                     </div>
                                                 @endif
                                                 @if($board->target_url)
-                                                    <p class="text-sm text-gray-400 truncate max-w-md">{{ $board->target_url }}</p>
+                                                    <p class="text-base text-gray-400 truncate">{{ $board->target_url }}</p>
                                                 @endif
                                                 @if($board->target_word_count)
-                                                    <p class="text-sm text-gray-400">Ziel: {{ number_format($board->target_word_count) }} Wörter</p>
+                                                    <p class="text-base text-gray-400">Ziel: {{ number_format($board->target_word_count) }} Wörter</p>
                                                 @endif
                                             </div>
                                         @endif
