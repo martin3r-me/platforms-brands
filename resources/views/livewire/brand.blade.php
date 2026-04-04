@@ -417,15 +417,44 @@
                                             @endif
 
                                         @elseif($group['key'] === 'guideline')
-                                            {{-- Kapitel als nummerierte Liste --}}
-                                            <div class="space-y-4">
+                                            {{-- Kapitel als Karten mit Regeln --}}
+                                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                                                 @forelse($board->chapters->take(6) as $index => $chapter)
-                                                    <div class="flex items-baseline gap-4">
-                                                        <span class="text-2xl font-light text-gray-300">{{ str_pad($index + 1, 2, '0', STR_PAD_LEFT) }}</span>
-                                                        <span class="text-lg text-gray-600">{{ Str::limit($chapter->title, 80) }}</span>
+                                                    <div class="bg-gray-50/80 rounded-2xl px-6 py-6">
+                                                        <div class="flex items-start gap-3">
+                                                            <span class="text-2xl font-light text-gray-300 leading-none">{{ str_pad($index + 1, 2, '0', STR_PAD_LEFT) }}</span>
+                                                            <div class="min-w-0">
+                                                                <span class="text-lg text-gray-800 font-semibold block">{{ $chapter->title }}</span>
+                                                                @if($chapter->description)
+                                                                    <p class="text-sm text-gray-500 mt-1 line-clamp-2 leading-relaxed">{{ $chapter->description }}</p>
+                                                                @endif
+                                                            </div>
+                                                        </div>
+                                                        @if($chapter->entries->isNotEmpty())
+                                                            <div class="mt-4 pt-3 border-t border-gray-200/60 space-y-2">
+                                                                @foreach($chapter->entries->take(3) as $entry)
+                                                                    <div>
+                                                                        <span class="text-sm text-gray-600 font-medium">{{ Str::limit($entry->title, 40) }}</span>
+                                                                        @if($entry->do_example || $entry->dont_example)
+                                                                            <div class="flex gap-3 mt-1">
+                                                                                @if($entry->do_example)
+                                                                                    <span class="text-[11px] text-emerald-600">Do: {{ Str::limit($entry->do_example, 30) }}</span>
+                                                                                @endif
+                                                                                @if($entry->dont_example)
+                                                                                    <span class="text-[11px] text-red-400">Don't: {{ Str::limit($entry->dont_example, 30) }}</span>
+                                                                                @endif
+                                                                            </div>
+                                                                        @endif
+                                                                    </div>
+                                                                @endforeach
+                                                            </div>
+                                                            @if($chapter->entries_count > 3)
+                                                                <p class="text-[11px] text-gray-300 mt-2">+{{ $chapter->entries_count - 3 }} weitere Regeln</p>
+                                                            @endif
+                                                        @endif
                                                     </div>
                                                 @empty
-                                                    <span class="text-base text-gray-300">Keine Kapitel</span>
+                                                    <span class="text-base text-gray-300 col-span-3">Keine Kapitel</span>
                                                 @endforelse
                                             </div>
 

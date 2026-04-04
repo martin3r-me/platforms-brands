@@ -550,7 +550,7 @@ class Brand extends Component
         $toneOfVoiceBoards = $this->brand->toneOfVoiceBoards()->with(['entries' => fn($q) => $q->limit(6), 'dimensions' => fn($q) => $q->limit(6)])->withCount('entries')->get();
         $personaBoards = $this->brand->personaBoards()->with(['personas' => fn($q) => $q->limit(6)])->get();
         $competitorBoards = $this->brand->competitorBoards()->with(['competitors' => fn($q) => $q->limit(6)])->get();
-        $guidelineBoards = $this->brand->guidelineBoards()->with(['chapters' => fn($q) => $q->limit(6)])->get();
+        $guidelineBoards = $this->brand->guidelineBoards()->with(['chapters' => fn($q) => $q->with(['entries' => fn($e) => $e->limit(3)])->withCount('entries')->limit(6)])->get();
         $moodboardBoards = $this->brand->moodboardBoards()->with(['images' => fn($q) => $q->limit(12)])->get();
         $assetBoards = $this->brand->assetBoards()->with(['assets' => fn($q) => $q->limit(6)])->withCount('assets')->get();
         $seoBoards = $this->brand->seoBoards()->with(['keywords' => fn($q) => $q->limit(12), 'keywordClusters' => fn($q) => $q->limit(5)])->withCount('keywords')->get();
