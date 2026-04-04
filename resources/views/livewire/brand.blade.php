@@ -417,44 +417,59 @@
                                             @endif
 
                                         @elseif($group['key'] === 'guideline')
-                                            {{-- Kapitel als Karten mit Regeln --}}
-                                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                                                @forelse($board->chapters->take(6) as $index => $chapter)
-                                                    <div class="bg-gray-50/80 rounded-2xl px-6 py-6">
-                                                        <div class="flex items-start gap-3">
-                                                            <span class="text-2xl font-light text-gray-300 leading-none">{{ str_pad($index + 1, 2, '0', STR_PAD_LEFT) }}</span>
-                                                            <div class="min-w-0">
-                                                                <span class="text-lg text-gray-800 font-semibold block">{{ $chapter->title }}</span>
+                                            {{-- Kapitel als ausführliche Sektionen --}}
+                                            <div class="space-y-8">
+                                                @forelse($board->chapters->take(8) as $index => $chapter)
+                                                    <div>
+                                                        {{-- Kapitel-Header --}}
+                                                        <div class="flex items-baseline gap-4 mb-4">
+                                                            <span class="text-3xl font-light text-gray-200 leading-none">{{ str_pad($index + 1, 2, '0', STR_PAD_LEFT) }}</span>
+                                                            <div>
+                                                                <span class="text-xl text-gray-800 font-semibold block">{{ $chapter->title }}</span>
                                                                 @if($chapter->description)
-                                                                    <p class="text-sm text-gray-500 mt-1 line-clamp-2 leading-relaxed">{{ $chapter->description }}</p>
+                                                                    <p class="text-base text-gray-500 mt-1 leading-relaxed max-w-2xl">{{ $chapter->description }}</p>
                                                                 @endif
                                                             </div>
                                                         </div>
+
+                                                        {{-- Regeln als Karten --}}
                                                         @if($chapter->entries->isNotEmpty())
-                                                            <div class="mt-4 pt-3 border-t border-gray-200/60 space-y-2">
-                                                                @foreach($chapter->entries->take(3) as $entry)
-                                                                    <div>
-                                                                        <span class="text-sm text-gray-600 font-medium">{{ Str::limit($entry->title, 40) }}</span>
+                                                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 ml-12">
+                                                                @foreach($chapter->entries->take(4) as $entry)
+                                                                    <div class="bg-gray-50/80 rounded-xl px-5 py-4">
+                                                                        <span class="text-[15px] text-gray-700 font-medium block">{{ $entry->title }}</span>
+                                                                        @if($entry->rule_text)
+                                                                            <p class="text-sm text-gray-500 mt-1.5 leading-relaxed line-clamp-2">{{ $entry->rule_text }}</p>
+                                                                        @endif
+                                                                        @if($entry->rationale)
+                                                                            <p class="text-xs text-gray-400 italic mt-1.5 line-clamp-1">{{ $entry->rationale }}</p>
+                                                                        @endif
                                                                         @if($entry->do_example || $entry->dont_example)
-                                                                            <div class="flex gap-3 mt-1">
+                                                                            <div class="flex flex-col gap-1 mt-3 pt-3 border-t border-gray-200/60">
                                                                                 @if($entry->do_example)
-                                                                                    <span class="text-[11px] text-emerald-600">Do: {{ Str::limit($entry->do_example, 30) }}</span>
+                                                                                    <div class="flex items-start gap-2">
+                                                                                        <span class="text-emerald-500 text-xs font-bold mt-px flex-shrink-0">DO</span>
+                                                                                        <span class="text-xs text-gray-600 leading-snug">{{ Str::limit($entry->do_example, 60) }}</span>
+                                                                                    </div>
                                                                                 @endif
                                                                                 @if($entry->dont_example)
-                                                                                    <span class="text-[11px] text-red-400">Don't: {{ Str::limit($entry->dont_example, 30) }}</span>
+                                                                                    <div class="flex items-start gap-2">
+                                                                                        <span class="text-red-400 text-xs font-bold mt-px flex-shrink-0">DON'T</span>
+                                                                                        <span class="text-xs text-gray-600 leading-snug">{{ Str::limit($entry->dont_example, 60) }}</span>
+                                                                                    </div>
                                                                                 @endif
                                                                             </div>
                                                                         @endif
                                                                     </div>
                                                                 @endforeach
                                                             </div>
-                                                            @if($chapter->entries_count > 3)
-                                                                <p class="text-[11px] text-gray-300 mt-2">+{{ $chapter->entries_count - 3 }} weitere Regeln</p>
+                                                            @if($chapter->entries_count > 4)
+                                                                <p class="text-xs text-gray-300 mt-2 ml-12">+{{ $chapter->entries_count - 4 }} weitere Regeln</p>
                                                             @endif
                                                         @endif
                                                     </div>
                                                 @empty
-                                                    <span class="text-base text-gray-300 col-span-3">Keine Kapitel</span>
+                                                    <span class="text-base text-gray-300">Keine Kapitel</span>
                                                 @endforelse
                                             </div>
 
