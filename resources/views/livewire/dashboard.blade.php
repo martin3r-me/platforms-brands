@@ -32,14 +32,13 @@
             </div>
         </div>
 
-        {{-- Brand Cards --}}
+        {{-- Brand Cards als 3er Grid --}}
         @if($activeBrandsList->isNotEmpty())
-            <div class="space-y-0 divide-y divide-gray-100">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                 @foreach($activeBrandsList as $brand)
                     @php
                         $ciBoard = $brand->ciBoards->first();
                         $moodboard = $brand->moodboardBoards->first();
-                        $personaBoard = $brand->personaBoards->first();
                         $typographyBoard = $brand->typographyBoards->first();
                         $boardCount = $brand->ciBoards->count() + $brand->socialBoards->count() + $brand->kanbanBoards->count()
                             + $brand->typographyBoards->count() + $brand->logoBoards->count() + $brand->toneOfVoiceBoards->count()
@@ -48,71 +47,89 @@
                             + $brand->contentBriefBoards->count();
                     @endphp
                     <a href="{{ route('brands.brands.show', $brand) }}" wire:navigate
-                       class="group relative block py-10 md:py-14 px-2 md:px-6 hover:bg-gray-50/50 transition-colors duration-300">
+                       class="group relative flex flex-col bg-white rounded-2xl border border-gray-100 hover:border-gray-200 hover:shadow-lg transition-all duration-300 overflow-hidden">
 
-                        {{-- Brand Name --}}
-                        <h2 class="text-3xl md:text-4xl font-light tracking-tight text-gray-900">{{ $brand->name }}</h2>
-
-                        @if($brand->description)
-                            <p class="text-base text-gray-400 leading-relaxed max-w-3xl mt-2">{{ Str::limit($brand->description, 200) }}</p>
+                        {{-- Color Bar aus CI --}}
+                        @if($ciBoard && $ciBoard->primary_color)
+                            <div class="h-1.5 flex">
+                                <div class="flex-1" style="background-color: {{ $ciBoard->primary_color }};"></div>
+                                @if($ciBoard->secondary_color)
+                                    <div class="flex-1" style="background-color: {{ $ciBoard->secondary_color }};"></div>
+                                @endif
+                                @if($ciBoard->accent_color)
+                                    <div class="flex-1" style="background-color: {{ $ciBoard->accent_color }};"></div>
+                                @endif
+                            </div>
+                        @else
+                            <div class="h-1.5 bg-gray-100"></div>
                         @endif
 
-                        {{-- Preview Row --}}
-                        <div class="mt-8 flex flex-wrap items-start gap-8">
+                        <div class="flex-1 p-6">
+                            {{-- Brand Name --}}
+                            <h2 class="text-xl font-semibold tracking-tight text-gray-900">{{ $brand->name }}</h2>
 
-                            {{-- CI-Farben --}}
-                            @if($ciBoard)
-                                <div class="flex items-center flex-shrink-0">
-                                    @if($ciBoard->primary_color)
-                                        <div class="w-10 h-10 rounded-full ring-2 ring-white shadow-sm" style="background-color: {{ $ciBoard->primary_color }};"></div>
-                                    @endif
-                                    @if($ciBoard->secondary_color)
-                                        <div class="w-10 h-10 rounded-full ring-2 ring-white shadow-sm -ml-2" style="background-color: {{ $ciBoard->secondary_color }};"></div>
-                                    @endif
-                                    @if($ciBoard->accent_color)
-                                        <div class="w-10 h-10 rounded-full ring-2 ring-white shadow-sm -ml-2" style="background-color: {{ $ciBoard->accent_color }};"></div>
-                                    @endif
-                                    @foreach($ciBoard->colors->take(3) as $color)
-                                        <div class="w-10 h-10 rounded-full ring-2 ring-white shadow-sm -ml-2" style="background-color: {{ $color->color }};"></div>
-                                    @endforeach
-                                </div>
-                            @endif
-
-                            {{-- Typografie --}}
-                            @if($typographyBoard && $typographyBoard->entries->isNotEmpty())
-                                <div class="flex-shrink-0">
-                                    @foreach($typographyBoard->entries->take(2) as $entry)
-                                        <span class="text-lg font-semibold text-gray-600 block leading-snug">{{ $entry->font_family }}</span>
-                                    @endforeach
-                                </div>
-                            @endif
-
-                            {{-- Moodboard Thumbnails --}}
-                            @if($moodboard && $moodboard->images->isNotEmpty())
-                                <div class="flex items-center gap-2 flex-shrink-0">
-                                    @foreach($moodboard->images->take(4) as $image)
-                                        @if($image->thumbnail_url)
-                                            <div class="w-12 h-12 rounded-xl overflow-hidden bg-gray-100">
-                                                <img src="{{ $image->thumbnail_url }}" alt="{{ $image->title }}" class="w-full h-full object-cover">
-                                            </div>
-                                        @endif
-                                    @endforeach
-                                </div>
+                            @if($brand->description)
+                                <p class="text-sm text-gray-400 leading-relaxed mt-1.5 line-clamp-2">{{ $brand->description }}</p>
                             @endif
 
                             {{-- Slogan --}}
                             @if($ciBoard && ($ciBoard->slogan || $ciBoard->tagline))
-                                <p class="text-base text-gray-400 italic flex-shrink min-w-0 truncate max-w-xs">&ldquo;{{ Str::limit($ciBoard->slogan ?: $ciBoard->tagline, 50) }}&rdquo;</p>
+                                <p class="text-sm text-gray-500 italic mt-3">&ldquo;{{ Str::limit($ciBoard->slogan ?: $ciBoard->tagline, 60) }}&rdquo;</p>
                             @endif
+
+                            {{-- Preview Elements --}}
+                            <div class="mt-5 space-y-4">
+
+                                {{-- Moodboard Thumbnails --}}
+                                @if($moodboard && $moodboard->images->isNotEmpty())
+                                    <div class="flex items-center gap-2">
+                                        @foreach($moodboard->images->take(4) as $image)
+                                            @if($image->thumbnail_url)
+                                                <div class="w-14 h-14 rounded-xl overflow-hidden bg-gray-100">
+                                                    <img src="{{ $image->thumbnail_url }}" alt="{{ $image->title }}" class="w-full h-full object-cover">
+                                                </div>
+                                            @endif
+                                        @endforeach
+                                    </div>
+                                @endif
+
+                                {{-- CI-Farben + Typografie nebeneinander --}}
+                                <div class="flex items-center gap-5">
+                                    @if($ciBoard)
+                                        <div class="flex items-center">
+                                            @if($ciBoard->primary_color)
+                                                <div class="w-8 h-8 rounded-full ring-2 ring-white shadow-sm" style="background-color: {{ $ciBoard->primary_color }};"></div>
+                                            @endif
+                                            @if($ciBoard->secondary_color)
+                                                <div class="w-8 h-8 rounded-full ring-2 ring-white shadow-sm -ml-2" style="background-color: {{ $ciBoard->secondary_color }};"></div>
+                                            @endif
+                                            @if($ciBoard->accent_color)
+                                                <div class="w-8 h-8 rounded-full ring-2 ring-white shadow-sm -ml-2" style="background-color: {{ $ciBoard->accent_color }};"></div>
+                                            @endif
+                                            @foreach($ciBoard->colors->take(2) as $color)
+                                                <div class="w-8 h-8 rounded-full ring-2 ring-white shadow-sm -ml-2" style="background-color: {{ $color->color }};"></div>
+                                            @endforeach
+                                        </div>
+                                    @endif
+
+                                    @if($typographyBoard && $typographyBoard->entries->isNotEmpty())
+                                        <div class="min-w-0">
+                                            @foreach($typographyBoard->entries->take(2) as $entry)
+                                                <span class="text-sm font-semibold text-gray-500 block leading-snug truncate">{{ $entry->font_family }}</span>
+                                            @endforeach
+                                        </div>
+                                    @endif
+                                </div>
+                            </div>
                         </div>
 
                         {{-- Footer --}}
-                        <div class="flex items-center justify-between mt-8">
-                            <div class="flex items-center gap-4 text-[12px] text-gray-300">
-                                <span>{{ $boardCount }} {{ $boardCount === 1 ? 'Board' : 'Boards' }}</span>
-                                <span>{{ $brand->updated_at->format('d. M Y') }}</span>
+                        <div class="px-6 py-3.5 border-t border-gray-50 flex items-center justify-between">
+                            <div class="flex items-center gap-3 text-[12px] text-gray-300">
+                                <span>{{ $boardCount }} Boards</span>
+                                <span>{{ $brand->updated_at->format('d. M') }}</span>
                             </div>
-                            <span class="text-sm text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                            <span class="text-xs text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                                 Öffnen &rarr;
                             </span>
                         </div>
