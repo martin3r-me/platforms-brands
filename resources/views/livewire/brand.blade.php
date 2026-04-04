@@ -174,7 +174,8 @@
         {{-- Boards Section --}}
         <div>
             @if($boardGroups->count() > 0 || $facebookPages->count() > 0 || $instagramAccounts->count() > 0)
-                <div class="space-y-0 divide-y divide-gray-100">
+                <div class="space-y-6">
+                    <div class="space-y-0 divide-y divide-gray-100">
                         @foreach($boardGroups as $group)
                             @foreach($group['boards'] as $board)
                                 @php
