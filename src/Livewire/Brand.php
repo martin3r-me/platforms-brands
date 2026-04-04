@@ -541,20 +541,20 @@ class Brand extends Component
         $user = Auth::user();
         $team = $user->currentTeam;
 
-        // Alle Board-Typen laden mit Preview-Relationen
-        $ciBoards = $this->brand->ciBoards()->with(['colors' => fn($q) => $q->limit(5)])->get();
+        // Alle Board-Typen laden mit Preview-Relationen (großzügig für Magazin-Ansicht)
+        $ciBoards = $this->brand->ciBoards()->with(['colors' => fn($q) => $q->limit(8)])->get();
         $socialBoards = $this->brand->socialBoards()->with(['slots' => fn($q) => $q->withCount('cards')])->withCount('cards')->get();
         $kanbanBoards = $this->brand->kanbanBoards()->with(['slots' => fn($q) => $q->withCount('cards')])->withCount('cards')->get();
-        $typographyBoards = $this->brand->typographyBoards()->with(['entries' => fn($q) => $q->limit(3)])->get();
-        $logoBoards = $this->brand->logoBoards()->with(['variants' => fn($q) => $q->limit(3)])->withCount('variants')->get();
-        $toneOfVoiceBoards = $this->brand->toneOfVoiceBoards()->with(['entries' => fn($q) => $q->limit(3), 'dimensions' => fn($q) => $q->limit(3)])->withCount('entries')->get();
-        $personaBoards = $this->brand->personaBoards()->with(['personas' => fn($q) => $q->limit(4)])->get();
-        $competitorBoards = $this->brand->competitorBoards()->with(['competitors' => fn($q) => $q->limit(4)])->get();
-        $guidelineBoards = $this->brand->guidelineBoards()->with(['chapters' => fn($q) => $q->limit(3)])->get();
-        $moodboardBoards = $this->brand->moodboardBoards()->with(['images' => fn($q) => $q->limit(4)])->get();
-        $assetBoards = $this->brand->assetBoards()->with(['assets' => fn($q) => $q->limit(3)])->withCount('assets')->get();
-        $seoBoards = $this->brand->seoBoards()->with(['keywords' => fn($q) => $q->limit(4), 'keywordClusters' => fn($q) => $q->limit(3)])->withCount('keywords')->get();
-        $contentBriefBoards = $this->brand->contentBriefBoards()->with(['sections' => fn($q) => $q->limit(3)])->get();
+        $typographyBoards = $this->brand->typographyBoards()->with(['entries' => fn($q) => $q->limit(5)])->get();
+        $logoBoards = $this->brand->logoBoards()->with(['variants' => fn($q) => $q->limit(6)])->withCount('variants')->get();
+        $toneOfVoiceBoards = $this->brand->toneOfVoiceBoards()->with(['entries' => fn($q) => $q->limit(6), 'dimensions' => fn($q) => $q->limit(6)])->withCount('entries')->get();
+        $personaBoards = $this->brand->personaBoards()->with(['personas' => fn($q) => $q->limit(6)])->get();
+        $competitorBoards = $this->brand->competitorBoards()->with(['competitors' => fn($q) => $q->limit(6)])->get();
+        $guidelineBoards = $this->brand->guidelineBoards()->with(['chapters' => fn($q) => $q->limit(6)])->get();
+        $moodboardBoards = $this->brand->moodboardBoards()->with(['images' => fn($q) => $q->limit(12)])->get();
+        $assetBoards = $this->brand->assetBoards()->with(['assets' => fn($q) => $q->limit(6)])->withCount('assets')->get();
+        $seoBoards = $this->brand->seoBoards()->with(['keywords' => fn($q) => $q->limit(12), 'keywordClusters' => fn($q) => $q->limit(5)])->withCount('keywords')->get();
+        $contentBriefBoards = $this->brand->contentBriefBoards()->with(['sections' => fn($q) => $q->limit(4)])->get();
 
         // Board-Gruppen für tabellarische Darstellung
         $boardGroups = collect([

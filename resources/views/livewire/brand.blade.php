@@ -204,22 +204,38 @@
                                     {{-- Preview Content --}}
                                     <div class="mt-8">
                                         @if($group['key'] === 'ci')
-                                            {{-- Farbpalette als große Swatches --}}
-                                            <div class="flex items-center">
+                                            {{-- Farben als benannte Swatches --}}
+                                            <div class="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
                                                 @if($board->primary_color)
-                                                    <div class="w-20 h-20 md:w-24 md:h-24 rounded-full shadow-sm ring-4 ring-white" style="background-color: {{ $board->primary_color }};"></div>
+                                                    <div class="text-center">
+                                                        <div class="w-full aspect-square rounded-2xl shadow-sm" style="background-color: {{ $board->primary_color }};"></div>
+                                                        <span class="text-xs text-gray-400 mt-2 block">Primär</span>
+                                                        <span class="text-[11px] text-gray-300 font-mono">{{ $board->primary_color }}</span>
+                                                    </div>
                                                 @endif
                                                 @if($board->secondary_color)
-                                                    <div class="w-20 h-20 md:w-24 md:h-24 rounded-full shadow-sm ring-4 ring-white -ml-4" style="background-color: {{ $board->secondary_color }};"></div>
+                                                    <div class="text-center">
+                                                        <div class="w-full aspect-square rounded-2xl shadow-sm" style="background-color: {{ $board->secondary_color }};"></div>
+                                                        <span class="text-xs text-gray-400 mt-2 block">Sekundär</span>
+                                                        <span class="text-[11px] text-gray-300 font-mono">{{ $board->secondary_color }}</span>
+                                                    </div>
                                                 @endif
                                                 @if($board->accent_color)
-                                                    <div class="w-20 h-20 md:w-24 md:h-24 rounded-full shadow-sm ring-4 ring-white -ml-4" style="background-color: {{ $board->accent_color }};"></div>
+                                                    <div class="text-center">
+                                                        <div class="w-full aspect-square rounded-2xl shadow-sm" style="background-color: {{ $board->accent_color }};"></div>
+                                                        <span class="text-xs text-gray-400 mt-2 block">Akzent</span>
+                                                        <span class="text-[11px] text-gray-300 font-mono">{{ $board->accent_color }}</span>
+                                                    </div>
                                                 @endif
-                                                @foreach($board->colors->take(6) as $color)
-                                                    <div class="w-20 h-20 md:w-24 md:h-24 rounded-full shadow-sm ring-4 ring-white -ml-4" style="background-color: {{ $color->color }};"></div>
+                                                @foreach($board->colors->take(7) as $color)
+                                                    <div class="text-center">
+                                                        <div class="w-full aspect-square rounded-2xl shadow-sm" style="background-color: {{ $color->color }};"></div>
+                                                        <span class="text-xs text-gray-400 mt-2 block">{{ $color->title ?: 'Farbe' }}</span>
+                                                        <span class="text-[11px] text-gray-300 font-mono">{{ $color->color }}</span>
+                                                    </div>
                                                 @endforeach
                                             </div>
-                                            <div class="mt-6 space-y-2">
+                                            <div class="mt-8 space-y-2">
                                                 @if($board->slogan)
                                                     <p class="text-2xl md:text-3xl text-gray-500 italic font-light leading-snug">&ldquo;{{ Str::limit($board->slogan, 140) }}&rdquo;</p>
                                                 @elseif($board->tagline)
@@ -308,22 +324,71 @@
                                             @endif
 
                                         @elseif($group['key'] === 'persona')
-                                            {{-- Personas als 3-Spalten-Grid --}}
-                                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                            {{-- Personas als reichhaltige Profil-Karten --}}
+                                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                                                 @forelse($board->personas->take(6) as $persona)
-                                                    <div class="bg-gray-50/80 rounded-xl px-6 py-5">
-                                                        <span class="text-lg text-gray-800 font-semibold block">{{ $persona->name }}</span>
-                                                        @if($persona->occupation)
-                                                            <span class="text-base text-gray-500 mt-1 block">{{ Str::limit($persona->occupation, 30) }}</span>
-                                                        @endif
-                                                        <div class="flex items-center gap-3 mt-2">
+                                                    <div class="bg-gray-50/80 rounded-2xl px-6 py-6">
+                                                        {{-- Name & Basics --}}
+                                                        <div class="flex items-start justify-between">
+                                                            <div>
+                                                                <span class="text-xl text-gray-800 font-semibold block">{{ $persona->name }}</span>
+                                                                @if($persona->occupation)
+                                                                    <span class="text-base text-gray-500 mt-0.5 block">{{ $persona->occupation }}</span>
+                                                                @endif
+                                                            </div>
                                                             @if($persona->age)
-                                                                <span class="text-sm text-gray-400">{{ $persona->age }} Jahre</span>
-                                                            @endif
-                                                            @if($persona->location)
-                                                                <span class="text-sm text-gray-400">{{ Str::limit($persona->location, 20) }}</span>
+                                                                <span class="text-sm text-gray-400 bg-white rounded-full px-3 py-1 flex-shrink-0">{{ $persona->age }} J.</span>
                                                             @endif
                                                         </div>
+
+                                                        {{-- Meta-Infos --}}
+                                                        @if($persona->location || $persona->gender || $persona->education)
+                                                            <div class="flex flex-wrap gap-x-3 gap-y-1 mt-3 text-sm text-gray-400">
+                                                                @if($persona->location)<span>{{ $persona->location }}</span>@endif
+                                                                @if($persona->gender)<span>· {{ $persona->gender_label }}</span>@endif
+                                                                @if($persona->education)<span>· {{ Str::limit($persona->education, 25) }}</span>@endif
+                                                            </div>
+                                                        @endif
+
+                                                        {{-- Bio --}}
+                                                        @if($persona->bio)
+                                                            <p class="text-sm text-gray-500 mt-3 leading-relaxed line-clamp-3">{{ $persona->bio }}</p>
+                                                        @endif
+
+                                                        {{-- Goals & Pain Points --}}
+                                                        @if(!empty($persona->goals) || !empty($persona->pain_points))
+                                                            <div class="mt-4 pt-4 border-t border-gray-200/60 grid grid-cols-2 gap-3">
+                                                                @if(!empty($persona->goals))
+                                                                    <div>
+                                                                        <span class="text-[11px] uppercase tracking-wider text-gray-400 font-medium">Ziele</span>
+                                                                        <div class="mt-1 space-y-0.5">
+                                                                            @foreach(array_slice($persona->goals, 0, 3) as $goal)
+                                                                                <p class="text-xs text-gray-500 leading-snug">{{ Str::limit($goal, 35) }}</p>
+                                                                            @endforeach
+                                                                        </div>
+                                                                    </div>
+                                                                @endif
+                                                                @if(!empty($persona->pain_points))
+                                                                    <div>
+                                                                        <span class="text-[11px] uppercase tracking-wider text-gray-400 font-medium">Pain Points</span>
+                                                                        <div class="mt-1 space-y-0.5">
+                                                                            @foreach(array_slice($persona->pain_points, 0, 3) as $pain)
+                                                                                <p class="text-xs text-gray-500 leading-snug">{{ Str::limit($pain, 35) }}</p>
+                                                                            @endforeach
+                                                                        </div>
+                                                                    </div>
+                                                                @endif
+                                                            </div>
+                                                        @endif
+
+                                                        {{-- Kanäle --}}
+                                                        @if(!empty($persona->channels))
+                                                            <div class="flex flex-wrap gap-1.5 mt-3">
+                                                                @foreach(array_slice($persona->channels, 0, 4) as $channel)
+                                                                    <span class="px-2 py-0.5 rounded-full bg-white text-[11px] text-gray-500">{{ $channel }}</span>
+                                                                @endforeach
+                                                            </div>
+                                                        @endif
                                                     </div>
                                                 @empty
                                                     <span class="text-base text-gray-300 col-span-3">Keine Personas</span>
@@ -366,8 +431,8 @@
 
                                         @elseif($group['key'] === 'moodboard')
                                             {{-- Bild-Galerie als großes responsives Grid --}}
-                                            <div class="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
-                                                @forelse($board->images->take(10) as $image)
+                                            <div class="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+                                                @forelse($board->images->take(12) as $image)
                                                     @if($image->thumbnail_url)
                                                         <div class="aspect-square rounded-2xl overflow-hidden bg-gray-100">
                                                             <img src="{{ $image->thumbnail_url }}" alt="{{ $image->title }}" class="w-full h-full object-cover">
@@ -378,11 +443,11 @@
                                                         </div>
                                                     @endif
                                                 @empty
-                                                    <span class="text-base text-gray-300 col-span-5">Keine Bilder</span>
+                                                    <span class="text-base text-gray-300 col-span-6">Keine Bilder</span>
                                                 @endforelse
                                             </div>
-                                            @if($entryCount > 10)
-                                                <p class="text-sm text-gray-300 mt-3">+{{ $entryCount - 10 }} weitere Bilder</p>
+                                            @if($entryCount > 12)
+                                                <p class="text-sm text-gray-300 mt-3">+{{ $entryCount - 12 }} weitere Bilder</p>
                                             @endif
 
                                         @elseif($group['key'] === 'asset')
