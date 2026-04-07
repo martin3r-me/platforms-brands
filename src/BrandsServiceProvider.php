@@ -142,6 +142,19 @@ class BrandsServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        // Morph-Map für Entity-Links
+        \Illuminate\Database\Eloquent\Relations\Relation::morphMap([
+            'brands_brand' => \Platform\Brands\Models\BrandsBrand::class,
+        ]);
+
+        // EntityLinkProvider registrieren (loose Kopplung mit Organization-Modul)
+        try {
+            resolve(\Platform\Organization\Services\EntityLinkRegistry::class)
+                ->register(new \Platform\Brands\Organization\BrandsEntityLinkProvider());
+        } catch (\Throwable $e) {
+            // Organization-Modul nicht geladen
+        }
+
         // Config veröffentlichen & zusammenführen (MUSS VOR registerModule sein!)
         $this->publishes([
             __DIR__.'/../config/brands.php' => config_path('brands.php'),
