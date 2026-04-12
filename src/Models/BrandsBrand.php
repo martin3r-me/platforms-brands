@@ -10,6 +10,7 @@ use Platform\Organization\Traits\HasOrganizationContexts;
 use Platform\Core\Traits\HasColors;
 use Platform\Core\Contracts\HasKeyResultAncestors;
 use Platform\Core\Contracts\HasDisplayName;
+use Platform\Core\Contracts\AgendaRenderable;
 use Platform\Crm\Traits\HasCompanyLinksTrait;
 use Platform\Crm\Contracts\CompanyInterface;
 use Platform\Crm\Contracts\ContactInterface;
@@ -18,7 +19,7 @@ use Platform\Integrations\Contracts\SocialMediaAccountLinkableInterface;
 /**
  * @ai.description Marke dient als Container für Brand-Management im Team.
  */
-class BrandsBrand extends Model implements HasKeyResultAncestors, HasDisplayName, SocialMediaAccountLinkableInterface
+class BrandsBrand extends Model implements HasKeyResultAncestors, HasDisplayName, SocialMediaAccountLinkableInterface, AgendaRenderable
 {
     use HasOrganizationContexts, HasColors, HasCompanyLinksTrait;
 
@@ -280,5 +281,21 @@ class BrandsBrand extends Model implements HasKeyResultAncestors, HasDisplayName
     public function getTeamId(): int
     {
         return $this->team_id ?? 0;
+    }
+
+    // ── AgendaRenderable ──────────────────────────────────────
+
+    public function toAgendaItem(): array
+    {
+        return [
+            'title' => $this->name,
+            'description' => $this->description ? \Illuminate\Support\Str::limit($this->description, 120) : null,
+            'icon' => '🏷️',
+            'color' => $this->color,
+            'status' => $this->done ? 'Erledigt' : 'Aktiv',
+            'status_color' => $this->done ? 'green' : 'blue',
+            'url' => route('brands.brands.show', $this),
+            'meta' => [],
+        ];
     }
 }
