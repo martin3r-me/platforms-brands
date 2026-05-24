@@ -5,7 +5,6 @@ namespace Platform\Brands\Livewire;
 use Livewire\Component;
 use Illuminate\Support\Facades\Auth;
 use Platform\Brands\Models\BrandsBrand;
-use Platform\Organization\Models\OrganizationContext;
 use Platform\Organization\Services\EntityDimensionBridge;
 use Platform\Organization\Models\OrganizationEntity;
 use Livewire\Attributes\On;
@@ -78,25 +77,7 @@ class Sidebar extends Component
         $entityBrandMap = [];
         $linkedBrandIds = [];
 
-        // a) OrganizationContext (primäre Quelle – UI)
         $contextMorphTypes = ['brand', 'brands_brand', BrandsBrand::class];
-        $contexts = OrganizationContext::query()
-            ->whereIn('contextable_type', $contextMorphTypes)
-            ->whereIn('contextable_id', $brandIds)
-            ->where('is_active', true)
-            ->with(['organizationEntity.type'])
-            ->get();
-
-        foreach ($contexts as $ctx) {
-            $entityId = $ctx->organization_entity_id;
-            $brandId = $ctx->contextable_id;
-            if ($entityId) {
-                $entityBrandMap[$entityId][] = $brandId;
-                $linkedBrandIds[] = $brandId;
-            }
-        }
-
-        // b) DimensionLink entity dimension (sekundäre Quelle – DimensionLinker / LLM Tools)
         $entityLinks = EntityDimensionBridge::linksForLinkables($contextMorphTypes, $brandIds);
 
         foreach ($entityLinks as $link) {
