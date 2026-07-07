@@ -5,8 +5,8 @@ namespace Platform\Brands\Flynk;
 use Illuminate\Support\Collection;
 use Platform\Brands\Models\BrandsBrand;
 use Platform\FlynkConnector\Contracts\ProvidesFlynkContext;
-use Platform\Organization\Models\OrganizationContext;
 use Platform\Organization\Models\OrganizationEntity;
+use Platform\Organization\Services\EntityDimensionBridge;
 
 /**
  * Erster FLYNK-Kontext-Lieferant: liefert den Marken-Kontext eines Knotens
@@ -48,13 +48,11 @@ class BrandsFlynkContextProvider implements ProvidesFlynkContext
 
     protected function resolveBrand(OrganizationEntity $node): ?BrandsBrand
     {
-        return OrganizationContext::query()
-            ->where('organization_entity_id', $node->id)
-            ->where('is_active', true)
-            ->with('contextable')
-            ->get()
-            ->map(fn ($c) => $c->contextable)
-            ->first(fn ($c) => $c instanceof BrandsBrand);
+        // Verortung wie überall via Dimension-Link (Morph-Alias 'brands_brand').
+        $link = EntityDimensionBridge::linksForEntity($node->id)
+            ->first(fn ($l) => $l->linkable_type === 'brands_brand');
+
+        return $link ? BrandsBrand::find($link->linkable_id) : null;
     }
 
     protected function identity($ci, Collection $entriesByType): array
