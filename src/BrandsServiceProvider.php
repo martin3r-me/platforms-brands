@@ -155,6 +155,14 @@ class BrandsServiceProvider extends ServiceProvider
             // Organization-Modul nicht geladen
         }
 
+        // FLYNK-Kontext-Lieferant registrieren (loose Kopplung mit FlynkConnector)
+        try {
+            resolve(\Platform\FlynkConnector\Services\FlynkContextRegistry::class)
+                ->register(new \Platform\Brands\Flynk\BrandsFlynkContextProvider());
+        } catch (\Throwable $e) {
+            // FlynkConnector-Modul nicht geladen
+        }
+
         // Config veröffentlichen & zusammenführen (MUSS VOR registerModule sein!)
         $this->publishes([
             __DIR__.'/../config/brands.php' => config_path('brands.php'),
