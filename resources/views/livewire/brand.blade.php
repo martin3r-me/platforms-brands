@@ -47,121 +47,56 @@
                     >
                         <div class="py-1 max-h-96 overflow-y-auto">
                             <button wire:click="createSocialBoard" @click="open = false" class="w-full text-left px-4 py-2.5 text-sm text-[var(--ui-secondary)] hover:bg-[var(--ui-muted-5)] transition-colors flex items-center gap-3">
-                                <div class="flex items-center justify-center w-8 h-8 rounded-md bg-purple-50">
-                                    @svg('heroicon-o-share', 'w-4 h-4 text-purple-600')
-                                </div>
-                                <div>
-                                    <div class="font-medium">Social Board</div>
-                                    <div class="text-xs text-[var(--ui-muted)]">Für Social Media</div>
-                                </div>
+                                <div class="flex items-center justify-center w-8 h-8 rounded-md bg-purple-50">@svg('heroicon-o-share', 'w-4 h-4 text-purple-600')</div>
+                                <div><div class="font-medium">Social Board</div><div class="text-xs text-[var(--ui-muted)]">Für Social Media</div></div>
                             </button>
                             <button wire:click="createCiBoard" @click="open = false" class="w-full text-left px-4 py-2.5 text-sm text-[var(--ui-secondary)] hover:bg-[var(--ui-muted-5)] transition-colors flex items-center gap-3">
-                                <div class="flex items-center justify-center w-8 h-8 rounded-md bg-amber-50">
-                                    @svg('heroicon-o-paint-brush', 'w-4 h-4 text-amber-600')
-                                </div>
-                                <div>
-                                    <div class="font-medium">CI Board</div>
-                                    <div class="text-xs text-[var(--ui-muted)]">Für Corporate Identity</div>
-                                </div>
+                                <div class="flex items-center justify-center w-8 h-8 rounded-md bg-amber-50">@svg('heroicon-o-paint-brush', 'w-4 h-4 text-amber-600')</div>
+                                <div><div class="font-medium">CI Board</div><div class="text-xs text-[var(--ui-muted)]">Für Corporate Identity</div></div>
                             </button>
                             <button wire:click="createKanbanBoard" @click="open = false" class="w-full text-left px-4 py-2.5 text-sm text-[var(--ui-secondary)] hover:bg-[var(--ui-muted-5)] transition-colors flex items-center gap-3">
-                                <div class="flex items-center justify-center w-8 h-8 rounded-md bg-indigo-50">
-                                    @svg('heroicon-o-view-columns', 'w-4 h-4 text-indigo-600')
-                                </div>
-                                <div>
-                                    <div class="font-medium">Kanban Board</div>
-                                    <div class="text-xs text-[var(--ui-muted)]">Für Aufgabenverwaltung</div>
-                                </div>
+                                <div class="flex items-center justify-center w-8 h-8 rounded-md bg-indigo-50">@svg('heroicon-o-view-columns', 'w-4 h-4 text-indigo-600')</div>
+                                <div><div class="font-medium">Kanban Board</div><div class="text-xs text-[var(--ui-muted)]">Für Aufgabenverwaltung</div></div>
                             </button>
                             <button wire:click="createTypographyBoard" @click="open = false" class="w-full text-left px-4 py-2.5 text-sm text-[var(--ui-secondary)] hover:bg-[var(--ui-muted-5)] transition-colors flex items-center gap-3">
-                                <div class="flex items-center justify-center w-8 h-8 rounded-md bg-rose-50">
-                                    @svg('heroicon-o-language', 'w-4 h-4 text-rose-600')
-                                </div>
-                                <div>
-                                    <div class="font-medium">Typografie Board</div>
-                                    <div class="text-xs text-[var(--ui-muted)]">Schriften & Hierarchien</div>
-                                </div>
+                                <div class="flex items-center justify-center w-8 h-8 rounded-md bg-rose-50">@svg('heroicon-o-language', 'w-4 h-4 text-rose-600')</div>
+                                <div><div class="font-medium">Typografie Board</div><div class="text-xs text-[var(--ui-muted)]">Schriften & Hierarchien</div></div>
                             </button>
                             <button wire:click="createLogoBoard" @click="open = false" class="w-full text-left px-4 py-2.5 text-sm text-[var(--ui-secondary)] hover:bg-[var(--ui-muted-5)] transition-colors flex items-center gap-3">
-                                <div class="flex items-center justify-center w-8 h-8 rounded-md bg-emerald-50">
-                                    @svg('heroicon-o-photo', 'w-4 h-4 text-emerald-600')
-                                </div>
-                                <div>
-                                    <div class="font-medium">Logo Board</div>
-                                    <div class="text-xs text-[var(--ui-muted)]">Logo-Varianten verwalten</div>
-                                </div>
+                                <div class="flex items-center justify-center w-8 h-8 rounded-md bg-emerald-50">@svg('heroicon-o-photo', 'w-4 h-4 text-emerald-600')</div>
+                                <div><div class="font-medium">Logo Board</div><div class="text-xs text-[var(--ui-muted)]">Logo-Varianten verwalten</div></div>
                             </button>
                             <button wire:click="createToneOfVoiceBoard" @click="open = false" class="w-full text-left px-4 py-2.5 text-sm text-[var(--ui-secondary)] hover:bg-[var(--ui-muted-5)] transition-colors flex items-center gap-3">
-                                <div class="flex items-center justify-center w-8 h-8 rounded-md bg-violet-50">
-                                    @svg('heroicon-o-megaphone', 'w-4 h-4 text-violet-600')
-                                </div>
-                                <div>
-                                    <div class="font-medium">Tone of Voice Board</div>
-                                    <div class="text-xs text-[var(--ui-muted)]">Markenstimme & Messaging</div>
-                                </div>
+                                <div class="flex items-center justify-center w-8 h-8 rounded-md bg-violet-50">@svg('heroicon-o-megaphone', 'w-4 h-4 text-violet-600')</div>
+                                <div><div class="font-medium">Tone of Voice Board</div><div class="text-xs text-[var(--ui-muted)]">Markenstimme & Messaging</div></div>
                             </button>
                             <button wire:click="createPersonaBoard" @click="open = false" class="w-full text-left px-4 py-2.5 text-sm text-[var(--ui-secondary)] hover:bg-[var(--ui-muted-5)] transition-colors flex items-center gap-3">
-                                <div class="flex items-center justify-center w-8 h-8 rounded-md bg-teal-50">
-                                    @svg('heroicon-o-user-group', 'w-4 h-4 text-teal-600')
-                                </div>
-                                <div>
-                                    <div class="font-medium">Persona Board</div>
-                                    <div class="text-xs text-[var(--ui-muted)]">Zielgruppen & Personas</div>
-                                </div>
+                                <div class="flex items-center justify-center w-8 h-8 rounded-md bg-teal-50">@svg('heroicon-o-user-group', 'w-4 h-4 text-teal-600')</div>
+                                <div><div class="font-medium">Persona Board</div><div class="text-xs text-[var(--ui-muted)]">Zielgruppen & Personas</div></div>
                             </button>
                             <button wire:click="createCompetitorBoard" @click="open = false" class="w-full text-left px-4 py-2.5 text-sm text-[var(--ui-secondary)] hover:bg-[var(--ui-muted-5)] transition-colors flex items-center gap-3">
-                                <div class="flex items-center justify-center w-8 h-8 rounded-md bg-orange-50">
-                                    @svg('heroicon-o-scale', 'w-4 h-4 text-orange-600')
-                                </div>
-                                <div>
-                                    <div class="font-medium">Wettbewerber Board</div>
-                                    <div class="text-xs text-[var(--ui-muted)]">Wettbewerber-Analyse & Positionierung</div>
-                                </div>
+                                <div class="flex items-center justify-center w-8 h-8 rounded-md bg-orange-50">@svg('heroicon-o-scale', 'w-4 h-4 text-orange-600')</div>
+                                <div><div class="font-medium">Wettbewerber Board</div><div class="text-xs text-[var(--ui-muted)]">Wettbewerber-Analyse</div></div>
                             </button>
                             <button wire:click="createGuidelineBoard" @click="open = false" class="w-full text-left px-4 py-2.5 text-sm text-[var(--ui-secondary)] hover:bg-[var(--ui-muted-5)] transition-colors flex items-center gap-3">
-                                <div class="flex items-center justify-center w-8 h-8 rounded-md bg-cyan-50">
-                                    @svg('heroicon-o-book-open', 'w-4 h-4 text-cyan-600')
-                                </div>
-                                <div>
-                                    <div class="font-medium">Guidelines Board</div>
-                                    <div class="text-xs text-[var(--ui-muted)]">Markenregeln & Dos/Don'ts</div>
-                                </div>
+                                <div class="flex items-center justify-center w-8 h-8 rounded-md bg-cyan-50">@svg('heroicon-o-book-open', 'w-4 h-4 text-cyan-600')</div>
+                                <div><div class="font-medium">Guidelines Board</div><div class="text-xs text-[var(--ui-muted)]">Markenregeln & Dos/Don'ts</div></div>
                             </button>
                             <button wire:click="createMoodboardBoard" @click="open = false" class="w-full text-left px-4 py-2.5 text-sm text-[var(--ui-secondary)] hover:bg-[var(--ui-muted-5)] transition-colors flex items-center gap-3">
-                                <div class="flex items-center justify-center w-8 h-8 rounded-md bg-rose-50">
-                                    @svg('heroicon-o-photo', 'w-4 h-4 text-rose-600')
-                                </div>
-                                <div>
-                                    <div class="font-medium">Moodboard</div>
-                                    <div class="text-xs text-[var(--ui-muted)]">Bildsprache & Stilrichtung</div>
-                                </div>
+                                <div class="flex items-center justify-center w-8 h-8 rounded-md bg-rose-50">@svg('heroicon-o-photo', 'w-4 h-4 text-rose-600')</div>
+                                <div><div class="font-medium">Moodboard</div><div class="text-xs text-[var(--ui-muted)]">Bildsprache & Stilrichtung</div></div>
                             </button>
                             <button wire:click="createAssetBoard" @click="open = false" class="w-full text-left px-4 py-2.5 text-sm text-[var(--ui-secondary)] hover:bg-[var(--ui-muted-5)] transition-colors flex items-center gap-3">
-                                <div class="flex items-center justify-center w-8 h-8 rounded-md bg-sky-50">
-                                    @svg('heroicon-o-folder-open', 'w-4 h-4 text-sky-600')
-                                </div>
-                                <div>
-                                    <div class="font-medium">Asset Board</div>
-                                    <div class="text-xs text-[var(--ui-muted)]">Templates & Brand Assets</div>
-                                </div>
+                                <div class="flex items-center justify-center w-8 h-8 rounded-md bg-sky-50">@svg('heroicon-o-folder-open', 'w-4 h-4 text-sky-600')</div>
+                                <div><div class="font-medium">Asset Board</div><div class="text-xs text-[var(--ui-muted)]">Templates & Brand Assets</div></div>
                             </button>
                             <button wire:click="createSeoBoard" @click="open = false" class="w-full text-left px-4 py-2.5 text-sm text-[var(--ui-secondary)] hover:bg-[var(--ui-muted-5)] transition-colors flex items-center gap-3">
-                                <div class="flex items-center justify-center w-8 h-8 rounded-md bg-lime-50">
-                                    @svg('heroicon-o-magnifying-glass', 'w-4 h-4 text-lime-600')
-                                </div>
-                                <div>
-                                    <div class="font-medium">SEO Board</div>
-                                    <div class="text-xs text-[var(--ui-muted)]">Keyword-Recherche & SEO-Analyse</div>
-                                </div>
+                                <div class="flex items-center justify-center w-8 h-8 rounded-md bg-lime-50">@svg('heroicon-o-magnifying-glass', 'w-4 h-4 text-lime-600')</div>
+                                <div><div class="font-medium">SEO Board</div><div class="text-xs text-[var(--ui-muted)]">Keyword-Recherche</div></div>
                             </button>
                             <button wire:click="createContentBriefBoard" @click="open = false" class="w-full text-left px-4 py-2.5 text-sm text-[var(--ui-secondary)] hover:bg-[var(--ui-muted-5)] transition-colors flex items-center gap-3">
-                                <div class="flex items-center justify-center w-8 h-8 rounded-md bg-fuchsia-50">
-                                    @svg('heroicon-o-document-magnifying-glass', 'w-4 h-4 text-fuchsia-600')
-                                </div>
-                                <div>
-                                    <div class="font-medium">Content Brief Board</div>
-                                    <div class="text-xs text-[var(--ui-muted)]">Content-Planung & Briefings</div>
-                                </div>
+                                <div class="flex items-center justify-center w-8 h-8 rounded-md bg-fuchsia-50">@svg('heroicon-o-document-magnifying-glass', 'w-4 h-4 text-fuchsia-600')</div>
+                                <div><div class="font-medium">Content Brief Board</div><div class="text-xs text-[var(--ui-muted)]">Content-Planung</div></div>
                             </button>
                         </div>
                     </div>
@@ -170,361 +105,500 @@
         </x-ui-page-actionbar>
     </x-slot>
 
-    <x-ui-page-container spacing="space-y-8">
+    <x-ui-page-container spacing="space-y-0" width="contained">
 
         @php
             $ci = $ciBoards->first();
             $primary = $ci?->primary_color;
             $slogan = $ci?->slogan ?: $ci?->tagline;
-            $totalBoards = $boardGroups->sum(fn($g) => $g['boards']->count());
+            $coverColors = collect([$ci?->primary_color, $ci?->accent_color, $ci?->secondary_color])->filter();
+            if ($ci) { $coverColors = $coverColors->merge($ci->colors->pluck('color')); }
+            $coverColors = $coverColors->filter()->values();
+
+            $totalBoards = $ciBoards->count() + $socialBoards->count() + $kanbanBoards->count()
+                + $typographyBoards->count() + $logoBoards->count() + $toneOfVoiceBoards->count()
+                + $personaBoards->count() + $competitorBoards->count() + $guidelineBoards->count()
+                + $moodboardBoards->count() + $seoBoards->count() + $assetBoards->count() + $contentBriefBoards->count();
+            $typeCount = collect([$ciBoards, $socialBoards, $kanbanBoards, $typographyBoards, $logoBoards,
+                $toneOfVoiceBoards, $personaBoards, $competitorBoards, $guidelineBoards, $moodboardBoards,
+                $seoBoards, $assetBoards, $contentBriefBoards])->filter->isNotEmpty()->count();
+
+            $hasIdentity = $ciBoards->isNotEmpty() || $typographyBoards->isNotEmpty() || $logoBoards->isNotEmpty() || $moodboardBoards->isNotEmpty();
+            $hasStrategie = $personaBoards->isNotEmpty() || $competitorBoards->isNotEmpty() || $toneOfVoiceBoards->isNotEmpty() || $guidelineBoards->isNotEmpty();
+            $hasOps = $socialBoards->isNotEmpty() || $kanbanBoards->isNotEmpty() || $seoBoards->isNotEmpty() || $contentBriefBoards->isNotEmpty() || $assetBoards->isNotEmpty();
+
             $accountsCount = $facebookPages->count() + $instagramAccounts->count();
+
+            $company = $brand->getCompany();
+            $contact = $brand->getContact();
         @endphp
 
-        {{-- ===== Header ===== --}}
-        <div class="flex items-start gap-4">
-            {{-- Marken-Signet --}}
-            @if($primary)
-                <span class="hidden sm:block h-14 w-14 shrink-0 rounded-[10px] ring-1 ring-[color:var(--nx-line)]" style="background-color: {{ $primary }};"></span>
+        {{-- ══════════ COVER (aus CI abgeleitet) ══════════ --}}
+        <div class="flex h-24 md:h-28 overflow-hidden rounded-t-[12px]" aria-hidden="true">
+            @if($coverColors->isNotEmpty())
+                @foreach($coverColors->take(6) as $c)
+                    <span class="flex-1" style="background-color: {{ $c }};"></span>
+                @endforeach
             @else
-                <span class="hidden sm:flex h-14 w-14 shrink-0 items-center justify-center rounded-[10px] bg-[color:var(--nx-accent-soft)] text-xl font-semibold text-[color:var(--nx-muted)]">{{ mb_strtoupper(mb_substr($brand->name, 0, 1)) }}</span>
+                <span class="flex-1 bg-[color:var(--nx-accent-soft)]"></span>
             @endif
+        </div>
 
-            <div class="min-w-0 flex-1">
-                <div class="flex flex-wrap items-center gap-2.5">
-                    <h1 class="text-2xl font-semibold tracking-tight text-[color:var(--nx-text)]">{{ $brand->name }}</h1>
-                    @if($brand->done)
-                        <x-nx-badge variant="neutral">Archiviert</x-nx-badge>
-                    @else
-                        <x-nx-badge variant="success" dot>Aktiv</x-nx-badge>
-                    @endif
-                    @if($verortung)
-                        <x-nx-badge variant="info">
-                            @svg('heroicon-o-building-office-2', 'w-3.5 h-3.5')
-                            {{ $verortung['entity'] }}@if($verortung['type']) · {{ $verortung['type'] }}@endif
-                        </x-nx-badge>
-                    @else
-                        <x-nx-badge variant="neutral">Unverknüpft</x-nx-badge>
-                    @endif
+        {{-- ══════════ TITEL ══════════ --}}
+        <div class="flex items-end gap-4 -mt-9 px-1">
+            @if($primary)
+                <div class="flex h-[76px] w-[76px] shrink-0 items-center justify-center rounded-[14px] text-2xl font-bold text-white ring-4 ring-[color:var(--nx-surface)]" style="background-color: {{ $primary }};">
+                    {{ mb_strtoupper(mb_substr($brand->name, 0, 1)) }}
                 </div>
+            @else
+                <div class="flex h-[76px] w-[76px] shrink-0 items-center justify-center rounded-[14px] bg-[color:var(--nx-accent-soft)] text-2xl font-bold text-[color:var(--nx-muted)] ring-4 ring-[color:var(--nx-surface)]">
+                    {{ mb_strtoupper(mb_substr($brand->name, 0, 1)) }}
+                </div>
+            @endif
+            <div class="min-w-0 pb-1">
+                <h1 class="flex flex-wrap items-center gap-x-3 gap-y-1 text-2xl md:text-[30px] font-bold leading-tight tracking-tight text-[color:var(--nx-text)]">
+                    {{ $brand->name }}
+                    @if($brand->done)
+                        <span class="inline-flex items-center gap-1.5 text-xs font-medium text-[color:var(--nx-muted)]">
+                            <span class="h-1.5 w-1.5 rounded-full bg-current"></span>Archiviert
+                        </span>
+                    @else
+                        <span class="inline-flex items-center gap-1.5 text-xs font-medium text-[color:var(--nx-success)]">
+                            <span class="h-1.5 w-1.5 rounded-full bg-current"></span>Aktiv
+                        </span>
+                    @endif
+                </h1>
                 @if($slogan)
-                    <p class="mt-1.5 text-base italic text-[color:var(--nx-muted)]">&ldquo;{{ Str::limit($slogan, 120) }}&rdquo;</p>
-                @endif
-                @if($brand->description)
-                    <p class="mt-1.5 max-w-2xl text-sm leading-relaxed text-[color:var(--nx-faint)]">{{ $brand->description }}</p>
+                    <p class="mt-1.5 text-[15px] italic text-[color:var(--nx-muted)]">&ldquo;{{ Str::limit($slogan, 120) }}&rdquo;</p>
                 @endif
             </div>
         </div>
 
-        {{-- ===== Kennzahlen ===== --}}
-        <x-nx-stat-grid cols="4">
-            <x-nx-stat label="Boards" :value="$totalBoards" :hint="$boardGroups->count() . ' Board-Typen'" icon="heroicon-o-squares-2x2" />
-            <x-nx-stat label="Social Accounts" :value="$accountsCount" :hint="$facebookPages->count() . ' FB · ' . $instagramAccounts->count() . ' IG'" icon="heroicon-o-share" />
-            <x-nx-stat label="Meta Connection" :value="$metaConnection ? 'Aktiv' : '—'" :hint="$metaConnection ? 'verbunden' : 'nicht verbunden'" icon="heroicon-o-link" :accent="$metaConnection ? 'var(--nx-success)' : null" />
-            <x-nx-stat label="Verortung" :value="$verortung['type'] ?? 'Frei'" :hint="$verortung['entity'] ?? 'nicht verortet'" icon="heroicon-o-building-office-2" />
-        </x-nx-stat-grid>
-
-        {{-- ===== Board-Gruppen ===== --}}
-        @if($boardGroups->count() > 0)
-            @php
-                $categories = [
-                    ['label' => 'Identität', 'icon' => 'heroicon-o-swatch', 'keys' => ['ci', 'typography', 'logo', 'moodboard']],
-                    ['label' => 'Strategie', 'icon' => 'heroicon-o-light-bulb', 'keys' => ['persona', 'competitor', 'tone-of-voice', 'guideline']],
-                    ['label' => 'Content', 'icon' => 'heroicon-o-pencil-square', 'keys' => ['social', 'kanban', 'seo', 'content-brief']],
-                    ['label' => 'Assets', 'icon' => 'heroicon-o-folder-open', 'keys' => ['asset']],
-                ];
-                $groupsByKey = $boardGroups->keyBy('key');
-            @endphp
-
-            @foreach($categories as $cat)
-                @php $catGroups = collect($cat['keys'])->map(fn($k) => $groupsByKey->get($k))->filter(); @endphp
-                @if($catGroups->isNotEmpty())
-                    <x-nx-section :icon="$cat['icon']" :title="$cat['label']" :hint="$catGroups->sum(fn($g) => $g['boards']->count()) . ' Boards'">
-                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                            @foreach($catGroups as $group)
-                                @foreach($group['boards'] as $board)
-                                    @php
-                                        $countAttr = $group['entryRelation'] ? $group['entryRelation'] . '_count' : null;
-                                        $entryCount = $countAttr && isset($board->$countAttr) ? $board->$countAttr : ($group['entryRelation'] ? $board->{$group['entryRelation']}->count() : 0);
-                                        $typeLabel = trim(str_replace('Boards', '', $group['label']));
-                                    @endphp
-                                    <x-nx-card flush class="overflow-hidden">
-                                        <a href="{{ route($group['routePrefix'], $board) }}" wire:navigate
-                                           class="block p-4 transition-colors hover:bg-[color:var(--nx-hover)]">
-                                            {{-- Karten-Kopf --}}
-                                            <div class="mb-2.5 flex items-center gap-2">
-                                                <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-[6px] bg-[color:var(--nx-accent-soft)]">
-                                                    @svg($group['icon'], 'w-3.5 h-3.5 text-[color:var(--nx-muted)]')
-                                                </span>
-                                                <span class="text-[11px] uppercase tracking-[0.15em] text-[color:var(--nx-faint)]">{{ $typeLabel }}</span>
-                                                @if($group['entryRelation'])
-                                                    <span class="ml-auto shrink-0 rounded-full bg-[color:var(--nx-accent-soft)] px-2 py-0.5 text-[11px] tabular-nums text-[color:var(--nx-muted)]">{{ $entryCount }}</span>
-                                                @endif
-                                            </div>
-
-                                            {{-- Board-Name --}}
-                                            <h4 class="truncate font-medium text-[color:var(--nx-text)]">
-                                                {{ $board->name }}
-                                                @if($board->done)<span class="ml-1 text-[color:var(--nx-success)]">✓</span>@endif
-                                            </h4>
-
-                                            {{-- Kompakte Vorschau --}}
-                                            <div class="mt-3 min-h-[2rem]">
-                                                @if($group['key'] === 'ci')
-                                                        @php $ciColors = collect([$board->primary_color, $board->secondary_color, $board->accent_color])->filter()->merge($board->colors->pluck('color'))->filter(); @endphp
-                                                        @if($ciColors->isNotEmpty())
-                                                            <div class="flex flex-wrap items-center gap-1.5">
-                                                                @foreach($ciColors->take(8) as $c)
-                                                                    <span class="h-5 w-5 rounded-full ring-1 ring-[color:var(--nx-line)]" style="background-color: {{ $c }};"></span>
-                                                                @endforeach
-                                                            </div>
-                                                            @if($board->slogan || $board->tagline)
-                                                                <p class="mt-2 truncate text-xs italic text-[color:var(--nx-faint)]">&ldquo;{{ $board->slogan ?: $board->tagline }}&rdquo;</p>
-                                                            @endif
-                                                        @else
-                                                            <span class="text-xs text-[color:var(--nx-faint)]">Keine Farben hinterlegt</span>
-                                                        @endif
-
-                                                @elseif($group['key'] === 'typography')
-                                                        @forelse($board->entries->take(3) as $entry)
-                                                            <div class="truncate text-sm text-[color:var(--nx-text)]">{{ $entry->font_family }}@if($entry->role)<span class="text-[color:var(--nx-faint)]"> · {{ $entry->role }}</span>@endif</div>
-                                                        @empty
-                                                            <span class="text-xs text-[color:var(--nx-faint)]">Keine Schriften</span>
-                                                        @endforelse
-
-                                                @elseif($group['key'] === 'logo')
-                                                        <div class="flex flex-wrap gap-1.5">
-                                                            @forelse($board->variants->take(4) as $v)
-                                                                <span class="rounded-[6px] bg-[color:var(--nx-accent-soft)] px-2 py-0.5 text-xs text-[color:var(--nx-muted)]">{{ Str::limit($v->name, 18) }}</span>
-                                                            @empty
-                                                                <span class="text-xs text-[color:var(--nx-faint)]">Keine Varianten</span>
-                                                            @endforelse
-                                                        </div>
-
-                                                @elseif($group['key'] === 'moodboard')
-                                                        <div class="flex gap-1.5">
-                                                            @forelse($board->images->take(5) as $img)
-                                                                @if($img->thumbnail_url)
-                                                                    <img src="{{ $img->thumbnail_url }}" alt="{{ $img->title }}" class="h-9 w-9 rounded-[6px] object-cover ring-1 ring-[color:var(--nx-line)]">
-                                                                @else
-                                                                    <span class="flex h-9 w-9 items-center justify-center rounded-[6px] bg-[color:var(--nx-accent-soft)]">@svg('heroicon-o-photo', 'w-4 h-4 text-[color:var(--nx-faint)]')</span>
-                                                                @endif
-                                                            @empty
-                                                                <span class="text-xs text-[color:var(--nx-faint)]">Keine Bilder</span>
-                                                            @endforelse
-                                                        </div>
-
-                                                @elseif($group['key'] === 'persona')
-                                                        <div class="flex flex-wrap gap-1.5">
-                                                            @forelse($board->personas->take(4) as $persona)
-                                                                <span class="rounded-[6px] bg-[color:var(--nx-accent-soft)] px-2 py-0.5 text-xs text-[color:var(--nx-muted)]">{{ Str::limit($persona->name, 18) }}</span>
-                                                            @empty
-                                                                <span class="text-xs text-[color:var(--nx-faint)]">Keine Personas</span>
-                                                            @endforelse
-                                                        </div>
-
-                                                @elseif($group['key'] === 'competitor')
-                                                        <div class="flex flex-wrap gap-1.5">
-                                                            @forelse($board->competitors->take(4) as $c)
-                                                                <span class="rounded-[6px] bg-[color:var(--nx-accent-soft)] px-2 py-0.5 text-xs text-[color:var(--nx-muted)]">{{ Str::limit($c->name, 18) }}</span>
-                                                            @empty
-                                                                <span class="text-xs text-[color:var(--nx-faint)]">Keine Wettbewerber</span>
-                                                            @endforelse
-                                                        </div>
-
-                                                @elseif($group['key'] === 'tone-of-voice')
-                                                        @if($board->dimensions->isNotEmpty())
-                                                            <span class="text-xs text-[color:var(--nx-faint)]">{{ $board->dimensions->count() }} Dimensionen</span>
-                                                        @elseif($board->entries->isNotEmpty())
-                                                            <div class="flex flex-wrap gap-1.5">
-                                                                @foreach($board->entries->take(4) as $entry)
-                                                                    <span class="rounded-[6px] bg-[color:var(--nx-accent-soft)] px-2 py-0.5 text-xs text-[color:var(--nx-muted)]">{{ Str::limit($entry->name, 18) }}</span>
-                                                                @endforeach
-                                                            </div>
-                                                        @else
-                                                            <span class="text-xs text-[color:var(--nx-faint)]">Keine Einträge</span>
-                                                        @endif
-
-                                                @elseif($group['key'] === 'guideline')
-                                                        <div class="flex flex-wrap gap-1.5">
-                                                            @forelse($board->chapters->take(4) as $chapter)
-                                                                <span class="rounded-[6px] bg-[color:var(--nx-accent-soft)] px-2 py-0.5 text-xs text-[color:var(--nx-muted)]">{{ Str::limit($chapter->title, 18) }}</span>
-                                                            @empty
-                                                                <span class="text-xs text-[color:var(--nx-faint)]">Keine Kapitel</span>
-                                                            @endforelse
-                                                        </div>
-
-                                                @elseif(in_array($group['key'], ['social', 'kanban']))
-                                                        <div class="flex flex-wrap gap-1.5">
-                                                            @forelse($board->slots->take(4) as $slot)
-                                                                <span class="rounded-[6px] bg-[color:var(--nx-accent-soft)] px-2 py-0.5 text-xs text-[color:var(--nx-muted)]">{{ Str::limit($slot->name, 14) }} · {{ $slot->cards_count }}</span>
-                                                            @empty
-                                                                <span class="text-xs text-[color:var(--nx-faint)]">Keine Spalten</span>
-                                                            @endforelse
-                                                        </div>
-
-                                                @elseif($group['key'] === 'seo')
-                                                        <div class="flex flex-wrap gap-1.5">
-                                                            @forelse($board->keywords->take(4) as $keyword)
-                                                                <span class="rounded-[6px] bg-[color:var(--nx-accent-soft)] px-2 py-0.5 text-xs text-[color:var(--nx-muted)]">{{ Str::limit($keyword->keyword, 18) }}</span>
-                                                            @empty
-                                                                <span class="text-xs text-[color:var(--nx-faint)]">Keine Keywords</span>
-                                                            @endforelse
-                                                        </div>
-
-                                                @elseif($group['key'] === 'content-brief')
-                                                        @if($board->content_type || $board->search_intent)
-                                                            <span class="text-sm text-[color:var(--nx-text)]">{{ $board->content_type }}</span>
-                                                            @if($board->search_intent)<span class="text-xs text-[color:var(--nx-faint)]"> · {{ $board->search_intent }}</span>@endif
-                                                        @else
-                                                            <span class="text-xs text-[color:var(--nx-faint)]">Kein Brief-Typ</span>
-                                                        @endif
-
-                                                @elseif($group['key'] === 'asset')
-                                                        <div class="flex flex-wrap gap-1.5">
-                                                            @forelse($board->assets->take(4) as $asset)
-                                                                <span class="rounded-[6px] bg-[color:var(--nx-accent-soft)] px-2 py-0.5 text-xs text-[color:var(--nx-muted)]">{{ Str::limit($asset->name, 18) }}</span>
-                                                            @empty
-                                                                <span class="text-xs text-[color:var(--nx-faint)]">Keine Assets</span>
-                                                            @endforelse
-                                                        </div>
-                                                @endif
-                                            </div>
-                                        </a>
-
-                                        {{-- Footer: Meta + Export --}}
-                                        <div class="flex items-center justify-between border-t border-[color:var(--nx-line)] px-4 py-2">
-                                            <span class="text-[11px] text-[color:var(--nx-faint)]">
-                                                @if($group['entryRelation']){{ $entryCount }} {{ $group['entryLabel'] }} · @endif{{ $board->updated_at->format('d.m.Y') }}
-                                            </span>
-                                            <span class="flex items-center gap-1">
-                                                <a href="{{ route('brands.export.download-board', ['boardType' => $group['boardType'], 'boardId' => $board->id, 'format' => 'json']) }}"
-                                                   class="rounded p-1 text-[color:var(--nx-faint)] transition-colors hover:bg-[color:var(--nx-hover)] hover:text-[color:var(--nx-text)]" title="JSON-Export">
-                                                    @svg('heroicon-o-code-bracket', 'w-3.5 h-3.5')
-                                                </a>
-                                                <a href="{{ route('brands.export.download-board', ['boardType' => $group['boardType'], 'boardId' => $board->id, 'format' => 'pdf']) }}"
-                                                   class="rounded p-1 text-[color:var(--nx-faint)] transition-colors hover:bg-[color:var(--nx-hover)] hover:text-[color:var(--nx-text)]" title="PDF-Export">
-                                                    @svg('heroicon-o-document', 'w-3.5 h-3.5')
-                                                </a>
-                                            </span>
-                                        </div>
-                                    </x-nx-card>
-                                @endforeach
-                            @endforeach
-                        </div>
-                    </x-nx-section>
-                @endif
-            @endforeach
-        @elseif($accountsCount === 0)
-            {{-- Leerzustand: gar keine Boards --}}
-            <x-nx-card>
-                <x-nx-empty icon="heroicon-o-squares-2x2">
-                    Noch keine Boards – lege über „Board erstellen" das erste Board für diese Marke an.
-                </x-nx-empty>
-            </x-nx-card>
+        @if($brand->description)
+            <p class="mt-3.5 max-w-[66ch] px-1 text-[14.5px] leading-relaxed text-[color:var(--nx-muted)]">{{ $brand->description }}</p>
         @endif
 
-        {{-- ===== Social Accounts ===== --}}
+        {{-- ══════════ PROPERTIES ══════════ --}}
+        <div class="mt-6 grid grid-cols-1 gap-x-10 gap-y-0.5 md:grid-cols-2">
+            {{-- Verortung --}}
+            <div class="grid grid-cols-[150px_1fr] items-center rounded-[6px] px-2 py-1.5 hover:bg-[color:var(--nx-hover)]">
+                <span class="flex items-center gap-2 text-[13.5px] text-[color:var(--nx-faint)]">@svg('heroicon-o-building-office-2', 'w-[15px] h-[15px]') Verortung</span>
+                <span class="text-[13.5px]">
+                    @if($verortung)
+                        <span class="inline-flex items-center gap-1.5 rounded-full bg-[rgba(25,113,194,.1)] px-2 py-0.5 text-[12.5px] text-[color:var(--nx-info)]">{{ $verortung['entity'] }}</span>
+                        @if($verortung['type'])<span class="text-[color:var(--nx-faint)]"> · {{ $verortung['type'] }}</span>@endif
+                    @else
+                        <span class="text-[color:var(--nx-faint)]">Unverknüpft</span>
+                    @endif
+                </span>
+            </div>
+            {{-- Engagement --}}
+            @if($verortung && !empty($verortung['via']))
+                <div class="grid grid-cols-[150px_1fr] items-center rounded-[6px] px-2 py-1.5 hover:bg-[color:var(--nx-hover)]">
+                    <span class="flex items-center gap-2 text-[13.5px] text-[color:var(--nx-faint)]">@svg('heroicon-o-link', 'w-[15px] h-[15px]') Engagement</span>
+                    <span class="text-[13.5px] text-[color:var(--nx-text)]">{{ $verortung['via'] }}</span>
+                </div>
+            @endif
+            {{-- Meta Connection --}}
+            <div class="grid grid-cols-[150px_1fr] items-center rounded-[6px] px-2 py-1.5 hover:bg-[color:var(--nx-hover)]">
+                <span class="flex items-center gap-2 text-[13.5px] text-[color:var(--nx-faint)]">@svg('heroicon-o-bolt', 'w-[15px] h-[15px]') Meta Connection</span>
+                @if($metaConnection)
+                    <span class="text-[13.5px] text-[color:var(--nx-success)]">Aktiv</span>
+                @else
+                    <span class="text-[13.5px] text-[color:var(--nx-faint)]">nicht verbunden</span>
+                @endif
+            </div>
+            {{-- Boards --}}
+            <div class="grid grid-cols-[150px_1fr] items-center rounded-[6px] px-2 py-1.5 hover:bg-[color:var(--nx-hover)]">
+                <span class="flex items-center gap-2 text-[13.5px] text-[color:var(--nx-faint)]">@svg('heroicon-o-squares-2x2', 'w-[15px] h-[15px]') Boards</span>
+                <span class="text-[13.5px] tabular-nums text-[color:var(--nx-text)]">{{ $totalBoards }} <span class="text-[color:var(--nx-faint)]">· {{ $typeCount }} Typen</span></span>
+            </div>
+            {{-- Accounts --}}
+            <div class="grid grid-cols-[150px_1fr] items-center rounded-[6px] px-2 py-1.5 hover:bg-[color:var(--nx-hover)]">
+                <span class="flex items-center gap-2 text-[13.5px] text-[color:var(--nx-faint)]">@svg('heroicon-o-share', 'w-[15px] h-[15px]') Social Accounts</span>
+                <span class="text-[13.5px] tabular-nums {{ $accountsCount ? 'text-[color:var(--nx-text)]' : 'text-[color:var(--nx-faint)]' }}">{{ $accountsCount }}</span>
+            </div>
+            {{-- Erstellt --}}
+            <div class="grid grid-cols-[150px_1fr] items-center rounded-[6px] px-2 py-1.5 hover:bg-[color:var(--nx-hover)]">
+                <span class="flex items-center gap-2 text-[13.5px] text-[color:var(--nx-faint)]">@svg('heroicon-o-calendar', 'w-[15px] h-[15px]') Erstellt</span>
+                <span class="text-[13.5px] text-[color:var(--nx-text)]">{{ $brand->created_at->format('d.m.Y') }}</span>
+            </div>
+            {{-- Unternehmen --}}
+            @if($company)
+                @php $companyResolver = app(\Platform\Core\Contracts\CrmCompanyResolverInterface::class); @endphp
+                <div class="grid grid-cols-[150px_1fr] items-center rounded-[6px] px-2 py-1.5 hover:bg-[color:var(--nx-hover)]">
+                    <span class="flex items-center gap-2 text-[13.5px] text-[color:var(--nx-faint)]">@svg('heroicon-o-briefcase', 'w-[15px] h-[15px]') Unternehmen</span>
+                    <a href="{{ $companyResolver->url($company->id) }}" class="text-[13.5px] text-[color:var(--nx-info)] hover:underline">{{ $companyResolver->displayName($company->id) }}</a>
+                </div>
+            @endif
+            {{-- Kontakt --}}
+            @if($contact)
+                @php $contactResolver = app(\Platform\Core\Contracts\CrmContactResolverInterface::class); @endphp
+                <div class="grid grid-cols-[150px_1fr] items-center rounded-[6px] px-2 py-1.5 hover:bg-[color:var(--nx-hover)]">
+                    <span class="flex items-center gap-2 text-[13.5px] text-[color:var(--nx-faint)]">@svg('heroicon-o-user', 'w-[15px] h-[15px]') Kontakt</span>
+                    <a href="{{ $contactResolver->url($contact->id) }}" class="text-[13.5px] text-[color:var(--nx-info)] hover:underline">{{ $contactResolver->displayName($contact->id) }}</a>
+                </div>
+            @endif
+        </div>
+
+        {{-- ══════════ IDENTITÄT ══════════ --}}
+        @if($hasIdentity)
+            <section class="mt-10">
+                <div class="mb-4 flex items-baseline gap-2.5 border-b border-[color:var(--nx-line)] pb-2.5">
+                    @svg('heroicon-o-swatch', 'w-[17px] h-[17px] text-[color:var(--nx-faint)] translate-y-[3px]')
+                    <h2 class="text-xs font-semibold uppercase tracking-[0.14em] text-[color:var(--nx-muted)]">Identität</h2>
+                </div>
+
+                {{-- Farbwelt --}}
+                @foreach($ciBoards as $ciB)
+                    @php
+                        $named = collect();
+                        if ($ciB->primary_color) { $named->push(['n' => 'Primär', 'c' => $ciB->primary_color]); }
+                        if ($ciB->secondary_color) { $named->push(['n' => 'Sekundär', 'c' => $ciB->secondary_color]); }
+                        if ($ciB->accent_color) { $named->push(['n' => 'Akzent', 'c' => $ciB->accent_color]); }
+                        foreach ($ciB->colors as $col) { $named->push(['n' => $col->title ?: 'Farbe', 'c' => $col->color]); }
+                    @endphp
+                    <a href="{{ route('brands.ci-boards.show', $ciB) }}" wire:navigate class="group block">
+                        <p class="mb-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-[color:var(--nx-faint)]">Farbwelt — CI @if($ciBoards->count() > 1)<span class="normal-case tracking-normal font-normal"> · {{ $ciB->name }}</span>@endif</p>
+                        @if($named->isNotEmpty())
+                            <div class="grid grid-cols-2 gap-3.5 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+                                @foreach($named->take(10) as $sw)
+                                    <div>
+                                        <div class="h-[88px] rounded-[8px] border border-[color:var(--nx-line)]" style="background-color: {{ $sw['c'] }};"></div>
+                                        <div class="mt-2 text-[13.5px] font-medium text-[color:var(--nx-text)]">{{ $sw['n'] }}</div>
+                                        <div class="text-[12px] uppercase tabular-nums text-[color:var(--nx-faint)]">{{ $sw['c'] }}</div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        @else
+                            <div class="rounded-[8px] border border-dashed border-[color:var(--nx-line-strong)] px-5 py-6 text-center text-[13px] text-[color:var(--nx-faint)]">Noch keine Farben hinterlegt</div>
+                        @endif
+                    </a>
+                    @if(!$loop->last)<div class="mt-6"></div>@endif
+                @endforeach
+
+                {{-- Typografie + Logo --}}
+                @if($typographyBoards->isNotEmpty() || $logoBoards->isNotEmpty())
+                    <div class="mt-7 grid grid-cols-1 gap-5 md:grid-cols-2">
+                        @if($typographyBoards->isNotEmpty())
+                            <div>
+                                <p class="mb-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-[color:var(--nx-faint)]">Typografie</p>
+                                @foreach($typographyBoards as $tB)
+                                    @if($tB->entries->isNotEmpty())
+                                        <a href="{{ route('brands.typography-boards.show', $tB) }}" wire:navigate class="block rounded-[8px] border border-[color:var(--nx-line)] bg-[color:var(--nx-surface)] px-4 py-4 transition-colors hover:bg-[color:var(--nx-hover)] {{ !$loop->first ? 'mt-3' : '' }}">
+                                            @foreach($tB->entries->take(4) as $entry)
+                                                <div class="{{ !$loop->first ? 'mt-2' : '' }}"><span class="text-[15px] font-semibold text-[color:var(--nx-text)]">{{ $entry->font_family }}</span>@if($entry->role)<span class="text-[13px] text-[color:var(--nx-faint)]"> · {{ $entry->role }}</span>@endif</div>
+                                            @endforeach
+                                        </a>
+                                    @else
+                                        <a href="{{ route('brands.typography-boards.show', $tB) }}" wire:navigate class="block rounded-[8px] border border-dashed border-[color:var(--nx-line-strong)] px-5 py-6 text-center text-[13px] text-[color:var(--nx-faint)] transition-colors hover:text-[color:var(--nx-muted)] {{ !$loop->first ? 'mt-3' : '' }}">
+                                            Noch keine Schriften definiert
+                                            <span class="mt-2.5 inline-block rounded-[6px] border border-[color:var(--nx-line-strong)] px-3 py-1 text-[13px] text-[color:var(--nx-muted)]">Schriften hinzufügen</span>
+                                        </a>
+                                    @endif
+                                @endforeach
+                            </div>
+                        @endif
+                        @if($logoBoards->isNotEmpty())
+                            <div>
+                                <p class="mb-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-[color:var(--nx-faint)]">Logo</p>
+                                @foreach($logoBoards as $lB)
+                                    @if($lB->variants->isNotEmpty())
+                                        <a href="{{ route('brands.logo-boards.show', $lB) }}" wire:navigate class="block rounded-[8px] border border-[color:var(--nx-line)] bg-[color:var(--nx-surface)] px-4 py-4 transition-colors hover:bg-[color:var(--nx-hover)] {{ !$loop->first ? 'mt-3' : '' }}">
+                                            <div class="flex flex-wrap gap-2">
+                                                @foreach($lB->variants->take(6) as $v)
+                                                    <span class="rounded-[6px] bg-[color:var(--nx-accent-soft)] px-2.5 py-1 text-[12.5px] text-[color:var(--nx-muted)]">{{ Str::limit($v->name, 20) }}</span>
+                                                @endforeach
+                                            </div>
+                                        </a>
+                                    @else
+                                        <a href="{{ route('brands.logo-boards.show', $lB) }}" wire:navigate class="block rounded-[8px] border border-dashed border-[color:var(--nx-line-strong)] px-5 py-6 text-center text-[13px] text-[color:var(--nx-faint)] transition-colors hover:text-[color:var(--nx-muted)] {{ !$loop->first ? 'mt-3' : '' }}">
+                                            Noch keine Logo-Varianten
+                                            <span class="mt-2.5 inline-block rounded-[6px] border border-[color:var(--nx-line-strong)] px-3 py-1 text-[13px] text-[color:var(--nx-muted)]">Variante hochladen</span>
+                                        </a>
+                                    @endif
+                                @endforeach
+                            </div>
+                        @endif
+                    </div>
+                @endif
+
+                {{-- Moodboard --}}
+                @foreach($moodboardBoards as $mB)
+                    <div class="mt-7">
+                        <p class="mb-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-[color:var(--nx-faint)]">Moodboard @if($mB->images->isNotEmpty())<span class="normal-case tracking-normal font-normal text-[color:var(--nx-faint)]"> · {{ $mB->images->count() }} {{ $mB->images->count() === 1 ? 'Bild' : 'Bilder' }}</span>@endif</p>
+                        <a href="{{ route('brands.moodboard-boards.show', $mB) }}" wire:navigate class="block">
+                            @if($mB->images->isNotEmpty())
+                                <div class="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-6">
+                                    @foreach($mB->images->take(12) as $img)
+                                        @if($img->thumbnail_url)
+                                            <div class="aspect-square overflow-hidden rounded-[6px] border border-[color:var(--nx-line)]"><img src="{{ $img->thumbnail_url }}" alt="{{ $img->title }}" class="h-full w-full object-cover"></div>
+                                        @else
+                                            <div class="flex aspect-square items-center justify-center rounded-[6px] bg-[color:var(--nx-accent-soft)]">@svg('heroicon-o-photo', 'w-5 h-5 text-[color:var(--nx-faint)]')</div>
+                                        @endif
+                                    @endforeach
+                                </div>
+                            @else
+                                <div class="rounded-[8px] border border-dashed border-[color:var(--nx-line-strong)] px-5 py-6 text-center text-[13px] text-[color:var(--nx-faint)]">Noch keine Bilder</div>
+                            @endif
+                        </a>
+                    </div>
+                @endforeach
+            </section>
+        @endif
+
+        {{-- ══════════ STRATEGIE ══════════ --}}
+        @if($hasStrategie)
+            <section class="mt-10">
+                <div class="mb-4 flex items-baseline gap-2.5 border-b border-[color:var(--nx-line)] pb-2.5">
+                    @svg('heroicon-o-light-bulb', 'w-[17px] h-[17px] text-[color:var(--nx-faint)] translate-y-[3px]')
+                    <h2 class="text-xs font-semibold uppercase tracking-[0.14em] text-[color:var(--nx-muted)]">Strategie</h2>
+                </div>
+
+                {{-- Personas --}}
+                @foreach($personaBoards as $pB)
+                    <div class="{{ !$loop->first ? 'mt-7' : '' }}">
+                        <p class="mb-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-[color:var(--nx-faint)]">Personas @if($pB->personas->isNotEmpty())<span class="normal-case tracking-normal font-normal text-[color:var(--nx-faint)]"> · {{ $pB->personas->count() }}</span>@endif</p>
+                        @if($pB->personas->isNotEmpty())
+                            <div class="grid grid-cols-1 gap-3.5 md:grid-cols-2 lg:grid-cols-3">
+                                @foreach($pB->personas->take(6) as $persona)
+                                    @php $pi = collect(explode(' ', trim($persona->name)))->filter()->take(2)->map(fn($w) => mb_strtoupper(mb_substr($w, 0, 1)))->implode(''); @endphp
+                                    <a href="{{ route('brands.persona-boards.show', $pB) }}" wire:navigate class="block rounded-[12px] border border-[color:var(--nx-line)] bg-[color:var(--nx-surface)] p-[18px] transition-colors hover:bg-[color:var(--nx-hover)]">
+                                        <div class="flex h-[38px] w-[38px] items-center justify-center rounded-full text-[14px] font-semibold text-white" style="background-color: {{ $primary ?: '#787774' }};">{{ $pi ?: '·' }}</div>
+                                        <div class="mt-3 text-[15px] font-semibold text-[color:var(--nx-text)]">{{ $persona->name }}</div>
+                                        @if($persona->occupation)<div class="mt-0.5 text-[13px] text-[color:var(--nx-faint)]">{{ $persona->occupation }}</div>@endif
+                                        @if(!empty($persona->goals) || !empty($persona->pain_points))
+                                            <div class="mt-3.5 space-y-3 border-t border-[color:var(--nx-line)] pt-3.5">
+                                                @if(!empty($persona->goals))
+                                                    <div>
+                                                        <div class="text-[10.5px] uppercase tracking-[0.1em] text-[color:var(--nx-faint)]">Ziele</div>
+                                                        <p class="mt-1 text-[12.5px] leading-snug text-[color:var(--nx-muted)]">{{ Str::limit(collect($persona->goals)->take(2)->implode(' · '), 80) }}</p>
+                                                    </div>
+                                                @endif
+                                                @if(!empty($persona->pain_points))
+                                                    <div>
+                                                        <div class="text-[10.5px] uppercase tracking-[0.1em] text-[color:var(--nx-faint)]">Pain Points</div>
+                                                        <p class="mt-1 text-[12.5px] leading-snug text-[color:var(--nx-muted)]">{{ Str::limit(collect($persona->pain_points)->take(2)->implode(' · '), 80) }}</p>
+                                                    </div>
+                                                @endif
+                                            </div>
+                                        @endif
+                                    </a>
+                                @endforeach
+                            </div>
+                        @else
+                            <a href="{{ route('brands.persona-boards.show', $pB) }}" wire:navigate class="block rounded-[8px] border border-dashed border-[color:var(--nx-line-strong)] px-5 py-6 text-center text-[13px] text-[color:var(--nx-faint)]">Noch keine Personas</a>
+                        @endif
+                    </div>
+                @endforeach
+
+                {{-- Tone of Voice + Wettbewerber --}}
+                @if($toneOfVoiceBoards->isNotEmpty() || $competitorBoards->isNotEmpty())
+                    <div class="mt-7 grid grid-cols-1 gap-5 md:grid-cols-2">
+                        @if($toneOfVoiceBoards->isNotEmpty())
+                            <div>
+                                <p class="mb-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-[color:var(--nx-faint)]">Tone of Voice</p>
+                                @foreach($toneOfVoiceBoards as $tvB)
+                                    <a href="{{ route('brands.tone-of-voice-boards.show', $tvB) }}" wire:navigate class="block rounded-[8px] border border-[color:var(--nx-line)] bg-[color:var(--nx-surface)] px-5 py-[18px] transition-colors hover:bg-[color:var(--nx-hover)] {{ !$loop->first ? 'mt-3' : '' }}">
+                                        @if($tvB->dimensions->isNotEmpty())
+                                            @foreach($tvB->dimensions->take(6) as $dim)
+                                                <div class="{{ !$loop->first ? 'mt-3.5' : '' }}">
+                                                    <div class="mb-1.5 flex justify-between text-[12.5px] text-[color:var(--nx-muted)]"><span>{{ $dim->label_left }}</span><span>{{ $dim->label_right }}</span></div>
+                                                    <div class="relative h-[5px] rounded-full bg-[color:var(--nx-accent-soft)]">
+                                                        <span class="absolute top-1/2 h-[13px] w-[13px] -translate-x-1/2 -translate-y-1/2 rounded-full ring-[3px] ring-[color:var(--nx-surface)]" style="left: {{ max(0, min(100, $dim->value ?? 50)) }}%; background-color: {{ $primary ?: '#787774' }};"></span>
+                                                    </div>
+                                                </div>
+                                            @endforeach
+                                        @elseif($tvB->entries->isNotEmpty())
+                                            <div class="flex flex-wrap gap-2">
+                                                @foreach($tvB->entries->take(6) as $entry)
+                                                    <span class="rounded-[6px] bg-[color:var(--nx-accent-soft)] px-2.5 py-1 text-[12.5px] text-[color:var(--nx-muted)]">{{ Str::limit($entry->name, 24) }}</span>
+                                                @endforeach
+                                            </div>
+                                        @else
+                                            <span class="text-[13px] text-[color:var(--nx-faint)]">Noch keine Dimensionen</span>
+                                        @endif
+                                    </a>
+                                @endforeach
+                            </div>
+                        @endif
+                        @if($competitorBoards->isNotEmpty())
+                            <div>
+                                <p class="mb-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-[color:var(--nx-faint)]">Wettbewerber</p>
+                                @foreach($competitorBoards as $cB)
+                                    <div class="overflow-hidden rounded-[8px] border border-[color:var(--nx-line)] bg-[color:var(--nx-surface)] {{ !$loop->first ? 'mt-3' : '' }}">
+                                        @forelse($cB->competitors->take(6) as $comp)
+                                            <a href="{{ route('brands.competitor-boards.show', $cB) }}" wire:navigate class="group flex items-center gap-3 border-b border-[color:var(--nx-line)] px-4 py-3 last:border-0 transition-colors hover:bg-[color:var(--nx-hover)]">
+                                                <span class="flex h-[30px] w-[30px] shrink-0 items-center justify-center rounded-[7px] bg-[color:var(--nx-accent-soft)] text-[color:var(--nx-muted)]">@svg('heroicon-o-flag', 'w-4 h-4')</span>
+                                                <span class="min-w-0">
+                                                    <span class="block text-[14px] font-medium text-[color:var(--nx-text)]">{{ $comp->name }}</span>
+                                                    @if($comp->website_url)<span class="block truncate text-[12.5px] text-[color:var(--nx-faint)]">{{ parse_url($comp->website_url, PHP_URL_HOST) }}</span>@endif
+                                                </span>
+                                                <span class="flex-1"></span>
+                                                <span class="text-[color:var(--nx-faint)] opacity-0 transition-opacity group-hover:opacity-100">&rsaquo;</span>
+                                            </a>
+                                        @empty
+                                            <div class="px-4 py-6 text-center text-[13px] text-[color:var(--nx-faint)]">Noch keine Wettbewerber</div>
+                                        @endforelse
+                                    </div>
+                                @endforeach
+                            </div>
+                        @endif
+                    </div>
+                @endif
+
+                {{-- Guidelines --}}
+                @foreach($guidelineBoards as $gB)
+                    <div class="mt-7">
+                        <p class="mb-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-[color:var(--nx-faint)]">Guidelines @if($gB->chapters->isNotEmpty())<span class="normal-case tracking-normal font-normal text-[color:var(--nx-faint)]"> · {{ $gB->chapters->count() }} {{ $gB->chapters->count() === 1 ? 'Kapitel' : 'Kapitel' }}</span>@endif</p>
+                        <div class="overflow-hidden rounded-[8px] border border-[color:var(--nx-line)] bg-[color:var(--nx-surface)]">
+                            @forelse($gB->chapters->take(8) as $chapter)
+                                <a href="{{ route('brands.guideline-boards.show', $gB) }}" wire:navigate class="group flex items-center gap-3 border-b border-[color:var(--nx-line)] px-4 py-3 last:border-0 transition-colors hover:bg-[color:var(--nx-hover)]">
+                                    <span class="flex h-[30px] w-[30px] shrink-0 items-center justify-center rounded-[7px] bg-[color:var(--nx-accent-soft)] text-[12px] font-semibold tabular-nums text-[color:var(--nx-muted)]">{{ str_pad($loop->iteration, 2, '0', STR_PAD_LEFT) }}</span>
+                                    <span class="min-w-0">
+                                        <span class="block text-[14px] font-medium text-[color:var(--nx-text)]">{{ $chapter->title }}</span>
+                                        @if($chapter->description)<span class="block truncate text-[12.5px] text-[color:var(--nx-faint)]">{{ Str::limit($chapter->description, 60) }}</span>@endif
+                                    </span>
+                                    <span class="flex-1"></span>
+                                    @if(isset($chapter->entries_count))<span class="rounded-full bg-[color:var(--nx-accent-soft)] px-2 py-0.5 text-[12px] tabular-nums text-[color:var(--nx-muted)]">{{ $chapter->entries_count }}</span>@endif
+                                    <span class="text-[color:var(--nx-faint)] opacity-0 transition-opacity group-hover:opacity-100">&rsaquo;</span>
+                                </a>
+                            @empty
+                                <div class="px-4 py-6 text-center text-[13px] text-[color:var(--nx-faint)]">Noch keine Kapitel</div>
+                            @endforelse
+                        </div>
+                    </div>
+                @endforeach
+            </section>
+        @endif
+
+        {{-- ══════════ CONTENT & ASSETS ══════════ --}}
+        @if($hasOps)
+            <section class="mt-10">
+                <div class="mb-4 flex items-baseline gap-2.5 border-b border-[color:var(--nx-line)] pb-2.5">
+                    @svg('heroicon-o-bars-3-bottom-left', 'w-[17px] h-[17px] text-[color:var(--nx-faint)] translate-y-[3px]')
+                    <h2 class="text-xs font-semibold uppercase tracking-[0.14em] text-[color:var(--nx-muted)]">Content &amp; Assets</h2>
+                </div>
+                <div class="overflow-hidden rounded-[8px] border border-[color:var(--nx-line)] bg-[color:var(--nx-surface)]">
+                    @foreach($socialBoards as $b)
+                        <a href="{{ route('brands.social-boards.show', $b) }}" wire:navigate class="group flex items-center gap-3.5 border-b border-[color:var(--nx-line)] px-[15px] py-3 last:border-0 transition-colors hover:bg-[color:var(--nx-hover)]">
+                            <span class="flex h-[30px] w-[30px] shrink-0 items-center justify-center rounded-[7px] bg-[color:var(--nx-accent-soft)] text-[color:var(--nx-muted)]">@svg('heroicon-o-share', 'w-4 h-4')</span>
+                            <span class="min-w-0"><span class="block text-[14px] font-medium text-[color:var(--nx-text)]">{{ $b->name }}</span><span class="block text-[12.5px] text-[color:var(--nx-faint)]">Social · {{ $b->slots->count() }} Slots · {{ $b->cards_count }} Cards</span></span>
+                            <span class="flex-1"></span>
+                            <span class="whitespace-nowrap text-[12.5px] tabular-nums text-[color:var(--nx-faint)]">{{ optional($b->updated_at)->format('d.m.Y') }}</span>
+                            <span class="text-[color:var(--nx-faint)] opacity-0 transition-opacity group-hover:opacity-100">&rsaquo;</span>
+                        </a>
+                    @endforeach
+                    @foreach($kanbanBoards as $b)
+                        <a href="{{ route('brands.kanban-boards.show', $b) }}" wire:navigate class="group flex items-center gap-3.5 border-b border-[color:var(--nx-line)] px-[15px] py-3 last:border-0 transition-colors hover:bg-[color:var(--nx-hover)]">
+                            <span class="flex h-[30px] w-[30px] shrink-0 items-center justify-center rounded-[7px] bg-[color:var(--nx-accent-soft)] text-[color:var(--nx-muted)]">@svg('heroicon-o-view-columns', 'w-4 h-4')</span>
+                            <span class="min-w-0"><span class="block text-[14px] font-medium text-[color:var(--nx-text)]">{{ $b->name }}</span><span class="block text-[12.5px] text-[color:var(--nx-faint)]">Kanban · {{ $b->slots->count() }} Spalten · {{ $b->cards_count }} Cards</span></span>
+                            <span class="flex-1"></span>
+                            <span class="whitespace-nowrap text-[12.5px] tabular-nums text-[color:var(--nx-faint)]">{{ optional($b->updated_at)->format('d.m.Y') }}</span>
+                            <span class="text-[color:var(--nx-faint)] opacity-0 transition-opacity group-hover:opacity-100">&rsaquo;</span>
+                        </a>
+                    @endforeach
+                    @foreach($seoBoards as $b)
+                        <a href="{{ route('brands.seo-boards.show', $b) }}" wire:navigate class="group flex items-center gap-3.5 border-b border-[color:var(--nx-line)] px-[15px] py-3 last:border-0 transition-colors hover:bg-[color:var(--nx-hover)]">
+                            <span class="flex h-[30px] w-[30px] shrink-0 items-center justify-center rounded-[7px] bg-[color:var(--nx-accent-soft)] text-[color:var(--nx-muted)]">@svg('heroicon-o-magnifying-glass', 'w-4 h-4')</span>
+                            <span class="min-w-0"><span class="block text-[14px] font-medium text-[color:var(--nx-text)]">{{ $b->name }}</span><span class="block text-[12.5px] text-[color:var(--nx-faint)]">SEO · {{ $b->keywords_count }} Keywords @if($b->keywordClusters->isNotEmpty())· {{ $b->keywordClusters->count() }} Cluster @endif</span></span>
+                            <span class="flex-1"></span>
+                            <span class="whitespace-nowrap text-[12.5px] tabular-nums text-[color:var(--nx-faint)]">{{ optional($b->updated_at)->format('d.m.Y') }}</span>
+                            <span class="text-[color:var(--nx-faint)] opacity-0 transition-opacity group-hover:opacity-100">&rsaquo;</span>
+                        </a>
+                    @endforeach
+                    @foreach($contentBriefBoards as $b)
+                        <a href="{{ route('brands.content-brief-boards.show', $b) }}" wire:navigate class="group flex items-center gap-3.5 border-b border-[color:var(--nx-line)] px-[15px] py-3 last:border-0 transition-colors hover:bg-[color:var(--nx-hover)]">
+                            <span class="flex h-[30px] w-[30px] shrink-0 items-center justify-center rounded-[7px] bg-[color:var(--nx-accent-soft)] text-[color:var(--nx-muted)]">@svg('heroicon-o-document-text', 'w-4 h-4')</span>
+                            <span class="min-w-0"><span class="block text-[14px] font-medium text-[color:var(--nx-text)]">{{ $b->name }}</span><span class="block text-[12.5px] {{ $b->content_type ? 'text-[color:var(--nx-faint)]' : 'text-[color:var(--nx-faint)]' }}">Content Brief @if($b->content_type)· {{ $b->content_type }}@else· kein Typ gesetzt @endif</span></span>
+                            <span class="flex-1"></span>
+                            <span class="whitespace-nowrap text-[12.5px] tabular-nums text-[color:var(--nx-faint)]">{{ optional($b->updated_at)->format('d.m.Y') }}</span>
+                            <span class="text-[color:var(--nx-faint)] opacity-0 transition-opacity group-hover:opacity-100">&rsaquo;</span>
+                        </a>
+                    @endforeach
+                    @foreach($assetBoards as $b)
+                        <a href="{{ route('brands.asset-boards.show', $b) }}" wire:navigate class="group flex items-center gap-3.5 border-b border-[color:var(--nx-line)] px-[15px] py-3 last:border-0 transition-colors hover:bg-[color:var(--nx-hover)]">
+                            <span class="flex h-[30px] w-[30px] shrink-0 items-center justify-center rounded-[7px] bg-[color:var(--nx-accent-soft)] text-[color:var(--nx-muted)]">@svg('heroicon-o-folder-open', 'w-4 h-4')</span>
+                            <span class="min-w-0"><span class="block text-[14px] font-medium text-[color:var(--nx-text)]">{{ $b->name }}</span><span class="block text-[12.5px] text-[color:var(--nx-faint)]">Assets · {{ $b->assets_count }} {{ $b->assets_count === 1 ? 'Datei' : 'Dateien' }}</span></span>
+                            <span class="flex-1"></span>
+                            <span class="whitespace-nowrap text-[12.5px] tabular-nums text-[color:var(--nx-faint)]">{{ optional($b->updated_at)->format('d.m.Y') }}</span>
+                            <span class="text-[color:var(--nx-faint)] opacity-0 transition-opacity group-hover:opacity-100">&rsaquo;</span>
+                        </a>
+                    @endforeach
+                </div>
+            </section>
+        @endif
+
+        {{-- ══════════ LEERZUSTAND ══════════ --}}
+        @if(!$hasIdentity && !$hasStrategie && !$hasOps && $accountsCount === 0)
+            <div class="mt-10 rounded-[8px] border border-[color:var(--nx-line)] bg-[color:var(--nx-surface)] px-6 py-12 text-center">
+                @svg('heroicon-o-squares-2x2', 'w-8 h-8 mx-auto text-[color:var(--nx-faint)] opacity-50')
+                <p class="mt-3 text-[13px] text-[color:var(--nx-faint)]">Noch keine Boards – lege über „Board erstellen" das erste Board an.</p>
+            </div>
+        @endif
+
+        {{-- ══════════ SOCIAL ACCOUNTS ══════════ --}}
         @if($accountsCount > 0 || ($metaConnection && ($availableFacebookPages->count() > 0 || $availableInstagramAccounts->count() > 0)))
-            <x-nx-section icon="heroicon-o-globe-alt" title="Social Accounts" :hint="$accountsCount . ' verknüpft'">
+            <section class="mt-10">
+                <div class="mb-4 flex items-baseline gap-2.5 border-b border-[color:var(--nx-line)] pb-2.5">
+                    @svg('heroicon-o-globe-alt', 'w-[17px] h-[17px] text-[color:var(--nx-faint)] translate-y-[3px]')
+                    <h2 class="text-xs font-semibold uppercase tracking-[0.14em] text-[color:var(--nx-muted)]">Social Accounts</h2>
+                    <span class="text-xs tabular-nums text-[color:var(--nx-faint)]">{{ $accountsCount }} verknüpft</span>
+                </div>
 
-                {{-- Verknüpfte Accounts --}}
                 @if($accountsCount > 0)
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                    <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
                         @foreach($facebookPages as $facebookPage)
-                            <x-nx-card flush>
-                                <div class="flex items-center gap-3 p-3">
-                                    <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-[6px] bg-[rgba(25,113,194,.1)]">
-                                        @svg('heroicon-o-globe-alt', 'w-4 h-4 text-[color:var(--nx-info)]')
-                                    </span>
-                                    <a href="{{ route('brands.facebook-pages.show', $facebookPage) }}" wire:navigate class="min-w-0 flex-1">
-                                        <span class="block truncate text-sm font-medium text-[color:var(--nx-text)]">{{ $facebookPage->name }}</span>
-                                        <span class="block text-xs text-[color:var(--nx-faint)]">Facebook Page</span>
-                                    </a>
-                                    @can('update', $brand)
-                                        <button wire:click="detachFacebookPage({{ $facebookPage->id }})" wire:confirm="Facebook Page wirklich von dieser Marke trennen?"
-                                                class="shrink-0 rounded p-1.5 text-[color:var(--nx-faint)] transition-colors hover:bg-[rgba(224,49,49,.08)] hover:text-[color:var(--nx-danger)]" title="Verknüpfung trennen">
-                                            @svg('heroicon-o-x-mark', 'w-4 h-4')
-                                        </button>
-                                    @endcan
-                                </div>
-                            </x-nx-card>
+                            <div class="flex items-center gap-3 rounded-[8px] border border-[color:var(--nx-line)] bg-[color:var(--nx-surface)] p-3">
+                                <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-[6px] bg-[rgba(25,113,194,.1)]">@svg('heroicon-o-globe-alt', 'w-4 h-4 text-[color:var(--nx-info)]')</span>
+                                <a href="{{ route('brands.facebook-pages.show', $facebookPage) }}" wire:navigate class="min-w-0 flex-1"><span class="block truncate text-sm font-medium text-[color:var(--nx-text)]">{{ $facebookPage->name }}</span><span class="block text-xs text-[color:var(--nx-faint)]">Facebook Page</span></a>
+                                @can('update', $brand)
+                                    <button wire:click="detachFacebookPage({{ $facebookPage->id }})" wire:confirm="Facebook Page wirklich trennen?" class="shrink-0 rounded p-1.5 text-[color:var(--nx-faint)] transition-colors hover:bg-[rgba(224,49,49,.08)] hover:text-[color:var(--nx-danger)]" title="Trennen">@svg('heroicon-o-x-mark', 'w-4 h-4')</button>
+                                @endcan
+                            </div>
                         @endforeach
-
                         @foreach($instagramAccounts as $instagramAccount)
-                            <x-nx-card flush>
-                                <div class="flex items-center gap-3 p-3">
-                                    <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-[6px] bg-[rgba(224,49,49,.1)]">
-                                        @svg('heroicon-o-camera', 'w-4 h-4 text-[color:var(--nx-danger)]')
-                                    </span>
-                                    <a href="{{ route('brands.instagram-accounts.show', $instagramAccount) }}" wire:navigate class="min-w-0 flex-1">
-                                        <span class="block truncate text-sm font-medium text-[color:var(--nx-text)]">{{ '@' . $instagramAccount->username }}</span>
-                                        <span class="block text-xs text-[color:var(--nx-faint)]">Instagram</span>
-                                    </a>
-                                    @can('update', $brand)
-                                        <button wire:click="detachInstagramAccount({{ $instagramAccount->id }})" wire:confirm="Instagram Account wirklich von dieser Marke trennen?"
-                                                class="shrink-0 rounded p-1.5 text-[color:var(--nx-faint)] transition-colors hover:bg-[rgba(224,49,49,.08)] hover:text-[color:var(--nx-danger)]" title="Verknüpfung trennen">
-                                            @svg('heroicon-o-x-mark', 'w-4 h-4')
-                                        </button>
-                                    @endcan
-                                </div>
-                            </x-nx-card>
+                            <div class="flex items-center gap-3 rounded-[8px] border border-[color:var(--nx-line)] bg-[color:var(--nx-surface)] p-3">
+                                <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-[6px] bg-[rgba(224,49,49,.1)]">@svg('heroicon-o-camera', 'w-4 h-4 text-[color:var(--nx-danger)]')</span>
+                                <a href="{{ route('brands.instagram-accounts.show', $instagramAccount) }}" wire:navigate class="min-w-0 flex-1"><span class="block truncate text-sm font-medium text-[color:var(--nx-text)]">{{ '@' . $instagramAccount->username }}</span><span class="block text-xs text-[color:var(--nx-faint)]">Instagram</span></a>
+                                @can('update', $brand)
+                                    <button wire:click="detachInstagramAccount({{ $instagramAccount->id }})" wire:confirm="Instagram Account wirklich trennen?" class="shrink-0 rounded p-1.5 text-[color:var(--nx-faint)] transition-colors hover:bg-[rgba(224,49,49,.08)] hover:text-[color:var(--nx-danger)]" title="Trennen">@svg('heroicon-o-x-mark', 'w-4 h-4')</button>
+                                @endcan
+                            </div>
                         @endforeach
                     </div>
                 @endif
 
-                {{-- Verfügbare Accounts zum Verknüpfen (eingeklappt) --}}
                 @if($metaConnection && ($availableFacebookPages->count() > 0 || $availableInstagramAccounts->count() > 0))
                     @php $availableCount = $availableFacebookPages->count() + $availableInstagramAccounts->count(); @endphp
                     <div x-data="{ open: false }" class="{{ $accountsCount > 0 ? 'mt-4' : '' }}">
-                        <button type="button" @click="open = !open"
-                                class="flex items-center gap-1.5 text-sm text-[color:var(--nx-muted)] transition-colors hover:text-[color:var(--nx-text)]">
-                            <svg class="h-4 w-4 transition-transform" :class="open && 'rotate-90'" viewBox="0 0 20 20" fill="none">
-                                <path d="M7 5l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
+                        <button type="button" @click="open = !open" class="flex items-center gap-1.5 text-sm text-[color:var(--nx-muted)] transition-colors hover:text-[color:var(--nx-text)]">
+                            <svg class="h-4 w-4 transition-transform" :class="open && 'rotate-90'" viewBox="0 0 20 20" fill="none"><path d="M7 5l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
                             Weitere Accounts verknüpfen ({{ $availableCount }})
                         </button>
-                        <div x-show="open" x-cloak class="mt-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                        <div x-show="open" x-cloak class="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
                             @foreach($availableFacebookPages as $facebookPage)
-                                <x-nx-card flush>
-                                    <div class="flex items-center gap-3 p-3">
-                                        <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-[6px] bg-[rgba(25,113,194,.1)]">
-                                            @svg('heroicon-o-globe-alt', 'w-4 h-4 text-[color:var(--nx-info)]')
-                                        </span>
-                                        <div class="min-w-0 flex-1">
-                                            <span class="block truncate text-sm font-medium text-[color:var(--nx-text)]">{{ $facebookPage->name }}</span>
-                                            <span class="block text-xs text-[color:var(--nx-faint)]">Facebook Page</span>
-                                        </div>
-                                        @can('update', $brand)
-                                            <x-nx-button variant="secondary" size="sm" wire:click="attachFacebookPage({{ $facebookPage->id }})" class="shrink-0">
-                                                @svg('heroicon-o-plus', 'w-3.5 h-3.5') Verknüpfen
-                                            </x-nx-button>
-                                        @endcan
-                                    </div>
-                                </x-nx-card>
+                                <div class="flex items-center gap-3 rounded-[8px] border border-[color:var(--nx-line)] bg-[color:var(--nx-surface)] p-3">
+                                    <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-[6px] bg-[rgba(25,113,194,.1)]">@svg('heroicon-o-globe-alt', 'w-4 h-4 text-[color:var(--nx-info)]')</span>
+                                    <div class="min-w-0 flex-1"><span class="block truncate text-sm font-medium text-[color:var(--nx-text)]">{{ $facebookPage->name }}</span><span class="block text-xs text-[color:var(--nx-faint)]">Facebook Page</span></div>
+                                    @can('update', $brand)
+                                        <x-ui-button variant="secondary" size="sm" wire:click="attachFacebookPage({{ $facebookPage->id }})" class="shrink-0">@svg('heroicon-o-plus', 'w-3.5 h-3.5') Verknüpfen</x-ui-button>
+                                    @endcan
+                                </div>
                             @endforeach
-
                             @foreach($availableInstagramAccounts as $instagramAccount)
-                                <x-nx-card flush>
-                                    <div class="flex items-center gap-3 p-3">
-                                        <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-[6px] bg-[rgba(224,49,49,.1)]">
-                                            @svg('heroicon-o-camera', 'w-4 h-4 text-[color:var(--nx-danger)]')
-                                        </span>
-                                        <div class="min-w-0 flex-1">
-                                            <span class="block truncate text-sm font-medium text-[color:var(--nx-text)]">{{ '@' . $instagramAccount->username }}</span>
-                                            <span class="block text-xs text-[color:var(--nx-faint)]">Instagram</span>
-                                        </div>
-                                        @can('update', $brand)
-                                            <x-nx-button variant="secondary" size="sm" wire:click="attachInstagramAccount({{ $instagramAccount->id }})" class="shrink-0">
-                                                @svg('heroicon-o-plus', 'w-3.5 h-3.5') Verknüpfen
-                                            </x-nx-button>
-                                        @endcan
-                                    </div>
-                                </x-nx-card>
+                                <div class="flex items-center gap-3 rounded-[8px] border border-[color:var(--nx-line)] bg-[color:var(--nx-surface)] p-3">
+                                    <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-[6px] bg-[rgba(224,49,49,.1)]">@svg('heroicon-o-camera', 'w-4 h-4 text-[color:var(--nx-danger)]')</span>
+                                    <div class="min-w-0 flex-1"><span class="block truncate text-sm font-medium text-[color:var(--nx-text)]">{{ '@' . $instagramAccount->username }}</span><span class="block text-xs text-[color:var(--nx-faint)]">Instagram</span></div>
+                                    @can('update', $brand)
+                                        <x-ui-button variant="secondary" size="sm" wire:click="attachInstagramAccount({{ $instagramAccount->id }})" class="shrink-0">@svg('heroicon-o-plus', 'w-3.5 h-3.5') Verknüpfen</x-ui-button>
+                                    @endcan
+                                </div>
                             @endforeach
                         </div>
                     </div>
                 @endif
-            </x-nx-section>
+            </section>
         @endif
 
     </x-ui-page-container>
@@ -532,72 +606,28 @@
     <x-slot name="sidebar">
         <x-ui-page-sidebar title="Marken-Übersicht" width="w-80" :defaultOpen="true">
             <div class="p-6 space-y-6">
-                {{-- Mini Dashboard --}}
                 <div class="bg-gradient-to-br from-[var(--ui-primary-5)] to-[var(--ui-primary-10)] rounded-xl p-4 border border-[var(--ui-primary)]/20">
                     <h3 class="text-xs font-semibold uppercase tracking-wide text-[var(--ui-primary)] mb-4">Dashboard</h3>
-
                     <div class="space-y-3">
-                        {{-- Boards Statistik --}}
-                        @php
-                            $sidebarTotalBoards = $boardGroups->sum(fn($g) => $g['boards']->count());
-                        @endphp
                         <div class="bg-white/80 backdrop-blur-sm rounded-lg p-3 border border-white/50">
-                            <div class="flex items-center justify-between mb-2">
-                                <div class="flex items-center gap-2">
-                                    @svg('heroicon-o-squares-2x2', 'w-4 h-4 text-[var(--ui-primary)]')
-                                    <span class="text-sm font-semibold text-[var(--ui-secondary)]">Boards</span>
-                                </div>
-                                <span class="text-lg font-bold text-[var(--ui-primary)]">{{ $sidebarTotalBoards }}</span>
-                            </div>
-                            <div class="grid grid-cols-4 gap-2 mt-2">
-                                @foreach($boardGroups as $group)
-                                    <div class="text-center">
-                                        <div class="text-xs font-medium text-{{ $group['color'] }}-600">{{ $group['boards']->count() }}</div>
-                                        <div class="text-[10px] text-[var(--ui-muted)]">{{ Str::limit($group['label'], 8, '.') }}</div>
-                                    </div>
-                                @endforeach
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-2">@svg('heroicon-o-squares-2x2', 'w-4 h-4 text-[var(--ui-primary)]')<span class="text-sm font-semibold text-[var(--ui-secondary)]">Boards</span></div>
+                                <span class="text-lg font-bold text-[var(--ui-primary)]">{{ $totalBoards }}</span>
                             </div>
                         </div>
-
-                        {{-- Social Accounts Statistik --}}
-                        @if($facebookPages->count() > 0 || $instagramAccounts->count() > 0)
+                        @if($accountsCount > 0)
                             <div class="bg-white/80 backdrop-blur-sm rounded-lg p-3 border border-white/50">
-                                <div class="flex items-center justify-between mb-2">
-                                    <div class="flex items-center gap-2">
-                                        @svg('heroicon-o-share', 'w-4 h-4 text-[var(--ui-primary)]')
-                                        <span class="text-sm font-semibold text-[var(--ui-secondary)]">Social Accounts</span>
-                                    </div>
-                                    <span class="text-lg font-bold text-[var(--ui-primary)]">{{ $facebookPages->count() + $instagramAccounts->count() }}</span>
-                                </div>
-                                <div class="flex items-center gap-3 mt-2">
-                                    @if($facebookPages->count() > 0)
-                                        <div class="flex items-center gap-1.5">
-                                            <div class="w-2 h-2 rounded-full bg-blue-500"></div>
-                                            <span class="text-xs text-[var(--ui-muted)]">{{ $facebookPages->count() }} Facebook</span>
-                                        </div>
-                                    @endif
-                                    @if($instagramAccounts->count() > 0)
-                                        <div class="flex items-center gap-1.5">
-                                            <div class="w-2 h-2 rounded-full bg-pink-500"></div>
-                                            <span class="text-xs text-[var(--ui-muted)]">{{ $instagramAccounts->count() }} Instagram</span>
-                                        </div>
-                                    @endif
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-2">@svg('heroicon-o-share', 'w-4 h-4 text-[var(--ui-primary)]')<span class="text-sm font-semibold text-[var(--ui-secondary)]">Social Accounts</span></div>
+                                    <span class="text-lg font-bold text-[var(--ui-primary)]">{{ $accountsCount }}</span>
                                 </div>
                             </div>
                         @endif
-
-                        {{-- Meta Connection Status --}}
                         <div class="bg-white/80 backdrop-blur-sm rounded-lg p-3 border border-white/50">
                             <div class="flex items-center justify-between">
-                                <div class="flex items-center gap-2">
-                                    @svg('heroicon-o-link', 'w-4 h-4 text-[var(--ui-primary)]')
-                                    <span class="text-sm font-semibold text-[var(--ui-secondary)]">Meta Connection</span>
-                                </div>
+                                <div class="flex items-center gap-2">@svg('heroicon-o-link', 'w-4 h-4 text-[var(--ui-primary)]')<span class="text-sm font-semibold text-[var(--ui-secondary)]">Meta Connection</span></div>
                                 @if($metaConnection)
-                                    <div class="flex items-center gap-1.5">
-                                        <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-                                        <span class="text-xs font-medium text-green-600">Aktiv</span>
-                                    </div>
+                                    <span class="inline-flex items-center gap-1.5 text-xs font-medium text-green-600"><span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>Aktiv</span>
                                 @else
                                     <span class="text-xs font-medium text-[var(--ui-muted)]">Nicht verbunden</span>
                                 @endif
@@ -606,7 +636,6 @@
                     </div>
                 </div>
 
-                {{-- Marken-Details --}}
                 <div>
                     <h3 class="text-xs font-semibold uppercase tracking-wide text-[var(--ui-muted)] mb-3">Details</h3>
                     <div class="space-y-2">
@@ -618,40 +647,18 @@
                         @endif
                         <div class="flex justify-between items-center py-2 px-3 bg-[var(--ui-muted-5)] border border-[var(--ui-border)]/40">
                             <span class="text-sm text-[var(--ui-muted)]">Erstellt</span>
-                            <span class="text-sm text-[var(--ui-secondary)] font-medium">
-                                {{ $brand->created_at->format('d.m.Y') }}
-                            </span>
+                            <span class="text-sm text-[var(--ui-secondary)] font-medium">{{ $brand->created_at->format('d.m.Y') }}</span>
                         </div>
-                        @if($brand->done)
-                            <div class="flex justify-between items-center py-2 px-3 bg-[var(--ui-muted-5)] border border-[var(--ui-border)]/40">
-                                <span class="text-sm text-[var(--ui-muted)]">Status</span>
-                                <span class="text-xs font-medium px-2 py-0.5 rounded bg-[var(--ui-success-5)] text-[var(--ui-success)]">
-                                    Erledigt
-                                </span>
-                            </div>
-                        @endif
-                        @if($brand->getCompany())
-                            @php
-                                $company = $brand->getCompany();
-                                $companyResolver = app(\Platform\Core\Contracts\CrmCompanyResolverInterface::class);
-                            @endphp
+                        @if($company)
                             <div class="flex justify-between items-center py-2 px-3 bg-[var(--ui-muted-5)] border border-[var(--ui-border)]/40">
                                 <span class="text-sm text-[var(--ui-muted)]">Unternehmen</span>
-                                <a href="{{ $companyResolver->url($company->id) }}" class="text-sm text-[var(--ui-primary)] font-medium hover:underline">
-                                    {{ $companyResolver->displayName($company->id) }}
-                                </a>
+                                <a href="{{ app(\Platform\Core\Contracts\CrmCompanyResolverInterface::class)->url($company->id) }}" class="text-sm text-[var(--ui-primary)] font-medium hover:underline">{{ app(\Platform\Core\Contracts\CrmCompanyResolverInterface::class)->displayName($company->id) }}</a>
                             </div>
                         @endif
-                        @if($brand->getContact())
-                            @php
-                                $contact = $brand->getContact();
-                                $contactResolver = app(\Platform\Core\Contracts\CrmContactResolverInterface::class);
-                            @endphp
+                        @if($contact)
                             <div class="flex justify-between items-center py-2 px-3 bg-[var(--ui-muted-5)] border border-[var(--ui-border)]/40">
                                 <span class="text-sm text-[var(--ui-muted)]">Kontaktperson</span>
-                                <a href="{{ $contactResolver->url($contact->id) }}" class="text-sm text-[var(--ui-primary)] font-medium hover:underline">
-                                    {{ $contactResolver->displayName($contact->id) }}
-                                </a>
+                                <a href="{{ app(\Platform\Core\Contracts\CrmContactResolverInterface::class)->url($contact->id) }}" class="text-sm text-[var(--ui-primary)] font-medium hover:underline">{{ app(\Platform\Core\Contracts\CrmContactResolverInterface::class)->displayName($contact->id) }}</a>
                             </div>
                         @endif
                     </div>
@@ -666,34 +673,14 @@
                 <h3 class="text-xs font-semibold uppercase tracking-wider text-[var(--ui-muted)] mb-4">Letzte Aktivitäten</h3>
                 <div class="space-y-3">
                     @forelse(($activities ?? []) as $activity)
-                        <div class="p-3 rounded-lg border border-[var(--ui-border)]/40 bg-[var(--ui-muted-5)] hover:bg-[var(--ui-muted)] transition-colors">
-                            <div class="flex items-start justify-between gap-2 mb-1">
-                                <div class="flex-1 min-w-0">
-                                    <div class="text-sm font-medium text-[var(--ui-secondary)] leading-snug">
-                                        {{ $activity['title'] ?? 'Aktivität' }}
-                                    </div>
-                                </div>
-                                @if(($activity['type'] ?? null) === 'system')
-                                    <div class="flex-shrink-0">
-                                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[var(--ui-muted-5)] border border-[var(--ui-border)]/40 text-xs text-[var(--ui-muted)]">
-                                            @svg('heroicon-o-cog', 'w-3 h-3')
-                                            System
-                                        </span>
-                                    </div>
-                                @endif
-                            </div>
-                            <div class="flex items-center gap-2 text-xs text-[var(--ui-muted)]">
-                                @svg('heroicon-o-clock', 'w-3 h-3')
-                                <span>{{ $activity['time'] ?? '' }}</span>
-                            </div>
+                        <div class="p-3 rounded-lg border border-[var(--ui-border)]/40 bg-[var(--ui-muted-5)]">
+                            <div class="text-sm font-medium text-[var(--ui-secondary)] leading-snug">{{ $activity['title'] ?? 'Aktivität' }}</div>
+                            <div class="flex items-center gap-2 text-xs text-[var(--ui-muted)] mt-1">@svg('heroicon-o-clock', 'w-3 h-3')<span>{{ $activity['time'] ?? '' }}</span></div>
                         </div>
                     @empty
                         <div class="py-8 text-center">
-                            <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-[var(--ui-muted-5)] mb-3">
-                                @svg('heroicon-o-clock', 'w-6 h-6 text-[var(--ui-muted)]')
-                            </div>
+                            <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-[var(--ui-muted-5)] mb-3">@svg('heroicon-o-clock', 'w-6 h-6 text-[var(--ui-muted)]')</div>
                             <p class="text-sm text-[var(--ui-muted)]">Noch keine Aktivitäten</p>
-                            <p class="text-xs text-[var(--ui-muted)] mt-1">Änderungen werden hier angezeigt</p>
                         </div>
                     @endforelse
                 </div>
