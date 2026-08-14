@@ -144,34 +144,28 @@
             @endif
         </div>
 
-        {{-- ══════════ TITEL ══════════ --}}
-        <div class="flex items-end gap-4 -mt-9 px-1">
+        {{-- ══════════ TITEL (Signet überlappt Cover, Titel darunter) ══════════ --}}
+        <div class="px-1">
             @if($primary)
-                <div class="flex h-[76px] w-[76px] shrink-0 items-center justify-center rounded-[14px] text-2xl font-bold text-white ring-4 ring-[color:var(--nx-surface)]" style="background-color: {{ $primary }};">
+                <div class="-mt-10 flex h-[72px] w-[72px] items-center justify-center rounded-[16px] text-2xl font-bold text-white ring-4 ring-[color:var(--nx-surface)]" style="background-color: {{ $primary }};">
                     {{ mb_strtoupper(mb_substr($brand->name, 0, 1)) }}
                 </div>
             @else
-                <div class="flex h-[76px] w-[76px] shrink-0 items-center justify-center rounded-[14px] bg-[color:var(--nx-accent-soft)] text-2xl font-bold text-[color:var(--nx-muted)] ring-4 ring-[color:var(--nx-surface)]">
+                <div class="-mt-10 flex h-[72px] w-[72px] items-center justify-center rounded-[16px] bg-[color:var(--nx-accent-soft)] text-2xl font-bold text-[color:var(--nx-muted)] ring-4 ring-[color:var(--nx-surface)]">
                     {{ mb_strtoupper(mb_substr($brand->name, 0, 1)) }}
                 </div>
             @endif
-            <div class="min-w-0 pb-1">
-                <h1 class="flex flex-wrap items-center gap-x-3 gap-y-1 text-2xl md:text-[30px] font-bold leading-tight tracking-tight text-[color:var(--nx-text)]">
-                    {{ $brand->name }}
-                    @if($brand->done)
-                        <span class="inline-flex items-center gap-1.5 text-xs font-medium text-[color:var(--nx-muted)]">
-                            <span class="h-1.5 w-1.5 rounded-full bg-current"></span>Archiviert
-                        </span>
-                    @else
-                        <span class="inline-flex items-center gap-1.5 text-xs font-medium text-[color:var(--nx-success)]">
-                            <span class="h-1.5 w-1.5 rounded-full bg-current"></span>Aktiv
-                        </span>
-                    @endif
-                </h1>
-                @if($slogan)
-                    <p class="mt-1.5 text-[15px] italic text-[color:var(--nx-muted)]">&ldquo;{{ Str::limit($slogan, 120) }}&rdquo;</p>
+            <h1 class="mt-3.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-2xl md:text-[30px] font-bold leading-tight tracking-tight text-[color:var(--nx-text)]">
+                {{ $brand->name }}
+                @if($brand->done)
+                    <span class="inline-flex items-center gap-1.5 text-xs font-medium text-[color:var(--nx-muted)]"><span class="h-1.5 w-1.5 rounded-full bg-current"></span>Archiviert</span>
+                @else
+                    <span class="inline-flex items-center gap-1.5 text-xs font-medium text-[color:var(--nx-success)]"><span class="h-1.5 w-1.5 rounded-full bg-current"></span>Aktiv</span>
                 @endif
-            </div>
+            </h1>
+            @if($slogan)
+                <p class="mt-1.5 text-[15px] italic text-[color:var(--nx-muted)]">&ldquo;{{ Str::limit($slogan, 120) }}&rdquo;</p>
+            @endif
         </div>
 
         @if($brand->description)
@@ -257,6 +251,7 @@
                         if ($ciB->secondary_color) { $named->push(['n' => 'Sekundär', 'c' => $ciB->secondary_color]); }
                         if ($ciB->accent_color) { $named->push(['n' => 'Akzent', 'c' => $ciB->accent_color]); }
                         foreach ($ciB->colors as $col) { $named->push(['n' => $col->title ?: 'Farbe', 'c' => $col->color]); }
+                        $named = $named->filter(fn($x) => !empty($x['c']))->unique(fn($x) => mb_strtoupper($x['c']))->values();
                     @endphp
                     <a href="{{ route('brands.ci-boards.show', $ciB) }}" wire:navigate class="group block">
                         <p class="mb-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-[color:var(--nx-faint)]">Farbwelt — CI @if($ciBoards->count() > 1)<span class="normal-case tracking-normal font-normal"> · {{ $ciB->name }}</span>@endif</p>
