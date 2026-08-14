@@ -5,8 +5,7 @@ namespace Platform\Brands\Livewire;
 use Livewire\Component;
 use Illuminate\Support\Facades\Auth;
 use Platform\Brands\Models\BrandsBrand;
-use Platform\Organization\Services\EntityDimensionBridge;
-use Platform\Organization\Models\OrganizationEntity;
+use Platform\Brands\Services\BrandVerortungResolver;
 use Livewire\Attributes\On;
 
 class Brand extends Component
@@ -766,33 +765,12 @@ class Brand extends Component
     }
 
     /**
-     * Ermittelt die (erste) Organisations-Verortung dieser Marke: Entity-Name + Typ.
+     * Organisatorische Verortung dieser Marke (über engagement_with zum Kunden aufgelöst).
      *
-     * @return array{entity: string, type: ?string}|null
+     * @return array{entity: string, type: ?string, sort: int, via: ?string}|null
      */
     protected function resolveVerortung(): ?array
     {
-        $contextMorphTypes = ['brand', 'brands_brand', BrandsBrand::class];
-        $links = EntityDimensionBridge::linksForLinkables($contextMorphTypes, [$this->brand->id]);
-
-        $entityId = null;
-        foreach ($links as $link) {
-            $entityId = $link->entity_id;
-            break;
-        }
-
-        if (!$entityId) {
-            return null;
-        }
-
-        $entity = OrganizationEntity::with('type')->find($entityId);
-        if (!$entity) {
-            return null;
-        }
-
-        return [
-            'entity' => $entity->name,
-            'type' => $entity->type?->name,
-        ];
+        return app(BrandVerortungResolver::class)->forBrandIds([$this->brand->id])[$this->brand->id] ?? null;
     }
 }

@@ -5,8 +5,7 @@ namespace Platform\Brands\Livewire;
 use Livewire\Component;
 use Illuminate\Support\Facades\Auth;
 use Platform\Brands\Models\BrandsBrand;
-use Platform\Organization\Services\EntityDimensionBridge;
-use Platform\Organization\Models\OrganizationEntity;
+use Platform\Brands\Services\BrandVerortungResolver;
 
 class Dashboard extends Component
 {
@@ -146,52 +145,13 @@ class Dashboard extends Component
     }
 
     /**
-     * Ermittelt je Marke die (erste) Organisations-Verortung: Entity-Name + Typ.
+     * Ermittelt je Marke die Verortung (über engagement_with zum Kunden aufgelöst).
      *
      * @param  array<int>  $brandIds
-     * @return array<int, array{entity: string, type: ?string, sort: int}>
+     * @return array<int, array{entity: string, type: ?string, sort: int, via: ?string}>
      */
     protected function resolveVerortung(array $brandIds): array
     {
-        if (empty($brandIds)) {
-            return [];
-        }
-
-        $contextMorphTypes = ['brand', 'brands_brand', BrandsBrand::class];
-        $links = EntityDimensionBridge::linksForLinkables($contextMorphTypes, $brandIds);
-
-        // Brand → erste Entity-ID
-        $brandEntity = [];
-        $entityIds = [];
-        foreach ($links as $link) {
-            $entityIds[] = $link->entity_id;
-            if (!isset($brandEntity[$link->linkable_id])) {
-                $brandEntity[$link->linkable_id] = $link->entity_id;
-            }
-        }
-
-        if (empty($entityIds)) {
-            return [];
-        }
-
-        $entities = OrganizationEntity::with('type')
-            ->whereIn('id', array_unique($entityIds))
-            ->get()
-            ->keyBy('id');
-
-        $result = [];
-        foreach ($brandEntity as $brandId => $entityId) {
-            $entity = $entities->get($entityId);
-            if (!$entity) {
-                continue;
-            }
-            $result[$brandId] = [
-                'entity' => $entity->name,
-                'type' => $entity->type?->name,
-                'sort' => $entity->type?->sort_order ?? 999,
-            ];
-        }
-
-        return $result;
+        return app(BrandVerortungResolver::class)->forBrandIds($brandIds);
     }
 }
