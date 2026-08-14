@@ -5,6 +5,8 @@ namespace Platform\Brands\Livewire;
 use Livewire\Component;
 use Illuminate\Support\Facades\Auth;
 use Platform\Brands\Models\BrandsBrand;
+use Platform\Organization\Services\EntityDimensionBridge;
+use Platform\Organization\Models\OrganizationEntity;
 use Livewire\Attributes\On;
 
 class Brand extends Component
@@ -703,6 +705,9 @@ class Brand extends Component
             ],
         ])->filter(fn($group) => $group['boards']->count() > 0);
 
+        // Verortung dieser Marke (Entity + Typ) via Organization-Dimension
+        $verortung = $this->resolveVerortung();
+
         // Meta Connection laden
         $metaConnection = $this->brand->metaConnection();
 
@@ -756,6 +761,38 @@ class Brand extends Component
             'availableFacebookPages' => $availableFacebookPages,
             'availableInstagramAccounts' => $availableInstagramAccounts,
             'metaConnection' => $metaConnection,
+            'verortung' => $verortung,
         ])->layout('platform::layouts.app');
+    }
+
+    /**
+     * Ermittelt die (erste) Organisations-Verortung dieser Marke: Entity-Name + Typ.
+     *
+     * @return array{entity: string, type: ?string}|null
+     */
+    protected function resolveVerortung(): ?array
+    {
+        $contextMorphTypes = ['brand', 'brands_brand', BrandsBrand::class];
+        $links = EntityDimensionBridge::linksForLinkables($contextMorphTypes, [$this->brand->id]);
+
+        $entityId = null;
+        foreach ($links as $link) {
+            $entityId = $link->entity_id;
+            break;
+        }
+
+        if (!$entityId) {
+            return null;
+        }
+
+        $entity = OrganizationEntity::with('type')->find($entityId);
+        if (!$entity) {
+            return null;
+        }
+
+        return [
+            'entity' => $entity->name,
+            'type' => $entity->type?->name,
+        ];
     }
 }

@@ -170,649 +170,377 @@
         </x-ui-page-actionbar>
     </x-slot>
 
-    <x-ui-page-container spacing="space-y-6">
-        {{-- Boards Section --}}
-        <div>
-            @if($boardGroups->count() > 0 || $facebookPages->count() > 0 || $instagramAccounts->count() > 0)
-                <div class="space-y-6">
-                    <div class="space-y-0 divide-y divide-gray-100">
-                        @foreach($boardGroups as $group)
-                            @foreach($group['boards'] as $board)
-                                @php
-                                    $countAttr = $group['entryRelation'] ? $group['entryRelation'] . '_count' : null;
-                                    $entryCount = $countAttr && isset($board->$countAttr) ? $board->$countAttr : ($group['entryRelation'] ? $board->{$group['entryRelation']}->count() : 0);
-                                @endphp
-                                <a href="{{ route($group['routePrefix'], $board) }}" wire:navigate
-                                   class="group relative block py-10 md:py-14 px-2 md:px-6 hover:bg-gray-50/50 transition-colors duration-300">
+    <x-ui-page-container spacing="space-y-8">
 
-                                    {{-- Category Label --}}
-                                    <span class="text-[11px] uppercase tracking-[0.2em] font-medium text-{{ $group['color'] }}-500">{{ $group['label'] }}</span>
+        @php
+            $ci = $ciBoards->first();
+            $primary = $ci?->primary_color;
+            $slogan = $ci?->slogan ?: $ci?->tagline;
+            $totalBoards = $boardGroups->sum(fn($g) => $g['boards']->count());
+            $accountsCount = $facebookPages->count() + $instagramAccounts->count();
+        @endphp
 
-                                    {{-- Board Name --}}
-                                    <h4 class="text-2xl md:text-3xl font-light tracking-tight text-gray-900 mt-2">
-                                        {{ $board->name }}
-                                        @if($board->done)
-                                            <span class="inline-flex items-center ml-3 text-[11px] font-medium text-emerald-500 align-middle">Erledigt</span>
-                                        @endif
-                                    </h4>
+        {{-- ===== Header ===== --}}
+        <div class="flex items-start gap-4">
+            {{-- Marken-Signet --}}
+            @if($primary)
+                <span class="hidden sm:block h-14 w-14 shrink-0 rounded-[10px] ring-1 ring-[color:var(--nx-line)]" style="background-color: {{ $primary }};"></span>
+            @else
+                <span class="hidden sm:flex h-14 w-14 shrink-0 items-center justify-center rounded-[10px] bg-[color:var(--nx-accent-soft)] text-xl font-semibold text-[color:var(--nx-muted)]">{{ mb_strtoupper(mb_substr($brand->name, 0, 1)) }}</span>
+            @endif
 
-                                    {{-- Description --}}
-                                    @if($board->description)
-                                        <p class="text-base text-gray-400 leading-relaxed max-w-2xl mt-3">{{ $board->description }}</p>
-                                    @endif
-
-                                    {{-- Preview Content --}}
-                                    <div class="mt-8">
-                                        @if($group['key'] === 'ci')
-                                            {{-- Farben als benannte Swatches --}}
-                                            <div class="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-                                                @if($board->primary_color)
-                                                    <div class="text-center">
-                                                        <div class="w-full aspect-square rounded-2xl shadow-sm" style="background-color: {{ $board->primary_color }};"></div>
-                                                        <span class="text-xs text-gray-400 mt-2 block">Primär</span>
-                                                        <span class="text-[11px] text-gray-300 font-mono">{{ $board->primary_color }}</span>
-                                                    </div>
-                                                @endif
-                                                @if($board->secondary_color)
-                                                    <div class="text-center">
-                                                        <div class="w-full aspect-square rounded-2xl shadow-sm" style="background-color: {{ $board->secondary_color }};"></div>
-                                                        <span class="text-xs text-gray-400 mt-2 block">Sekundär</span>
-                                                        <span class="text-[11px] text-gray-300 font-mono">{{ $board->secondary_color }}</span>
-                                                    </div>
-                                                @endif
-                                                @if($board->accent_color)
-                                                    <div class="text-center">
-                                                        <div class="w-full aspect-square rounded-2xl shadow-sm" style="background-color: {{ $board->accent_color }};"></div>
-                                                        <span class="text-xs text-gray-400 mt-2 block">Akzent</span>
-                                                        <span class="text-[11px] text-gray-300 font-mono">{{ $board->accent_color }}</span>
-                                                    </div>
-                                                @endif
-                                                @foreach($board->colors->take(7) as $color)
-                                                    <div class="text-center">
-                                                        <div class="w-full aspect-square rounded-2xl shadow-sm" style="background-color: {{ $color->color }};"></div>
-                                                        <span class="text-xs text-gray-400 mt-2 block">{{ $color->title ?: 'Farbe' }}</span>
-                                                        <span class="text-[11px] text-gray-300 font-mono">{{ $color->color }}</span>
-                                                    </div>
-                                                @endforeach
-                                            </div>
-                                            <div class="mt-8 space-y-2">
-                                                @if($board->slogan)
-                                                    <p class="text-2xl md:text-3xl text-gray-500 italic font-light leading-snug">&ldquo;{{ Str::limit($board->slogan, 140) }}&rdquo;</p>
-                                                @elseif($board->tagline)
-                                                    <p class="text-2xl md:text-3xl text-gray-500 italic font-light leading-snug">&ldquo;{{ Str::limit($board->tagline, 140) }}&rdquo;</p>
-                                                @endif
-                                                @if($board->font_family)
-                                                    <p class="text-lg text-gray-400 mt-3">Schrift: {{ $board->font_family }}</p>
-                                                @endif
-                                            </div>
-
-                                        @elseif($group['key'] === 'social' || $group['key'] === 'kanban')
-                                            {{-- Slots als Karten-Grid mit Card-Preview --}}
-                                            <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
-                                                @forelse($board->slots->take(6) as $slot)
-                                                    <div class="bg-gray-50/80 rounded-xl px-5 py-4">
-                                                        <span class="text-[15px] font-medium text-gray-700 block">{{ Str::limit($slot->name, 24) }}</span>
-                                                        <span class="text-sm text-gray-400 mt-1 block">{{ $slot->cards_count }} {{ $slot->cards_count === 1 ? 'Card' : 'Cards' }}</span>
-                                                    </div>
-                                                @empty
-                                                    <span class="text-base text-gray-300 col-span-3">Keine Spalten</span>
-                                                @endforelse
-                                            </div>
-                                            @if($board->slots->count() > 6)
-                                                <p class="text-sm text-gray-300 mt-3">+{{ $board->slots->count() - 6 }} weitere Spalten</p>
-                                            @endif
-
-                                        @elseif($group['key'] === 'typography')
-                                            {{-- Schriften als echte große Textbeispiele --}}
-                                            <div class="space-y-8">
-                                                @forelse($board->entries->take(4) as $entry)
-                                                    <div>
-                                                        <span class="text-3xl md:text-4xl font-semibold text-gray-800 block leading-tight">{{ $entry->font_family }}</span>
-                                                        <p class="text-lg text-gray-400 mt-1">
-                                                            @if($entry->role){{ $entry->role }}@endif
-                                                            @if($entry->font_weight) · {{ $entry->font_weight }}@endif
-                                                            @if($entry->font_size) · {{ $entry->font_size }}@endif
-                                                        </p>
-                                                    </div>
-                                                @empty
-                                                    <span class="text-base text-gray-300">Keine Schriften</span>
-                                                @endforelse
-                                            </div>
-
-                                        @elseif($group['key'] === 'logo')
-                                            {{-- Logo-Varianten als Grid --}}
-                                            <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
-                                                @forelse($board->variants->take(6) as $variant)
-                                                    <div class="bg-gray-50/80 rounded-xl px-5 py-4">
-                                                        <span class="text-[15px] font-medium text-gray-700 block">{{ $variant->name }}</span>
-                                                        @if($variant->type)
-                                                            <span class="text-sm text-gray-400 mt-1 block">{{ $variant->type }}</span>
-                                                        @endif
-                                                    </div>
-                                                @empty
-                                                    <span class="text-base text-gray-300 col-span-3">Keine Varianten</span>
-                                                @endforelse
-                                            </div>
-                                            @if($board->variants_count > 6)
-                                                <p class="text-sm text-gray-300 mt-3">+{{ $board->variants_count - 6 }} weitere</p>
-                                            @endif
-
-                                        @elseif($group['key'] === 'tone-of-voice')
-                                            {{-- Dimensionen volle Breite --}}
-                                            @if($board->dimensions->isNotEmpty())
-                                                <div class="space-y-6">
-                                                    @foreach($board->dimensions->take(5) as $dim)
-                                                        <div>
-                                                            <div class="flex items-center justify-between mb-2">
-                                                                <span class="text-base text-gray-500 font-medium">{{ $dim->label_left }}</span>
-                                                                <span class="text-base text-gray-500 font-medium">{{ $dim->label_right }}</span>
-                                                            </div>
-                                                            <div class="h-2 bg-gray-100 rounded-full relative">
-                                                                <div class="absolute top-1/2 -translate-y-1/2 w-5 h-5 bg-gray-500 rounded-full shadow-md ring-4 ring-white" style="left: {{ ($dim->value ?? 50) }}%;"></div>
-                                                            </div>
-                                                        </div>
-                                                    @endforeach
-                                                </div>
-                                            @elseif($board->entries->isNotEmpty())
-                                                <div class="flex flex-wrap gap-3">
-                                                    @foreach($board->entries->take(6) as $entry)
-                                                        <span class="px-5 py-2.5 rounded-full bg-gray-50 text-[15px] text-gray-600">{{ Str::limit($entry->name, 30) }}</span>
-                                                    @endforeach
-                                                </div>
-                                            @else
-                                                <span class="text-base text-gray-300">Keine Einträge</span>
-                                            @endif
-
-                                        @elseif($group['key'] === 'persona')
-                                            {{-- Personas als reichhaltige Profil-Karten --}}
-                                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                                                @forelse($board->personas->take(6) as $persona)
-                                                    <div class="bg-gray-50/80 rounded-2xl px-6 py-6">
-                                                        {{-- Name & Basics --}}
-                                                        <div class="flex items-start justify-between">
-                                                            <div>
-                                                                <span class="text-xl text-gray-800 font-semibold block">{{ $persona->name }}</span>
-                                                                @if($persona->occupation)
-                                                                    <span class="text-base text-gray-500 mt-0.5 block">{{ $persona->occupation }}</span>
-                                                                @endif
-                                                            </div>
-                                                            @if($persona->age)
-                                                                <span class="text-sm text-gray-400 bg-white rounded-full px-3 py-1 flex-shrink-0">{{ $persona->age }} J.</span>
-                                                            @endif
-                                                        </div>
-
-                                                        {{-- Meta-Infos --}}
-                                                        @if($persona->location || $persona->gender || $persona->education)
-                                                            <div class="flex flex-wrap gap-x-3 gap-y-1 mt-3 text-sm text-gray-400">
-                                                                @if($persona->location)<span>{{ $persona->location }}</span>@endif
-                                                                @if($persona->gender)<span>· {{ $persona->gender_label }}</span>@endif
-                                                                @if($persona->education)<span>· {{ Str::limit($persona->education, 25) }}</span>@endif
-                                                            </div>
-                                                        @endif
-
-                                                        {{-- Bio --}}
-                                                        @if($persona->bio)
-                                                            <p class="text-sm text-gray-500 mt-3 leading-relaxed line-clamp-3">{{ $persona->bio }}</p>
-                                                        @endif
-
-                                                        {{-- Goals & Pain Points --}}
-                                                        @if(!empty($persona->goals) || !empty($persona->pain_points))
-                                                            <div class="mt-4 pt-4 border-t border-gray-200/60 grid grid-cols-2 gap-3">
-                                                                @if(!empty($persona->goals))
-                                                                    <div>
-                                                                        <span class="text-[11px] uppercase tracking-wider text-gray-400 font-medium">Ziele</span>
-                                                                        <div class="mt-1 space-y-0.5">
-                                                                            @foreach(array_slice($persona->goals, 0, 3) as $goal)
-                                                                                <p class="text-xs text-gray-500 leading-snug">{{ Str::limit($goal, 35) }}</p>
-                                                                            @endforeach
-                                                                        </div>
-                                                                    </div>
-                                                                @endif
-                                                                @if(!empty($persona->pain_points))
-                                                                    <div>
-                                                                        <span class="text-[11px] uppercase tracking-wider text-gray-400 font-medium">Pain Points</span>
-                                                                        <div class="mt-1 space-y-0.5">
-                                                                            @foreach(array_slice($persona->pain_points, 0, 3) as $pain)
-                                                                                <p class="text-xs text-gray-500 leading-snug">{{ Str::limit($pain, 35) }}</p>
-                                                                            @endforeach
-                                                                        </div>
-                                                                    </div>
-                                                                @endif
-                                                            </div>
-                                                        @endif
-
-                                                        {{-- Kanäle --}}
-                                                        @if(!empty($persona->channels))
-                                                            <div class="flex flex-wrap gap-1.5 mt-3">
-                                                                @foreach(array_slice($persona->channels, 0, 4) as $channel)
-                                                                    <span class="px-2 py-0.5 rounded-full bg-white text-[11px] text-gray-500">{{ $channel }}</span>
-                                                                @endforeach
-                                                            </div>
-                                                        @endif
-                                                    </div>
-                                                @empty
-                                                    <span class="text-base text-gray-300 col-span-3">Keine Personas</span>
-                                                @endforelse
-                                            </div>
-                                            @if($entryCount > 6)
-                                                <p class="text-sm text-gray-300 mt-3">+{{ $entryCount - 6 }} weitere</p>
-                                            @endif
-
-                                        @elseif($group['key'] === 'competitor')
-                                            {{-- Wettbewerber als Grid --}}
-                                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                                @forelse($board->competitors->take(6) as $competitor)
-                                                    <div class="bg-gray-50/80 rounded-xl px-6 py-5">
-                                                        <span class="text-lg text-gray-800 font-semibold block">{{ $competitor->name }}</span>
-                                                        @if($competitor->website_url)
-                                                            <span class="text-sm text-gray-400 mt-1 block truncate">{{ parse_url($competitor->website_url, PHP_URL_HOST) }}</span>
-                                                        @endif
-                                                    </div>
-                                                @empty
-                                                    <span class="text-base text-gray-300 col-span-2">Keine Wettbewerber</span>
-                                                @endforelse
-                                            </div>
-                                            @if($entryCount > 6)
-                                                <p class="text-sm text-gray-300 mt-3">+{{ $entryCount - 6 }} weitere</p>
-                                            @endif
-
-                                        @elseif($group['key'] === 'guideline')
-                                            {{-- Kapitel als ausführliche Sektionen --}}
-                                            <div class="space-y-8">
-                                                @forelse($board->chapters->take(8) as $index => $chapter)
-                                                    <div>
-                                                        {{-- Kapitel-Header --}}
-                                                        <div class="flex items-baseline gap-4 mb-4">
-                                                            <span class="text-3xl font-light text-gray-200 leading-none">{{ str_pad($index + 1, 2, '0', STR_PAD_LEFT) }}</span>
-                                                            <div>
-                                                                <span class="text-xl text-gray-800 font-semibold block">{{ $chapter->title }}</span>
-                                                                @if($chapter->description)
-                                                                    <p class="text-base text-gray-500 mt-1 leading-relaxed max-w-2xl">{{ $chapter->description }}</p>
-                                                                @endif
-                                                            </div>
-                                                        </div>
-
-                                                        {{-- Regeln als Karten --}}
-                                                        @if($chapter->entries->isNotEmpty())
-                                                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 ml-12">
-                                                                @foreach($chapter->entries->take(4) as $entry)
-                                                                    <div class="bg-gray-50/80 rounded-xl px-5 py-4">
-                                                                        <span class="text-[15px] text-gray-700 font-medium block">{{ $entry->title }}</span>
-                                                                        @if($entry->rule_text)
-                                                                            <p class="text-sm text-gray-500 mt-1.5 leading-relaxed line-clamp-2">{{ $entry->rule_text }}</p>
-                                                                        @endif
-                                                                        @if($entry->rationale)
-                                                                            <p class="text-xs text-gray-400 italic mt-1.5 line-clamp-1">{{ $entry->rationale }}</p>
-                                                                        @endif
-                                                                        @if($entry->do_example || $entry->dont_example)
-                                                                            <div class="flex flex-col gap-1 mt-3 pt-3 border-t border-gray-200/60">
-                                                                                @if($entry->do_example)
-                                                                                    <div class="flex items-start gap-2">
-                                                                                        <span class="text-emerald-500 text-xs font-bold mt-px flex-shrink-0">DO</span>
-                                                                                        <span class="text-xs text-gray-600 leading-snug">{{ Str::limit($entry->do_example, 60) }}</span>
-                                                                                    </div>
-                                                                                @endif
-                                                                                @if($entry->dont_example)
-                                                                                    <div class="flex items-start gap-2">
-                                                                                        <span class="text-red-400 text-xs font-bold mt-px flex-shrink-0">DON'T</span>
-                                                                                        <span class="text-xs text-gray-600 leading-snug">{{ Str::limit($entry->dont_example, 60) }}</span>
-                                                                                    </div>
-                                                                                @endif
-                                                                            </div>
-                                                                        @endif
-                                                                    </div>
-                                                                @endforeach
-                                                            </div>
-                                                            @if($chapter->entries_count > 4)
-                                                                <p class="text-xs text-gray-300 mt-2 ml-12">+{{ $chapter->entries_count - 4 }} weitere Regeln</p>
-                                                            @endif
-                                                        @endif
-                                                    </div>
-                                                @empty
-                                                    <span class="text-base text-gray-300">Keine Kapitel</span>
-                                                @endforelse
-                                            </div>
-
-                                        @elseif($group['key'] === 'moodboard')
-                                            {{-- Bild-Galerie als großes responsives Grid --}}
-                                            <div class="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
-                                                @forelse($board->images->take(12) as $image)
-                                                    @if($image->thumbnail_url)
-                                                        <div class="aspect-square rounded-2xl overflow-hidden bg-gray-100">
-                                                            <img src="{{ $image->thumbnail_url }}" alt="{{ $image->title }}" class="w-full h-full object-cover">
-                                                        </div>
-                                                    @else
-                                                        <div class="aspect-square rounded-2xl bg-gray-50 flex items-center justify-center">
-                                                            @svg('heroicon-o-photo', 'w-8 h-8 text-gray-300')
-                                                        </div>
-                                                    @endif
-                                                @empty
-                                                    <span class="text-base text-gray-300 col-span-6">Keine Bilder</span>
-                                                @endforelse
-                                            </div>
-                                            @if($entryCount > 12)
-                                                <p class="text-sm text-gray-300 mt-3">+{{ $entryCount - 12 }} weitere Bilder</p>
-                                            @endif
-
-                                        @elseif($group['key'] === 'asset')
-                                            {{-- Assets als Grid --}}
-                                            <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
-                                                @forelse($board->assets->take(6) as $asset)
-                                                    <div class="bg-gray-50/80 rounded-xl px-5 py-4">
-                                                        <span class="text-[15px] font-medium text-gray-700 block">{{ Str::limit($asset->name, 28) }}</span>
-                                                        @if($asset->asset_type)
-                                                            <span class="text-sm text-gray-400 uppercase tracking-wide mt-1 block">{{ $asset->asset_type }}</span>
-                                                        @endif
-                                                    </div>
-                                                @empty
-                                                    <span class="text-base text-gray-300 col-span-3">Keine Assets</span>
-                                                @endforelse
-                                            </div>
-                                            @if($board->assets_count > 6)
-                                                <p class="text-sm text-gray-300 mt-3">+{{ $board->assets_count - 6 }} weitere</p>
-                                            @endif
-
-                                        @elseif($group['key'] === 'seo')
-                                            {{-- Keywords als großes Tag-Cloud + Cluster --}}
-                                            <div class="flex flex-wrap gap-3">
-                                                @forelse($board->keywords->take(10) as $keyword)
-                                                    <span class="px-5 py-2.5 rounded-full bg-gray-50 text-[15px] text-gray-600">
-                                                        {{ Str::limit($keyword->keyword, 30) }}
-                                                        @if($keyword->search_volume)
-                                                            <span class="text-gray-300 ml-2">{{ number_format($keyword->search_volume) }}</span>
-                                                        @endif
-                                                    </span>
-                                                @empty
-                                                    <span class="text-base text-gray-300">Keine Keywords</span>
-                                                @endforelse
-                                                @if($board->keywords_count > 10)
-                                                    <span class="self-center text-sm text-gray-300">+{{ $board->keywords_count - 10 }}</span>
-                                                @endif
-                                            </div>
-                                            @if($board->keywordClusters->isNotEmpty())
-                                                <p class="text-base text-gray-400 mt-4">{{ $board->keywordClusters->count() }} Cluster</p>
-                                            @endif
-
-                                        @elseif($group['key'] === 'content-brief')
-                                            {{-- Content Brief --}}
-                                            <div class="bg-gray-50/80 rounded-xl px-6 py-5 max-w-xl">
-                                                @if($board->content_type || $board->search_intent)
-                                                    <div class="flex items-center gap-4">
-                                                        @if($board->content_type)
-                                                            <span class="text-lg text-gray-700 font-medium">{{ $board->content_type }}</span>
-                                                        @endif
-                                                        @if($board->search_intent)
-                                                            <span class="text-base text-gray-400">{{ $board->search_intent }}</span>
-                                                        @endif
-                                                    </div>
-                                                @endif
-                                                @if($board->target_url)
-                                                    <p class="text-base text-gray-400 truncate mt-2">{{ $board->target_url }}</p>
-                                                @endif
-                                                @if($board->target_word_count)
-                                                    <p class="text-base text-gray-400 mt-1">Ziel: {{ number_format($board->target_word_count) }} Wörter</p>
-                                                @endif
-                                            </div>
-                                        @endif
-                                    </div>
-
-                                    {{-- Footer: Meta + Export + CTA --}}
-                                    <div class="flex items-center justify-between mt-8">
-                                        <span class="text-[12px] text-gray-300">
-                                            @if($group['entryRelation']){{ $entryCount }} {{ $group['entryLabel'] }} · @endif{{ $board->updated_at->format('d. M Y') }}
-                                        </span>
-                                        <div class="flex items-center gap-3">
-                                            <div class="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200" onclick="event.preventDefault(); event.stopPropagation();">
-                                                <span class="p-1.5 text-gray-300 hover:text-gray-600 rounded-lg transition-colors" onclick="window.location.href='{{ route('brands.export.download-board', ['boardType' => $group['boardType'], 'boardId' => $board->id, 'format' => 'json']) }}'" title="JSON">
-                                                    @svg('heroicon-o-code-bracket', 'w-3.5 h-3.5')
-                                                </span>
-                                                <span class="p-1.5 text-gray-300 hover:text-gray-600 rounded-lg transition-colors" onclick="window.location.href='{{ route('brands.export.download-board', ['boardType' => $group['boardType'], 'boardId' => $board->id, 'format' => 'pdf']) }}'" title="PDF">
-                                                    @svg('heroicon-o-document', 'w-3.5 h-3.5')
-                                                </span>
-                                            </div>
-                                            <span class="text-sm text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                                                Öffnen &rarr;
-                                            </span>
-                                        </div>
-                                    </div>
-                                </a>
-                            @endforeach
-                        @endforeach
-                    </div>
-
-                    {{-- Social Accounts Gruppe (Facebook Pages & Instagram) --}}
-                    @if($facebookPages->count() > 0 || $instagramAccounts->count() > 0)
-                        <div>
-                            <div class="flex items-center gap-2 mb-3">
-                                <div class="flex items-center justify-center w-7 h-7 rounded-lg bg-gradient-to-br from-blue-50 to-pink-50">
-                                    @svg('heroicon-o-globe-alt', 'w-4 h-4 text-blue-600')
-                                </div>
-                                <h3 class="text-sm font-semibold text-[var(--ui-secondary)] uppercase tracking-wide">Social Accounts</h3>
-                                <span class="text-xs text-[var(--ui-muted)]">({{ $facebookPages->count() + $instagramAccounts->count() }})</span>
-                            </div>
-
-                            <div class="bg-white rounded-xl border border-[var(--ui-border)]/60 shadow-sm overflow-hidden">
-                                <table class="w-full">
-                                    <thead>
-                                        <tr class="border-b border-[var(--ui-border)]/40">
-                                            <th class="text-left text-xs font-medium text-[var(--ui-muted)] uppercase tracking-wider px-4 py-2.5">Name</th>
-                                            <th class="text-left text-xs font-medium text-[var(--ui-muted)] uppercase tracking-wider px-4 py-2.5 hidden sm:table-cell">Typ</th>
-                                            <th class="text-right text-xs font-medium text-[var(--ui-muted)] uppercase tracking-wider px-4 py-2.5 hidden lg:table-cell">Verknüpft seit</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody class="divide-y divide-[var(--ui-border)]/30">
-                                        @foreach($facebookPages as $facebookPage)
-                                            <tr class="group hover:bg-blue-50/30 transition-colors">
-                                                <td class="px-4 py-3">
-                                                    <a href="{{ route('brands.facebook-pages.show', $facebookPage) }}" class="block">
-                                                        <div class="font-medium text-sm text-[var(--ui-secondary)] group-hover:text-blue-600 transition-colors">{{ $facebookPage->name }}</div>
-                                                        @if($facebookPage->description)
-                                                            <div class="text-xs text-[var(--ui-muted)] mt-0.5 line-clamp-1">{{ $facebookPage->description }}</div>
-                                                        @endif
-                                                    </a>
-                                                </td>
-                                                <td class="px-4 py-3 hidden sm:table-cell">
-                                                    <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 text-xs font-medium">
-                                                        @svg('heroicon-o-globe-alt', 'w-3.5 h-3.5')
-                                                        Facebook Page
-                                                    </span>
-                                                </td>
-                                                <td class="px-4 py-3 text-right hidden lg:table-cell">
-                                                    <span class="text-xs text-[var(--ui-muted)]">{{ $facebookPage->created_at->format('d.m.Y') }}</span>
-                                                </td>
-                                            </tr>
-                                        @endforeach
-                                        @foreach($instagramAccounts as $instagramAccount)
-                                            <tr class="group hover:bg-pink-50/30 transition-colors">
-                                                <td class="px-4 py-3">
-                                                    <a href="{{ route('brands.instagram-accounts.show', $instagramAccount) }}" class="block">
-                                                        <div class="font-medium text-sm text-[var(--ui-secondary)] group-hover:text-pink-600 transition-colors">{{ '@' . $instagramAccount->username }}</div>
-                                                        @if($instagramAccount->description)
-                                                            <div class="text-xs text-[var(--ui-muted)] mt-0.5 line-clamp-1">{{ $instagramAccount->description }}</div>
-                                                        @endif
-                                                    </a>
-                                                </td>
-                                                <td class="px-4 py-3 hidden sm:table-cell">
-                                                    <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-pink-50 text-pink-700 text-xs font-medium">
-                                                        @svg('heroicon-o-camera', 'w-3.5 h-3.5')
-                                                        Instagram
-                                                    </span>
-                                                </td>
-                                                <td class="px-4 py-3 text-right hidden lg:table-cell">
-                                                    <span class="text-xs text-[var(--ui-muted)]">{{ $instagramAccount->created_at->format('d.m.Y') }}</span>
-                                                </td>
-                                            </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
+            <div class="min-w-0 flex-1">
+                <div class="flex flex-wrap items-center gap-2.5">
+                    <h1 class="text-2xl font-semibold tracking-tight text-[color:var(--nx-text)]">{{ $brand->name }}</h1>
+                    @if($brand->done)
+                        <x-nx-badge variant="neutral">Archiviert</x-nx-badge>
+                    @else
+                        <x-nx-badge variant="success" dot>Aktiv</x-nx-badge>
+                    @endif
+                    @if($verortung)
+                        <x-nx-badge variant="info">
+                            @svg('heroicon-o-building-office-2', 'w-3.5 h-3.5')
+                            {{ $verortung['entity'] }}@if($verortung['type']) · {{ $verortung['type'] }}@endif
+                        </x-nx-badge>
+                    @else
+                        <x-nx-badge variant="neutral">Unverknüpft</x-nx-badge>
                     @endif
                 </div>
-            @else
-                <div class="bg-white rounded-xl border border-[var(--ui-border)]/60 shadow-sm p-12 text-center">
-                    <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-[var(--ui-primary-5)] to-[var(--ui-primary-10)] mb-4">
-                        @svg('heroicon-o-squares-2x2', 'w-8 h-8 text-[var(--ui-primary)]')
-                    </div>
-                    <h3 class="text-lg font-semibold text-[var(--ui-secondary)] mb-2">Noch keine Boards</h3>
-                    <p class="text-sm text-[var(--ui-muted)] mb-6">Erstelle dein erstes Board für diese Marke.</p>
-                    @can('update', $brand)
-                        <x-ui-button variant="primary" size="sm" wire:click="createContentBriefBoard">
-                            <span class="inline-flex items-center gap-2">
-                                @svg('heroicon-o-plus', 'w-4 h-4')
-                                <span>Board erstellen</span>
-                            </span>
-                        </x-ui-button>
-                    @endcan
-                </div>
-            @endif
+                @if($slogan)
+                    <p class="mt-1.5 text-base italic text-[color:var(--nx-muted)]">&ldquo;{{ Str::limit($slogan, 120) }}&rdquo;</p>
+                @endif
+                @if($brand->description)
+                    <p class="mt-1.5 max-w-2xl text-sm leading-relaxed text-[color:var(--nx-faint)]">{{ $brand->description }}</p>
+                @endif
+            </div>
         </div>
 
-        {{-- Verknüpfte Social Accounts als Liste --}}
-        @if($facebookPages->count() > 0 || $instagramAccounts->count() > 0)
-            <div>
-                <div class="flex items-center justify-between mb-4">
-                    <h2 class="text-xl font-semibold text-[var(--ui-secondary)]">Verknüpfte Social Accounts</h2>
-                </div>
-                <div class="bg-white rounded-xl border border-[var(--ui-border)]/60 shadow-sm overflow-hidden">
-                    <div class="divide-y divide-[var(--ui-border)]/40">
+        {{-- ===== Kennzahlen ===== --}}
+        <x-nx-stat-grid cols="4">
+            <x-nx-stat label="Boards" :value="$totalBoards" :hint="$boardGroups->count() . ' Board-Typen'" icon="heroicon-o-squares-2x2" />
+            <x-nx-stat label="Social Accounts" :value="$accountsCount" :hint="$facebookPages->count() . ' FB · ' . $instagramAccounts->count() . ' IG'" icon="heroicon-o-share" />
+            <x-nx-stat label="Meta Connection" :value="$metaConnection ? 'Aktiv' : '—'" :hint="$metaConnection ? 'verbunden' : 'nicht verbunden'" icon="heroicon-o-link" :accent="$metaConnection ? 'var(--nx-success)' : null" />
+            <x-nx-stat label="Verortung" :value="$verortung['type'] ?? 'Frei'" :hint="$verortung['entity'] ?? 'nicht verortet'" icon="heroicon-o-building-office-2" />
+        </x-nx-stat-grid>
+
+        {{-- ===== Board-Gruppen ===== --}}
+        @if($boardGroups->count() > 0)
+            @php
+                $categories = [
+                    ['label' => 'Identität', 'icon' => 'heroicon-o-swatch', 'keys' => ['ci', 'typography', 'logo', 'moodboard']],
+                    ['label' => 'Strategie', 'icon' => 'heroicon-o-light-bulb', 'keys' => ['persona', 'competitor', 'tone-of-voice', 'guideline']],
+                    ['label' => 'Content', 'icon' => 'heroicon-o-pencil-square', 'keys' => ['social', 'kanban', 'seo', 'content-brief']],
+                    ['label' => 'Assets', 'icon' => 'heroicon-o-folder-open', 'keys' => ['asset']],
+                ];
+                $groupsByKey = $boardGroups->keyBy('key');
+            @endphp
+
+            @foreach($categories as $cat)
+                @php($catGroups = collect($cat['keys'])->map(fn($k) => $groupsByKey->get($k))->filter())
+                @if($catGroups->isNotEmpty())
+                    <x-nx-section :icon="$cat['icon']" :title="$cat['label']" :hint="$catGroups->sum(fn($g) => $g['boards']->count()) . ' Boards'">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                            @foreach($catGroups as $group)
+                                @foreach($group['boards'] as $board)
+                                    @php
+                                        $countAttr = $group['entryRelation'] ? $group['entryRelation'] . '_count' : null;
+                                        $entryCount = $countAttr && isset($board->$countAttr) ? $board->$countAttr : ($group['entryRelation'] ? $board->{$group['entryRelation']}->count() : 0);
+                                        $typeLabel = trim(str_replace('Boards', '', $group['label']));
+                                    @endphp
+                                    <x-nx-card flush class="overflow-hidden">
+                                        <a href="{{ route($group['routePrefix'], $board) }}" wire:navigate
+                                           class="block p-4 transition-colors hover:bg-[color:var(--nx-hover)]">
+                                            {{-- Karten-Kopf --}}
+                                            <div class="mb-2.5 flex items-center gap-2">
+                                                <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-[6px] bg-[color:var(--nx-accent-soft)]">
+                                                    @svg($group['icon'], 'w-3.5 h-3.5 text-[color:var(--nx-muted)]')
+                                                </span>
+                                                <span class="text-[11px] uppercase tracking-[0.15em] text-[color:var(--nx-faint)]">{{ $typeLabel }}</span>
+                                                @if($group['entryRelation'])
+                                                    <span class="ml-auto shrink-0 rounded-full bg-[color:var(--nx-accent-soft)] px-2 py-0.5 text-[11px] tabular-nums text-[color:var(--nx-muted)]">{{ $entryCount }}</span>
+                                                @endif
+                                            </div>
+
+                                            {{-- Board-Name --}}
+                                            <h4 class="truncate font-medium text-[color:var(--nx-text)]">
+                                                {{ $board->name }}
+                                                @if($board->done)<span class="ml-1 text-[color:var(--nx-success)]">✓</span>@endif
+                                            </h4>
+
+                                            {{-- Kompakte Vorschau --}}
+                                            <div class="mt-3 min-h-[2rem]">
+                                                @switch($group['key'])
+                                                    @case('ci')
+                                                        @php($ciColors = collect([$board->primary_color, $board->secondary_color, $board->accent_color])->filter()->merge($board->colors->pluck('color'))->filter())
+                                                        @if($ciColors->isNotEmpty())
+                                                            <div class="flex flex-wrap items-center gap-1.5">
+                                                                @foreach($ciColors->take(8) as $c)
+                                                                    <span class="h-5 w-5 rounded-full ring-1 ring-[color:var(--nx-line)]" style="background-color: {{ $c }};"></span>
+                                                                @endforeach
+                                                            </div>
+                                                            @if($board->slogan || $board->tagline)
+                                                                <p class="mt-2 truncate text-xs italic text-[color:var(--nx-faint)]">&ldquo;{{ $board->slogan ?: $board->tagline }}&rdquo;</p>
+                                                            @endif
+                                                        @else
+                                                            <span class="text-xs text-[color:var(--nx-faint)]">Keine Farben hinterlegt</span>
+                                                        @endif
+                                                        @break
+
+                                                    @case('typography')
+                                                        @forelse($board->entries->take(3) as $entry)
+                                                            <div class="truncate text-sm text-[color:var(--nx-text)]">{{ $entry->font_family }}@if($entry->role)<span class="text-[color:var(--nx-faint)]"> · {{ $entry->role }}</span>@endif</div>
+                                                        @empty
+                                                            <span class="text-xs text-[color:var(--nx-faint)]">Keine Schriften</span>
+                                                        @endforelse
+                                                        @break
+
+                                                    @case('logo')
+                                                        <div class="flex flex-wrap gap-1.5">
+                                                            @forelse($board->variants->take(4) as $v)
+                                                                <span class="rounded-[6px] bg-[color:var(--nx-accent-soft)] px-2 py-0.5 text-xs text-[color:var(--nx-muted)]">{{ Str::limit($v->name, 18) }}</span>
+                                                            @empty
+                                                                <span class="text-xs text-[color:var(--nx-faint)]">Keine Varianten</span>
+                                                            @endforelse
+                                                        </div>
+                                                        @break
+
+                                                    @case('moodboard')
+                                                        <div class="flex gap-1.5">
+                                                            @forelse($board->images->take(5) as $img)
+                                                                @if($img->thumbnail_url)
+                                                                    <img src="{{ $img->thumbnail_url }}" alt="{{ $img->title }}" class="h-9 w-9 rounded-[6px] object-cover ring-1 ring-[color:var(--nx-line)]">
+                                                                @else
+                                                                    <span class="flex h-9 w-9 items-center justify-center rounded-[6px] bg-[color:var(--nx-accent-soft)]">@svg('heroicon-o-photo', 'w-4 h-4 text-[color:var(--nx-faint)]')</span>
+                                                                @endif
+                                                            @empty
+                                                                <span class="text-xs text-[color:var(--nx-faint)]">Keine Bilder</span>
+                                                            @endforelse
+                                                        </div>
+                                                        @break
+
+                                                    @case('persona')
+                                                        <div class="flex flex-wrap gap-1.5">
+                                                            @forelse($board->personas->take(4) as $persona)
+                                                                <span class="rounded-[6px] bg-[color:var(--nx-accent-soft)] px-2 py-0.5 text-xs text-[color:var(--nx-muted)]">{{ Str::limit($persona->name, 18) }}</span>
+                                                            @empty
+                                                                <span class="text-xs text-[color:var(--nx-faint)]">Keine Personas</span>
+                                                            @endforelse
+                                                        </div>
+                                                        @break
+
+                                                    @case('competitor')
+                                                        <div class="flex flex-wrap gap-1.5">
+                                                            @forelse($board->competitors->take(4) as $c)
+                                                                <span class="rounded-[6px] bg-[color:var(--nx-accent-soft)] px-2 py-0.5 text-xs text-[color:var(--nx-muted)]">{{ Str::limit($c->name, 18) }}</span>
+                                                            @empty
+                                                                <span class="text-xs text-[color:var(--nx-faint)]">Keine Wettbewerber</span>
+                                                            @endforelse
+                                                        </div>
+                                                        @break
+
+                                                    @case('tone-of-voice')
+                                                        @if($board->dimensions->isNotEmpty())
+                                                            <span class="text-xs text-[color:var(--nx-faint)]">{{ $board->dimensions->count() }} Dimensionen</span>
+                                                        @elseif($board->entries->isNotEmpty())
+                                                            <div class="flex flex-wrap gap-1.5">
+                                                                @foreach($board->entries->take(4) as $entry)
+                                                                    <span class="rounded-[6px] bg-[color:var(--nx-accent-soft)] px-2 py-0.5 text-xs text-[color:var(--nx-muted)]">{{ Str::limit($entry->name, 18) }}</span>
+                                                                @endforeach
+                                                            </div>
+                                                        @else
+                                                            <span class="text-xs text-[color:var(--nx-faint)]">Keine Einträge</span>
+                                                        @endif
+                                                        @break
+
+                                                    @case('guideline')
+                                                        <div class="flex flex-wrap gap-1.5">
+                                                            @forelse($board->chapters->take(4) as $chapter)
+                                                                <span class="rounded-[6px] bg-[color:var(--nx-accent-soft)] px-2 py-0.5 text-xs text-[color:var(--nx-muted)]">{{ Str::limit($chapter->title, 18) }}</span>
+                                                            @empty
+                                                                <span class="text-xs text-[color:var(--nx-faint)]">Keine Kapitel</span>
+                                                            @endforelse
+                                                        </div>
+                                                        @break
+
+                                                    @case('social')
+                                                    @case('kanban')
+                                                        <div class="flex flex-wrap gap-1.5">
+                                                            @forelse($board->slots->take(4) as $slot)
+                                                                <span class="rounded-[6px] bg-[color:var(--nx-accent-soft)] px-2 py-0.5 text-xs text-[color:var(--nx-muted)]">{{ Str::limit($slot->name, 14) }} · {{ $slot->cards_count }}</span>
+                                                            @empty
+                                                                <span class="text-xs text-[color:var(--nx-faint)]">Keine Spalten</span>
+                                                            @endforelse
+                                                        </div>
+                                                        @break
+
+                                                    @case('seo')
+                                                        <div class="flex flex-wrap gap-1.5">
+                                                            @forelse($board->keywords->take(4) as $keyword)
+                                                                <span class="rounded-[6px] bg-[color:var(--nx-accent-soft)] px-2 py-0.5 text-xs text-[color:var(--nx-muted)]">{{ Str::limit($keyword->keyword, 18) }}</span>
+                                                            @empty
+                                                                <span class="text-xs text-[color:var(--nx-faint)]">Keine Keywords</span>
+                                                            @endforelse
+                                                        </div>
+                                                        @break
+
+                                                    @case('content-brief')
+                                                        @if($board->content_type || $board->search_intent)
+                                                            <span class="text-sm text-[color:var(--nx-text)]">{{ $board->content_type }}</span>
+                                                            @if($board->search_intent)<span class="text-xs text-[color:var(--nx-faint)]"> · {{ $board->search_intent }}</span>@endif
+                                                        @else
+                                                            <span class="text-xs text-[color:var(--nx-faint)]">Kein Brief-Typ</span>
+                                                        @endif
+                                                        @break
+
+                                                    @case('asset')
+                                                        <div class="flex flex-wrap gap-1.5">
+                                                            @forelse($board->assets->take(4) as $asset)
+                                                                <span class="rounded-[6px] bg-[color:var(--nx-accent-soft)] px-2 py-0.5 text-xs text-[color:var(--nx-muted)]">{{ Str::limit($asset->name, 18) }}</span>
+                                                            @empty
+                                                                <span class="text-xs text-[color:var(--nx-faint)]">Keine Assets</span>
+                                                            @endforelse
+                                                        </div>
+                                                        @break
+                                                @endswitch
+                                            </div>
+                                        </a>
+
+                                        {{-- Footer: Meta + Export --}}
+                                        <div class="flex items-center justify-between border-t border-[color:var(--nx-line)] px-4 py-2">
+                                            <span class="text-[11px] text-[color:var(--nx-faint)]">
+                                                @if($group['entryRelation']){{ $entryCount }} {{ $group['entryLabel'] }} · @endif{{ $board->updated_at->format('d.m.Y') }}
+                                            </span>
+                                            <span class="flex items-center gap-1">
+                                                <a href="{{ route('brands.export.download-board', ['boardType' => $group['boardType'], 'boardId' => $board->id, 'format' => 'json']) }}"
+                                                   class="rounded p-1 text-[color:var(--nx-faint)] transition-colors hover:bg-[color:var(--nx-hover)] hover:text-[color:var(--nx-text)]" title="JSON-Export">
+                                                    @svg('heroicon-o-code-bracket', 'w-3.5 h-3.5')
+                                                </a>
+                                                <a href="{{ route('brands.export.download-board', ['boardType' => $group['boardType'], 'boardId' => $board->id, 'format' => 'pdf']) }}"
+                                                   class="rounded p-1 text-[color:var(--nx-faint)] transition-colors hover:bg-[color:var(--nx-hover)] hover:text-[color:var(--nx-text)]" title="PDF-Export">
+                                                    @svg('heroicon-o-document', 'w-3.5 h-3.5')
+                                                </a>
+                                            </span>
+                                        </div>
+                                    </x-nx-card>
+                                @endforeach
+                            @endforeach
+                        </div>
+                    </x-nx-section>
+                @endif
+            @endforeach
+        @elseif($accountsCount === 0)
+            {{-- Leerzustand: gar keine Boards --}}
+            <x-nx-card>
+                <x-nx-empty icon="heroicon-o-squares-2x2">
+                    Noch keine Boards – lege über „Board erstellen" das erste Board für diese Marke an.
+                </x-nx-empty>
+            </x-nx-card>
+        @endif
+
+        {{-- ===== Social Accounts ===== --}}
+        @if($accountsCount > 0 || ($metaConnection && ($availableFacebookPages->count() > 0 || $availableInstagramAccounts->count() > 0)))
+            <x-nx-section icon="heroicon-o-globe-alt" title="Social Accounts" :hint="$accountsCount . ' verknüpft'">
+
+                {{-- Verknüpfte Accounts --}}
+                @if($accountsCount > 0)
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                         @foreach($facebookPages as $facebookPage)
-                            <div class="p-4 hover:bg-[var(--ui-muted-5)] transition-colors">
-                                <div class="flex items-center justify-between">
-                                    <div class="flex items-center gap-3 flex-1 min-w-0">
-                                        <div class="flex-shrink-0 flex items-center justify-center w-10 h-10 rounded-lg bg-blue-50">
-                                            @svg('heroicon-o-globe-alt', 'w-5 h-5 text-blue-600')
-                                        </div>
-                                        <div class="flex-1 min-w-0">
-                                            <a href="{{ route('brands.facebook-pages.show', $facebookPage) }}" class="block">
-                                                <h4 class="text-sm font-semibold text-[var(--ui-secondary)] hover:text-blue-600 transition-colors truncate">{{ $facebookPage->name }}</h4>
-                                            </a>
-                                            @if($facebookPage->description)
-                                                <p class="text-xs text-[var(--ui-muted)] mt-0.5 line-clamp-1">{{ $facebookPage->description }}</p>
-                                            @endif
-                                        </div>
-                                    </div>
+                            <x-nx-card flush>
+                                <div class="flex items-center gap-3 p-3">
+                                    <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-[6px] bg-[rgba(25,113,194,.1)]">
+                                        @svg('heroicon-o-globe-alt', 'w-4 h-4 text-[color:var(--nx-info)]')
+                                    </span>
+                                    <a href="{{ route('brands.facebook-pages.show', $facebookPage) }}" wire:navigate class="min-w-0 flex-1">
+                                        <span class="block truncate text-sm font-medium text-[color:var(--nx-text)]">{{ $facebookPage->name }}</span>
+                                        <span class="block text-xs text-[color:var(--nx-faint)]">Facebook Page</span>
+                                    </a>
                                     @can('update', $brand)
-                                        <button
-                                            wire:click="detachFacebookPage({{ $facebookPage->id }})"
-                                            wire:confirm="Facebook Page wirklich von dieser Marke trennen?"
-                                            class="flex-shrink-0 ml-3 p-1.5 text-[var(--ui-muted)] hover:text-[var(--ui-error)] hover:bg-red-50 rounded transition-colors"
-                                            title="Verknüpfung trennen"
-                                        >
+                                        <button wire:click="detachFacebookPage({{ $facebookPage->id }})" wire:confirm="Facebook Page wirklich von dieser Marke trennen?"
+                                                class="shrink-0 rounded p-1.5 text-[color:var(--nx-faint)] transition-colors hover:bg-[rgba(224,49,49,.08)] hover:text-[color:var(--nx-danger)]" title="Verknüpfung trennen">
                                             @svg('heroicon-o-x-mark', 'w-4 h-4')
                                         </button>
                                     @endcan
                                 </div>
-                            </div>
+                            </x-nx-card>
                         @endforeach
 
                         @foreach($instagramAccounts as $instagramAccount)
-                            <div class="p-4 hover:bg-[var(--ui-muted-5)] transition-colors">
-                                <div class="flex items-center justify-between">
-                                    <div class="flex items-center gap-3 flex-1 min-w-0">
-                                        <div class="flex-shrink-0 flex items-center justify-center w-10 h-10 rounded-lg bg-pink-50">
-                                            @svg('heroicon-o-camera', 'w-5 h-5 text-pink-600')
-                                        </div>
-                                        <div class="flex-1 min-w-0">
-                                            <a href="{{ route('brands.instagram-accounts.show', $instagramAccount) }}" class="block">
-                                                <h4 class="text-sm font-semibold text-[var(--ui-secondary)] hover:text-pink-600 transition-colors truncate">{{ '@' . $instagramAccount->username }}</h4>
-                                            </a>
-                                            @if($instagramAccount->description)
-                                                <p class="text-xs text-[var(--ui-muted)] mt-0.5 line-clamp-1">{{ $instagramAccount->description }}</p>
-                                            @endif
-                                        </div>
-                                    </div>
+                            <x-nx-card flush>
+                                <div class="flex items-center gap-3 p-3">
+                                    <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-[6px] bg-[rgba(224,49,49,.1)]">
+                                        @svg('heroicon-o-camera', 'w-4 h-4 text-[color:var(--nx-danger)]')
+                                    </span>
+                                    <a href="{{ route('brands.instagram-accounts.show', $instagramAccount) }}" wire:navigate class="min-w-0 flex-1">
+                                        <span class="block truncate text-sm font-medium text-[color:var(--nx-text)]">{{ '@' . $instagramAccount->username }}</span>
+                                        <span class="block text-xs text-[color:var(--nx-faint)]">Instagram</span>
+                                    </a>
                                     @can('update', $brand)
-                                        <button
-                                            wire:click="detachInstagramAccount({{ $instagramAccount->id }})"
-                                            wire:confirm="Instagram Account wirklich von dieser Marke trennen?"
-                                            class="flex-shrink-0 ml-3 p-1.5 text-[var(--ui-muted)] hover:text-[var(--ui-error)] hover:bg-red-50 rounded transition-colors"
-                                            title="Verknüpfung trennen"
-                                        >
+                                        <button wire:click="detachInstagramAccount({{ $instagramAccount->id }})" wire:confirm="Instagram Account wirklich von dieser Marke trennen?"
+                                                class="shrink-0 rounded p-1.5 text-[color:var(--nx-faint)] transition-colors hover:bg-[rgba(224,49,49,.08)] hover:text-[color:var(--nx-danger)]" title="Verknüpfung trennen">
                                             @svg('heroicon-o-x-mark', 'w-4 h-4')
                                         </button>
                                     @endcan
                                 </div>
-                            </div>
+                            </x-nx-card>
                         @endforeach
                     </div>
-                </div>
-            </div>
-        @endif
+                @endif
 
-        {{-- Verfügbare Accounts zum Verknüpfen --}}
-        @if($metaConnection && ($availableFacebookPages->count() > 0 || $availableInstagramAccounts->count() > 0))
-            <div>
-                <div class="flex items-center justify-between mb-4">
-                    <h2 class="text-xl font-semibold text-[var(--ui-secondary)]">Accounts verknüpfen</h2>
-                </div>
-                <div class="bg-white rounded-xl border border-[var(--ui-border)]/60 shadow-sm overflow-hidden">
-                    <div class="divide-y divide-[var(--ui-border)]/40">
-                        @foreach($availableFacebookPages as $facebookPage)
-                            <div class="p-4 hover:bg-[var(--ui-muted-5)] transition-colors">
-                                <div class="flex items-center justify-between">
-                                    <div class="flex items-center gap-3 flex-1 min-w-0">
-                                        <div class="flex-shrink-0 flex items-center justify-center w-10 h-10 rounded-lg bg-blue-50">
-                                            @svg('heroicon-o-globe-alt', 'w-5 h-5 text-blue-600')
+                {{-- Verfügbare Accounts zum Verknüpfen (eingeklappt) --}}
+                @if($metaConnection && ($availableFacebookPages->count() > 0 || $availableInstagramAccounts->count() > 0))
+                    @php($availableCount = $availableFacebookPages->count() + $availableInstagramAccounts->count())
+                    <div x-data="{ open: false }" class="{{ $accountsCount > 0 ? 'mt-4' : '' }}">
+                        <button type="button" @click="open = !open"
+                                class="flex items-center gap-1.5 text-sm text-[color:var(--nx-muted)] transition-colors hover:text-[color:var(--nx-text)]">
+                            <svg class="h-4 w-4 transition-transform" :class="open && 'rotate-90'" viewBox="0 0 20 20" fill="none">
+                                <path d="M7 5l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            Weitere Accounts verknüpfen ({{ $availableCount }})
+                        </button>
+                        <div x-show="open" x-cloak class="mt-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                            @foreach($availableFacebookPages as $facebookPage)
+                                <x-nx-card flush>
+                                    <div class="flex items-center gap-3 p-3">
+                                        <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-[6px] bg-[rgba(25,113,194,.1)]">
+                                            @svg('heroicon-o-globe-alt', 'w-4 h-4 text-[color:var(--nx-info)]')
+                                        </span>
+                                        <div class="min-w-0 flex-1">
+                                            <span class="block truncate text-sm font-medium text-[color:var(--nx-text)]">{{ $facebookPage->name }}</span>
+                                            <span class="block text-xs text-[color:var(--nx-faint)]">Facebook Page</span>
                                         </div>
-                                        <div class="flex-1 min-w-0">
-                                            <h4 class="text-sm font-semibold text-[var(--ui-secondary)] truncate">{{ $facebookPage->name }}</h4>
-                                            @if($facebookPage->description)
-                                                <p class="text-xs text-[var(--ui-muted)] mt-0.5 line-clamp-1">{{ $facebookPage->description }}</p>
-                                            @endif
-                                        </div>
+                                        @can('update', $brand)
+                                            <x-nx-button variant="secondary" size="sm" wire:click="attachFacebookPage({{ $facebookPage->id }})" class="shrink-0">
+                                                @svg('heroicon-o-plus', 'w-3.5 h-3.5') Verknüpfen
+                                            </x-nx-button>
+                                        @endcan
                                     </div>
-                                    @can('update', $brand)
-                                        <x-ui-button
-                                            variant="primary"
-                                            size="sm"
-                                            wire:click="attachFacebookPage({{ $facebookPage->id }})"
-                                            class="ml-3 flex-shrink-0"
-                                        >
-                                            <span class="inline-flex items-center gap-1.5">
-                                                @svg('heroicon-o-plus', 'w-3.5 h-3.5')
-                                                <span>Verknüpfen</span>
-                                            </span>
-                                        </x-ui-button>
-                                    @endcan
-                                </div>
-                            </div>
-                        @endforeach
+                                </x-nx-card>
+                            @endforeach
 
-                        @foreach($availableInstagramAccounts as $instagramAccount)
-                            <div class="p-4 hover:bg-[var(--ui-muted-5)] transition-colors">
-                                <div class="flex items-center justify-between">
-                                    <div class="flex items-center gap-3 flex-1 min-w-0">
-                                        <div class="flex-shrink-0 flex items-center justify-center w-10 h-10 rounded-lg bg-pink-50">
-                                            @svg('heroicon-o-camera', 'w-5 h-5 text-pink-600')
+                            @foreach($availableInstagramAccounts as $instagramAccount)
+                                <x-nx-card flush>
+                                    <div class="flex items-center gap-3 p-3">
+                                        <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-[6px] bg-[rgba(224,49,49,.1)]">
+                                            @svg('heroicon-o-camera', 'w-4 h-4 text-[color:var(--nx-danger)]')
+                                        </span>
+                                        <div class="min-w-0 flex-1">
+                                            <span class="block truncate text-sm font-medium text-[color:var(--nx-text)]">{{ '@' . $instagramAccount->username }}</span>
+                                            <span class="block text-xs text-[color:var(--nx-faint)]">Instagram</span>
                                         </div>
-                                        <div class="flex-1 min-w-0">
-                                            <h4 class="text-sm font-semibold text-[var(--ui-secondary)] truncate">{{ '@' . $instagramAccount->username }}</h4>
-                                            @if($instagramAccount->description)
-                                                <p class="text-xs text-[var(--ui-muted)] mt-0.5 line-clamp-1">{{ $instagramAccount->description }}</p>
-                                            @endif
-                                        </div>
+                                        @can('update', $brand)
+                                            <x-nx-button variant="secondary" size="sm" wire:click="attachInstagramAccount({{ $instagramAccount->id }})" class="shrink-0">
+                                                @svg('heroicon-o-plus', 'w-3.5 h-3.5') Verknüpfen
+                                            </x-nx-button>
+                                        @endcan
                                     </div>
-                                    @can('update', $brand)
-                                        <x-ui-button
-                                            variant="primary"
-                                            size="sm"
-                                            wire:click="attachInstagramAccount({{ $instagramAccount->id }})"
-                                            class="ml-3 flex-shrink-0"
-                                        >
-                                            <span class="inline-flex items-center gap-1.5">
-                                                @svg('heroicon-o-plus', 'w-3.5 h-3.5')
-                                                <span>Verknüpfen</span>
-                                            </span>
-                                        </x-ui-button>
-                                    @endcan
-                                </div>
-                            </div>
-                        @endforeach
+                                </x-nx-card>
+                            @endforeach
+                        </div>
                     </div>
-                </div>
-            </div>
+                @endif
+            </x-nx-section>
         @endif
+
     </x-ui-page-container>
 
     <x-slot name="sidebar">
@@ -821,11 +549,11 @@
                 {{-- Mini Dashboard --}}
                 <div class="bg-gradient-to-br from-[var(--ui-primary-5)] to-[var(--ui-primary-10)] rounded-xl p-4 border border-[var(--ui-primary)]/20">
                     <h3 class="text-xs font-semibold uppercase tracking-wide text-[var(--ui-primary)] mb-4">Dashboard</h3>
-                    
+
                     <div class="space-y-3">
                         {{-- Boards Statistik --}}
                         @php
-                            $totalBoards = $boardGroups->sum(fn($g) => $g['boards']->count());
+                            $sidebarTotalBoards = $boardGroups->sum(fn($g) => $g['boards']->count());
                         @endphp
                         <div class="bg-white/80 backdrop-blur-sm rounded-lg p-3 border border-white/50">
                             <div class="flex items-center justify-between mb-2">
@@ -833,7 +561,7 @@
                                     @svg('heroicon-o-squares-2x2', 'w-4 h-4 text-[var(--ui-primary)]')
                                     <span class="text-sm font-semibold text-[var(--ui-secondary)]">Boards</span>
                                 </div>
-                                <span class="text-lg font-bold text-[var(--ui-primary)]">{{ $totalBoards }}</span>
+                                <span class="text-lg font-bold text-[var(--ui-primary)]">{{ $sidebarTotalBoards }}</span>
                             </div>
                             <div class="grid grid-cols-4 gap-2 mt-2">
                                 @foreach($boardGroups as $group)
@@ -896,6 +624,12 @@
                 <div>
                     <h3 class="text-xs font-semibold uppercase tracking-wide text-[var(--ui-muted)] mb-3">Details</h3>
                     <div class="space-y-2">
+                        @if($verortung)
+                            <div class="flex justify-between items-center py-2 px-3 bg-[var(--ui-muted-5)] border border-[var(--ui-border)]/40">
+                                <span class="text-sm text-[var(--ui-muted)]">Verortung</span>
+                                <span class="text-sm text-[var(--ui-secondary)] font-medium text-right">{{ $verortung['entity'] }}</span>
+                            </div>
+                        @endif
                         <div class="flex justify-between items-center py-2 px-3 bg-[var(--ui-muted-5)] border border-[var(--ui-border)]/40">
                             <span class="text-sm text-[var(--ui-muted)]">Erstellt</span>
                             <span class="text-sm text-[var(--ui-secondary)] font-medium">
