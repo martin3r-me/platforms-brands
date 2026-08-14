@@ -236,7 +236,7 @@
             @endphp
 
             @foreach($categories as $cat)
-                @php($catGroups = collect($cat['keys'])->map(fn($k) => $groupsByKey->get($k))->filter())
+                @php $catGroups = collect($cat['keys'])->map(fn($k) => $groupsByKey->get($k))->filter(); @endphp
                 @if($catGroups->isNotEmpty())
                     <x-nx-section :icon="$cat['icon']" :title="$cat['label']" :hint="$catGroups->sum(fn($g) => $g['boards']->count()) . ' Boards'">
                         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -270,7 +270,7 @@
                                             {{-- Kompakte Vorschau --}}
                                             <div class="mt-3 min-h-[2rem]">
                                                 @if($group['key'] === 'ci')
-                                                        @php($ciColors = collect([$board->primary_color, $board->secondary_color, $board->accent_color])->filter()->merge($board->colors->pluck('color'))->filter())
+                                                        @php $ciColors = collect([$board->primary_color, $board->secondary_color, $board->accent_color])->filter()->merge($board->colors->pluck('color'))->filter(); @endphp
                                                         @if($ciColors->isNotEmpty())
                                                             <div class="flex flex-wrap items-center gap-1.5">
                                                                 @foreach($ciColors->take(8) as $c)
@@ -474,7 +474,7 @@
 
                 {{-- Verfügbare Accounts zum Verknüpfen (eingeklappt) --}}
                 @if($metaConnection && ($availableFacebookPages->count() > 0 || $availableInstagramAccounts->count() > 0))
-                    @php($availableCount = $availableFacebookPages->count() + $availableInstagramAccounts->count())
+                    @php $availableCount = $availableFacebookPages->count() + $availableInstagramAccounts->count(); @endphp
                     <div x-data="{ open: false }" class="{{ $accountsCount > 0 ? 'mt-4' : '' }}">
                         <button type="button" @click="open = !open"
                                 class="flex items-center gap-1.5 text-sm text-[color:var(--nx-muted)] transition-colors hover:text-[color:var(--nx-text)]">
