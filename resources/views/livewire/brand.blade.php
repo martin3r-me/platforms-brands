@@ -269,8 +269,7 @@
 
                                             {{-- Kompakte Vorschau --}}
                                             <div class="mt-3 min-h-[2rem]">
-                                                @switch($group['key'])
-                                                    @case('ci')
+                                                @if($group['key'] === 'ci')
                                                         @php($ciColors = collect([$board->primary_color, $board->secondary_color, $board->accent_color])->filter()->merge($board->colors->pluck('color'))->filter())
                                                         @if($ciColors->isNotEmpty())
                                                             <div class="flex flex-wrap items-center gap-1.5">
@@ -284,17 +283,15 @@
                                                         @else
                                                             <span class="text-xs text-[color:var(--nx-faint)]">Keine Farben hinterlegt</span>
                                                         @endif
-                                                        @break
 
-                                                    @case('typography')
+                                                @elseif($group['key'] === 'typography')
                                                         @forelse($board->entries->take(3) as $entry)
                                                             <div class="truncate text-sm text-[color:var(--nx-text)]">{{ $entry->font_family }}@if($entry->role)<span class="text-[color:var(--nx-faint)]"> · {{ $entry->role }}</span>@endif</div>
                                                         @empty
                                                             <span class="text-xs text-[color:var(--nx-faint)]">Keine Schriften</span>
                                                         @endforelse
-                                                        @break
 
-                                                    @case('logo')
+                                                @elseif($group['key'] === 'logo')
                                                         <div class="flex flex-wrap gap-1.5">
                                                             @forelse($board->variants->take(4) as $v)
                                                                 <span class="rounded-[6px] bg-[color:var(--nx-accent-soft)] px-2 py-0.5 text-xs text-[color:var(--nx-muted)]">{{ Str::limit($v->name, 18) }}</span>
@@ -302,9 +299,8 @@
                                                                 <span class="text-xs text-[color:var(--nx-faint)]">Keine Varianten</span>
                                                             @endforelse
                                                         </div>
-                                                        @break
 
-                                                    @case('moodboard')
+                                                @elseif($group['key'] === 'moodboard')
                                                         <div class="flex gap-1.5">
                                                             @forelse($board->images->take(5) as $img)
                                                                 @if($img->thumbnail_url)
@@ -316,9 +312,8 @@
                                                                 <span class="text-xs text-[color:var(--nx-faint)]">Keine Bilder</span>
                                                             @endforelse
                                                         </div>
-                                                        @break
 
-                                                    @case('persona')
+                                                @elseif($group['key'] === 'persona')
                                                         <div class="flex flex-wrap gap-1.5">
                                                             @forelse($board->personas->take(4) as $persona)
                                                                 <span class="rounded-[6px] bg-[color:var(--nx-accent-soft)] px-2 py-0.5 text-xs text-[color:var(--nx-muted)]">{{ Str::limit($persona->name, 18) }}</span>
@@ -326,9 +321,8 @@
                                                                 <span class="text-xs text-[color:var(--nx-faint)]">Keine Personas</span>
                                                             @endforelse
                                                         </div>
-                                                        @break
 
-                                                    @case('competitor')
+                                                @elseif($group['key'] === 'competitor')
                                                         <div class="flex flex-wrap gap-1.5">
                                                             @forelse($board->competitors->take(4) as $c)
                                                                 <span class="rounded-[6px] bg-[color:var(--nx-accent-soft)] px-2 py-0.5 text-xs text-[color:var(--nx-muted)]">{{ Str::limit($c->name, 18) }}</span>
@@ -336,9 +330,8 @@
                                                                 <span class="text-xs text-[color:var(--nx-faint)]">Keine Wettbewerber</span>
                                                             @endforelse
                                                         </div>
-                                                        @break
 
-                                                    @case('tone-of-voice')
+                                                @elseif($group['key'] === 'tone-of-voice')
                                                         @if($board->dimensions->isNotEmpty())
                                                             <span class="text-xs text-[color:var(--nx-faint)]">{{ $board->dimensions->count() }} Dimensionen</span>
                                                         @elseif($board->entries->isNotEmpty())
@@ -350,9 +343,8 @@
                                                         @else
                                                             <span class="text-xs text-[color:var(--nx-faint)]">Keine Einträge</span>
                                                         @endif
-                                                        @break
 
-                                                    @case('guideline')
+                                                @elseif($group['key'] === 'guideline')
                                                         <div class="flex flex-wrap gap-1.5">
                                                             @forelse($board->chapters->take(4) as $chapter)
                                                                 <span class="rounded-[6px] bg-[color:var(--nx-accent-soft)] px-2 py-0.5 text-xs text-[color:var(--nx-muted)]">{{ Str::limit($chapter->title, 18) }}</span>
@@ -360,10 +352,8 @@
                                                                 <span class="text-xs text-[color:var(--nx-faint)]">Keine Kapitel</span>
                                                             @endforelse
                                                         </div>
-                                                        @break
 
-                                                    @case('social')
-                                                    @case('kanban')
+                                                @elseif(in_array($group['key'], ['social', 'kanban']))
                                                         <div class="flex flex-wrap gap-1.5">
                                                             @forelse($board->slots->take(4) as $slot)
                                                                 <span class="rounded-[6px] bg-[color:var(--nx-accent-soft)] px-2 py-0.5 text-xs text-[color:var(--nx-muted)]">{{ Str::limit($slot->name, 14) }} · {{ $slot->cards_count }}</span>
@@ -371,9 +361,8 @@
                                                                 <span class="text-xs text-[color:var(--nx-faint)]">Keine Spalten</span>
                                                             @endforelse
                                                         </div>
-                                                        @break
 
-                                                    @case('seo')
+                                                @elseif($group['key'] === 'seo')
                                                         <div class="flex flex-wrap gap-1.5">
                                                             @forelse($board->keywords->take(4) as $keyword)
                                                                 <span class="rounded-[6px] bg-[color:var(--nx-accent-soft)] px-2 py-0.5 text-xs text-[color:var(--nx-muted)]">{{ Str::limit($keyword->keyword, 18) }}</span>
@@ -381,18 +370,16 @@
                                                                 <span class="text-xs text-[color:var(--nx-faint)]">Keine Keywords</span>
                                                             @endforelse
                                                         </div>
-                                                        @break
 
-                                                    @case('content-brief')
+                                                @elseif($group['key'] === 'content-brief')
                                                         @if($board->content_type || $board->search_intent)
                                                             <span class="text-sm text-[color:var(--nx-text)]">{{ $board->content_type }}</span>
                                                             @if($board->search_intent)<span class="text-xs text-[color:var(--nx-faint)]"> · {{ $board->search_intent }}</span>@endif
                                                         @else
                                                             <span class="text-xs text-[color:var(--nx-faint)]">Kein Brief-Typ</span>
                                                         @endif
-                                                        @break
 
-                                                    @case('asset')
+                                                @elseif($group['key'] === 'asset')
                                                         <div class="flex flex-wrap gap-1.5">
                                                             @forelse($board->assets->take(4) as $asset)
                                                                 <span class="rounded-[6px] bg-[color:var(--nx-accent-soft)] px-2 py-0.5 text-xs text-[color:var(--nx-muted)]">{{ Str::limit($asset->name, 18) }}</span>
@@ -400,8 +387,7 @@
                                                                 <span class="text-xs text-[color:var(--nx-faint)]">Keine Assets</span>
                                                             @endforelse
                                                         </div>
-                                                        @break
-                                                @endswitch
+                                                @endif
                                             </div>
                                         </a>
 
