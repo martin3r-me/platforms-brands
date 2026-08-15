@@ -11,392 +11,243 @@
         ]">
             <x-slot name="left">
                 @can('update', $guidelineBoard)
-                    <x-ui-button variant="ghost" size="sm" x-data @click="$dispatch('open-modal-guideline-board-settings', { guidelineBoardId: {{ $guidelineBoard->id }} })">
-                        @svg('heroicon-o-cog-6-tooth', 'w-4 h-4')
-                        <span>Einstellungen</span>
-                    </x-ui-button>
+                    <x-nx-button variant="ghost" size="sm" x-data @click="$dispatch('open-modal-guideline-board-settings', { guidelineBoardId: {{ $guidelineBoard->id }} })">
+                        @svg('heroicon-o-cog-6-tooth', 'w-4 h-4') Einstellungen
+                    </x-nx-button>
                 @endcan
             </x-slot>
 
             @can('update', $guidelineBoard)
-                <x-ui-button variant="primary" size="sm" x-data @click="$dispatch('open-modal-guideline-chapter', { guidelineBoardId: {{ $guidelineBoard->id }} })">
-                    @svg('heroicon-o-plus', 'w-4 h-4')
-                    <span>Kapitel hinzufügen</span>
-                </x-ui-button>
+                <x-nx-button variant="primary" size="sm" x-data @click="$dispatch('open-modal-guideline-chapter', { guidelineBoardId: {{ $guidelineBoard->id }} })">
+                    @svg('heroicon-o-plus', 'w-4 h-4') Kapitel hinzufügen
+                </x-nx-button>
             @endcan
         </x-ui-page-actionbar>
     </x-slot>
 
-    <x-ui-page-container spacing="space-y-8">
-        {{-- Header Section --}}
-        <div class="bg-white rounded-xl border border-[var(--ui-border)]/60 shadow-sm overflow-hidden">
-            <div class="p-6 lg:p-8">
-                <div class="flex items-center gap-4 mb-4">
-                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-100 to-cyan-50 flex items-center justify-center">
-                        @svg('heroicon-o-book-open', 'w-6 h-6 text-cyan-600')
-                    </div>
-                    <div>
-                        <h1 class="text-3xl font-bold text-[var(--ui-secondary)] tracking-tight leading-tight">{{ $guidelineBoard->name }}</h1>
-                        @if($guidelineBoard->description)
-                            <p class="text-[var(--ui-muted)] mt-1">{{ $guidelineBoard->description }}</p>
-                        @endif
-                    </div>
-                </div>
-            </div>
+    <x-ui-page-container spacing="space-y-10" width="contained">
+
+        {{-- Titel --}}
+        <div>
+            <h1 class="text-2xl font-semibold tracking-tight text-[color:var(--nx-text)]">{{ $guidelineBoard->name }}</h1>
+            @if($guidelineBoard->description)
+                <p class="mt-1.5 max-w-2xl text-[14.5px] leading-relaxed text-[color:var(--nx-muted)]">{{ $guidelineBoard->description }}</p>
+            @endif
         </div>
 
         <div class="flex gap-8">
-            {{-- Table of Contents (Inhaltsverzeichnis) --}}
+            {{-- Inhaltsverzeichnis --}}
             @if($chapters->count() > 0)
-                <div class="hidden lg:block w-64 flex-shrink-0">
+                <div class="hidden lg:block w-60 flex-shrink-0">
                     <div class="sticky top-24">
-                        <div class="bg-white rounded-xl border border-[var(--ui-border)]/60 shadow-sm p-4">
-                            <h3 class="text-xs font-semibold uppercase tracking-wide text-[var(--ui-muted)] mb-3">Inhaltsverzeichnis</h3>
-                            <nav class="space-y-1">
-                                @foreach($chapters as $index => $chapter)
-                                    <a href="#chapter-{{ $chapter->id }}" class="flex items-center gap-2 px-3 py-2 text-sm text-[var(--ui-secondary)] hover:text-cyan-600 hover:bg-cyan-50 rounded-lg transition-colors">
-                                        <span class="text-xs font-bold text-[var(--ui-muted)] w-5">{{ $index + 1 }}.</span>
-                                        <span class="truncate">{{ $chapter->title }}</span>
-                                        @if($chapter->entries->count() > 0)
-                                            <span class="ml-auto text-[10px] font-medium px-1.5 py-0.5 rounded bg-cyan-50 text-cyan-600">{{ $chapter->entries->count() }}</span>
-                                        @endif
-                                    </a>
-                                @endforeach
-                            </nav>
-                        </div>
+                        <h3 class="mb-2.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-[color:var(--nx-faint)]">Inhaltsverzeichnis</h3>
+                        <nav class="space-y-0.5">
+                            @foreach($chapters as $index => $chapter)
+                                <a href="#chapter-{{ $chapter->id }}" class="flex items-center gap-2 rounded-[6px] px-2.5 py-1.5 text-[13px] text-[color:var(--nx-muted)] transition-colors hover:bg-[color:var(--nx-hover)] hover:text-[color:var(--nx-text)]">
+                                    <span class="w-4 shrink-0 text-[11px] tabular-nums text-[color:var(--nx-faint)]">{{ $index + 1 }}.</span>
+                                    <span class="truncate">{{ $chapter->title }}</span>
+                                    @if($chapter->entries->count() > 0)
+                                        <span class="ml-auto text-[11px] tabular-nums text-[color:var(--nx-faint)]">{{ $chapter->entries->count() }}</span>
+                                    @endif
+                                </a>
+                            @endforeach
+                        </nav>
                     </div>
                 </div>
             @endif
 
-            {{-- Main Content --}}
-            <div class="flex-1 min-w-0 space-y-6">
+            {{-- Hauptinhalt --}}
+            <div class="min-w-0 flex-1 space-y-10">
                 @if($chapters->count() > 0)
                     @foreach($chapters as $chapterIndex => $chapter)
-                        <div id="chapter-{{ $chapter->id }}" class="bg-white rounded-2xl border border-[var(--ui-border)]/60 shadow-sm overflow-hidden scroll-mt-24">
-                            {{-- Chapter Header --}}
-                            <div class="p-6 lg:p-8 border-b border-[var(--ui-border)]/40">
-                                <div class="flex items-center justify-between">
-                                    <div class="flex items-center gap-3">
-                                        <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-cyan-100 to-cyan-50 flex items-center justify-center">
-                                            @if($chapter->icon)
-                                                @svg($chapter->icon, 'w-5 h-5 text-cyan-600')
-                                            @else
-                                                <span class="text-sm font-bold text-cyan-600">{{ $chapterIndex + 1 }}</span>
-                                            @endif
-                                        </div>
-                                        <div>
-                                            <h2 class="text-xl font-bold text-[var(--ui-secondary)]">{{ $chapter->title }}</h2>
-                                            @if($chapter->description)
-                                                <p class="text-sm text-[var(--ui-muted)] mt-0.5">{{ $chapter->description }}</p>
-                                            @endif
-                                        </div>
+                        <section id="chapter-{{ $chapter->id }}" class="scroll-mt-24 space-y-3">
+                            {{-- Kapitel-Kopf --}}
+                            <div class="flex items-start justify-between gap-3">
+                                <div class="flex min-w-0 items-center gap-2">
+                                    @if($chapter->icon)
+                                        @svg($chapter->icon, 'w-4 h-4 shrink-0 text-[color:var(--nx-faint)]')
+                                    @else
+                                        <span class="w-4 shrink-0 text-sm font-semibold tabular-nums text-[color:var(--nx-faint)]">{{ $chapterIndex + 1 }}</span>
+                                    @endif
+                                    <div class="min-w-0">
+                                        <h2 class="truncate text-sm font-semibold text-[color:var(--nx-text)]">{{ $chapter->title }}</h2>
+                                        @if($chapter->description)
+                                            <p class="mt-0.5 text-xs text-[color:var(--nx-faint)]">{{ $chapter->description }}</p>
+                                        @endif
                                     </div>
-                                    @can('update', $guidelineBoard)
-                                        <div class="flex items-center gap-1">
-                                            <button
-                                                x-data
-                                                @click="$dispatch('open-modal-guideline-entry', { guidelineBoardId: {{ $guidelineBoard->id }}, chapterId: {{ $chapter->id }} })"
-                                                class="p-2 text-[var(--ui-muted)] hover:text-cyan-600 hover:bg-cyan-50 rounded-lg transition-colors"
-                                                title="Regel hinzufügen"
-                                            >
-                                                @svg('heroicon-o-plus', 'w-5 h-5')
-                                            </button>
-                                            <button
-                                                x-data
-                                                @click="$dispatch('open-modal-guideline-chapter', { guidelineBoardId: {{ $guidelineBoard->id }}, chapterId: {{ $chapter->id }} })"
-                                                class="p-2 text-[var(--ui-muted)] hover:text-[var(--ui-primary)] hover:bg-[var(--ui-primary-5)] rounded-lg transition-colors"
-                                                title="Kapitel bearbeiten"
-                                            >
-                                                @svg('heroicon-o-pencil', 'w-4 h-4')
-                                            </button>
-                                            <button
-                                                wire:click="deleteChapter({{ $chapter->id }})"
-                                                wire:confirm="Kapitel und alle enthaltenen Regeln wirklich löschen?"
-                                                class="p-2 text-[var(--ui-muted)] hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                                                title="Kapitel löschen"
-                                            >
-                                                @svg('heroicon-o-trash', 'w-4 h-4')
-                                            </button>
-                                        </div>
-                                    @endcan
                                 </div>
+                                @can('update', $guidelineBoard)
+                                    <div class="flex shrink-0 items-center gap-1">
+                                        <button type="button" x-data @click="$dispatch('open-modal-guideline-entry', { guidelineBoardId: {{ $guidelineBoard->id }}, chapterId: {{ $chapter->id }} })"
+                                                class="rounded p-1 text-[color:var(--nx-faint)] transition-colors hover:bg-[color:var(--nx-hover)] hover:text-[color:var(--nx-text)]" title="Regel hinzufügen">
+                                            @svg('heroicon-o-plus', 'w-4 h-4')
+                                        </button>
+                                        <button type="button" x-data @click="$dispatch('open-modal-guideline-chapter', { guidelineBoardId: {{ $guidelineBoard->id }}, chapterId: {{ $chapter->id }} })"
+                                                class="rounded p-1 text-[color:var(--nx-faint)] transition-colors hover:bg-[color:var(--nx-hover)] hover:text-[color:var(--nx-text)]" title="Kapitel bearbeiten">
+                                            @svg('heroicon-o-pencil', 'w-4 h-4')
+                                        </button>
+                                        <button type="button" wire:click="deleteChapter({{ $chapter->id }})" wire:confirm="Kapitel und alle enthaltenen Regeln wirklich löschen?"
+                                                class="rounded p-1 text-[color:var(--nx-faint)] transition-colors hover:bg-[color:var(--nx-hover)] hover:text-[color:var(--nx-danger)]" title="Kapitel löschen">
+                                            @svg('heroicon-o-trash', 'w-4 h-4')
+                                        </button>
+                                    </div>
+                                @endcan
                             </div>
 
-                            {{-- Chapter Entries --}}
-                            <div class="p-6 lg:p-8">
-                                @if($chapter->entries->count() > 0)
-                                    <div class="space-y-8">
-                                        @foreach($chapter->entries as $entry)
-                                            <div class="group relative">
-                                                {{-- Entry Header --}}
-                                                <div class="flex items-start justify-between mb-4">
-                                                    <h3 class="text-lg font-semibold text-[var(--ui-secondary)]">{{ $entry->title }}</h3>
-                                                    @can('update', $guidelineBoard)
-                                                        <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                            <button
-                                                                x-data
-                                                                @click="$dispatch('open-modal-guideline-entry', { guidelineBoardId: {{ $guidelineBoard->id }}, chapterId: {{ $chapter->id }}, entryId: {{ $entry->id }} })"
-                                                                class="p-1.5 text-[var(--ui-muted)] hover:text-[var(--ui-primary)] hover:bg-[var(--ui-primary-5)] rounded transition-colors"
-                                                                title="Bearbeiten"
-                                                            >
-                                                                @svg('heroicon-o-pencil', 'w-4 h-4')
-                                                            </button>
-                                                            <button
-                                                                wire:click="deleteEntry({{ $entry->id }})"
-                                                                wire:confirm="Regel wirklich löschen?"
-                                                                class="p-1.5 text-[var(--ui-muted)] hover:text-red-600 hover:bg-red-50 rounded transition-colors"
-                                                                title="Löschen"
-                                                            >
-                                                                @svg('heroicon-o-trash', 'w-4 h-4')
-                                                            </button>
-                                                        </div>
-                                                    @endcan
-                                                </div>
-
-                                                {{-- Rule Text --}}
-                                                <div class="p-4 rounded-xl bg-[var(--ui-muted-5)] border border-[var(--ui-border)]/40 mb-4">
-                                                    <p class="text-sm text-[var(--ui-secondary)] leading-relaxed">{{ $entry->rule_text }}</p>
-                                                </div>
-
-                                                {{-- Rationale --}}
-                                                @if($entry->rationale)
-                                                    <div class="flex items-start gap-2 mb-4 px-4">
-                                                        @svg('heroicon-o-light-bulb', 'w-4 h-4 text-amber-500 mt-0.5 flex-shrink-0')
-                                                        <p class="text-sm text-[var(--ui-muted)] italic">{{ $entry->rationale }}</p>
+                            {{-- Kapitel-Regeln als Hairline-Liste --}}
+                            @if($chapter->entries->count() > 0)
+                                <x-nx-card flush class="divide-y divide-[color:var(--nx-line)]">
+                                    @foreach($chapter->entries as $entry)
+                                        <div class="group p-5">
+                                            {{-- Regel-Kopf --}}
+                                            <div class="flex items-start justify-between gap-3">
+                                                <h3 class="text-[15px] font-semibold text-[color:var(--nx-text)]">{{ $entry->title }}</h3>
+                                                @can('update', $guidelineBoard)
+                                                    <div class="flex shrink-0 items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+                                                        <button type="button" x-data @click="$dispatch('open-modal-guideline-entry', { guidelineBoardId: {{ $guidelineBoard->id }}, chapterId: {{ $chapter->id }}, entryId: {{ $entry->id }} })"
+                                                                class="rounded p-1 text-[color:var(--nx-faint)] transition-colors hover:bg-[color:var(--nx-hover)] hover:text-[color:var(--nx-text)]" title="Bearbeiten">
+                                                            @svg('heroicon-o-pencil', 'w-4 h-4')
+                                                        </button>
+                                                        <button type="button" wire:click="deleteEntry({{ $entry->id }})" wire:confirm="Regel wirklich löschen?"
+                                                                class="rounded p-1 text-[color:var(--nx-faint)] transition-colors hover:bg-[color:var(--nx-hover)] hover:text-[color:var(--nx-danger)]" title="Löschen">
+                                                            @svg('heroicon-o-trash', 'w-4 h-4')
+                                                        </button>
                                                     </div>
-                                                @endif
-
-                                                {{-- Do / Don't Comparison --}}
-                                                @if($entry->do_example || $entry->dont_example)
-                                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                                                        {{-- DO --}}
-                                                        @if($entry->do_example)
-                                                            <div class="rounded-xl border-2 border-green-200 bg-green-50/50 overflow-hidden">
-                                                                <div class="flex items-center gap-2 px-4 py-2.5 bg-green-100/80 border-b border-green-200">
-                                                                    <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-green-500">
-                                                                        @svg('heroicon-o-check', 'w-4 h-4 text-white')
-                                                                    </span>
-                                                                    <span class="text-sm font-bold text-green-800 uppercase tracking-wider">Do</span>
-                                                                </div>
-                                                                @if($entry->do_image_path)
-                                                                    <div class="px-4 pt-3">
-                                                                        <img src="{{ asset($entry->do_image_path) }}" alt="Do-Beispiel" class="w-full rounded-lg border border-green-200">
-                                                                    </div>
-                                                                @endif
-                                                                <div class="p-4">
-                                                                    <p class="text-sm text-green-900 leading-relaxed">{{ $entry->do_example }}</p>
-                                                                </div>
-                                                            </div>
-                                                        @endif
-
-                                                        {{-- DON'T --}}
-                                                        @if($entry->dont_example)
-                                                            <div class="rounded-xl border-2 border-red-200 bg-red-50/50 overflow-hidden">
-                                                                <div class="flex items-center gap-2 px-4 py-2.5 bg-red-100/80 border-b border-red-200">
-                                                                    <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-red-500">
-                                                                        @svg('heroicon-o-x-mark', 'w-4 h-4 text-white')
-                                                                    </span>
-                                                                    <span class="text-sm font-bold text-red-800 uppercase tracking-wider">Don't</span>
-                                                                </div>
-                                                                @if($entry->dont_image_path)
-                                                                    <div class="px-4 pt-3">
-                                                                        <img src="{{ asset($entry->dont_image_path) }}" alt="Don't-Beispiel" class="w-full rounded-lg border border-red-200">
-                                                                    </div>
-                                                                @endif
-                                                                <div class="p-4">
-                                                                    <p class="text-sm text-red-900 leading-relaxed">{{ $entry->dont_example }}</p>
-                                                                </div>
-                                                            </div>
-                                                        @endif
-                                                    </div>
-                                                @endif
-
-                                                {{-- Cross References --}}
-                                                @if(!empty($entry->cross_references))
-                                                    <div class="flex flex-wrap items-center gap-2 mt-4">
-                                                        @svg('heroicon-o-link', 'w-4 h-4 text-[var(--ui-muted)]')
-                                                        @foreach($entry->cross_references as $ref)
-                                                            @php
-                                                                $refRoute = null;
-                                                                $refBoardType = $ref['board_type'] ?? '';
-                                                                $refBoardId = $ref['board_id'] ?? '';
-                                                                $refLabel = $ref['label'] ?? 'Board';
-
-                                                                $routeMap = [
-                                                                    'ci-board' => 'brands.ci-boards.show',
-                                                                    'logo-board' => 'brands.logo-boards.show',
-                                                                    'typography-board' => 'brands.typography-boards.show',
-                                                                    'tone-of-voice-board' => 'brands.tone-of-voice-boards.show',
-                                                                    'persona-board' => 'brands.persona-boards.show',
-                                                                    'competitor-board' => 'brands.competitor-boards.show',
-                                                                ];
-
-                                                                $modelMap = [
-                                                                    'ci-board' => \Platform\Brands\Models\BrandsCiBoard::class,
-                                                                    'logo-board' => \Platform\Brands\Models\BrandsLogoBoard::class,
-                                                                    'typography-board' => \Platform\Brands\Models\BrandsTypographyBoard::class,
-                                                                    'tone-of-voice-board' => \Platform\Brands\Models\BrandsToneOfVoiceBoard::class,
-                                                                    'persona-board' => \Platform\Brands\Models\BrandsPersonaBoard::class,
-                                                                    'competitor-board' => \Platform\Brands\Models\BrandsCompetitorBoard::class,
-                                                                ];
-
-                                                                if (isset($routeMap[$refBoardType]) && $refBoardId) {
-                                                                    $modelClass = $modelMap[$refBoardType];
-                                                                    $refModel = $modelClass::find($refBoardId);
-                                                                    if ($refModel) {
-                                                                        $refRoute = route($routeMap[$refBoardType], $refModel);
-                                                                        $refLabel = $refLabel ?: $refModel->name;
-                                                                    }
-                                                                }
-                                                            @endphp
-                                                            @if($refRoute)
-                                                                <a href="{{ $refRoute }}" class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-cyan-700 bg-cyan-50 border border-cyan-200 rounded-md hover:bg-cyan-100 transition-colors">
-                                                                    @svg('heroicon-o-arrow-top-right-on-square', 'w-3 h-3')
-                                                                    {{ $refLabel }}
-                                                                </a>
-                                                            @endif
-                                                        @endforeach
-                                                    </div>
-                                                @endif
-
-                                                {{-- Separator --}}
-                                                @if(!$loop->last)
-                                                    <div class="border-t border-[var(--ui-border)]/30 mt-8"></div>
-                                                @endif
+                                                @endcan
                                             </div>
-                                        @endforeach
-                                    </div>
-                                @else
-                                    <div class="text-center py-8">
-                                        <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-cyan-50 mb-3">
-                                            @svg('heroicon-o-document-text', 'w-6 h-6 text-cyan-400')
+
+                                            {{-- Regeltext --}}
+                                            <p class="mt-2 text-[13px] leading-relaxed text-[color:var(--nx-text)]">{{ $entry->rule_text }}</p>
+
+                                            {{-- Begründung --}}
+                                            @if($entry->rationale)
+                                                <div class="mt-2 flex items-start gap-2">
+                                                    @svg('heroicon-o-light-bulb', 'w-4 h-4 mt-0.5 shrink-0 text-[color:var(--nx-faint)]')
+                                                    <p class="text-[13px] italic text-[color:var(--nx-muted)]">{{ $entry->rationale }}</p>
+                                                </div>
+                                            @endif
+
+                                            {{-- Do / Don't --}}
+                                            @if($entry->do_example || $entry->dont_example)
+                                                <div class="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
+                                                    {{-- DO --}}
+                                                    @if($entry->do_example)
+                                                        <div class="rounded-[8px] border border-[color:var(--nx-line)] bg-[color:var(--nx-surface)] p-4">
+                                                            <x-nx-badge variant="success" dot>Do</x-nx-badge>
+                                                            @if($entry->do_image_path)
+                                                                <img src="{{ asset($entry->do_image_path) }}" alt="Do-Beispiel" class="mt-3 w-full rounded-[6px] border border-[color:var(--nx-line)]">
+                                                            @endif
+                                                            <p class="mt-3 text-[13px] leading-relaxed text-[color:var(--nx-text)]">{{ $entry->do_example }}</p>
+                                                        </div>
+                                                    @endif
+
+                                                    {{-- DON'T --}}
+                                                    @if($entry->dont_example)
+                                                        <div class="rounded-[8px] border border-[color:var(--nx-line)] bg-[color:var(--nx-surface)] p-4">
+                                                            <x-nx-badge variant="danger" dot>Don't</x-nx-badge>
+                                                            @if($entry->dont_image_path)
+                                                                <img src="{{ asset($entry->dont_image_path) }}" alt="Don't-Beispiel" class="mt-3 w-full rounded-[6px] border border-[color:var(--nx-line)]">
+                                                            @endif
+                                                            <p class="mt-3 text-[13px] leading-relaxed text-[color:var(--nx-text)]">{{ $entry->dont_example }}</p>
+                                                        </div>
+                                                    @endif
+                                                </div>
+                                            @endif
+
+                                            {{-- Querverweise --}}
+                                            @if(!empty($entry->cross_references))
+                                                <div class="mt-4 flex flex-wrap items-center gap-2">
+                                                    @svg('heroicon-o-link', 'w-4 h-4 shrink-0 text-[color:var(--nx-faint)]')
+                                                    @foreach($entry->cross_references as $ref)
+                                                        @php
+                                                            $refRoute = null;
+                                                            $refBoardType = $ref['board_type'] ?? '';
+                                                            $refBoardId = $ref['board_id'] ?? '';
+                                                            $refLabel = $ref['label'] ?? 'Board';
+
+                                                            $routeMap = [
+                                                                'ci-board' => 'brands.ci-boards.show',
+                                                                'logo-board' => 'brands.logo-boards.show',
+                                                                'typography-board' => 'brands.typography-boards.show',
+                                                                'tone-of-voice-board' => 'brands.tone-of-voice-boards.show',
+                                                                'persona-board' => 'brands.persona-boards.show',
+                                                                'competitor-board' => 'brands.competitor-boards.show',
+                                                            ];
+
+                                                            $modelMap = [
+                                                                'ci-board' => \Platform\Brands\Models\BrandsCiBoard::class,
+                                                                'logo-board' => \Platform\Brands\Models\BrandsLogoBoard::class,
+                                                                'typography-board' => \Platform\Brands\Models\BrandsTypographyBoard::class,
+                                                                'tone-of-voice-board' => \Platform\Brands\Models\BrandsToneOfVoiceBoard::class,
+                                                                'persona-board' => \Platform\Brands\Models\BrandsPersonaBoard::class,
+                                                                'competitor-board' => \Platform\Brands\Models\BrandsCompetitorBoard::class,
+                                                            ];
+
+                                                            if (isset($routeMap[$refBoardType]) && $refBoardId) {
+                                                                $modelClass = $modelMap[$refBoardType];
+                                                                $refModel = $modelClass::find($refBoardId);
+                                                                if ($refModel) {
+                                                                    $refRoute = route($routeMap[$refBoardType], $refModel);
+                                                                    $refLabel = $refLabel ?: $refModel->name;
+                                                                }
+                                                            }
+                                                        @endphp
+                                                        @if($refRoute)
+                                                            <x-nx-badge :href="$refRoute" variant="info">
+                                                                @svg('heroicon-o-arrow-top-right-on-square', 'w-3 h-3')
+                                                                {{ $refLabel }}
+                                                            </x-nx-badge>
+                                                        @endif
+                                                    @endforeach
+                                                </div>
+                                            @endif
                                         </div>
-                                        <p class="text-sm text-[var(--ui-muted)] mb-3">Noch keine Regeln in diesem Kapitel</p>
-                                        @can('update', $guidelineBoard)
-                                            <x-ui-button
-                                                variant="primary"
-                                                size="sm"
-                                                x-data
-                                                @click="$dispatch('open-modal-guideline-entry', { guidelineBoardId: {{ $guidelineBoard->id }}, chapterId: {{ $chapter->id }} })"
-                                            >
-                                                <span class="inline-flex items-center gap-2">
-                                                    @svg('heroicon-o-plus', 'w-4 h-4')
-                                                    <span>Regel hinzufügen</span>
-                                                </span>
-                                            </x-ui-button>
-                                        @endcan
-                                    </div>
-                                @endif
-                            </div>
-                        </div>
+                                    @endforeach
+                                </x-nx-card>
+                            @else
+                                <x-nx-empty icon="heroicon-o-document-text">
+                                    Noch keine Regeln in diesem Kapitel
+                                    @can('update', $guidelineBoard)
+                                        <x-slot name="action">
+                                            <x-nx-button variant="ghost" size="sm" x-data @click="$dispatch('open-modal-guideline-entry', { guidelineBoardId: {{ $guidelineBoard->id }}, chapterId: {{ $chapter->id }} })">
+                                                @svg('heroicon-o-plus', 'w-4 h-4') Regel hinzufügen
+                                            </x-nx-button>
+                                        </x-slot>
+                                    @endcan
+                                </x-nx-empty>
+                            @endif
+                        </section>
                     @endforeach
                 @else
-                    <div class="text-center py-16 border-2 border-dashed border-[var(--ui-border)]/40 rounded-xl bg-[var(--ui-muted-5)]">
-                        <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-cyan-50 mb-4">
-                            @svg('heroicon-o-book-open', 'w-8 h-8 text-cyan-400')
-                        </div>
-                        <p class="text-sm font-medium text-[var(--ui-secondary)] mb-1">Noch keine Kapitel vorhanden</p>
-                        <p class="text-xs text-[var(--ui-muted)] mb-4">Erstelle Kapitel, um deine Markenregeln zu strukturieren</p>
+                    <x-nx-empty icon="heroicon-o-book-open">
+                        Noch keine Kapitel vorhanden – erstelle Kapitel, um deine Markenregeln zu strukturieren.
                         @can('update', $guidelineBoard)
-                            <x-ui-button
-                                variant="primary"
-                                size="sm"
-                                x-data
-                                @click="$dispatch('open-modal-guideline-chapter', { guidelineBoardId: {{ $guidelineBoard->id }} })"
-                            >
-                                <span class="inline-flex items-center gap-2">
-                                    @svg('heroicon-o-plus', 'w-4 h-4')
-                                    <span>Kapitel hinzufügen</span>
-                                </span>
-                            </x-ui-button>
+                            <x-slot name="action">
+                                <x-nx-button variant="primary" size="sm" x-data @click="$dispatch('open-modal-guideline-chapter', { guidelineBoardId: {{ $guidelineBoard->id }} })">
+                                    @svg('heroicon-o-plus', 'w-4 h-4') Kapitel hinzufügen
+                                </x-nx-button>
+                            </x-slot>
                         @endcan
-                    </div>
+                    </x-nx-empty>
                 @endif
             </div>
         </div>
     </x-ui-page-container>
 
     <x-slot name="sidebar">
-        <x-ui-page-sidebar title="Board-Übersicht" width="w-80" :defaultOpen="true">
-            <div class="p-6 space-y-6">
-                {{-- Board-Details --}}
-                <div>
-                    <h3 class="text-xs font-semibold uppercase tracking-wide text-[var(--ui-muted)] mb-3">Details</h3>
-                    <div class="space-y-2">
-                        <div class="flex justify-between items-center py-2 px-3 bg-[var(--ui-muted-5)] border border-[var(--ui-border)]/40 rounded-lg">
-                            <span class="text-sm text-[var(--ui-muted)]">Typ</span>
-                            <span class="text-xs font-medium px-2 py-1 rounded-full bg-cyan-50 text-cyan-600 border border-cyan-200">
-                                Guidelines
-                            </span>
-                        </div>
-                        <div class="flex justify-between items-center py-2 px-3 bg-[var(--ui-muted-5)] border border-[var(--ui-border)]/40 rounded-lg">
-                            <span class="text-sm text-[var(--ui-muted)]">Erstellt</span>
-                            <span class="text-sm text-[var(--ui-secondary)] font-medium">
-                                {{ $guidelineBoard->created_at->format('d.m.Y') }}
-                            </span>
-                        </div>
-                        @if($chapters->count() > 0)
-                            <div class="flex justify-between items-center py-2 px-3 bg-[var(--ui-muted-5)] border border-[var(--ui-border)]/40 rounded-lg">
-                                <span class="text-sm text-[var(--ui-muted)]">Kapitel</span>
-                                <span class="text-sm text-[var(--ui-secondary)] font-medium">
-                                    {{ $chapters->count() }}
-                                </span>
-                            </div>
-                        @endif
-                        @php
-                            $totalEntries = $chapters->sum(fn($ch) => $ch->entries->count());
-                        @endphp
-                        @if($totalEntries > 0)
-                            <div class="flex justify-between items-center py-2 px-3 bg-[var(--ui-muted-5)] border border-[var(--ui-border)]/40 rounded-lg">
-                                <span class="text-sm text-[var(--ui-muted)]">Regeln</span>
-                                <span class="text-sm text-[var(--ui-secondary)] font-medium">
-                                    {{ $totalEntries }}
-                                </span>
-                            </div>
-                        @endif
-                    </div>
-                </div>
-
-                {{-- Kapitel-Übersicht --}}
-                @if($chapters->count() > 0)
-                    <div>
-                        <h3 class="text-xs font-semibold uppercase tracking-wide text-[var(--ui-muted)] mb-3">Kapitel</h3>
-                        <div class="space-y-2">
-                            @foreach($chapters as $chapter)
-                                <a href="#chapter-{{ $chapter->id }}" class="flex items-center justify-between py-2 px-3 bg-[var(--ui-muted-5)] border border-[var(--ui-border)]/40 rounded-lg hover:bg-cyan-50 hover:border-cyan-200 transition-colors">
-                                    <span class="text-sm font-medium text-[var(--ui-secondary)]">{{ $chapter->title }}</span>
-                                    <span class="text-xs font-medium px-1.5 py-0.5 rounded bg-cyan-50 text-cyan-600">{{ $chapter->entries->count() }}</span>
-                                </a>
-                            @endforeach
-                        </div>
-                    </div>
-                @endif
-            </div>
-        </x-ui-page-sidebar>
+        @php
+            $totalEntries = $chapters->sum(fn($ch) => $ch->entries->count());
+        @endphp
+        @include('brands::partials.board-sidebar', ['detailRows' => array_filter([
+            ['label' => 'Typ', 'value' => 'Guidelines'],
+            ['label' => 'Erstellt', 'value' => $guidelineBoard->created_at->format('d.m.Y')],
+            $chapters->count() > 0 ? ['label' => 'Kapitel', 'value' => (string) $chapters->count()] : null,
+            $totalEntries > 0 ? ['label' => 'Regeln', 'value' => (string) $totalEntries] : null,
+        ])])
     </x-slot>
 
     <x-slot name="activity">
-        <x-ui-page-sidebar title="Aktivitäten" width="w-80" :defaultOpen="false" storeKey="activityOpen" side="right">
-            <div class="p-6">
-                <h3 class="text-xs font-semibold uppercase tracking-wider text-[var(--ui-muted)] mb-4">Letzte Aktivitäten</h3>
-                <div class="space-y-3">
-                    @forelse(($activities ?? []) as $activity)
-                        <div class="p-3 rounded-lg border border-[var(--ui-border)]/40 bg-[var(--ui-muted-5)]">
-                            <div class="text-sm font-medium text-[var(--ui-secondary)]">{{ $activity['title'] ?? 'Aktivität' }}</div>
-                            <div class="text-xs text-[var(--ui-muted)]">{{ $activity['time'] ?? '' }}</div>
-                        </div>
-                    @empty
-                        <div class="py-8 text-center">
-                            <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-[var(--ui-muted-5)] mb-3">
-                                @svg('heroicon-o-clock', 'w-6 h-6 text-[var(--ui-muted)]')
-                            </div>
-                            <p class="text-sm text-[var(--ui-muted)]">Noch keine Aktivitäten</p>
-                            <p class="text-xs text-[var(--ui-muted)] mt-1">Änderungen werden hier angezeigt</p>
-                        </div>
-                    @endforelse
-                </div>
-            </div>
-        </x-ui-page-sidebar>
+        @include('brands::partials.board-activity')
     </x-slot>
 
     <livewire:brands.guideline-board-settings-modal />
