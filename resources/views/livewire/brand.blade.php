@@ -294,7 +294,7 @@
                                                     $stack = "'" . $entry->font_family . "', " . ($cf ? ($fontFallbacks[$cf['category']] ?? 'sans-serif') : 'sans-serif');
                                                 @endphp
                                                 <div class="{{ !$loop->first ? 'mt-3.5 border-t border-[color:var(--nx-line)] pt-3.5' : '' }}">
-                                                    <div class="truncate text-[color:var(--nx-text)]" style="font-family: {{ $stack }}; font-weight: {{ $entry->font_weight ?: 400 }}; font-size: 22px; line-height: 1.25;">{{ $entry->sample_text ?: 'Aa Bb Cc — ' . $entry->font_family }}</div>
+                                                    <div class="truncate text-[color:var(--nx-text)]" style="font-family: {{ $stack }}; font-weight: {{ $entry->font_weight ?: 400 }}; font-size: 22px; line-height: 1.3;">{{ $entry->sample_text ?: 'Marken mit klarem Charakter — AaGg 0123' }}</div>
                                                     <div class="mt-1 text-[12px] text-[color:var(--nx-faint)]">{{ $entry->font_family }} · {{ $entry->font_weight ?: 400 }}@if($entry->role) · {{ $entry->role }}@endif</div>
                                                 </div>
                                             @endforeach

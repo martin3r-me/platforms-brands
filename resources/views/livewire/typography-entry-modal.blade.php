@@ -51,26 +51,30 @@
                 $catalog = collect(config('brands.fonts', []));
                 $catLabels = config('brands.font_categories', []);
                 $catFallbacks = config('brands.font_fallbacks', []);
+                $pickerSpecimen = trim((string) $entrySampleText) !== '' ? $entrySampleText : 'Marken mit klarem Charakter — AaGg 0123';
             @endphp
             <div>
                 <div class="flex items-center justify-between mb-2">
                     <label class="block text-sm font-medium text-[var(--ui-secondary)]">Schriftfamilie</label>
                     <span class="text-xs text-[var(--ui-muted)]">{{ $catalog->count() }} Schriften · OFL · self-hosted</span>
                 </div>
-                <div class="space-y-4 max-h-[340px] overflow-y-auto pr-1">
+                <div class="space-y-4 max-h-[380px] overflow-y-auto pr-1">
                     @foreach($catalog->groupBy('category') as $catKey => $fonts)
                         <div>
-                            <div class="text-[11px] font-semibold uppercase tracking-wider text-[var(--ui-muted)] mb-2">{{ $catLabels[$catKey] ?? $catKey }}</div>
-                            <div class="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                            <div class="text-[11px] font-semibold uppercase tracking-wider text-[var(--ui-muted)] mb-1.5">{{ $catLabels[$catKey] ?? $catKey }}</div>
+                            <div class="space-y-1.5">
                                 @foreach($fonts as $f)
                                     @php $stack = "'" . $f['family'] . "', " . ($catFallbacks[$f['category']] ?? 'sans-serif'); @endphp
                                     <button
                                         type="button"
                                         wire:click="selectCatalogFont('{{ $f['key'] }}')"
-                                        class="flex flex-col items-start gap-1 rounded-lg border px-3 py-2.5 text-left transition-colors {{ $entryFontFamily === $f['family'] ? 'border-[var(--ui-primary)] ring-1 ring-[var(--ui-primary)] bg-[var(--ui-primary-5)]' : 'border-[var(--ui-border)] hover:bg-[var(--ui-muted-5)]' }}"
+                                        class="block w-full rounded-lg border px-3.5 py-2.5 text-left transition-colors {{ $entryFontFamily === $f['family'] ? 'border-[var(--ui-primary)] ring-1 ring-[var(--ui-primary)] bg-[var(--ui-primary-5)]' : 'border-[var(--ui-border)] hover:bg-[var(--ui-muted-5)]' }}"
                                     >
-                                        <span class="w-full truncate text-[19px] leading-tight text-[var(--ui-secondary)]" style="font-family: {{ $stack }};">{{ $f['label'] }}</span>
-                                        <span class="text-[10.5px] text-[var(--ui-muted)]">{{ $f['label'] }}@if(!empty($f['family_group'])) · {{ $f['family_group'] }}@endif</span>
+                                        <div class="flex items-baseline justify-between gap-3">
+                                            <span class="text-[11px] font-medium text-[var(--ui-secondary)]">{{ $f['label'] }}@if(!empty($f['family_group']))<span class="font-normal text-[var(--ui-muted)]"> · {{ $f['family_group'] }}</span>@endif</span>
+                                            @if($entryFontFamily === $f['family'])<span class="text-[10px] font-medium text-[var(--ui-primary)]">Ausgewählt</span>@endif
+                                        </div>
+                                        <div class="mt-1 truncate text-[color:var(--ui-secondary)]" style="font-family: {{ $stack }}; font-size: 23px; line-height: 1.3;">{{ $pickerSpecimen }}</div>
                                     </button>
                                 @endforeach
                             </div>
