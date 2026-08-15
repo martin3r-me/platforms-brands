@@ -11,93 +11,53 @@
         ]">
             <x-slot name="left">
                 @can('update', $kanbanBoard)
-                    <x-ui-button variant="ghost" size="sm" x-data @click="$dispatch('open-modal-kanban-board-settings', { kanbanBoardId: {{ $kanbanBoard->id }} })">
-                        @svg('heroicon-o-cog-6-tooth', 'w-4 h-4')
-                        <span>Einstellungen</span>
-                    </x-ui-button>
-                    <x-ui-button variant="ghost" size="sm" x-data @click="$dispatch('extrafields:open')">
-                        @svg('heroicon-o-adjustments-horizontal', 'w-4 h-4')
-                        <span>Extra-Felder</span>
-                    </x-ui-button>
+                    <x-nx-button variant="ghost" size="sm" x-data @click="$dispatch('open-modal-kanban-board-settings', { kanbanBoardId: {{ $kanbanBoard->id }} })">
+                        @svg('heroicon-o-cog-6-tooth', 'w-4 h-4') Einstellungen
+                    </x-nx-button>
+                    <x-nx-button variant="ghost" size="sm" x-data @click="$dispatch('extrafields:open')">
+                        @svg('heroicon-o-adjustments-horizontal', 'w-4 h-4') Extra-Felder
+                    </x-nx-button>
                 @endcan
             </x-slot>
 
             @can('update', $kanbanBoard)
-                <x-ui-button variant="primary" size="sm" wire:click="createSlot">
-                    @svg('heroicon-o-plus', 'w-4 h-4')
-                    <span>Slot erstellen</span>
-                </x-ui-button>
+                <x-nx-button variant="primary" size="sm" wire:click="createSlot">
+                    @svg('heroicon-o-plus', 'w-4 h-4') Slot erstellen
+                </x-nx-button>
             @endcan
         </x-ui-page-actionbar>
     </x-slot>
 
     <x-slot name="sidebar">
-        <x-ui-page-sidebar title="Board-Übersicht" width="w-80" :defaultOpen="true">
-            <div class="p-4 space-y-6">
-                {{-- Board-Details --}}
-                <div>
-                    <h3 class="text-xs font-semibold uppercase tracking-wide text-[var(--ui-muted)] mb-3">Details</h3>
-                    <div class="space-y-2">
-                        <div class="flex justify-between items-center py-2 px-3 bg-[var(--ui-muted-5)] border border-[var(--ui-border)]/40">
-                            <span class="text-sm text-[var(--ui-muted)]">Typ</span>
-                            <span class="text-xs font-medium px-2 py-1 rounded-full bg-indigo-50 text-indigo-600 border border-indigo-200">
-                                Kanban Board
-                            </span>
-                        </div>
-                        <div class="flex justify-between items-center py-2 px-3 bg-[var(--ui-muted-5)] border border-[var(--ui-border)]/40">
-                            <span class="text-sm text-[var(--ui-muted)]">Erstellt</span>
-                            <span class="text-sm text-[var(--ui-secondary)] font-medium">
-                                {{ $kanbanBoard->created_at->format('d.m.Y') }}
-                            </span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </x-ui-page-sidebar>
+        @include('brands::partials.board-sidebar', ['detailRows' => [
+            ['label' => 'Typ', 'value' => 'Kanban Board'],
+            ['label' => 'Erstellt', 'value' => $kanbanBoard->created_at->format('d.m.Y')],
+            ['label' => 'Slots', 'value' => (string) $slots->count()],
+        ]])
     </x-slot>
 
     <x-slot name="activity">
-        <x-ui-page-sidebar title="Aktivitäten" width="w-80" :defaultOpen="false" storeKey="activityOpen" side="right">
-            <div class="p-4 space-y-4">
-                <div class="text-sm text-[var(--ui-muted)]">Letzte Aktivitäten</div>
-                <div class="space-y-3 text-sm">
-                    @forelse(($activities ?? []) as $activity)
-                        <div class="p-2 rounded border border-[var(--ui-border)]/60 bg-[var(--ui-muted-5)]">
-                            <div class="font-medium text-[var(--ui-secondary)] truncate">{{ $activity['title'] ?? 'Aktivität' }}</div>
-                            <div class="text-[var(--ui-muted)]">{{ $activity['time'] ?? '' }}</div>
-                        </div>
-                    @empty
-                        <div class="py-8 text-center">
-                            <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-[var(--ui-muted-5)] mb-3">
-                                @svg('heroicon-o-clock', 'w-6 h-6 text-[var(--ui-muted)]')
-                            </div>
-                            <p class="text-sm text-[var(--ui-muted)]">Noch keine Aktivitäten</p>
-                            <p class="text-xs text-[var(--ui-muted)] mt-1">Änderungen werden hier angezeigt</p>
-                        </div>
-                    @endforelse
-                </div>
-            </div>
-        </x-ui-page-sidebar>
+        @include('brands::partials.board-activity')
     </x-slot>
 
     {{-- Board-Container: füllt restliche Breite, Spalten scrollen intern --}}
     @if($slots->count() > 0)
         <div class="kanban-board-kanban-container">
-            <x-ui-kanban-container sortable="updateSlotOrder" sortable-group="updateCardOrder">
+            <x-nx-kanban-container sortable="updateSlotOrder" sortable-group="updateCardOrder">
                 @foreach($slots as $slot)
-                    <x-ui-kanban-column :title="$slot->name" :sortable-id="$slot->id" :scrollable="true">
+                    <x-nx-kanban-column :title="$slot->name" :sortable-id="$slot->id" :count="$slot->cards->count()" :scrollable="true">
                         <x-slot name="headerActions">
                             @can('update', $kanbanBoard)
                                 <button
                                     wire:click="createCard({{ $slot->id }})"
-                                    class="text-[var(--ui-muted)] hover:text-[var(--ui-secondary)] transition-colors"
+                                    class="rounded-[6px] p-1 text-[color:var(--nx-faint)] transition-colors hover:bg-[color:var(--nx-hover)] hover:text-[color:var(--nx-text)]"
                                     title="Neue Card"
                                 >
                                     @svg('heroicon-o-plus-circle', 'w-4 h-4')
                                 </button>
                                 <button
                                     @click="$dispatch('open-modal-kanban-board-slot-settings', { slotId: {{ $slot->id }} })"
-                                    class="text-[var(--ui-muted)] hover:text-[var(--ui-secondary)] transition-colors"
+                                    class="rounded-[6px] p-1 text-[color:var(--nx-faint)] transition-colors hover:bg-[color:var(--nx-hover)] hover:text-[color:var(--nx-text)]"
                                     title="Einstellungen"
                                 >
                                     @svg('heroicon-o-cog-6-tooth', 'w-4 h-4')
@@ -108,27 +68,22 @@
                         @foreach($slot->cards as $card)
                             @include('brands::livewire.kanban-card-preview-card', ['card' => $card])
                         @endforeach
-                    </x-ui-kanban-column>
+                    </x-nx-kanban-column>
                 @endforeach
-            </x-ui-kanban-container>
+            </x-nx-kanban-container>
         </div>
     @else
-        <div class="flex items-center justify-center h-full">
-            <div class="bg-white rounded-xl border border-[var(--ui-border)]/60 shadow-sm p-12 text-center max-w-md">
-                <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-indigo-50 mb-4">
-                    @svg('heroicon-o-view-columns', 'w-8 h-8 text-indigo-600')
-                </div>
-                <h3 class="text-lg font-semibold text-[var(--ui-secondary)] mb-2">Noch keine Slots</h3>
-                <p class="text-sm text-[var(--ui-muted)] mb-4">Erstelle deinen ersten Slot für dieses Kanban Board.</p>
+        <div class="flex flex-1 items-center justify-center">
+            <x-nx-empty icon="heroicon-o-view-columns">
+                Noch keine Slots – erstelle deinen ersten Slot für dieses Kanban Board.
                 @can('update', $kanbanBoard)
-                    <x-ui-button variant="primary" size="sm" wire:click="createSlot">
-                        <span class="inline-flex items-center gap-2">
-                            @svg('heroicon-o-plus', 'w-4 h-4')
-                            <span>Slot erstellen</span>
-                        </span>
-                    </x-ui-button>
+                    <x-slot name="action">
+                        <x-nx-button variant="primary" size="sm" wire:click="createSlot">
+                            @svg('heroicon-o-plus', 'w-4 h-4') Slot erstellen
+                        </x-nx-button>
+                    </x-slot>
                 @endcan
-            </div>
+            </x-nx-empty>
         </div>
     @endif
 
@@ -136,12 +91,3 @@
     <livewire:brands.kanban-board-settings-modal/>
     <livewire:brands.kanban-board-slot-settings-modal/>
 </x-ui-page>
-
-@push('styles')
-<style>
-    /* Toggle-Button im Kanban Board verstecken */
-    .kanban-board-kanban-container .absolute.bottom-6 {
-        display: none !important;
-    }
-</style>
-@endpush
