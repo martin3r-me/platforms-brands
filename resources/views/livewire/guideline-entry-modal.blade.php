@@ -1,7 +1,7 @@
-<x-ui-modal size="xl" model="modalShow" header="{{ $entry ? 'Regel bearbeiten' : 'Neue Regel' }}">
-    <div class="space-y-6">
+<x-nx-modal size="xl" model="modalShow" header="{{ $entry ? 'Regel bearbeiten' : 'Neue Regel' }}">
+    <div class="space-y-4">
         {{-- Title --}}
-        <x-ui-input-text
+        <x-nx-input-text
             name="entryTitle"
             label="Regel-Titel"
             wire:model.live.debounce.300ms="entryTitle"
@@ -11,7 +11,7 @@
         />
 
         {{-- Rule Text --}}
-        <x-ui-input-textarea
+        <x-nx-input-textarea
             name="entryRuleText"
             label="Regel-Text"
             wire:model.live.debounce.300ms="entryRuleText"
@@ -21,7 +21,7 @@
         />
 
         {{-- Rationale --}}
-        <x-ui-input-textarea
+        <x-nx-input-textarea
             name="entryRationale"
             label="Begründung (optional)"
             wire:model.live.debounce.300ms="entryRationale"
@@ -30,15 +30,15 @@
         />
 
         {{-- Do/Don't Examples --}}
-        <div class="border border-[var(--ui-border)]/60 rounded-xl overflow-hidden">
-            <div class="bg-[var(--ui-muted-5)] px-4 py-3 border-b border-[var(--ui-border)]/40">
-                <h3 class="text-sm font-semibold text-[var(--ui-secondary)]">Do / Don't Beispiele</h3>
-                <p class="text-xs text-[var(--ui-muted)]">Zeige anhand von Beispielen, was richtig und falsch ist</p>
+        <div class="border border-[color:var(--nx-line)] rounded-[8px] overflow-hidden">
+            <div class="bg-[color:var(--nx-hover)] px-4 py-3 border-b border-[color:var(--nx-line)]">
+                <h3 class="text-sm font-semibold text-[color:var(--nx-text)]">Do / Don't Beispiele</h3>
+                <p class="text-xs text-[color:var(--nx-faint)]">Zeige anhand von Beispielen, was richtig und falsch ist</p>
             </div>
             <div class="p-4 space-y-4">
                 {{-- Do Example --}}
                 <div>
-                    <label class="flex items-center gap-2 text-sm font-medium text-[var(--ui-secondary)] mb-1">
+                    <label class="flex items-center gap-2 text-sm font-medium text-[color:var(--nx-text)] mb-1">
                         <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-green-100">
                             @svg('heroicon-o-check', 'w-3 h-3 text-green-600')
                         </span>
@@ -54,7 +54,7 @@
 
                 {{-- Don't Example --}}
                 <div>
-                    <label class="flex items-center gap-2 text-sm font-medium text-[var(--ui-secondary)] mb-1">
+                    <label class="flex items-center gap-2 text-sm font-medium text-[color:var(--nx-text)] mb-1">
                         <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-red-100">
                             @svg('heroicon-o-x-mark', 'w-3 h-3 text-red-600')
                         </span>
@@ -71,11 +71,11 @@
         </div>
 
         {{-- Cross References --}}
-        <div class="border border-[var(--ui-border)]/60 rounded-xl overflow-hidden">
-            <div class="bg-[var(--ui-muted-5)] px-4 py-3 border-b border-[var(--ui-border)]/40 flex items-center justify-between">
+        <div class="border border-[color:var(--nx-line)] rounded-[8px] overflow-hidden">
+            <div class="bg-[color:var(--nx-hover)] px-4 py-3 border-b border-[color:var(--nx-line)] flex items-center justify-between">
                 <div>
-                    <h3 class="text-sm font-semibold text-[var(--ui-secondary)]">Cross-Referenzen</h3>
-                    <p class="text-xs text-[var(--ui-muted)]">Verlinke andere Boards (CI-Farben, Logos, Typografie...)</p>
+                    <h3 class="text-sm font-semibold text-[color:var(--nx-text)]">Cross-Referenzen</h3>
+                    <p class="text-xs text-[color:var(--nx-faint)]">Verlinke andere Boards (CI-Farben, Logos, Typografie...)</p>
                 </div>
                 <button
                     type="button"
@@ -91,14 +91,14 @@
                     <div class="flex items-center gap-2">
                         <select
                             wire:model.live="entryCrossReferences.{{ $index }}.board_type"
-                            class="flex-1 px-3 py-2 text-sm border border-[var(--ui-border)] rounded-lg focus:ring-2 focus:ring-[var(--ui-primary)] focus:border-transparent"
+                            class="flex-1 px-3 py-2 text-sm border border-[color:var(--nx-line-strong)] rounded-lg bg-[color:var(--nx-surface)] text-[color:var(--nx-text)] focus:ring-2 focus:ring-[color:var(--nx-accent)] focus:border-transparent"
                         >
                             <option value="">Board-Typ wählen...</option>
                             @foreach($availableBoards as $board)
                                 <option value="{{ $board['board_type'] }}___{{ $board['board_id'] }}">{{ $board['label'] }}</option>
                             @endforeach
                         </select>
-                        <x-ui-input-text
+                        <x-nx-input-text
                             name="entryCrossReferences.{{ $index }}.label"
                             wire:model.live.debounce.300ms="entryCrossReferences.{{ $index }}.label"
                             placeholder="Label..."
@@ -107,23 +107,23 @@
                         <button
                             type="button"
                             wire:click="removeCrossReference({{ $index }})"
-                            class="p-2 text-[var(--ui-muted)] hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                            class="p-2 text-[color:var(--nx-faint)] hover:text-red-600 hover:bg-red-50 rounded transition-colors"
                         >
                             @svg('heroicon-o-trash', 'w-4 h-4')
                         </button>
                     </div>
                 @empty
-                    <p class="text-xs text-[var(--ui-muted)] text-center py-2">Keine Cross-Referenzen hinzugefügt</p>
+                    <p class="text-xs text-[color:var(--nx-faint)] text-center py-2">Keine Cross-Referenzen hinzugefügt</p>
                 @endforelse
             </div>
         </div>
 
         {{-- Live Preview --}}
         @if($entryRuleText)
-            <div class="p-4 bg-[var(--ui-muted-5)] rounded-xl border border-[var(--ui-border)]/40">
-                <div class="text-xs font-semibold text-[var(--ui-muted)] mb-3 uppercase tracking-wider">Vorschau</div>
-                <h4 class="text-base font-semibold text-[var(--ui-secondary)] mb-2">{{ $entryTitle ?: 'Neue Regel' }}</h4>
-                <p class="text-sm text-[var(--ui-secondary)] leading-relaxed mb-3">{{ $entryRuleText }}</p>
+            <div class="p-4 bg-[color:var(--nx-hover)] rounded-[8px] border border-[color:var(--nx-line)]">
+                <div class="text-xs font-semibold text-[color:var(--nx-faint)] mb-3 uppercase tracking-wider">Vorschau</div>
+                <h4 class="text-base font-semibold text-[color:var(--nx-text)] mb-2">{{ $entryTitle ?: 'Neue Regel' }}</h4>
+                <p class="text-sm text-[color:var(--nx-text)] leading-relaxed mb-3">{{ $entryRuleText }}</p>
                 @if($entryDoExample || $entryDontExample)
                     <div class="grid grid-cols-2 gap-3">
                         @if($entryDoExample)
@@ -155,8 +155,8 @@
     </div>
 
     <x-slot name="footer">
-        <x-ui-button variant="success" wire:click="save">
+        <x-nx-button variant="primary" wire:click="save">
             {{ $entry ? 'Aktualisieren' : 'Erstellen' }}
-        </x-ui-button>
+        </x-nx-button>
     </x-slot>
-</x-ui-modal>
+</x-nx-modal>

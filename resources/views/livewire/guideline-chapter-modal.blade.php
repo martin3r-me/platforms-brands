@@ -1,6 +1,6 @@
-<x-ui-modal size="md" model="modalShow" header="{{ $chapter ? 'Kapitel bearbeiten' : 'Neues Kapitel' }}">
-    <div class="space-y-6">
-        <x-ui-input-text
+<x-nx-modal size="md" model="modalShow" header="{{ $chapter ? 'Kapitel bearbeiten' : 'Neues Kapitel' }}">
+    <div class="space-y-4">
+        <x-nx-input-text
             name="chapterTitle"
             label="Kapitel-Titel"
             wire:model.live.debounce.300ms="chapterTitle"
@@ -9,7 +9,7 @@
             :errorKey="'chapterTitle'"
         />
 
-        <x-ui-input-textarea
+        <x-nx-input-textarea
             name="chapterDescription"
             label="Beschreibung"
             wire:model.live.debounce.300ms="chapterDescription"
@@ -17,7 +17,7 @@
             :errorKey="'chapterDescription'"
         />
 
-        <x-ui-input-text
+        <x-nx-input-text
             name="chapterIcon"
             label="Icon (optional)"
             wire:model.live.debounce.300ms="chapterIcon"
@@ -27,8 +27,8 @@
     </div>
 
     <x-slot name="footer">
-        <x-ui-button variant="success" wire:click="save">
+        <x-nx-button variant="primary" wire:click="save">
             {{ $chapter ? 'Aktualisieren' : 'Erstellen' }}
-        </x-ui-button>
+        </x-nx-button>
     </x-slot>
-</x-ui-modal>
+</x-nx-modal>
