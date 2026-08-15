@@ -96,7 +96,7 @@
         </x-nx-section>
 
         {{-- Text & Schrift --}}
-        <x-nx-section icon="heroicon-o-language" title="Text &amp; Schrift" description="Slogan, Tagline und Schriftart">
+        <x-nx-section icon="heroicon-o-language" title="Text & Schrift" description="Slogan, Tagline und Schriftart">
             <div class="grid grid-cols-1 gap-5 lg:grid-cols-2">
                 <div class="space-y-4">
                     <x-nx-input-textarea name="ciSlogan" label="Slogan" :rows="4" wire:model="ciBoard.slogan" placeholder="Dein prägnanter Marken-Slogan…" hint="Zentraler Slogan" />
