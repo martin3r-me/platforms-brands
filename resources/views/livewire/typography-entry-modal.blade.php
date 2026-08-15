@@ -1,5 +1,8 @@
 <x-ui-modal size="lg" model="modalShow" header="{{ $entry ? 'Schrift-Definition bearbeiten' : 'Neue Schrift-Definition' }}">
     <div class="space-y-6">
+        {{-- Self-hosted Katalog-Fonts für Live-Vorschau --}}
+        @include('brands::partials.fonts')
+
         {{-- Name & Role --}}
         <x-ui-form-grid :cols="2" :gap="4">
             <x-ui-input-text
@@ -27,92 +30,55 @@
             <div class="flex gap-1 p-1 bg-[var(--ui-muted-5)] rounded-lg border border-[var(--ui-border)]/40">
                 <button
                     type="button"
-                    wire:click="$set('fontSourceTab', 'system')"
-                    class="flex-1 px-3 py-2 text-sm font-medium rounded-md transition-colors {{ $fontSourceTab === 'system' ? 'bg-white text-[var(--ui-primary)] shadow-sm' : 'text-[var(--ui-muted)] hover:text-[var(--ui-secondary)]' }}"
+                    wire:click="$set('fontSourceTab', 'catalog')"
+                    class="flex-1 px-3 py-2 text-sm font-medium rounded-md transition-colors {{ $fontSourceTab === 'catalog' ? 'bg-white text-[var(--ui-primary)] shadow-sm' : 'text-[var(--ui-muted)] hover:text-[var(--ui-secondary)]' }}"
                 >
-                    System Fonts
-                </button>
-                <button
-                    type="button"
-                    wire:click="$set('fontSourceTab', 'google')"
-                    class="flex-1 px-3 py-2 text-sm font-medium rounded-md transition-colors {{ $fontSourceTab === 'google' ? 'bg-white text-[var(--ui-primary)] shadow-sm' : 'text-[var(--ui-muted)] hover:text-[var(--ui-secondary)]' }}"
-                >
-                    Google Fonts
+                    Katalog
                 </button>
                 <button
                     type="button"
                     wire:click="$set('fontSourceTab', 'custom')"
                     class="flex-1 px-3 py-2 text-sm font-medium rounded-md transition-colors {{ $fontSourceTab === 'custom' ? 'bg-white text-[var(--ui-primary)] shadow-sm' : 'text-[var(--ui-muted)] hover:text-[var(--ui-secondary)]' }}"
                 >
-                    Custom Upload
+                    Eigene Schrift hochladen
                 </button>
             </div>
         </div>
 
-        {{-- System Font Selection --}}
-        @if($fontSourceTab === 'system')
+        {{-- Katalog: kuratierte, self-hosted Fonts (OFL) --}}
+        @if($fontSourceTab === 'catalog')
+            @php
+                $catalog = collect(config('brands.fonts', []));
+                $catLabels = config('brands.font_categories', []);
+                $catFallbacks = config('brands.font_fallbacks', []);
+            @endphp
             <div>
-                <label class="block text-sm font-medium text-[var(--ui-secondary)] mb-1">Schriftfamilie</label>
-                <select wire:model.live="entryFontFamily" class="w-full px-3 py-2 text-sm border border-[var(--ui-border)] rounded-lg focus:ring-2 focus:ring-[var(--ui-primary)] focus:border-transparent">
-                    <optgroup label="Sans-Serif">
-                        <option value="Inter">Inter</option>
-                        <option value="Arial">Arial</option>
-                        <option value="Helvetica">Helvetica</option>
-                        <option value="system-ui">System UI</option>
-                        <option value="Segoe UI">Segoe UI</option>
-                        <option value="Verdana">Verdana</option>
-                        <option value="Tahoma">Tahoma</option>
-                        <option value="Trebuchet MS">Trebuchet MS</option>
-                    </optgroup>
-                    <optgroup label="Serif">
-                        <option value="Georgia">Georgia</option>
-                        <option value="Times New Roman">Times New Roman</option>
-                        <option value="Palatino">Palatino</option>
-                        <option value="Book Antiqua">Book Antiqua</option>
-                    </optgroup>
-                    <optgroup label="Monospace">
-                        <option value="Consolas">Consolas</option>
-                        <option value="Courier New">Courier New</option>
-                        <option value="Monaco">Monaco</option>
-                        <option value="Menlo">Menlo</option>
-                    </optgroup>
-                </select>
-            </div>
-        @endif
-
-        {{-- Google Fonts Selection --}}
-        @if($fontSourceTab === 'google')
-            <div>
-                <label class="block text-sm font-medium text-[var(--ui-secondary)] mb-1">Google Font suchen</label>
-                <div class="relative">
-                    <input
-                        type="text"
-                        wire:model.live.debounce.300ms="googleFontSearch"
-                        wire:keyup="searchGoogleFonts"
-                        placeholder="z.B. Roboto, Montserrat, Playfair..."
-                        class="w-full px-3 py-2 text-sm border border-[var(--ui-border)] rounded-lg focus:ring-2 focus:ring-[var(--ui-primary)] focus:border-transparent"
-                    >
-                    @if(count($googleFontResults) > 0)
-                        <div class="absolute z-10 w-full mt-1 bg-white border border-[var(--ui-border)] rounded-lg shadow-lg max-h-48 overflow-y-auto">
-                            @foreach($googleFontResults as $font)
-                                <button
-                                    type="button"
-                                    wire:click="selectGoogleFont('{{ $font }}')"
-                                    class="w-full text-left px-3 py-2 text-sm hover:bg-[var(--ui-muted-5)] transition-colors"
-                                >
-                                    {{ $font }}
-                                </button>
-                            @endforeach
-                        </div>
-                    @endif
+                <div class="flex items-center justify-between mb-2">
+                    <label class="block text-sm font-medium text-[var(--ui-secondary)]">Schriftfamilie</label>
+                    <span class="text-xs text-[var(--ui-muted)]">{{ $catalog->count() }} Schriften · OFL · self-hosted</span>
                 </div>
-                @if($entryFontSource === 'google' && $entryFontFamily)
-                    <div class="mt-2 flex items-center gap-2">
-                        <span class="text-xs text-[var(--ui-muted)]">Ausgewählt:</span>
-                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-blue-50 text-blue-700 text-xs font-medium border border-blue-200">
-                            {{ $entryFontFamily }}
-                        </span>
-                    </div>
+                <div class="space-y-4 max-h-[340px] overflow-y-auto pr-1">
+                    @foreach($catalog->groupBy('category') as $catKey => $fonts)
+                        <div>
+                            <div class="text-[11px] font-semibold uppercase tracking-wider text-[var(--ui-muted)] mb-2">{{ $catLabels[$catKey] ?? $catKey }}</div>
+                            <div class="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                                @foreach($fonts as $f)
+                                    @php $stack = "'" . $f['family'] . "', " . ($catFallbacks[$f['category']] ?? 'sans-serif'); @endphp
+                                    <button
+                                        type="button"
+                                        wire:click="selectCatalogFont('{{ $f['key'] }}')"
+                                        class="flex flex-col items-start gap-1 rounded-lg border px-3 py-2.5 text-left transition-colors {{ $entryFontFamily === $f['family'] ? 'border-[var(--ui-primary)] ring-1 ring-[var(--ui-primary)] bg-[var(--ui-primary-5)]' : 'border-[var(--ui-border)] hover:bg-[var(--ui-muted-5)]' }}"
+                                    >
+                                        <span class="w-full truncate text-[19px] leading-tight text-[var(--ui-secondary)]" style="font-family: {{ $stack }};">{{ $f['label'] }}</span>
+                                        <span class="text-[10.5px] text-[var(--ui-muted)]">{{ $f['label'] }}@if(!empty($f['family_group'])) · {{ $f['family_group'] }}@endif</span>
+                                    </button>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+                @if($entryFontFamily)
+                    <p class="mt-2 text-xs text-[var(--ui-muted)]">Ausgewählt: <span class="font-medium text-[var(--ui-secondary)]">{{ $entryFontFamily }}</span></p>
                 @endif
             </div>
         @endif
@@ -243,14 +209,13 @@
         {{-- Live Preview --}}
         <div class="p-4 bg-[var(--ui-muted-5)] rounded-xl border border-[var(--ui-border)]/40">
             <div class="text-xs font-semibold text-[var(--ui-muted)] mb-3 uppercase tracking-wider">Live-Vorschau</div>
-            @if($fontSourceTab === 'google' && $entryFontFamily)
-                @php
-                    $previewGoogleUrl = "https://fonts.googleapis.com/css2?family=" . str_replace(' ', '+', $entryFontFamily) . ":wght@" . $entryFontWeight . "&display=swap";
-                @endphp
-                <link href="{{ $previewGoogleUrl }}" rel="stylesheet">
-            @endif
+            @php
+                $previewCf = collect(config('brands.fonts', []))->firstWhere('family', $entryFontFamily);
+                $previewFb = config('brands.font_fallbacks', []);
+                $previewStack = "'" . $entryFontFamily . "', " . ($previewCf ? ($previewFb[$previewCf['category']] ?? 'sans-serif') : 'sans-serif');
+            @endphp
             <div
-                style="font-family: '{{ $entryFontFamily }}', sans-serif; font-weight: {{ $entryFontWeight }}; font-style: {{ $entryFontStyle }}; font-size: {{ $entryFontSize }}px; {{ $entryLineHeight ? 'line-height: ' . $entryLineHeight . ';' : '' }} {{ $entryLetterSpacing !== null && $entryLetterSpacing !== '' ? 'letter-spacing: ' . $entryLetterSpacing . 'px;' : '' }} {{ $entryTextTransform ? 'text-transform: ' . $entryTextTransform . ';' : '' }}"
+                style="font-family: {{ $previewStack }}; font-weight: {{ $entryFontWeight }}; font-style: {{ $entryFontStyle }}; font-size: {{ $entryFontSize }}px; {{ $entryLineHeight ? 'line-height: ' . $entryLineHeight . ';' : '' }} {{ $entryLetterSpacing !== null && $entryLetterSpacing !== '' ? 'letter-spacing: ' . $entryLetterSpacing . 'px;' : '' }} {{ $entryTextTransform ? 'text-transform: ' . $entryTextTransform . ';' : '' }}"
                 class="text-[var(--ui-secondary)]"
             >
                 {{ $entrySampleText ?: 'The quick brown fox jumps over the lazy dog' }}

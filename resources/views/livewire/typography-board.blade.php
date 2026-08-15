@@ -28,6 +28,9 @@
     </x-slot>
 
     <x-ui-page-container spacing="space-y-8">
+        {{-- Self-hosted Katalog-Fonts (lädt nur, was gerendert wird) --}}
+        @include('brands::partials.fonts')
+
         {{-- Header Section --}}
         <div class="bg-white rounded-xl border border-[var(--ui-border)]/60 shadow-sm overflow-hidden">
             <div class="p-6 lg:p-8">

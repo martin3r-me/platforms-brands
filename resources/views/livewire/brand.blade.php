@@ -131,7 +131,14 @@
 
             $company = $brand->getCompany();
             $contact = $brand->getContact();
+
+            // Font-Fallback-Stacks für echtes Rendering der Katalog-Schriften
+            $fontFallbacks = config('brands.font_fallbacks', []);
+            $catalogByFamily = collect(config('brands.fonts', []))->keyBy('family');
         @endphp
+
+        {{-- Self-hosted Katalog-Fonts (lädt nur, was gerendert wird) --}}
+        @include('brands::partials.fonts')
 
         {{-- ══════════ COVER (aus CI abgeleitet) ══════════ --}}
         <div class="flex h-24 md:h-28 overflow-hidden rounded-t-[12px]" aria-hidden="true">
@@ -282,7 +289,14 @@
                                     @if($tB->entries->isNotEmpty())
                                         <a href="{{ route('brands.typography-boards.show', $tB) }}" wire:navigate class="block rounded-[8px] border border-[color:var(--nx-line)] bg-[color:var(--nx-surface)] px-4 py-4 transition-colors hover:bg-[color:var(--nx-hover)] {{ !$loop->first ? 'mt-3' : '' }}">
                                             @foreach($tB->entries->take(4) as $entry)
-                                                <div class="{{ !$loop->first ? 'mt-2' : '' }}"><span class="text-[15px] font-semibold text-[color:var(--nx-text)]">{{ $entry->font_family }}</span>@if($entry->role)<span class="text-[13px] text-[color:var(--nx-faint)]"> · {{ $entry->role }}</span>@endif</div>
+                                                @php
+                                                    $cf = $catalogByFamily->get($entry->font_family);
+                                                    $stack = "'" . $entry->font_family . "', " . ($cf ? ($fontFallbacks[$cf['category']] ?? 'sans-serif') : 'sans-serif');
+                                                @endphp
+                                                <div class="{{ !$loop->first ? 'mt-3.5 border-t border-[color:var(--nx-line)] pt-3.5' : '' }}">
+                                                    <div class="truncate text-[color:var(--nx-text)]" style="font-family: {{ $stack }}; font-weight: {{ $entry->font_weight ?: 400 }}; font-size: 22px; line-height: 1.25;">{{ $entry->sample_text ?: 'Aa Bb Cc — ' . $entry->font_family }}</div>
+                                                    <div class="mt-1 text-[12px] text-[color:var(--nx-faint)]">{{ $entry->font_family }} · {{ $entry->font_weight ?: 400 }}@if($entry->role) · {{ $entry->role }}@endif</div>
+                                                </div>
                                             @endforeach
                                         </a>
                                     @else

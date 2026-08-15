@@ -19,13 +19,13 @@ class TypographyEntryModal extends Component
     public $fontUpload;
     public $googleFontSearch = '';
     public $googleFontResults = [];
-    public $fontSourceTab = 'system';
+    public $fontSourceTab = 'catalog';
 
     // Entry fields
     public $entryName = '';
     public $entryRole = '';
     public $entryFontFamily = 'Inter';
-    public $entryFontSource = 'system';
+    public $entryFontSource = 'catalog';
     public $entryFontWeight = 400;
     public $entryFontStyle = 'normal';
     public $entryFontSize = 16;
@@ -56,7 +56,7 @@ class TypographyEntryModal extends Component
         $this->entryName = '';
         $this->entryRole = '';
         $this->entryFontFamily = 'Inter';
-        $this->entryFontSource = 'system';
+        $this->entryFontSource = 'catalog';
         $this->entryFontWeight = 400;
         $this->entryFontStyle = 'normal';
         $this->entryFontSize = 16;
@@ -68,7 +68,19 @@ class TypographyEntryModal extends Component
         $this->fontUpload = null;
         $this->googleFontSearch = '';
         $this->googleFontResults = [];
-        $this->fontSourceTab = 'system';
+        $this->fontSourceTab = 'catalog';
+    }
+
+    /**
+     * Font aus dem kuratierten Katalog (config/brands.php) auswählen.
+     */
+    public function selectCatalogFont(string $key): void
+    {
+        $font = collect(config('brands.fonts', []))->firstWhere('key', $key);
+        if ($font) {
+            $this->entryFontFamily = $font['family'];
+            $this->entryFontSource = 'catalog';
+        }
     }
 
     protected function fillFromEntry()
@@ -85,7 +97,7 @@ class TypographyEntryModal extends Component
         $this->entryTextTransform = $this->entry->text_transform ?? '';
         $this->entrySampleText = $this->entry->sample_text ?? '';
         $this->entryDescription = $this->entry->description ?? '';
-        $this->fontSourceTab = $this->entry->font_source;
+        $this->fontSourceTab = $this->entry->font_source === 'custom' ? 'custom' : 'catalog';
     }
 
     public function mount()
