@@ -4,80 +4,80 @@
     // Search Volume Bar
     $svPercent = ($maxSearchVolume > 0 && $keyword->search_volume) ? round(($keyword->search_volume / $maxSearchVolume) * 100) : 0;
 
-    // KD Label + Color
+    // KD Label + nx-Badge-Variant
     $kd = $keyword->keyword_difficulty;
     if ($kd !== null) {
-        if ($kd <= 14) { $kdLabel = 'Sehr leicht'; $kdColor = 'emerald'; }
-        elseif ($kd <= 29) { $kdLabel = 'Leicht'; $kdColor = 'green'; }
-        elseif ($kd <= 49) { $kdLabel = 'Machbar'; $kdColor = 'yellow'; }
-        elseif ($kd <= 69) { $kdLabel = 'Schwer'; $kdColor = 'orange'; }
-        elseif ($kd <= 84) { $kdLabel = 'Sehr schwer'; $kdColor = 'red'; }
-        else { $kdLabel = 'Extrem'; $kdColor = 'rose'; }
+        if ($kd <= 14) { $kdLabel = 'Sehr leicht'; $kdVariant = 'success'; }
+        elseif ($kd <= 29) { $kdLabel = 'Leicht'; $kdVariant = 'success'; }
+        elseif ($kd <= 49) { $kdLabel = 'Machbar'; $kdVariant = 'warning'; }
+        elseif ($kd <= 69) { $kdLabel = 'Schwer'; $kdVariant = 'warning'; }
+        elseif ($kd <= 84) { $kdLabel = 'Sehr schwer'; $kdVariant = 'danger'; }
+        else { $kdLabel = 'Extrem'; $kdVariant = 'danger'; }
     } else {
-        $kdLabel = null; $kdColor = 'gray';
+        $kdLabel = null; $kdVariant = 'neutral';
     }
 
     // Intent
     $intentConfig = [
-        'informational' => ['label' => 'Info', 'icon' => 'heroicon-o-information-circle', 'color' => 'blue'],
-        'navigational' => ['label' => 'Navi', 'icon' => 'heroicon-o-map-pin', 'color' => 'purple'],
-        'commercial' => ['label' => 'Kommerziell', 'icon' => 'heroicon-o-shopping-bag', 'color' => 'amber'],
-        'transactional' => ['label' => 'Transaktional', 'icon' => 'heroicon-o-banknotes', 'color' => 'green'],
+        'informational' => ['label' => 'Info', 'icon' => 'heroicon-o-information-circle', 'variant' => 'info'],
+        'navigational' => ['label' => 'Navi', 'icon' => 'heroicon-o-map-pin', 'variant' => 'accent'],
+        'commercial' => ['label' => 'Kommerziell', 'icon' => 'heroicon-o-shopping-bag', 'variant' => 'warning'],
+        'transactional' => ['label' => 'Transaktional', 'icon' => 'heroicon-o-banknotes', 'variant' => 'success'],
     ];
     $intent = $intentConfig[$keyword->search_intent] ?? null;
 
     // Priority
     $priorityConfig = [
-        'high' => ['label' => 'Hoch', 'color' => 'red', 'icon' => 'heroicon-s-chevron-double-up'],
-        'medium' => ['label' => 'Mittel', 'color' => 'amber', 'icon' => 'heroicon-o-minus'],
-        'low' => ['label' => 'Niedrig', 'color' => 'gray', 'icon' => 'heroicon-s-chevron-double-down'],
+        'high' => ['label' => 'Hoch', 'variant' => 'danger', 'icon' => 'heroicon-s-chevron-double-up'],
+        'medium' => ['label' => 'Mittel', 'variant' => 'warning', 'icon' => 'heroicon-o-minus'],
+        'low' => ['label' => 'Niedrig', 'variant' => 'neutral', 'icon' => 'heroicon-s-chevron-double-down'],
     ];
     $prio = $priorityConfig[$keyword->priority] ?? null;
 
     // Trend
     $trendConfig = [
-        'up' => ['icon' => 'heroicon-o-arrow-trending-up', 'color' => 'green'],
-        'down' => ['icon' => 'heroicon-o-arrow-trending-down', 'color' => 'red'],
-        'stable' => ['icon' => 'heroicon-o-minus', 'color' => 'gray'],
-        'seasonal' => ['icon' => 'heroicon-o-sun', 'color' => 'amber'],
+        'up' => ['icon' => 'heroicon-o-arrow-trending-up', 'variant' => 'success'],
+        'down' => ['icon' => 'heroicon-o-arrow-trending-down', 'variant' => 'danger'],
+        'stable' => ['icon' => 'heroicon-o-minus', 'variant' => 'neutral'],
+        'seasonal' => ['icon' => 'heroicon-o-sun', 'variant' => 'warning'],
     ];
     $trend = $trendConfig[$keyword->trend] ?? null;
 
     // Content Status
     $statusConfig = [
-        'none' => ['label' => 'Offen', 'color' => 'gray'],
-        'planned' => ['label' => 'Geplant', 'color' => 'blue'],
-        'in_progress' => ['label' => 'In Arbeit', 'color' => 'amber'],
-        'published' => ['label' => 'Live', 'color' => 'green'],
+        'none' => ['label' => 'Offen', 'variant' => 'neutral'],
+        'planned' => ['label' => 'Geplant', 'variant' => 'info'],
+        'in_progress' => ['label' => 'In Arbeit', 'variant' => 'warning'],
+        'published' => ['label' => 'Live', 'variant' => 'success'],
     ];
     $status = $statusConfig[$keyword->content_status] ?? $statusConfig['none'];
 
-    // Position color
+    // Position color -> nx-Badge-Variant
     $pos = $keyword->position;
-    $posColor = $pos !== null
-        ? ($pos <= 3 ? 'emerald' : ($pos <= 10 ? 'lime' : ($pos <= 20 ? 'yellow' : ($pos <= 50 ? 'orange' : 'red'))))
-        : 'gray';
+    $posVariant = $pos !== null
+        ? ($pos <= 3 ? 'success' : ($pos <= 10 ? 'success' : ($pos <= 20 ? 'warning' : ($pos <= 50 ? 'warning' : 'danger'))))
+        : 'neutral';
 @endphp
 
-<x-ui-kanban-card :title="''" class="seo-keyword-card">
+<x-nx-kanban-card :title="''" class="seo-keyword-card">
     {{-- Keyword Title --}}
     <div class="mb-2">
-        <h4 class="text-sm font-semibold text-[var(--ui-secondary)] m-0 leading-tight">
-            @svg('heroicon-o-magnifying-glass', 'w-3 h-3 inline-block text-lime-500 mr-0.5')
+        <h4 class="m-0 text-sm font-semibold leading-tight text-[color:var(--nx-text)]">
+            @svg('heroicon-o-magnifying-glass', 'w-3 h-3 inline-block text-[color:var(--nx-accent)] mr-0.5')
             {{ $keyword->keyword }}
         </h4>
     </div>
 
     {{-- Metrics --}}
-    <div class="space-y-1.5 mb-2">
+    <div class="mb-2 space-y-1.5">
         {{-- Suchvolumen --}}
         @if($keyword->search_volume !== null)
             <div class="flex items-center justify-between gap-2">
-                <span class="text-[10px] text-[var(--ui-muted)] uppercase tracking-wide w-7 flex-shrink-0">SV</span>
-                <div class="flex-grow h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                    <div class="h-full rounded-full bg-lime-500 transition-all" style="width: {{ $svPercent }}%"></div>
+                <span class="w-7 flex-shrink-0 text-[10px] uppercase tracking-wide text-[color:var(--nx-faint)]">SV</span>
+                <div class="h-1.5 flex-grow overflow-hidden rounded-full bg-[color:var(--nx-hover)]">
+                    <div class="h-full rounded-full bg-[color:var(--nx-accent)] transition-all" style="width: {{ $svPercent }}%"></div>
                 </div>
-                <span class="text-[11px] font-bold text-[var(--ui-secondary)] tabular-nums min-w-[36px] text-right">
+                <span class="min-w-[36px] text-right text-[11px] font-bold tabular-nums text-[color:var(--nx-text)]">
                     {{ number_format($keyword->search_volume) }}
                 </span>
             </div>
@@ -86,39 +86,37 @@
         {{-- Keyword Difficulty --}}
         @if($kd !== null)
             <div class="flex items-center justify-between gap-2">
-                <span class="text-[10px] text-[var(--ui-muted)] uppercase tracking-wide w-7 flex-shrink-0">KD</span>
-                <div class="flex-grow h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                    <div class="h-full rounded-full bg-{{ $kdColor }}-500 transition-all" style="width: {{ $kd }}%"></div>
+                <span class="w-7 flex-shrink-0 text-[10px] uppercase tracking-wide text-[color:var(--nx-faint)]">KD</span>
+                <div class="h-1.5 flex-grow overflow-hidden rounded-full bg-[color:var(--nx-hover)]">
+                    <div class="h-full rounded-full bg-[color:var(--nx-muted)] transition-all" style="width: {{ $kd }}%"></div>
                 </div>
-                <span class="text-[10px] font-bold text-{{ $kdColor }}-700 tabular-nums">{{ $kd }}</span>
+                <span class="text-[10px] font-bold tabular-nums text-[color:var(--nx-text)]">{{ $kd }}</span>
             </div>
             <div class="flex justify-end -mt-0.5">
-                <span class="text-[9px] font-medium text-{{ $kdColor }}-600 bg-{{ $kdColor }}-50 px-1.5 rounded-full border border-{{ $kdColor }}-200">
-                    {{ $kdLabel }}
-                </span>
+                <x-nx-badge :variant="$kdVariant">{{ $kdLabel }}</x-nx-badge>
             </div>
         @endif
 
         {{-- CPC --}}
         @if($keyword->cpc_cents !== null)
             <div class="flex items-center justify-between gap-2">
-                <span class="text-[10px] text-[var(--ui-muted)] uppercase tracking-wide w-7 flex-shrink-0">CPC</span>
-                <span class="text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200 tabular-nums">
-                    {{ number_format($keyword->cpc_cents / 100, 2) }}&thinsp;&euro;
-                </span>
+                <span class="w-7 flex-shrink-0 text-[10px] uppercase tracking-wide text-[color:var(--nx-faint)]">CPC</span>
+                <x-nx-badge variant="success">
+                    <span class="tabular-nums">{{ number_format($keyword->cpc_cents / 100, 2) }}&thinsp;&euro;</span>
+                </x-nx-badge>
             </div>
         @endif
 
         {{-- Position --}}
         @if($pos !== null)
             <div class="flex items-center justify-between gap-2">
-                <span class="text-[10px] text-[var(--ui-muted)] uppercase tracking-wide w-7 flex-shrink-0">Pos</span>
+                <span class="w-7 flex-shrink-0 text-[10px] uppercase tracking-wide text-[color:var(--nx-faint)]">Pos</span>
                 <div class="flex items-center gap-1.5">
-                    <span class="inline-flex items-center justify-center min-w-[24px] h-5 px-1 rounded text-[11px] font-bold bg-{{ $posColor }}-50 text-{{ $posColor }}-700 border border-{{ $posColor }}-200 tabular-nums">
-                        {{ $pos }}
-                    </span>
+                    <x-nx-badge :variant="$posVariant">
+                        <span class="tabular-nums">{{ $pos }}</span>
+                    </x-nx-badge>
                     @if($keyword->target_position)
-                        <span class="text-[9px] text-[var(--ui-muted)]">
+                        <span class="text-[9px] text-[color:var(--nx-faint)]">
                             @svg('heroicon-o-arrow-right', 'w-2.5 h-2.5 inline-block')
                             {{ $keyword->target_position }}
                         </span>
@@ -129,33 +127,30 @@
     </div>
 
     {{-- Badges --}}
-    <div class="flex flex-wrap gap-1 mb-1.5">
+    <div class="mb-1.5 flex flex-wrap gap-1">
         @if($intent)
-            <span class="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[9px] font-medium bg-{{ $intent['color'] }}-50 text-{{ $intent['color'] }}-700 border border-{{ $intent['color'] }}-200">
+            <x-nx-badge :variant="$intent['variant']">
                 @svg($intent['icon'], 'w-2.5 h-2.5')
                 {{ $intent['label'] }}
-            </span>
+            </x-nx-badge>
         @endif
         @if($prio)
-            <span class="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[9px] font-medium bg-{{ $prio['color'] }}-50 text-{{ $prio['color'] }}-700 border border-{{ $prio['color'] }}-200">
+            <x-nx-badge :variant="$prio['variant']">
                 @svg($prio['icon'], 'w-2.5 h-2.5')
                 {{ $prio['label'] }}
-            </span>
+            </x-nx-badge>
         @endif
         @if($trend)
-            <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-{{ $trend['color'] }}-50 border border-{{ $trend['color'] }}-200">
-                @svg($trend['icon'], 'w-3 h-3 text-' . $trend['color'] . '-600')
-            </span>
+            <x-nx-badge :variant="$trend['variant']">
+                @svg($trend['icon'], 'w-2.5 h-2.5')
+            </x-nx-badge>
         @endif
-        <span class="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[9px] font-medium bg-{{ $status['color'] }}-50 text-{{ $status['color'] }}-700 border border-{{ $status['color'] }}-200">
-            <span class="w-1.5 h-1.5 rounded-full bg-{{ $status['color'] }}-500"></span>
-            {{ $status['label'] }}
-        </span>
+        <x-nx-badge :variant="$status['variant']" dot>{{ $status['label'] }}</x-nx-badge>
     </div>
 
     {{-- Content Idea --}}
     @if($keyword->content_idea)
-        <div class="text-[10px] text-[var(--ui-muted)] line-clamp-2 italic leading-relaxed">
+        <div class="line-clamp-2 text-[10px] italic leading-relaxed text-[color:var(--nx-faint)]">
             {{ Str::limit($keyword->content_idea, 80) }}
         </div>
     @endif
@@ -163,13 +158,13 @@
     {{-- URL --}}
     @if($keyword->published_url || $keyword->target_url)
         @php $displayUrl = $keyword->published_url ?? $keyword->target_url; @endphp
-        <div class="flex items-center gap-1 mt-1">
-            @svg('heroicon-o-link', 'w-2.5 h-2.5 text-[var(--ui-muted)] flex-shrink-0')
-            <a href="{{ $displayUrl }}" target="_blank" class="text-[10px] text-lime-700 hover:text-lime-900 hover:underline truncate max-w-[200px]" title="{{ $displayUrl }}">
+        <div class="mt-1 flex items-center gap-1">
+            @svg('heroicon-o-link', 'w-2.5 h-2.5 text-[color:var(--nx-faint)] flex-shrink-0')
+            <a href="{{ $displayUrl }}" target="_blank" class="max-w-[200px] truncate text-[10px] text-[color:var(--nx-accent)] hover:underline" title="{{ $displayUrl }}">
                 {{ Str::limit(str_replace(['https://', 'http://', 'www.'], '', $displayUrl), 35) }}
             </a>
             @if($keyword->published_url)
-                <span class="text-[8px] font-bold text-green-700 bg-green-100 px-1 rounded">LIVE</span>
+                <x-nx-badge variant="success">LIVE</x-nx-badge>
             @endif
         </div>
     @endif
@@ -177,10 +172,10 @@
     {{-- Last Fetched --}}
     @if($keyword->last_fetched_at)
         <x-slot name="footer">
-            <span class="text-[9px] text-[var(--ui-muted)]">
+            <span class="text-[9px] text-[color:var(--nx-faint)]">
                 @svg('heroicon-o-clock', 'w-2.5 h-2.5 inline-block')
                 {{ $keyword->last_fetched_at->diffForHumans() }}
             </span>
         </x-slot>
     @endif
-</x-ui-kanban-card>
+</x-nx-kanban-card>

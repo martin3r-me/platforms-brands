@@ -10,14 +10,14 @@
     }"
 >
     {{-- Modul Header --}}
-    <div x-show="!collapsed" class="p-3 text-sm italic text-[var(--ui-secondary)] uppercase border-b border-[var(--ui-border)] mb-2">
+    <div x-show="!collapsed" class="p-3 text-sm italic text-[color:var(--nx-text)] uppercase border-b border-[color:var(--nx-line)] mb-2">
         Marken
     </div>
 
     {{-- Abschnitt: Allgemein --}}
     <x-ui-sidebar-list label="Allgemein">
         <x-ui-sidebar-item :href="route('brands.dashboard')">
-            @svg('heroicon-o-home', 'w-4 h-4 text-[var(--ui-secondary)]')
+            @svg('heroicon-o-home', 'w-4 h-4 text-[color:var(--nx-text)]')
             <span class="ml-2 text-sm">Dashboard</span>
         </x-ui-sidebar-item>
     </x-ui-sidebar-list>
@@ -25,21 +25,21 @@
     {{-- Neue Marke --}}
     <x-ui-sidebar-list>
         <x-ui-sidebar-item wire:click="createBrand">
-            @svg('heroicon-o-plus-circle', 'w-4 h-4 text-[var(--ui-secondary)]')
+            @svg('heroicon-o-plus-circle', 'w-4 h-4 text-[color:var(--nx-text)]')
             <span class="ml-2 text-sm">Neue Marke</span>
         </x-ui-sidebar-item>
     </x-ui-sidebar-list>
 
     {{-- Collapsed: Icons-only für Allgemein --}}
-    <div x-show="collapsed" class="px-2 py-2 border-b border-[var(--ui-border)]">
+    <div x-show="collapsed" class="px-2 py-2 border-b border-[color:var(--nx-line)]">
         <div class="flex flex-col gap-2">
-            <a href="{{ route('brands.dashboard') }}" wire:navigate class="flex items-center justify-center p-2 rounded-md text-[var(--ui-secondary)] hover:bg-[var(--ui-muted-5)]">
+            <a href="{{ route('brands.dashboard') }}" wire:navigate class="flex items-center justify-center p-2 rounded-md text-[color:var(--nx-text)] hover:bg-[color:var(--nx-hover)]">
                 @svg('heroicon-o-home', 'w-5 h-5')
             </a>
         </div>
     </div>
-    <div x-show="collapsed" class="px-2 py-2 border-b border-[var(--ui-border)]">
-        <button type="button" wire:click="createBrand" class="flex items-center justify-center p-2 rounded-md text-[var(--ui-secondary)] hover:bg-[var(--ui-muted-5)]">
+    <div x-show="collapsed" class="px-2 py-2 border-b border-[color:var(--nx-line)]">
+        <button type="button" wire:click="createBrand" class="flex items-center justify-center p-2 rounded-md text-[color:var(--nx-text)] hover:bg-[color:var(--nx-hover)]">
             @svg('heroicon-o-plus-circle', 'w-5 h-5')
         </button>
     </div>
@@ -67,8 +67,8 @@
                            href="{{ route('brands.brands.show', ['brandsBrand' => $brand]) }}"
                            wire:navigate
                            title="{{ $brand->name }}"
-                           class="flex items-center gap-1.5 py-0.5 pl-3 pr-2 text-[var(--ui-secondary)] hover:text-[var(--ui-primary)] transition truncate">
-                            <span class="w-1 h-1 rounded-full flex-shrink-0 bg-[var(--ui-muted)] opacity-40"></span>
+                           class="flex items-center gap-1.5 py-0.5 pl-3 pr-2 text-[color:var(--nx-text)] hover:text-[color:var(--nx-accent)] transition truncate">
+                            <span class="w-1 h-1 rounded-full flex-shrink-0 bg-[color:var(--nx-faint)] opacity-40"></span>
                             <span class="truncate text-[11px]">{{ $brand->name }}</span>
                         </a>
                     @endforeach
@@ -82,7 +82,7 @@
                         type="button"
                         wire:click="toggleShowAllBrands"
                         x-on:click="localStorage.setItem('brands.showAllBrands', (!$wire.showAllBrands).toString())"
-                        class="flex items-center gap-2 text-xs text-[var(--ui-muted)] hover:text-[var(--ui-secondary)] transition-colors"
+                        class="flex items-center gap-2 text-xs text-[color:var(--nx-faint)] hover:text-[color:var(--nx-text)] transition-colors"
                     >
                         @if($showAllBrands)
                             @svg('heroicon-o-eye-slash', 'w-4 h-4')
@@ -97,7 +97,7 @@
 
             {{-- Keine Marken --}}
             @if($entityTypeGroups->isEmpty() && $unlinkedBrands->isEmpty())
-                <div class="px-3 py-1 text-xs text-[var(--ui-muted)]">
+                <div class="px-3 py-1 text-xs text-[color:var(--nx-faint)]">
                     Keine Marken vorhanden
                 </div>
             @endif
