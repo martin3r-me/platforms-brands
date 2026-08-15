@@ -1,12 +1,12 @@
-<x-ui-modal size="xl" model="modalShow" header="{{ $asset ? 'Asset bearbeiten' : 'Neues Asset' }}">
+<x-nx-modal size="xl" model="modalShow" header="{{ $asset ? 'Asset bearbeiten' : 'Neues Asset' }}">
     <div class="space-y-6">
         {{-- File Upload --}}
         <div>
-            <label class="block text-sm font-medium text-[var(--ui-secondary)] mb-2">
+            <label class="block text-sm font-medium text-[color:var(--nx-text)] mb-2">
                 Datei {{ $asset ? '(optional, neue Version hochladen)' : '(erforderlich)' }}
             </label>
             @if($asset && !$assetFile)
-                <div class="mb-3 p-4 rounded-xl border border-[var(--ui-border)]/60 bg-[var(--ui-muted-5)]">
+                <div class="mb-3 p-4 rounded-[6px] border border-[color:var(--nx-line)] bg-[color:var(--nx-hover)]">
                     <div class="flex items-center gap-3">
                         @if($asset->mime_type && str_starts_with($asset->mime_type, 'image/'))
                             <img src="{{ asset('storage/' . $asset->file_path) }}" alt="{{ $asset->name }}" class="w-16 h-16 object-cover rounded-lg">
@@ -16,8 +16,8 @@
                             </div>
                         @endif
                         <div>
-                            <p class="text-sm font-medium text-[var(--ui-secondary)]">{{ $asset->file_name }}</p>
-                            <p class="text-xs text-[var(--ui-muted)]">
+                            <p class="text-sm font-medium text-[color:var(--nx-text)]">{{ $asset->file_name }}</p>
+                            <p class="text-xs text-[color:var(--nx-faint)]">
                                 Version {{ $asset->current_version }}
                                 @if($asset->file_size)
                                     &middot; {{ number_format($asset->file_size / 1024, 0, ',', '.') }} KB
@@ -28,20 +28,20 @@
                 </div>
             @endif
             @if($assetFile)
-                <div class="mb-3 p-3 rounded-xl border border-green-200 bg-green-50/50">
+                <div class="mb-3 p-3 rounded-[6px] border border-green-200 bg-green-50/50">
                     <div class="flex items-center gap-2">
                         @svg('heroicon-o-check-circle', 'w-5 h-5 text-green-600')
                         <span class="text-sm text-green-700">Neue Datei ausgewählt</span>
                     </div>
                 </div>
             @endif
-            <input type="file" wire:model="assetFile" class="block w-full text-sm text-[var(--ui-muted)] file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-sky-50 file:text-sky-700 hover:file:bg-sky-100 file:cursor-pointer">
-            @error('assetFile') <p class="text-sm text-red-500 mt-1">{{ $message }}</p> @enderror
+            <input type="file" wire:model="assetFile" class="block w-full text-sm text-[color:var(--nx-faint)] file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-sky-50 file:text-sky-700 hover:file:bg-sky-100 file:cursor-pointer">
+            @error('assetFile') <p class="text-sm text-[color:var(--nx-danger)] mt-1">{{ $message }}</p> @enderror
         </div>
 
         {{-- Change Note (nur bei Update mit neuer Datei) --}}
         @if($asset && $assetFile)
-            <x-ui-input-textarea
+            <x-nx-input-textarea
                 name="changeNote"
                 label="Änderungsnotiz (optional)"
                 wire:model.live.debounce.300ms="changeNote"
@@ -51,7 +51,7 @@
         @endif
 
         {{-- Name --}}
-        <x-ui-input-text
+        <x-nx-input-text
             name="assetName"
             label="Name"
             wire:model.live.debounce.300ms="assetName"
@@ -61,7 +61,7 @@
         />
 
         {{-- Description --}}
-        <x-ui-input-textarea
+        <x-nx-input-textarea
             name="assetDescription"
             label="Beschreibung (optional)"
             wire:model.live.debounce.300ms="assetDescription"
@@ -71,14 +71,14 @@
 
         {{-- Asset Type --}}
         <div>
-            <label class="block text-sm font-medium text-[var(--ui-secondary)] mb-2">Asset-Typ</label>
+            <label class="block text-sm font-medium text-[color:var(--nx-text)] mb-2">Asset-Typ</label>
             <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
                 @foreach($availableTypes as $typeKey => $typeLabel)
                     <label
-                        class="flex items-center gap-2 p-3 rounded-xl border-2 cursor-pointer transition-colors {{ $assetType === $typeKey ? 'border-sky-400 bg-sky-50/50' : 'border-[var(--ui-border)]/60 hover:border-sky-200' }}"
+                        class="flex items-center gap-2 p-3 rounded-[6px] border-2 cursor-pointer transition-colors {{ $assetType === $typeKey ? 'border-sky-400 bg-sky-50/50' : 'border-[color:var(--nx-line)] hover:border-sky-200' }}"
                     >
                         <input type="radio" wire:model.live="assetType" value="{{ $typeKey }}" class="sr-only">
-                        <span class="text-sm font-medium {{ $assetType === $typeKey ? 'text-sky-800' : 'text-[var(--ui-secondary)]' }}">{{ $typeLabel }}</span>
+                        <span class="text-sm font-medium {{ $assetType === $typeKey ? 'text-sky-800' : 'text-[color:var(--nx-text)]' }}">{{ $typeLabel }}</span>
                     </label>
                 @endforeach
             </div>
@@ -86,14 +86,14 @@
 
         {{-- Kanal-Tags --}}
         <div>
-            <label class="block text-sm font-medium text-[var(--ui-secondary)] mb-2">Kanal-Tags</label>
-            <p class="text-xs text-[var(--ui-muted)] mb-3">Klicke auf Tags, um Kanäle zuzuweisen</p>
+            <label class="block text-sm font-medium text-[color:var(--nx-text)] mb-2">Kanal-Tags</label>
+            <p class="text-xs text-[color:var(--nx-faint)] mb-3">Klicke auf Tags, um Kanäle zuzuweisen</p>
             <div class="flex flex-wrap gap-2">
                 @foreach($availableTags as $tag)
                     <button
                         type="button"
                         wire:click="toggleTag('{{ $tag }}')"
-                        class="inline-flex items-center px-3 py-1.5 text-sm font-medium rounded-full border transition-colors {{ in_array($tag, $assetTags) ? 'bg-sky-500 text-white border-sky-500' : 'bg-white text-[var(--ui-secondary)] border-[var(--ui-border)] hover:border-sky-300 hover:bg-sky-50' }}"
+                        class="inline-flex items-center px-3 py-1.5 text-sm font-medium rounded-full border transition-colors {{ in_array($tag, $assetTags) ? 'bg-sky-500 text-white border-sky-500' : 'bg-white text-[color:var(--nx-text)] border-[color:var(--nx-line)] hover:border-sky-300 hover:bg-sky-50' }}"
                     >
                         {{ $tag }}
                     </button>
@@ -103,14 +103,14 @@
 
         {{-- Verfügbare Formate --}}
         <div>
-            <label class="block text-sm font-medium text-[var(--ui-secondary)] mb-2">Verfügbare Formate</label>
-            <p class="text-xs text-[var(--ui-muted)] mb-3">In welchen Formaten steht dieses Asset zur Verfügung?</p>
+            <label class="block text-sm font-medium text-[color:var(--nx-text)] mb-2">Verfügbare Formate</label>
+            <p class="text-xs text-[color:var(--nx-faint)] mb-3">In welchen Formaten steht dieses Asset zur Verfügung?</p>
             <div class="flex flex-wrap gap-2">
                 @foreach($availableFormats as $format)
                     <button
                         type="button"
                         wire:click="toggleFormat('{{ $format }}')"
-                        class="inline-flex items-center px-3 py-1.5 text-sm font-medium rounded-full border transition-colors uppercase {{ in_array($format, $assetFormats) ? 'bg-sky-500 text-white border-sky-500' : 'bg-white text-[var(--ui-secondary)] border-[var(--ui-border)] hover:border-sky-300 hover:bg-sky-50' }}"
+                        class="inline-flex items-center px-3 py-1.5 text-sm font-medium rounded-full border transition-colors uppercase {{ in_array($format, $assetFormats) ? 'bg-sky-500 text-white border-sky-500' : 'bg-white text-[color:var(--nx-text)] border-[color:var(--nx-line)] hover:border-sky-300 hover:bg-sky-50' }}"
                     >
                         {{ $format }}
                     </button>
@@ -121,18 +121,18 @@
         {{-- Versions-Historie (nur bei bestehendem Asset) --}}
         @if($asset && count($versions) > 0)
             <div>
-                <label class="block text-sm font-medium text-[var(--ui-secondary)] mb-2">Versionen</label>
+                <label class="block text-sm font-medium text-[color:var(--nx-text)] mb-2">Versionen</label>
                 <div class="space-y-2 max-h-48 overflow-y-auto">
                     @foreach($versions as $version)
-                        <div class="flex items-center justify-between p-3 rounded-lg border border-[var(--ui-border)]/40 bg-[var(--ui-muted-5)]">
+                        <div class="flex items-center justify-between p-3 rounded-lg border border-[color:var(--nx-line)] bg-[color:var(--nx-hover)]">
                             <div>
-                                <span class="text-sm font-medium text-[var(--ui-secondary)]">v{{ $version->version_number }}</span>
+                                <span class="text-sm font-medium text-[color:var(--nx-text)]">v{{ $version->version_number }}</span>
                                 @if($version->change_note)
-                                    <span class="text-xs text-[var(--ui-muted)]"> – {{ $version->change_note }}</span>
+                                    <span class="text-xs text-[color:var(--nx-faint)]"> – {{ $version->change_note }}</span>
                                 @endif
-                                <p class="text-xs text-[var(--ui-muted)]">{{ $version->created_at->format('d.m.Y H:i') }}</p>
+                                <p class="text-xs text-[color:var(--nx-faint)]">{{ $version->created_at->format('d.m.Y H:i') }}</p>
                             </div>
-                            <a href="{{ asset('storage/' . $version->file_path) }}" download="{{ $version->file_name }}" class="p-1.5 text-[var(--ui-muted)] hover:text-sky-600 transition-colors" title="Version {{ $version->version_number }} herunterladen">
+                            <a href="{{ asset('storage/' . $version->file_path) }}" download="{{ $version->file_name }}" class="p-1.5 text-[color:var(--nx-faint)] hover:text-sky-600 transition-colors" title="Version {{ $version->version_number }} herunterladen">
                                 @svg('heroicon-o-arrow-down-tray', 'w-4 h-4')
                             </a>
                         </div>
@@ -143,8 +143,8 @@
     </div>
 
     <x-slot name="footer">
-        <x-ui-button variant="success" wire:click="save">
+        <x-nx-button variant="primary" wire:click="save">
             {{ $asset ? 'Aktualisieren' : 'Erstellen' }}
-        </x-ui-button>
+        </x-nx-button>
     </x-slot>
-</x-ui-modal>
+</x-nx-modal>

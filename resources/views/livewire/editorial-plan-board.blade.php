@@ -14,62 +14,48 @@
 
     <x-slot name="sidebar">
         <x-ui-page-sidebar title="Filter" width="w-72" :defaultOpen="true">
-            <div class="p-4 space-y-6">
+            <div class="p-5 space-y-6">
                 {{-- Status Filter --}}
                 <div>
-                    <h3 class="text-xs font-semibold uppercase tracking-wide text-[var(--ui-muted)] mb-3">Status</h3>
-                    <select wire:model.live="filterStatus" class="w-full text-sm rounded-lg border border-[var(--ui-border)] bg-white px-3 py-2 text-[var(--ui-secondary)] focus:ring-2 focus:ring-[var(--ui-primary)]/20 focus:border-[var(--ui-primary)]">
-                        <option value="">Alle Status</option>
-                        <option value="draft">Entwurf</option>
-                        <option value="scheduled">Geplant</option>
-                        <option value="publishing">Wird veröffentlicht</option>
-                        <option value="published">Veröffentlicht</option>
-                        <option value="failed">Fehlgeschlagen</option>
-                    </select>
+                    <h3 class="mb-2.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-[color:var(--nx-faint)]">Status</h3>
+                    <x-nx-input-select name="filterStatus" wire:model.live="filterStatus" nullable nullLabel="Alle Status" :options="[
+                        ['value' => 'draft', 'label' => 'Entwurf'],
+                        ['value' => 'scheduled', 'label' => 'Geplant'],
+                        ['value' => 'publishing', 'label' => 'Wird veröffentlicht'],
+                        ['value' => 'published', 'label' => 'Veröffentlicht'],
+                        ['value' => 'failed', 'label' => 'Fehlgeschlagen'],
+                    ]" />
                 </div>
 
                 {{-- Platform Filter --}}
                 <div>
-                    <h3 class="text-xs font-semibold uppercase tracking-wide text-[var(--ui-muted)] mb-3">Plattform</h3>
-                    <select wire:model.live="filterPlatform" class="w-full text-sm rounded-lg border border-[var(--ui-border)] bg-white px-3 py-2 text-[var(--ui-secondary)] focus:ring-2 focus:ring-[var(--ui-primary)]/20 focus:border-[var(--ui-primary)]">
-                        <option value="">Alle Plattformen</option>
-                        @foreach($platforms as $platform)
-                            <option value="{{ $platform->id }}">{{ $platform->name }}</option>
-                        @endforeach
-                    </select>
+                    <h3 class="mb-2.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-[color:var(--nx-faint)]">Plattform</h3>
+                    <x-nx-input-select name="filterPlatform" wire:model.live="filterPlatform" nullable nullLabel="Alle Plattformen" :options="$platforms" optionValue="id" optionLabel="name" />
                 </div>
 
                 {{-- Ansicht --}}
                 <div>
-                    <h3 class="text-xs font-semibold uppercase tracking-wide text-[var(--ui-muted)] mb-3">Ansicht</h3>
-                    <div class="flex gap-1 p-1 bg-[var(--ui-muted-5)] rounded-lg border border-[var(--ui-border)]/40">
-                        <button wire:click="setViewMode('day')" class="flex-1 px-3 py-1.5 text-xs font-medium rounded-md transition-colors {{ $viewMode === 'day' ? 'bg-white text-[var(--ui-primary)] shadow-sm border border-[var(--ui-border)]/60' : 'text-[var(--ui-muted)] hover:text-[var(--ui-secondary)]' }}">
-                            Tag
-                        </button>
-                        <button wire:click="setViewMode('week')" class="flex-1 px-3 py-1.5 text-xs font-medium rounded-md transition-colors {{ $viewMode === 'week' ? 'bg-white text-[var(--ui-primary)] shadow-sm border border-[var(--ui-border)]/60' : 'text-[var(--ui-muted)] hover:text-[var(--ui-secondary)]' }}">
-                            Woche
-                        </button>
-                        <button wire:click="setViewMode('month')" class="flex-1 px-3 py-1.5 text-xs font-medium rounded-md transition-colors {{ $viewMode === 'month' ? 'bg-white text-[var(--ui-primary)] shadow-sm border border-[var(--ui-border)]/60' : 'text-[var(--ui-muted)] hover:text-[var(--ui-secondary)]' }}">
-                            Monat
-                        </button>
+                    <h3 class="mb-2.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-[color:var(--nx-faint)]">Ansicht</h3>
+                    <div class="flex gap-1 rounded-[8px] border border-[color:var(--nx-line)] bg-[color:var(--nx-hover)] p-1">
+                        @foreach(['day' => 'Tag', 'week' => 'Woche', 'month' => 'Monat'] as $mode => $modeLabel)
+                            <button wire:click="setViewMode('{{ $mode }}')" class="flex-1 rounded-[6px] px-3 py-1.5 text-xs font-medium transition-colors {{ $viewMode === $mode ? 'bg-[color:var(--nx-surface)] text-[color:var(--nx-text)] border border-[color:var(--nx-line)]' : 'text-[color:var(--nx-faint)] hover:text-[color:var(--nx-text)]' }}">
+                                {{ $modeLabel }}
+                            </button>
+                        @endforeach
                     </div>
                 </div>
 
                 {{-- Board-Details --}}
                 <div>
-                    <h3 class="text-xs font-semibold uppercase tracking-wide text-[var(--ui-muted)] mb-3">Details</h3>
-                    <div class="space-y-2">
-                        <div class="flex justify-between items-center py-2 px-3 bg-[var(--ui-muted-5)] border border-[var(--ui-border)]/40">
-                            <span class="text-sm text-[var(--ui-muted)]">Typ</span>
-                            <span class="text-xs font-medium px-2 py-1 rounded-full bg-[var(--ui-primary-10)] text-[var(--ui-primary)] border border-[var(--ui-primary)]/20">
-                                Redaktionsplan
-                            </span>
+                    <h3 class="mb-2.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-[color:var(--nx-faint)]">Details</h3>
+                    <div class="overflow-hidden rounded-[8px] border border-[color:var(--nx-line)] bg-[color:var(--nx-surface)] divide-y divide-[color:var(--nx-line)]">
+                        <div class="flex items-center justify-between gap-3 px-3 py-2">
+                            <span class="shrink-0 text-[13px] text-[color:var(--nx-faint)]">Typ</span>
+                            <x-nx-badge variant="accent">Redaktionsplan</x-nx-badge>
                         </div>
-                        <div class="flex justify-between items-center py-2 px-3 bg-[var(--ui-muted-5)] border border-[var(--ui-border)]/40">
-                            <span class="text-sm text-[var(--ui-muted)]">Marke</span>
-                            <span class="text-sm text-[var(--ui-secondary)] font-medium">
-                                {{ $socialBoard->brand->name }}
-                            </span>
+                        <div class="flex items-center justify-between gap-3 px-3 py-2">
+                            <span class="shrink-0 text-[13px] text-[color:var(--nx-faint)]">Marke</span>
+                            <span class="min-w-0 truncate text-right text-[13px] font-medium text-[color:var(--nx-text)]">{{ $socialBoard->brand->name }}</span>
                         </div>
                     </div>
                 </div>
@@ -80,35 +66,35 @@
     {{-- Main Content --}}
     <div class="p-6">
         {{-- Period Navigation --}}
-        <div class="flex items-center justify-between mb-6">
-            <div class="flex items-center gap-3">
-                <button wire:click="previousPeriod" class="p-2 rounded-lg border border-[var(--ui-border)] hover:bg-[var(--ui-muted-5)] transition-colors text-[var(--ui-secondary)]">
+        <div class="mb-6 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <button wire:click="previousPeriod" class="rounded-[6px] border border-[color:var(--nx-line-strong)] p-2 text-[color:var(--nx-text)] transition-colors hover:bg-[color:var(--nx-hover)]">
                     @svg('heroicon-o-chevron-left', 'w-4 h-4')
                 </button>
-                <button wire:click="goToToday" class="px-3 py-1.5 text-sm font-medium rounded-lg border border-[var(--ui-border)] hover:bg-[var(--ui-muted-5)] transition-colors text-[var(--ui-secondary)]">
+                <button wire:click="goToToday" class="rounded-[6px] border border-[color:var(--nx-line-strong)] px-3 py-1.5 text-sm font-medium text-[color:var(--nx-text)] transition-colors hover:bg-[color:var(--nx-hover)]">
                     Heute
                 </button>
-                <button wire:click="nextPeriod" class="p-2 rounded-lg border border-[var(--ui-border)] hover:bg-[var(--ui-muted-5)] transition-colors text-[var(--ui-secondary)]">
+                <button wire:click="nextPeriod" class="rounded-[6px] border border-[color:var(--nx-line-strong)] p-2 text-[color:var(--nx-text)] transition-colors hover:bg-[color:var(--nx-hover)]">
                     @svg('heroicon-o-chevron-right', 'w-4 h-4')
                 </button>
-                <h2 class="text-lg font-semibold text-[var(--ui-secondary)] ml-2">{{ $periodTitle }}</h2>
+                <h2 class="ml-2 text-lg font-semibold text-[color:var(--nx-text)]">{{ $periodTitle }}</h2>
             </div>
         </div>
 
         {{-- Flash Messages --}}
         @if(session('success'))
-            <div class="mb-4 px-4 py-3 rounded-lg bg-green-50 border border-green-200 text-green-800 text-sm">
-                {{ session('success') }}
+            <div class="mb-4">
+                <x-nx-callout variant="success">{{ session('success') }}</x-nx-callout>
             </div>
         @endif
         @if(session('error'))
-            <div class="mb-4 px-4 py-3 rounded-lg bg-red-50 border border-red-200 text-red-800 text-sm">
-                {{ session('error') }}
+            <div class="mb-4">
+                <x-nx-callout variant="danger">{{ session('error') }}</x-nx-callout>
             </div>
         @endif
 
         {{-- Timeline/Calendar Grid --}}
-        <div class="space-y-1">
+        <div class="space-y-1.5">
             @foreach($days as $day)
                 @php
                     $dateKey = $day->format('Y-m-d');
@@ -116,30 +102,28 @@
                     $isToday = $day->isToday();
                     $isWeekend = $day->isWeekend();
                 @endphp
-                <div class="rounded-xl border {{ $isToday ? 'border-[var(--ui-primary)]/40 bg-[var(--ui-primary-10)]/30' : ($isWeekend ? 'border-[var(--ui-border)]/30 bg-[var(--ui-muted-5)]/50' : 'border-[var(--ui-border)]/40 bg-white') }}">
+                <div class="rounded-[8px] border {{ $isToday ? 'border-[color:var(--nx-accent)] bg-[color:var(--nx-hover)]' : ($isWeekend ? 'border-[color:var(--nx-line)] bg-[color:var(--nx-hover)]' : 'border-[color:var(--nx-line)] bg-[color:var(--nx-surface)]') }}">
                     {{-- Day Header --}}
-                    <div class="flex items-center gap-3 px-4 py-2.5 border-b border-[var(--ui-border)]/20">
-                        <div class="flex items-center gap-2 min-w-[140px]">
-                            <span class="text-xs font-medium uppercase tracking-wide {{ $isToday ? 'text-[var(--ui-primary)]' : 'text-[var(--ui-muted)]' }}">
+                    <div class="flex items-center gap-3 border-b border-[color:var(--nx-line)] px-4 py-2.5">
+                        <div class="flex min-w-[140px] items-center gap-2">
+                            <span class="text-xs font-medium uppercase tracking-wide {{ $isToday ? 'text-[color:var(--nx-text)]' : 'text-[color:var(--nx-faint)]' }}">
                                 {{ $day->translatedFormat('D') }}
                             </span>
-                            <span class="text-sm font-semibold {{ $isToday ? 'text-[var(--ui-primary)]' : 'text-[var(--ui-secondary)]' }}">
+                            <span class="text-sm font-semibold text-[color:var(--nx-text)]">
                                 {{ $day->format('d.m.') }}
                             </span>
                             @if($isToday)
-                                <span class="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-[var(--ui-primary)] text-white">
-                                    Heute
-                                </span>
+                                <x-nx-badge variant="accent">Heute</x-nx-badge>
                             @endif
                         </div>
-                        <span class="text-xs text-[var(--ui-muted)]">
+                        <span class="text-xs text-[color:var(--nx-faint)]">
                             {{ $dayCards->count() }} {{ $dayCards->count() === 1 ? 'Card' : 'Cards' }}
                         </span>
                     </div>
 
                     {{-- Cards for this day --}}
                     @if($dayCards->count() > 0)
-                        <div class="divide-y divide-[var(--ui-border)]/20">
+                        <div class="divide-y divide-[color:var(--nx-line)]">
                             @foreach($dayCards as $card)
                                 @include('brands::livewire.editorial-plan-card-detail', ['card' => $card])
                             @endforeach
@@ -152,40 +136,22 @@
         {{-- Unscheduled Cards --}}
         @if($unscheduledCards->count() > 0)
             <div class="mt-8">
-                <h3 class="text-sm font-semibold uppercase tracking-wide text-[var(--ui-muted)] mb-3 flex items-center gap-2">
+                <h3 class="mb-3 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-[color:var(--nx-faint)]">
                     @svg('heroicon-o-inbox', 'w-4 h-4')
                     Ungeplante Cards ({{ $unscheduledCards->count() }})
                 </h3>
-                <div class="rounded-xl border border-[var(--ui-border)]/40 bg-white divide-y divide-[var(--ui-border)]/20">
-                    @foreach($unscheduledCards as $card)
-                        @include('brands::livewire.editorial-plan-card-detail', ['card' => $card])
-                    @endforeach
-                </div>
+                <x-nx-card flush>
+                    <div class="divide-y divide-[color:var(--nx-line)]">
+                        @foreach($unscheduledCards as $card)
+                            @include('brands::livewire.editorial-plan-card-detail', ['card' => $card])
+                        @endforeach
+                    </div>
+                </x-nx-card>
             </div>
         @endif
     </div>
 
     <x-slot name="activity">
-        <x-ui-page-sidebar title="Aktivitäten" width="w-80" :defaultOpen="false" storeKey="activityOpen" side="right">
-            <div class="p-4 space-y-4">
-                <div class="text-sm text-[var(--ui-muted)]">Letzte Aktivitäten</div>
-                <div class="space-y-3 text-sm">
-                    @forelse(($activities ?? []) as $activity)
-                        <div class="p-2 rounded border border-[var(--ui-border)]/60 bg-[var(--ui-muted-5)]">
-                            <div class="font-medium text-[var(--ui-secondary)] truncate">{{ $activity['title'] ?? 'Aktivität' }}</div>
-                            <div class="text-[var(--ui-muted)]">{{ $activity['time'] ?? '' }}</div>
-                        </div>
-                    @empty
-                        <div class="py-8 text-center">
-                            <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-[var(--ui-muted-5)] mb-3">
-                                @svg('heroicon-o-clock', 'w-6 h-6 text-[var(--ui-muted)]')
-                            </div>
-                            <p class="text-sm text-[var(--ui-muted)]">Noch keine Aktivitäten</p>
-                            <p class="text-xs text-[var(--ui-muted)] mt-1">Änderungen werden hier angezeigt</p>
-                        </div>
-                    @endforelse
-                </div>
-            </div>
-        </x-ui-page-sidebar>
+        @include('brands::partials.board-activity')
     </x-slot>
 </x-ui-page>
