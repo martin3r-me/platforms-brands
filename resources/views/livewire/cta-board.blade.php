@@ -10,73 +10,60 @@
             ['label' => $ctaBoard->name],
         ]">
             <x-slot name="left">
-                @can('update', $ctaBoard)
-                    <x-ui-button variant="ghost" size="sm" x-data @click="$dispatch('open-modal-cta-board-settings', { ctaBoardId: {{ $ctaBoard->id }} })">
-                        @svg('heroicon-o-cog-6-tooth', 'w-4 h-4')
-                        <span>Einstellungen</span>
-                    </x-ui-button>
-                @endcan
+                <div class="inline-flex items-center rounded-[6px] border border-[color:var(--nx-line)] p-0.5">
+                    <button wire:click="setGroupBy('funnel_stage')"
+                        class="rounded-[4px] px-2.5 py-1 text-xs font-medium transition-colors {{ $groupBy === 'funnel_stage' ? 'bg-[color:var(--nx-hover)] text-[color:var(--nx-text)]' : 'text-[color:var(--nx-faint)] hover:text-[color:var(--nx-text)]' }}">
+                        Funnel Stage
+                    </button>
+                    <button wire:click="setGroupBy('type')"
+                        class="rounded-[4px] px-2.5 py-1 text-xs font-medium transition-colors {{ $groupBy === 'type' ? 'bg-[color:var(--nx-hover)] text-[color:var(--nx-text)]' : 'text-[color:var(--nx-faint)] hover:text-[color:var(--nx-text)]' }}">
+                        Typ
+                    </button>
+                </div>
             </x-slot>
+
+            @can('update', $ctaBoard)
+                <x-nx-button variant="ghost" size="sm" x-data @click="$dispatch('open-modal-cta-board-settings', { ctaBoardId: {{ $ctaBoard->id }} })">
+                    @svg('heroicon-o-cog-6-tooth', 'w-4 h-4') Einstellungen
+                </x-nx-button>
+            @endcan
         </x-ui-page-actionbar>
     </x-slot>
 
     <x-slot name="sidebar">
         <x-ui-page-sidebar title="Board-Übersicht" width="w-80" :defaultOpen="true">
-            <div class="p-4 space-y-6">
+            <div class="p-5 space-y-5">
                 {{-- Board-Details --}}
                 <div>
-                    <h3 class="text-xs font-semibold uppercase tracking-wide text-[var(--ui-muted)] mb-3">Details</h3>
-                    <div class="space-y-2">
-                        <div class="flex justify-between items-center py-2 px-3 bg-[var(--ui-muted-5)] border border-[var(--ui-border)]/40">
-                            <span class="text-sm text-[var(--ui-muted)]">Typ</span>
-                            <span class="text-xs font-medium px-2 py-1 rounded-full bg-violet-50 text-violet-700 border border-violet-200">
-                                CTA Board
-                            </span>
+                    <h3 class="mb-2.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-[color:var(--nx-faint)]">Details</h3>
+                    <div class="overflow-hidden rounded-[8px] border border-[color:var(--nx-line)] bg-[color:var(--nx-surface)] divide-y divide-[color:var(--nx-line)]">
+                        <div class="flex items-center justify-between gap-3 px-3 py-2">
+                            <span class="shrink-0 text-[13px] text-[color:var(--nx-faint)]">Typ</span>
+                            <span class="min-w-0 truncate text-right text-[13px] text-[color:var(--nx-text)]">CTA Board</span>
                         </div>
-                        <div class="flex justify-between items-center py-2 px-3 bg-[var(--ui-muted-5)] border border-[var(--ui-border)]/40">
-                            <span class="text-sm text-[var(--ui-muted)]">CTAs gesamt</span>
-                            <span class="text-sm text-[var(--ui-secondary)] font-medium">
-                                {{ $ctas->count() }}
-                            </span>
+                        <div class="flex items-center justify-between gap-3 px-3 py-2">
+                            <span class="shrink-0 text-[13px] text-[color:var(--nx-faint)]">CTAs gesamt</span>
+                            <span class="min-w-0 truncate text-right text-[13px] text-[color:var(--nx-text)]">{{ $ctas->count() }}</span>
                         </div>
-                        <div class="flex justify-between items-center py-2 px-3 bg-[var(--ui-muted-5)] border border-[var(--ui-border)]/40">
-                            <span class="text-sm text-[var(--ui-muted)]">Aktiv</span>
-                            <span class="text-sm text-[var(--ui-secondary)] font-medium">
-                                {{ $ctas->where('is_active', true)->count() }}
-                            </span>
+                        <div class="flex items-center justify-between gap-3 px-3 py-2">
+                            <span class="shrink-0 text-[13px] text-[color:var(--nx-faint)]">Aktiv</span>
+                            <span class="min-w-0 truncate text-right text-[13px] text-[color:var(--nx-text)]">{{ $ctas->where('is_active', true)->count() }}</span>
                         </div>
-                        <div class="flex justify-between items-center py-2 px-3 bg-[var(--ui-muted-5)] border border-[var(--ui-border)]/40">
-                            <span class="text-sm text-[var(--ui-muted)]">Erstellt</span>
-                            <span class="text-sm text-[var(--ui-secondary)] font-medium">
-                                {{ $ctaBoard->created_at->format('d.m.Y') }}
-                            </span>
+                        <div class="flex items-center justify-between gap-3 px-3 py-2">
+                            <span class="shrink-0 text-[13px] text-[color:var(--nx-faint)]">Erstellt</span>
+                            <span class="min-w-0 truncate text-right text-[13px] text-[color:var(--nx-text)]">{{ $ctaBoard->created_at->format('d.m.Y') }}</span>
                         </div>
-                    </div>
-                </div>
-
-                {{-- Gruppierung --}}
-                <div>
-                    <h3 class="text-xs font-semibold uppercase tracking-wide text-[var(--ui-muted)] mb-3">Gruppierung</h3>
-                    <div class="flex gap-2">
-                        <button wire:click="setGroupBy('funnel_stage')"
-                            class="px-3 py-1.5 text-xs font-medium rounded-lg border transition-colors {{ $groupBy === 'funnel_stage' ? 'bg-violet-50 text-violet-700 border-violet-200' : 'text-[var(--ui-muted)] border-[var(--ui-border)]/40 hover:bg-[var(--ui-muted-5)]' }}">
-                            Funnel Stage
-                        </button>
-                        <button wire:click="setGroupBy('type')"
-                            class="px-3 py-1.5 text-xs font-medium rounded-lg border transition-colors {{ $groupBy === 'type' ? 'bg-violet-50 text-violet-700 border-violet-200' : 'text-[var(--ui-muted)] border-[var(--ui-border)]/40 hover:bg-[var(--ui-muted-5)]' }}">
-                            Typ
-                        </button>
                     </div>
                 </div>
 
                 {{-- Filter --}}
                 <div>
-                    <h3 class="text-xs font-semibold uppercase tracking-wide text-[var(--ui-muted)] mb-3">Filter</h3>
+                    <h3 class="mb-2.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-[color:var(--nx-faint)]">Filter</h3>
                     <div class="space-y-3">
                         {{-- Type Filter --}}
                         <div>
-                            <label class="block text-xs text-[var(--ui-muted)] mb-1">Typ</label>
-                            <select wire:model.live="filterType" class="w-full text-xs rounded-lg border border-[var(--ui-border)]/40 bg-white px-2.5 py-1.5 text-[var(--ui-secondary)]">
+                            <label class="mb-1 block text-[11px] text-[color:var(--nx-faint)]">Typ</label>
+                            <select wire:model.live="filterType" class="w-full rounded-[6px] border border-[color:var(--nx-line-strong)] bg-[color:var(--nx-surface)] px-2.5 py-1.5 text-xs text-[color:var(--nx-text)] transition-colors focus:border-[color:var(--nx-accent)] focus:outline-none focus:ring-1 focus:ring-[color:var(--nx-accent)]">
                                 <option value="">Alle</option>
                                 <option value="primary">Primary</option>
                                 <option value="secondary">Secondary</option>
@@ -86,8 +73,8 @@
 
                         {{-- Funnel Stage Filter --}}
                         <div>
-                            <label class="block text-xs text-[var(--ui-muted)] mb-1">Funnel Stage</label>
-                            <select wire:model.live="filterFunnelStage" class="w-full text-xs rounded-lg border border-[var(--ui-border)]/40 bg-white px-2.5 py-1.5 text-[var(--ui-secondary)]">
+                            <label class="mb-1 block text-[11px] text-[color:var(--nx-faint)]">Funnel Stage</label>
+                            <select wire:model.live="filterFunnelStage" class="w-full rounded-[6px] border border-[color:var(--nx-line-strong)] bg-[color:var(--nx-surface)] px-2.5 py-1.5 text-xs text-[color:var(--nx-text)] transition-colors focus:border-[color:var(--nx-accent)] focus:outline-none focus:ring-1 focus:ring-[color:var(--nx-accent)]">
                                 <option value="">Alle</option>
                                 <option value="awareness">Awareness</option>
                                 <option value="consideration">Consideration</option>
@@ -97,8 +84,8 @@
 
                         {{-- Active Filter --}}
                         <div>
-                            <label class="block text-xs text-[var(--ui-muted)] mb-1">Status</label>
-                            <select wire:model.live="filterIsActive" class="w-full text-xs rounded-lg border border-[var(--ui-border)]/40 bg-white px-2.5 py-1.5 text-[var(--ui-secondary)]">
+                            <label class="mb-1 block text-[11px] text-[color:var(--nx-faint)]">Status</label>
+                            <select wire:model.live="filterIsActive" class="w-full rounded-[6px] border border-[color:var(--nx-line-strong)] bg-[color:var(--nx-surface)] px-2.5 py-1.5 text-xs text-[color:var(--nx-text)] transition-colors focus:border-[color:var(--nx-accent)] focus:outline-none focus:ring-1 focus:ring-[color:var(--nx-accent)]">
                                 <option value="">Alle</option>
                                 <option value="1">Aktiv</option>
                                 <option value="0">Inaktiv</option>
@@ -111,97 +98,63 @@
     </x-slot>
 
     <x-slot name="activity">
-        <x-ui-page-sidebar title="Aktivitäten" width="w-80" :defaultOpen="false" storeKey="activityOpen" side="right">
-            <div class="p-4 space-y-4">
-                <div class="text-sm text-[var(--ui-muted)]">Letzte Aktivitäten</div>
-                <div class="space-y-3 text-sm">
-                    <div class="py-8 text-center">
-                        <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-[var(--ui-muted-5)] mb-3">
-                            @svg('heroicon-o-clock', 'w-6 h-6 text-[var(--ui-muted)]')
-                        </div>
-                        <p class="text-sm text-[var(--ui-muted)]">Noch keine Aktivitäten</p>
-                        <p class="text-xs text-[var(--ui-muted)] mt-1">Änderungen werden hier angezeigt</p>
-                    </div>
-                </div>
-            </div>
-        </x-ui-page-sidebar>
+        @include('brands::partials.board-activity')
     </x-slot>
 
     {{-- Board-Container --}}
-    @if($ctas->count() > 0)
-        <div class="cta-board-kanban-container">
-            <x-ui-kanban-container>
-                @if($groupBy === 'funnel_stage')
-                    @foreach($grouped as $stage => $stageCtas)
-                        @php
-                            $stageLabels = [
-                                'awareness' => 'Awareness',
-                                'consideration' => 'Consideration',
-                                'decision' => 'Decision',
-                            ];
-                            $stageColors = [
-                                'awareness' => 'blue',
-                                'consideration' => 'amber',
-                                'decision' => 'green',
-                            ];
-                            $stageLabel = $stageLabels[$stage] ?? ucfirst($stage);
-                            $stageColor = $stageColors[$stage] ?? 'gray';
-                        @endphp
-                        <x-ui-kanban-column :title="$stageLabel" :scrollable="true">
-                            <x-slot name="headerActions">
-                                <span class="inline-block w-3 h-3 rounded-full bg-{{ $stageColor }}-500"></span>
-                            </x-slot>
-
+    <x-ui-page-container spacing="space-y-8" width="contained">
+        @if($ctas->count() > 0)
+            @if($groupBy === 'funnel_stage')
+                @foreach($grouped as $stage => $stageCtas)
+                    @php
+                        $stageLabels = [
+                            'awareness' => 'Awareness',
+                            'consideration' => 'Consideration',
+                            'decision' => 'Decision',
+                        ];
+                        $stageVariants = [
+                            'awareness' => 'info',
+                            'consideration' => 'warning',
+                            'decision' => 'success',
+                        ];
+                        $stageLabel = $stageLabels[$stage] ?? ucfirst($stage);
+                        $stageVariant = $stageVariants[$stage] ?? 'neutral';
+                    @endphp
+                    <x-nx-section :title="$stageLabel" :hint="$stageCtas->count()">
+                        <x-nx-card flush class="divide-y divide-[color:var(--nx-line)]">
                             @foreach($stageCtas as $cta)
-                                @include('brands::livewire.cta-preview-card', ['cta' => $cta])
+                                @include('brands::livewire.cta-row', ['cta' => $cta])
                             @endforeach
-                        </x-ui-kanban-column>
-                    @endforeach
-                @else
-                    {{-- Group by type --}}
-                    @foreach($grouped as $typeKey => $typeCtas)
-                        @php
-                            $typeLabels = [
-                                'primary' => 'Primary',
-                                'secondary' => 'Secondary',
-                                'micro' => 'Micro',
-                            ];
-                            $typeLabel = $typeLabels[$typeKey] ?? ucfirst($typeKey);
-                        @endphp
-                        <x-ui-kanban-column :title="$typeLabel" :scrollable="true">
+                        </x-nx-card>
+                    </x-nx-section>
+                @endforeach
+            @else
+                {{-- Group by type --}}
+                @foreach($grouped as $typeKey => $typeCtas)
+                    @php
+                        $typeLabels = [
+                            'primary' => 'Primary',
+                            'secondary' => 'Secondary',
+                            'micro' => 'Micro',
+                        ];
+                        $typeLabel = $typeLabels[$typeKey] ?? ucfirst($typeKey);
+                    @endphp
+                    <x-nx-section :title="$typeLabel" :hint="$typeCtas->count()">
+                        <x-nx-card flush class="divide-y divide-[color:var(--nx-line)]">
                             @foreach($typeCtas as $cta)
-                                @include('brands::livewire.cta-preview-card', ['cta' => $cta])
+                                @include('brands::livewire.cta-row', ['cta' => $cta])
                             @endforeach
-                        </x-ui-kanban-column>
-                    @endforeach
-                @endif
-            </x-ui-kanban-container>
-        </div>
-    @else
-        <div class="flex items-center justify-center h-full">
-            <div class="bg-white rounded-xl border border-[var(--ui-border)]/60 shadow-sm p-12 text-center max-w-md">
-                <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-violet-50 mb-4">
-                    @svg('heroicon-o-cursor-arrow-rays', 'w-8 h-8 text-violet-600')
-                </div>
-                <h3 class="text-lg font-semibold text-[var(--ui-secondary)] mb-2">Noch keine CTAs</h3>
-                <p class="text-sm text-[var(--ui-muted)] mb-4">Erstelle CTAs über die LLM-Tools, um dein CTA Board zu füllen.</p>
-                <div class="text-xs text-[var(--ui-muted)] bg-[var(--ui-muted-5)] rounded-lg p-3 border border-[var(--ui-border)]/40">
-                    <p class="font-medium mb-1">Verfügbare Tools:</p>
-                    <p>brands.ctas.POST</p>
-                    <p>brands.ctas.BULK_POST</p>
-                </div>
-            </div>
-        </div>
-    @endif
+                        </x-nx-card>
+                    </x-nx-section>
+                @endforeach
+            @endif
+        @else
+            <x-nx-empty icon="heroicon-o-cursor-arrow-rays">
+                Noch keine CTAs – erstelle CTAs über die LLM-Tools (brands.ctas.POST · brands.ctas.BULK_POST), um dein CTA Board zu füllen.
+            </x-nx-empty>
+        @endif
+    </x-ui-page-container>
 
     {{-- Settings Modal --}}
     <livewire:brands.cta-board-settings-modal/>
 </x-ui-page>
-
-@push('styles')
-<style>
-    .cta-board-kanban-container .absolute.bottom-6 {
-        display: none !important;
-    }
-</style>
-@endpush
