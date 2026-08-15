@@ -1,12 +1,12 @@
-<x-ui-modal size="lg" model="modalShow" header="SEO Board-Einstellungen">
+<x-nx-modal size="lg" model="modalShow" header="SEO Board-Einstellungen">
     @if($seoBoard)
         <div class="space-y-6">
             {{-- Allgemein --}}
             <div>
-                <h3 class="text-xs font-semibold uppercase tracking-wide text-[var(--ui-muted)] mb-3">Allgemein</h3>
-                <x-ui-form-grid :cols="1" :gap="4">
+                <h3 class="text-xs font-semibold uppercase tracking-wide text-[var(--nx-faint)] mb-3">Allgemein</h3>
+                <div class="space-y-4">
                     @can('update', $seoBoard)
-                        <x-ui-input-text
+                        <x-nx-input-text
                             name="seoBoard.name"
                             label="Board Name"
                             wire:model.live.debounce.500ms="seoBoard.name"
@@ -14,7 +14,7 @@
                             required
                             :errorKey="'seoBoard.name'"
                         />
-                        <x-ui-input-textarea
+                        <x-nx-input-textarea
                             name="seoBoard.description"
                             label="Beschreibung"
                             wire:model.live.debounce.500ms="seoBoard.description"
@@ -22,57 +22,57 @@
                             :errorKey="'seoBoard.description'"
                         />
                     @else
-                        <div class="flex items-center justify-between text-sm p-2 rounded border border-[var(--ui-border)] bg-white">
-                            <span class="text-[var(--ui-muted)]">Board Name</span>
-                            <span class="font-medium text-[var(--ui-body-color)]">{{ $seoBoard->name }}</span>
+                        <div class="flex items-center justify-between text-sm p-2 rounded border border-[var(--nx-line)] bg-[color:var(--nx-surface)]">
+                            <span class="text-[var(--nx-faint)]">Board Name</span>
+                            <span class="font-medium text-[var(--nx-text)]">{{ $seoBoard->name }}</span>
                         </div>
                     @endcan
-                </x-ui-form-grid>
+                </div>
             </div>
 
             {{-- DataForSEO Konfiguration --}}
             @can('update', $seoBoard)
                 <div>
-                    <h3 class="text-xs font-semibold uppercase tracking-wide text-[var(--ui-muted)] mb-3">
+                    <h3 class="text-xs font-semibold uppercase tracking-wide text-[var(--nx-faint)] mb-3">
                         @svg('heroicon-o-globe-alt', 'w-3.5 h-3.5 inline-block mr-1')
                         DataForSEO Konfiguration
                     </h3>
-                    <x-ui-form-grid :cols="1" :gap="4">
-                        <x-ui-input-text
+                    <div class="space-y-4">
+                        <x-nx-input-text
                             name="configLocationCode"
                             label="Location Code"
                             wire:model.live.debounce.500ms="configLocationCode"
                             placeholder="z.B. 2276 (Deutschland)"
                             :errorKey="'configLocationCode'"
                         />
-                        <x-ui-input-text
+                        <x-nx-input-text
                             name="configLanguageName"
                             label="Sprache"
                             wire:model.live.debounce.500ms="configLanguageName"
                             placeholder="z.B. German"
                             :errorKey="'configLanguageName'"
                         />
-                        <x-ui-input-text
+                        <x-nx-input-text
                             name="configConnectionId"
                             label="Connection ID (optional)"
                             wire:model.live.debounce.500ms="configConnectionId"
                             placeholder="Standard-Connection des Teams"
                             :errorKey="'configConnectionId'"
                         />
-                    </x-ui-form-grid>
-                    <div class="mt-2 text-[10px] text-[var(--ui-muted)] bg-[var(--ui-muted-5)] rounded p-2 border border-[var(--ui-border)]/40">
+                    </div>
+                    <div class="mt-2 text-[10px] text-[var(--nx-faint)] bg-[var(--nx-hover)] rounded p-2 border border-[var(--nx-line)]">
                         <strong>Location Codes:</strong> 2276 = Deutschland, 2040 = &Ouml;sterreich, 2756 = Schweiz, 2826 = UK, 2840 = USA
                     </div>
                 </div>
 
                 {{-- Automatischer Refresh --}}
                 <div>
-                    <h3 class="text-xs font-semibold uppercase tracking-wide text-[var(--ui-muted)] mb-3">
+                    <h3 class="text-xs font-semibold uppercase tracking-wide text-[var(--nx-faint)] mb-3">
                         @svg('heroicon-o-arrow-path', 'w-3.5 h-3.5 inline-block mr-1')
                         Automatischer Refresh
                     </h3>
-                    <x-ui-form-grid :cols="1" :gap="4">
-                        <x-ui-input-select
+                    <div class="space-y-4">
+                        <x-nx-input-select
                             name="refreshIntervalDays"
                             label="Refresh-Intervall"
                             :options="$refreshIntervalOptions"
@@ -83,9 +83,9 @@
                             wire:model.live="refreshIntervalDays"
                             :errorKey="'refreshIntervalDays'"
                         />
-                    </x-ui-form-grid>
+                    </div>
                     @if($seoBoard->last_refreshed_at)
-                        <div class="mt-2 text-[10px] text-[var(--ui-muted)]">
+                        <div class="mt-2 text-[10px] text-[var(--nx-faint)]">
                             Letzter Refresh: {{ $seoBoard->last_refreshed_at->format('d.m.Y H:i') }} ({{ $seoBoard->last_refreshed_at->diffForHumans() }})
                         </div>
                     @endif
@@ -93,26 +93,28 @@
 
                 {{-- Budget --}}
                 <div>
-                    <h3 class="text-xs font-semibold uppercase tracking-wide text-[var(--ui-muted)] mb-3">
+                    <h3 class="text-xs font-semibold uppercase tracking-wide text-[var(--nx-faint)] mb-3">
                         @svg('heroicon-o-banknotes', 'w-3.5 h-3.5 inline-block mr-1')
                         API-Budget
                     </h3>
-                    <x-ui-form-grid :cols="1" :gap="4">
-                        <x-ui-input-text
+                    <div class="space-y-4">
+                        <x-nx-input-text
                             name="budgetLimitEuro"
                             label="Budget-Limit in Euro (leer = unbegrenzt)"
                             wire:model.live.debounce.500ms="budgetLimitEuro"
                             placeholder="z.B. 10.00"
                             :errorKey="'budgetLimitEuro'"
                         />
-                    </x-ui-form-grid>
-                    <div class="mt-2 flex items-center justify-between text-sm p-2 rounded border border-[var(--ui-border)] bg-[var(--ui-muted-5)]">
-                        <span class="text-[var(--ui-muted)]">Verbraucht</span>
-                        <span class="font-semibold text-[var(--ui-secondary)]">{{ number_format(($seoBoard->budget_spent_cents ?? 0) / 100, 2) }} &euro;</span>
+                    </div>
+                    <div class="mt-2 flex items-center justify-between text-sm p-2 rounded border border-[var(--nx-line)] bg-[var(--nx-hover)]">
+                        <span class="text-[var(--nx-faint)]">Verbraucht</span>
+                        <span class="font-semibold text-[var(--nx-text)]">{{ number_format(($seoBoard->budget_spent_cents ?? 0) / 100, 2) }} &euro;</span>
                     </div>
                     @if($seoBoard->budget_spent_cents > 0)
                         <div class="mt-2">
-                            <x-ui-confirm-button action="resetBudget" text="Budget zur&uuml;cksetzen" confirmText="Wirklich zur&uuml;cksetzen?" />
+                            <x-nx-button variant="danger" size="sm" wire:click="resetBudget" wire:confirm="Wirklich zur&uuml;cksetzen?">
+                                @svg('heroicon-o-trash', 'w-4 h-4') Budget zur&uuml;cksetzen
+                            </x-nx-button>
                         </div>
                     @endif
                 </div>
@@ -120,16 +122,18 @@
 
             {{-- Board l&ouml;schen --}}
             @can('delete', $seoBoard)
-                <div class="pt-4 border-t border-red-200">
-                    <x-ui-confirm-button action="deleteSeoBoard" text="SEO Board l&ouml;schen" confirmText="Wirklich l&ouml;schen?" />
+                <div class="pt-4 border-t border-[var(--nx-line)]">
+                    <x-nx-button variant="danger" size="sm" wire:click="deleteSeoBoard" wire:confirm="Wirklich l&ouml;schen?">
+                        @svg('heroicon-o-trash', 'w-4 h-4') SEO Board l&ouml;schen
+                    </x-nx-button>
                 </div>
             @endcan
         </div>
 
         <x-slot name="footer">
             @can('update', $seoBoard)
-                <x-ui-button variant="success" wire:click="save">Speichern</x-ui-button>
+                <x-nx-button variant="primary" wire:click="save">Speichern</x-nx-button>
             @endcan
         </x-slot>
     @endif
-</x-ui-modal>
+</x-nx-modal>

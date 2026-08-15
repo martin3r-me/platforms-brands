@@ -1,6 +1,6 @@
-<x-ui-modal size="md" model="modalShow" header="Guidelines Board Einstellungen">
-    <div class="space-y-6">
-        <x-ui-input-text
+<x-nx-modal size="md" model="modalShow" header="Guidelines Board Einstellungen">
+    <div class="space-y-4">
+        <x-nx-input-text
             name="boardName"
             label="Board-Name"
             wire:model.live.debounce.300ms="boardName"
@@ -9,7 +9,7 @@
             :errorKey="'boardName'"
         />
 
-        <x-ui-input-textarea
+        <x-nx-input-textarea
             name="boardDescription"
             label="Beschreibung"
             wire:model.live.debounce.300ms="boardDescription"
@@ -19,8 +19,8 @@
     </div>
 
     <x-slot name="footer">
-        <x-ui-button variant="success" wire:click="save">
+        <x-nx-button variant="primary" wire:click="save">
             Speichern
-        </x-ui-button>
+        </x-nx-button>
     </x-slot>
-</x-ui-modal>
+</x-nx-modal>

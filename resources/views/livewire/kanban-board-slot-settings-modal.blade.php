@@ -1,8 +1,8 @@
-<x-ui-modal size="md" model="modalShow" header="Slot-Einstellungen">
+<x-nx-modal size="md" model="modalShow" header="Slot-Einstellungen">
     @if($slot)
-        <x-ui-form-grid :cols="1" :gap="4">
+        <div class="space-y-4">
             {{-- Slot Name --}}
-            <x-ui-input-text
+            <x-nx-input-text
                 name="slot.name"
                 label="Slot-Name"
                 wire:model.live.debounce.500ms="slot.name"
@@ -10,18 +10,20 @@
                 required
                 :errorKey="'slot.name'"
             />
-        </x-ui-form-grid>
+        </div>
 
         {{-- Slot löschen --}}
         <div class="mt-4">
-            <x-ui-confirm-button action="deleteSlot" text="Slot löschen" confirmText="Wirklich löschen? Alle Cards in diesem Slot werden ebenfalls gelöscht." />
+            <x-nx-button variant="danger" size="sm" wire:click="deleteSlot" wire:confirm="Wirklich löschen? Alle Cards in diesem Slot werden ebenfalls gelöscht.">
+                @svg('heroicon-o-trash', 'w-4 h-4') Slot löschen
+            </x-nx-button>
         </div>
     @endif
 
     <x-slot name="footer">
         @if($slot)
-            <x-ui-button variant="secondary" wire:click="closeModal">Abbrechen</x-ui-button>
-            <x-ui-button variant="primary" wire:click="save">Speichern</x-ui-button>
+            <x-nx-button variant="ghost" wire:click="closeModal">Abbrechen</x-nx-button>
+            <x-nx-button variant="primary" wire:click="save">Speichern</x-nx-button>
         @endif
     </x-slot>
-</x-ui-modal>
+</x-nx-modal>
