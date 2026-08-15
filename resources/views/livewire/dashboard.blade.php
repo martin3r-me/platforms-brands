@@ -7,10 +7,10 @@
         <x-ui-page-actionbar :breadcrumbs="[
             ['label' => 'Marken', 'icon' => 'tag'],
         ]">
-            <x-ui-button variant="primary" size="sm" wire:click="createBrand">
+            <x-nx-button variant="primary" size="sm" wire:click="createBrand">
                 @svg('heroicon-o-plus', 'w-4 h-4')
                 <span>Neue Marke</span>
-            </x-ui-button>
+            </x-nx-button>
         </x-ui-page-actionbar>
     </x-slot>
 
