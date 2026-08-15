@@ -10,49 +10,49 @@
             ['label' => '@' . $instagramAccount->username],
         ]">
             @can('update', $instagramAccount)
-                <x-ui-button variant="primary" size="sm" wire:click="syncMedia">
+                <x-nx-button variant="primary" size="sm" wire:click="syncMedia">
                     @svg('heroicon-o-arrow-path', 'w-4 h-4')
                     <span>Media synchronisieren</span>
-                </x-ui-button>
+                </x-nx-button>
             @endcan
         </x-ui-page-actionbar>
     </x-slot>
 
-    <x-ui-page-container spacing="space-y-6">
+    <x-ui-page-container spacing="space-y-10" width="contained">
         {{-- Hero Section --}}
-        <div class="border-b border-[var(--ui-border)]/60 bg-white">
+        <div>
             <div class="grid lg:grid-cols-2 gap-12 items-start">
                 {{-- Linke Spalte: Profilinfo --}}
                 <div class="space-y-8">
                     <div class="flex items-start gap-8">
                         {{-- Profilbild --}}
                         <div class="relative group">
-                            <div class="w-32 h-32 rounded-full ring-4 ring-white shadow-xl bg-[var(--ui-primary-5)] flex items-center justify-center">
-                                @svg('heroicon-o-camera', 'w-16 h-16 text-[var(--ui-primary)]')
+                            <div class="flex h-32 w-32 items-center justify-center rounded-full bg-[color:var(--nx-accent-soft)] ring-4 ring-[color:var(--nx-surface)]">
+                                @svg('heroicon-o-camera', 'w-16 h-16 text-[color:var(--nx-muted)]')
                             </div>
                         </div>
 
                         <div class="flex-1">
                             {{-- Username und Verifizierung --}}
-                            <div class="flex items-center gap-2 mb-1">
-                                <h1 class="text-xl font-semibold text-[var(--ui-secondary)]">{{ '@' . $instagramAccount->username }}</h1>
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                    @svg('heroicon-o-check-badge', 'w-3.5 h-3.5 mr-1')
+                            <div class="mb-1 flex items-center gap-2">
+                                <h1 class="text-2xl font-semibold text-[color:var(--nx-text)]">{{ '@' . $instagramAccount->username }}</h1>
+                                <x-nx-badge variant="info">
+                                    @svg('heroicon-o-check-badge', 'w-3.5 h-3.5')
                                     Verifiziert
-                                </span>
+                                </x-nx-badge>
                             </div>
 
                             {{-- Name und Bio --}}
                             <div class="mt-4 space-y-2">
                                 @if($latestInsights && $latestInsights->current_name)
-                                    <h2 class="text-base font-semibold text-[var(--ui-secondary)]">{{ $latestInsights->current_name }}</h2>
+                                    <h2 class="text-base font-semibold text-[color:var(--nx-text)]">{{ $latestInsights->current_name }}</h2>
                                 @endif
                                 @if($latestInsights && $latestInsights->current_biography)
-                                    <p class="text-[var(--ui-muted)] whitespace-pre-line text-sm leading-relaxed">
+                                    <p class="whitespace-pre-line text-sm leading-relaxed text-[color:var(--nx-muted)]">
                                         {{ $latestInsights->current_biography }}
                                     </p>
                                 @elseif($instagramAccount->description)
-                                    <p class="text-[var(--ui-muted)] whitespace-pre-line text-sm leading-relaxed">
+                                    <p class="whitespace-pre-line text-sm leading-relaxed text-[color:var(--nx-muted)]">
                                         {{ $instagramAccount->description }}
                                     </p>
                                 @endif
@@ -60,12 +60,10 @@
 
                             {{-- Action Button --}}
                             <div class="mt-6">
-                                <a href="https://instagram.com/{{ $instagramAccount->username }}" 
-                                   target="_blank"
-                                   class="inline-flex items-center justify-center px-6 py-2 border border-[var(--ui-border)]/60 rounded-lg text-sm font-medium text-[var(--ui-secondary)] bg-white hover:bg-[var(--ui-muted-5)] transition-colors duration-200">
-                                    @svg('heroicon-o-arrow-top-right-on-square', 'w-4 h-4 mr-2')
+                                <x-nx-button variant="secondary" size="md" :href="'https://instagram.com/' . $instagramAccount->username" target="_blank">
+                                    @svg('heroicon-o-arrow-top-right-on-square', 'w-4 h-4')
                                     Auf Instagram ansehen
-                                </a>
+                                </x-nx-button>
                             </div>
                         </div>
                     </div>
@@ -73,114 +71,38 @@
 
                 {{-- Rechte Spalte: Statistiken --}}
                 <div class="grid grid-cols-2 gap-4">
-                    {{-- Follower --}}
-                    <div class="p-6 rounded-xl border border-[var(--ui-border)]/60 shadow-sm hover:border-pink-200 transition-all duration-200 bg-gradient-to-br from-white to-pink-50/30">
-                        <div class="flex items-center gap-4">
-                            <div class="size-12 bg-pink-50 rounded-lg flex items-center justify-center">
-                                @svg('heroicon-o-users', 'size-6 text-pink-600')
-                            </div>
-                            <div>
-                                <p class="text-sm font-medium text-[var(--ui-muted)]">Follower</p>
-                                <p class="text-2xl font-bold text-[var(--ui-secondary)]">
-                                    {{ $latestInsights ? number_format($latestInsights->current_followers ?? $latestInsights->follower_count ?? 0) : '0' }}
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-
-                    {{-- Following --}}
-                    <div class="p-6 rounded-xl border border-[var(--ui-border)]/60 shadow-sm hover:border-purple-200 transition-all duration-200 bg-gradient-to-br from-white to-purple-50/30">
-                        <div class="flex items-center gap-4">
-                            <div class="size-12 bg-purple-50 rounded-lg flex items-center justify-center">
-                                @svg('heroicon-o-user-group', 'size-6 text-purple-600')
-                            </div>
-                            <div>
-                                <p class="text-sm font-medium text-[var(--ui-muted)]">Following</p>
-                                <p class="text-2xl font-bold text-[var(--ui-secondary)]">
-                                    {{ $latestInsights ? number_format($latestInsights->current_follows ?? 0) : '0' }}
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-
-                    {{-- Likes --}}
-                    <div class="p-6 rounded-xl border border-[var(--ui-border)]/60 shadow-sm hover:border-red-200 transition-all duration-200 bg-gradient-to-br from-white to-red-50/30">
-                        <div class="flex items-center gap-4">
-                            <div class="size-12 bg-red-50 rounded-lg flex items-center justify-center">
-                                @svg('heroicon-o-heart', 'size-6 text-red-600')
-                            </div>
-                            <div>
-                                <p class="text-sm font-medium text-[var(--ui-muted)]">Likes</p>
-                                <p class="text-2xl font-bold text-[var(--ui-secondary)]">
-                                    {{ number_format($media->sum('like_count')) }}
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-
-                    {{-- Kommentare --}}
-                    <div class="p-6 rounded-xl border border-[var(--ui-border)]/60 shadow-sm hover:border-blue-200 transition-all duration-200 bg-gradient-to-br from-white to-blue-50/30">
-                        <div class="flex items-center gap-4">
-                            <div class="size-12 bg-blue-50 rounded-lg flex items-center justify-center">
-                                @svg('heroicon-o-chat-bubble-left', 'size-6 text-blue-600')
-                            </div>
-                            <div>
-                                <p class="text-sm font-medium text-[var(--ui-muted)]">Kommentare</p>
-                                <p class="text-2xl font-bold text-[var(--ui-secondary)]">
-                                    {{ number_format($media->sum('comments_count')) }}
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-
-                    {{-- Posts --}}
-                    <div class="p-6 rounded-xl border border-[var(--ui-border)]/60 shadow-sm hover:border-amber-200 transition-all duration-200 bg-gradient-to-br from-white to-amber-50/30 col-span-2">
-                        <div class="flex items-center gap-4">
-                            <div class="size-12 bg-amber-50 rounded-lg flex items-center justify-center">
-                                @svg('heroicon-o-photo', 'size-6 text-amber-600')
-                            </div>
-                            <div>
-                                <p class="text-sm font-medium text-[var(--ui-muted)]">Gesamt Posts</p>
-                                <p class="text-2xl font-bold text-[var(--ui-secondary)]">
-                                    {{ number_format($media->count()) }}
-                                </p>
-                            </div>
-                        </div>
-                    </div>
+                    <x-nx-stat label="Follower" icon="heroicon-o-users"
+                               :value="$latestInsights ? number_format($latestInsights->current_followers ?? $latestInsights->follower_count ?? 0) : '0'" />
+                    <x-nx-stat label="Following" icon="heroicon-o-user-group"
+                               :value="$latestInsights ? number_format($latestInsights->current_follows ?? 0) : '0'" />
+                    <x-nx-stat label="Likes" icon="heroicon-o-heart"
+                               :value="number_format($media->sum('like_count'))" />
+                    <x-nx-stat label="Kommentare" icon="heroicon-o-chat-bubble-left"
+                               :value="number_format($media->sum('comments_count'))" />
+                    <x-nx-stat label="Gesamt Posts" icon="heroicon-o-photo" class="col-span-2"
+                               :value="number_format($media->count())" />
                 </div>
             </div>
         </div>
 
         {{-- Latest Post Performance --}}
         @if($lastPost = $media->first())
-            <div class="bg-white rounded-xl border border-[var(--ui-border)]/60 shadow-sm p-6">
-                {{-- Header --}}
-                <div class="flex items-center justify-between mb-6">
-                    <div>
-                        <div class="flex items-center gap-2">
-                            @svg('heroicon-o-photo', 'w-6 h-6 text-[var(--ui-muted)]')
-                            <h2 class="text-2xl font-bold text-[var(--ui-secondary)]">Letzter Post</h2>
-                        </div>
-                        <p class="text-[var(--ui-muted)] text-sm">
-                            Veröffentlicht: {{ $lastPost->timestamp ? $lastPost->timestamp->format('d.m.Y, H:i') : 'Unbekannt' }} Uhr
-                        </p>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-2 gap-8">
+            <x-nx-section icon="heroicon-o-photo" title="Letzter Post"
+                          :description="'Veröffentlicht: ' . ($lastPost->timestamp ? $lastPost->timestamp->format('d.m.Y, H:i') : 'Unbekannt') . ' Uhr'">
+                <div class="grid grid-cols-1 gap-8 lg:grid-cols-2">
                     {{-- Post Preview --}}
-                    <div class="border border-[var(--ui-border)]/60 rounded-lg overflow-hidden">
+                    <x-nx-card flush class="overflow-hidden">
                         {{-- Post Header --}}
-                        <div class="p-2 flex items-center gap-2 border-b border-[var(--ui-border)]/60">
-                            <div class="w-4 h-4 rounded-full bg-[var(--ui-primary-5)] flex items-center justify-center">
-                                @svg('heroicon-o-camera', 'w-3 h-3 text-[var(--ui-primary)]')
+                        <div class="flex items-center gap-2 border-b border-[color:var(--nx-line)] p-2">
+                            <div class="flex h-4 w-4 items-center justify-center rounded-full bg-[color:var(--nx-accent-soft)]">
+                                @svg('heroicon-o-camera', 'w-3 h-3 text-[color:var(--nx-muted)]')
                             </div>
                             <div class="flex items-center gap-2">
-                                <p class="text-xs font-medium text-[var(--ui-secondary)] truncate">
+                                <p class="truncate text-xs font-medium text-[color:var(--nx-text)]">
                                     {{ $instagramAccount->username }}
                                 </p>
                                 @if($lastPost->contextFiles->count() > 1)
-                                    <div class="flex items-center gap-1 text-[var(--ui-muted)]">
+                                    <div class="flex items-center gap-1 text-[color:var(--nx-faint)]">
                                         @svg('heroicon-o-squares-2x2', 'w-3 h-3')
                                         <span class="text-xs">{{ $lastPost->contextFiles->count() }}</span>
                                     </div>
@@ -201,10 +123,10 @@
                                 }
                             }
                         @endphp
-                        <div class="relative bg-[var(--ui-muted-5)] {{ $aspectRatio }} overflow-hidden">
+                        <div class="relative bg-[color:var(--nx-hover)] {{ $aspectRatio }} overflow-hidden">
                             @if($lastPost->media_type === 'CAROUSEL_ALBUM' && $lastPost->contextFiles->where('meta.role', 'carousel')->count() > 0)
                                 {{-- Carousel Album --}}
-                                @php 
+                                @php
                                     $carouselItems = $lastPost->contextFiles->where('meta.role', 'carousel')->sortBy(function($file) {
                                         return $file->meta['carousel_index'] ?? 999;
                                     });
@@ -231,7 +153,7 @@
                                             @endif
                                         </div>
                                     @endforeach
-                                    
+
                                     @if($carouselItems->count() > 1)
                                         {{-- Navigation Arrows --}}
                                         <button @click="activeIndex = activeIndex === 0 ? {{ $carouselItems->count() - 1 }} : activeIndex - 1"
@@ -242,7 +164,7 @@
                                                 class="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-2 transition-colors z-10">
                                             @svg('heroicon-o-chevron-right', 'w-5 h-5')
                                         </button>
-                                        
+
                                         {{-- Dots Indicator --}}
                                         <div class="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5 z-10">
                                             @foreach($carouselItems as $index => $item)
@@ -275,7 +197,7 @@
                             </div>
 
                             {{-- Post Stats --}}
-                            <div class="border-t border-[var(--ui-border)]/60 bg-white">
+                            <div class="border-t border-[color:var(--nx-line)] bg-[color:var(--nx-surface)]">
                                 <div class="px-3 py-2 flex items-center justify-between">
                                     <div class="flex items-center gap-2">
                                         <div class="flex items-center gap-1">
@@ -283,350 +205,289 @@
                                             <span class="text-sm font-medium">{{ number_format($lastPost->like_count) }}</span>
                                         </div>
                                         <div class="flex items-center gap-1">
-                                            @svg('heroicon-o-chat-bubble-left', 'w-4 h-4 text-[var(--ui-muted)]')
-                                            <span class="text-sm font-medium text-[var(--ui-secondary)]">{{ number_format($lastPost->comments_count) }}</span>
+                                            @svg('heroicon-o-chat-bubble-left', 'w-4 h-4 text-[color:var(--nx-faint)]')
+                                            <span class="text-sm font-medium text-[color:var(--nx-text)]">{{ number_format($lastPost->comments_count) }}</span>
                                         </div>
                                     </div>
                                     @if($lastPost->timestamp)
-                                        <span class="text-xs text-[var(--ui-muted)]">{{ $lastPost->timestamp->format('d.m.Y') }}</span>
+                                        <span class="text-xs text-[color:var(--nx-faint)]">{{ $lastPost->timestamp->format('d.m.Y') }}</span>
                                     @endif
                                 </div>
                                 @if($lastPost->caption)
-                                    <div class="px-3 py-2 border-t border-[var(--ui-border)]/40">
-                                        <p class="text-sm text-[var(--ui-secondary)] whitespace-pre-line line-clamp-2">{{ $lastPost->caption }}</p>
+                                    <div class="px-3 py-2 border-t border-[color:var(--nx-line)]">
+                                        <p class="text-sm text-[color:var(--nx-text)] whitespace-pre-line line-clamp-2">{{ $lastPost->caption }}</p>
                                     </div>
                                 @endif
                         </div>
-                    </div>
+                    </x-nx-card>
 
                     {{-- Post Stats --}}
                     <div class="space-y-6">
                         {{-- Quick Stats --}}
                         <div class="grid grid-cols-2 gap-4">
-                            <div class="p-4 bg-white rounded-lg border border-[var(--ui-border)]/60">
-                                <div class="flex items-center gap-2 text-pink-600 mb-2">
-                                    @svg('heroicon-o-heart', 'w-5 h-5')
-                                    <span class="text-lg font-bold">{{ number_format($lastPost->like_count) }}</span>
-                                </div>
-                                <span class="text-sm text-[var(--ui-muted)]">Likes</span>
-                            </div>
-                            
-                            <div class="p-4 bg-white rounded-lg border border-[var(--ui-border)]/60">
-                                <div class="flex items-center gap-2 text-blue-600 mb-2">
-                                    @svg('heroicon-o-chat-bubble-left', 'w-5 h-5')
-                                    <span class="text-lg font-bold">{{ number_format($lastPost->comments_count) }}</span>
-                                </div>
-                                <span class="text-sm text-[var(--ui-muted)]">Kommentare</span>
-                            </div>
+                            <x-nx-stat label="Likes" icon="heroicon-o-heart" :value="number_format($lastPost->like_count)" />
+                            <x-nx-stat label="Kommentare" icon="heroicon-o-chat-bubble-left" :value="number_format($lastPost->comments_count)" />
 
                             {{-- Insights Stats --}}
                             @if($lastPost->latestInsight)
-                                <div class="p-4 bg-white rounded-lg border border-[var(--ui-border)]/60">
-                                    <div class="flex items-center gap-2 text-amber-600 mb-2">
-                                        @svg('heroicon-o-bookmark', 'w-5 h-5')
-                                        <span class="text-lg font-bold">{{ number_format($lastPost->latestInsight->saved ?? 0) }}</span>
-                                    </div>
-                                    <span class="text-sm text-[var(--ui-muted)]">Gespeichert</span>
-                                </div>
-
-                                <div class="p-4 bg-white rounded-lg border border-[var(--ui-border)]/60">
-                                    <div class="flex items-center gap-2 text-green-600 mb-2">
-                                        @svg('heroicon-o-share', 'w-5 h-5')
-                                        <span class="text-lg font-bold">{{ number_format($lastPost->latestInsight->shares ?? 0) }}</span>
-                                    </div>
-                                    <span class="text-sm text-[var(--ui-muted)]">Geteilt</span>
-                                </div>
+                                <x-nx-stat label="Gespeichert" icon="heroicon-o-bookmark" :value="number_format($lastPost->latestInsight->saved ?? 0)" />
+                                <x-nx-stat label="Geteilt" icon="heroicon-o-share" :value="number_format($lastPost->latestInsight->shares ?? 0)" />
                             @endif
                         </div>
 
                         {{-- Performance Metrics --}}
                         @if($lastPost->latestInsight)
-                            <div class="bg-[var(--ui-muted-5)] rounded-lg p-4 space-y-4">
-                                <h4 class="font-medium text-[var(--ui-secondary)]">Performance</h4>
+                            <x-nx-card class="space-y-4">
+                                <h4 class="text-sm font-semibold text-[color:var(--nx-text)]">Performance</h4>
                                 <div class="grid gap-3 text-sm">
                                     <div class="flex items-center justify-between">
                                         <div class="flex items-center gap-2">
-                                            @svg('heroicon-o-eye', 'w-4 h-4 text-[var(--ui-muted)]')
-                                            <span class="text-[var(--ui-muted)]">Reichweite</span>
+                                            @svg('heroicon-o-eye', 'w-4 h-4 text-[color:var(--nx-faint)]')
+                                            <span class="text-[color:var(--nx-muted)]">Reichweite</span>
                                         </div>
-                                        <span class="font-medium text-[var(--ui-secondary)]">{{ number_format($lastPost->latestInsight->reach ?? 0) }}</span>
+                                        <span class="font-medium text-[color:var(--nx-text)]">{{ number_format($lastPost->latestInsight->reach ?? 0) }}</span>
                                     </div>
                                     <div class="flex items-center justify-between">
                                         <div class="flex items-center gap-2">
-                                            @svg('heroicon-o-cursor-arrow-rays', 'w-4 h-4 text-[var(--ui-muted)]')
-                                            <span class="text-[var(--ui-muted)]">Impressionen</span>
+                                            @svg('heroicon-o-cursor-arrow-rays', 'w-4 h-4 text-[color:var(--nx-faint)]')
+                                            <span class="text-[color:var(--nx-muted)]">Impressionen</span>
                                         </div>
-                                        <span class="font-medium text-[var(--ui-secondary)]">{{ number_format($lastPost->latestInsight->impressions ?? 0) }}</span>
+                                        <span class="font-medium text-[color:var(--nx-text)]">{{ number_format($lastPost->latestInsight->impressions ?? 0) }}</span>
                                     </div>
                                     <div class="flex items-center justify-between">
                                         <div class="flex items-center gap-2">
-                                            @svg('heroicon-o-hand-raised', 'w-4 h-4 text-[var(--ui-muted)]')
-                                            <span class="text-[var(--ui-muted)]">Interaktionen</span>
+                                            @svg('heroicon-o-hand-raised', 'w-4 h-4 text-[color:var(--nx-faint)]')
+                                            <span class="text-[color:var(--nx-muted)]">Interaktionen</span>
                                         </div>
-                                        <span class="font-medium text-[var(--ui-secondary)]">{{ number_format($lastPost->latestInsight->total_interactions ?? 0) }}</span>
+                                        <span class="font-medium text-[color:var(--nx-text)]">{{ number_format($lastPost->latestInsight->total_interactions ?? 0) }}</span>
                                     </div>
                                 </div>
-                            </div>
+                            </x-nx-card>
                         @endif
 
                         {{-- Post Details --}}
-                        <div class="bg-[var(--ui-muted-5)] rounded-lg p-4 space-y-3">
-                            <h4 class="font-medium text-[var(--ui-secondary)]">Post Details</h4>
+                        <x-nx-card class="space-y-3">
+                            <h4 class="text-sm font-semibold text-[color:var(--nx-text)]">Post Details</h4>
                             <div class="grid gap-2 text-sm">
                                 <div class="flex items-center justify-between">
-                                    <span class="text-[var(--ui-muted)]">Typ</span>
-                                    <span class="font-medium text-[var(--ui-secondary)]">{{ $lastPost->media_type }}</span>
+                                    <span class="text-[color:var(--nx-muted)]">Typ</span>
+                                    <span class="font-medium text-[color:var(--nx-text)]">{{ $lastPost->media_type }}</span>
                                 </div>
                                 <div class="flex items-center justify-between">
-                                    <span class="text-[var(--ui-muted)]">Story</span>
-                                    <span class="font-medium text-[var(--ui-secondary)]">{{ $lastPost->is_story ? 'Ja' : 'Nein' }}</span>
+                                    <span class="text-[color:var(--nx-muted)]">Story</span>
+                                    <span class="font-medium text-[color:var(--nx-text)]">{{ $lastPost->is_story ? 'Ja' : 'Nein' }}</span>
                                 </div>
                                 <div class="flex items-center justify-between">
-                                    <span class="text-[var(--ui-muted)]">Medien</span>
-                                    <span class="font-medium text-[var(--ui-secondary)]">{{ $lastPost->contextFiles->count() }}</span>
+                                    <span class="text-[color:var(--nx-muted)]">Medien</span>
+                                    <span class="font-medium text-[color:var(--nx-text)]">{{ $lastPost->contextFiles->count() }}</span>
                                 </div>
                                 @if($lastPost->permalink)
-                                    <a href="{{ $lastPost->permalink }}" 
-                                       target="_blank"
-                                       class="inline-flex items-center justify-center px-4 py-2 mt-2 border border-transparent rounded-lg text-sm font-medium text-white bg-pink-600 hover:bg-pink-700">
-                                        @svg('heroicon-o-arrow-top-right-on-square', 'w-4 h-4 mr-2')
+                                    <x-nx-button variant="primary" size="md" :href="$lastPost->permalink" target="_blank" class="mt-2">
+                                        @svg('heroicon-o-arrow-top-right-on-square', 'w-4 h-4')
                                         Auf Instagram ansehen
-                                    </a>
+                                    </x-nx-button>
                                 @endif
                             </div>
-                        </div>
+                        </x-nx-card>
                     </div>
                 </div>
-            </div>
+            </x-nx-section>
         @endif
 
         {{-- Performance Insights --}}
         @if($latestInsights)
-            <div class="bg-white rounded-xl border border-[var(--ui-border)]/60 shadow-sm">
-                {{-- Header --}}
-                <div class="px-6 py-4 border-b border-[var(--ui-border)]/60">
-                    <h2 class="text-2xl font-bold text-[var(--ui-secondary)] flex items-center gap-2">
-                        @svg('heroicon-o-chart-bar', 'w-6 h-6 text-[var(--ui-muted)]')
-                        Account Performance
-                    </h2>
-                    <div class="flex items-center gap-2 mt-1">
-                        <p class="text-[var(--ui-muted)]">Letztes Update: {{ $latestInsights->updated_at->format('d.m.Y, H:i') }} Uhr</p>
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                            Letzter Tag
-                        </span>
-                    </div>
-                </div>
+            <x-nx-section icon="heroicon-o-chart-bar" title="Account Performance"
+                          :description="'Letztes Update: ' . $latestInsights->updated_at->format('d.m.Y, H:i') . ' Uhr'">
+                <x-slot name="action">
+                    <x-nx-badge variant="info">Letzter Tag</x-nx-badge>
+                </x-slot>
 
                 {{-- Performance Grid --}}
-                <div class="p-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     {{-- Reichweite & Sichtbarkeit --}}
                     <div class="lg:col-span-1">
-                        <h3 class="text-base font-semibold text-[var(--ui-secondary)] flex items-center gap-2 mb-4">
-                            @svg('heroicon-o-eye', 'w-5 h-5 text-blue-500')
-                            Reichweite & Sichtbarkeit
+                        <h3 class="mb-4 flex items-center gap-2 text-base font-semibold text-[color:var(--nx-text)]">
+                            @svg('heroicon-o-eye', 'w-5 h-5 text-[color:var(--nx-faint)]')
+                            Reichweite &amp; Sichtbarkeit
                         </h3>
-                        
-                        <div class="space-y-4">
-                            <div class="bg-[var(--ui-muted-5)] rounded-xl p-4">
-                                <div class="flex items-center justify-between h-full">
-                                    <div>
-                                        <h4 class="text-sm font-medium text-[var(--ui-muted)]">Reichweite</h4>
-                                        <p class="text-2xl font-bold text-[var(--ui-secondary)] mt-1">{{ number_format($latestInsights->reach ?? 0) }}</p>
-                                    </div>
-                                    <div class="flex items-center text-blue-600">
-                                        @svg('heroicon-o-users', 'w-5 h-5')
-                                        <span class="text-xs ml-1">Unique Accounts</span>
-                                    </div>
-                                </div>
-                            </div>
 
-                            <div class="bg-[var(--ui-muted-5)] rounded-xl p-4">
-                                <div class="flex items-center justify-between h-full">
+                        <div class="space-y-4">
+                            <x-nx-card>
+                                <div class="flex h-full items-center justify-between">
                                     <div>
-                                        <h4 class="text-sm font-medium text-[var(--ui-muted)]">Impressionen</h4>
-                                        <p class="text-2xl font-bold text-[var(--ui-secondary)] mt-1">{{ number_format($latestInsights->impressions ?? 0) }}</p>
+                                        <h4 class="text-sm font-medium text-[color:var(--nx-muted)]">Reichweite</h4>
+                                        <p class="mt-1 text-2xl font-bold text-[color:var(--nx-text)]">{{ number_format($latestInsights->reach ?? 0) }}</p>
                                     </div>
-                                    <div class="flex items-center text-blue-600">
-                                        @svg('heroicon-o-eye', 'w-5 h-5')
-                                        <span class="text-xs ml-1">Gesamte Ansichten</span>
+                                    <div class="flex items-center text-[color:var(--nx-faint)]">
+                                        @svg('heroicon-o-users', 'w-5 h-5')
+                                        <span class="ml-1 text-xs">Unique Accounts</span>
                                     </div>
                                 </div>
-                            </div>
+                            </x-nx-card>
+
+                            <x-nx-card>
+                                <div class="flex h-full items-center justify-between">
+                                    <div>
+                                        <h4 class="text-sm font-medium text-[color:var(--nx-muted)]">Impressionen</h4>
+                                        <p class="mt-1 text-2xl font-bold text-[color:var(--nx-text)]">{{ number_format($latestInsights->impressions ?? 0) }}</p>
+                                    </div>
+                                    <div class="flex items-center text-[color:var(--nx-faint)]">
+                                        @svg('heroicon-o-eye', 'w-5 h-5')
+                                        <span class="ml-1 text-xs">Gesamte Ansichten</span>
+                                    </div>
+                                </div>
+                            </x-nx-card>
                         </div>
                     </div>
 
                     {{-- Engagement --}}
                     <div class="lg:col-span-1">
-                        <h3 class="text-base font-semibold text-[var(--ui-secondary)] flex items-center gap-2 mb-4">
-                            @svg('heroicon-o-heart', 'w-5 h-5 text-pink-500')
+                        <h3 class="mb-4 flex items-center gap-2 text-base font-semibold text-[color:var(--nx-text)]">
+                            @svg('heroicon-o-heart', 'w-5 h-5 text-[color:var(--nx-faint)]')
                             Engagement
                         </h3>
 
                         <div class="space-y-4">
-                            <div class="bg-[var(--ui-muted-5)] rounded-xl p-4">
-                                <div class="flex items-center justify-between mb-3">
+                            <x-nx-card>
+                                <div class="mb-3 flex items-center justify-between">
                                     <div>
-                                        <h4 class="text-sm font-medium text-[var(--ui-muted)]">Interaktionen</h4>
-                                        <p class="text-2xl font-bold text-[var(--ui-secondary)] mt-1">{{ number_format($latestInsights->total_interactions ?? 0) }}</p>
+                                        <h4 class="text-sm font-medium text-[color:var(--nx-muted)]">Interaktionen</h4>
+                                        <p class="mt-1 text-2xl font-bold text-[color:var(--nx-text)]">{{ number_format($latestInsights->total_interactions ?? 0) }}</p>
                                     </div>
                                 </div>
                                 <div class="mt-3 grid grid-cols-2 gap-3">
                                     <div class="flex items-center gap-1">
                                         @svg('heroicon-o-heart', 'w-4 h-4 text-pink-500')
-                                        <span class="text-sm text-[var(--ui-muted)]">{{ number_format($latestInsights->likes ?? 0) }}</span>
+                                        <span class="text-sm text-[color:var(--nx-muted)]">{{ number_format($latestInsights->likes ?? 0) }}</span>
                                     </div>
                                     <div class="flex items-center gap-1">
                                         @svg('heroicon-o-chat-bubble-left', 'w-4 h-4 text-blue-500')
-                                        <span class="text-sm text-[var(--ui-muted)]">{{ number_format($latestInsights->comments ?? 0) }}</span>
+                                        <span class="text-sm text-[color:var(--nx-muted)]">{{ number_format($latestInsights->comments ?? 0) }}</span>
                                     </div>
                                     <div class="flex items-center gap-1">
                                         @svg('heroicon-o-bookmark', 'w-4 h-4 text-amber-500')
-                                        <span class="text-sm text-[var(--ui-muted)]">{{ number_format($latestInsights->saves ?? 0) }}</span>
+                                        <span class="text-sm text-[color:var(--nx-muted)]">{{ number_format($latestInsights->saves ?? 0) }}</span>
                                     </div>
                                     <div class="flex items-center gap-1">
                                         @svg('heroicon-o-share', 'w-4 h-4 text-green-500')
-                                        <span class="text-sm text-[var(--ui-muted)]">{{ number_format($latestInsights->shares ?? 0) }}</span>
+                                        <span class="text-sm text-[color:var(--nx-muted)]">{{ number_format($latestInsights->shares ?? 0) }}</span>
                                     </div>
                                 </div>
-                            </div>
+                            </x-nx-card>
 
-                            <div class="bg-[var(--ui-muted-5)] rounded-xl p-4">
-                                <div class="flex items-center justify-between h-full">
+                            <x-nx-card>
+                                <div class="flex h-full items-center justify-between">
                                     <div>
-                                        <h4 class="text-sm font-medium text-[var(--ui-muted)]">Profilaufrufe</h4>
-                                        <p class="text-2xl font-bold text-[var(--ui-secondary)] mt-1">{{ number_format($latestInsights->profile_views ?? 0) }}</p>
+                                        <h4 class="text-sm font-medium text-[color:var(--nx-muted)]">Profilaufrufe</h4>
+                                        <p class="mt-1 text-2xl font-bold text-[color:var(--nx-text)]">{{ number_format($latestInsights->profile_views ?? 0) }}</p>
                                     </div>
-                                    <div class="flex items-center text-[var(--ui-muted)]">
+                                    <div class="flex items-center text-[color:var(--nx-faint)]">
                                         @svg('heroicon-o-user', 'w-5 h-5')
                                     </div>
                                 </div>
-                            </div>
+                            </x-nx-card>
                         </div>
                     </div>
-                    
+
                     {{-- Engagement Rate --}}
                     <div class="lg:col-span-1">
-                        <h3 class="text-base font-semibold text-[var(--ui-secondary)] flex items-center gap-2 mb-4">
-                            @svg('heroicon-o-chart-bar', 'w-5 h-5 text-purple-500')
+                        <h3 class="mb-4 flex items-center gap-2 text-base font-semibold text-[color:var(--nx-text)]">
+                            @svg('heroicon-o-chart-bar', 'w-5 h-5 text-[color:var(--nx-faint)]')
                             Engagement Rate
                         </h3>
-                        
+
                         <div class="space-y-4">
-                            <div class="bg-[var(--ui-muted-5)] rounded-xl p-4">
-                                <div class="flex items-center justify-between h-full">
+                            <x-nx-card>
+                                <div class="flex h-full items-center justify-between">
                                     <div>
-                                        <h4 class="text-sm font-medium text-[var(--ui-muted)]">Durchschnittlich</h4>
+                                        <h4 class="text-sm font-medium text-[color:var(--nx-muted)]">Durchschnittlich</h4>
                                         @php
                                             $followers = $latestInsights->current_followers ?? $latestInsights->follower_count ?? 0;
                                             $totalEngagements = ($latestInsights->likes ?? 0) + ($latestInsights->comments ?? 0) + ($latestInsights->saves ?? 0) + ($latestInsights->shares ?? 0);
                                             $engagementRate = $followers > 0 ? ($totalEngagements / $followers) * 100 : 0;
                                         @endphp
-                                        <p class="text-2xl font-bold text-[var(--ui-secondary)] mt-1">
+                                        <p class="mt-1 text-2xl font-bold text-[color:var(--nx-text)]">
                                             {{ number_format($engagementRate, 1) }}%
                                         </p>
                                     </div>
-                                    <div class="flex items-center text-purple-600">
+                                    <div class="flex items-center text-[color:var(--nx-faint)]">
                                         @svg('heroicon-o-arrow-trending-up', 'w-5 h-5')
-                                        <span class="text-xs ml-1">pro Follower</span>
+                                        <span class="ml-1 text-xs">pro Follower</span>
                                     </div>
                                 </div>
-                                <div class="mt-3 grid grid-cols-2 gap-2 text-xs text-[var(--ui-muted)]">
+                                <div class="mt-3 grid grid-cols-2 gap-2 text-xs text-[color:var(--nx-faint)]">
                                     <div>Engagements: {{ number_format($totalEngagements) }}</div>
                                     <div>Follower: {{ number_format($followers) }}</div>
                                 </div>
-                            </div>
+                            </x-nx-card>
                         </div>
                     </div>
                 </div>
-            </div>
+            </x-nx-section>
         @endif
 
         {{-- Hashtag Section --}}
         @if($topHashtags->count() > 0)
-            <div class="bg-white rounded-xl border border-[var(--ui-border)]/60 shadow-sm p-6">
-                {{-- Header --}}
-                <div class="flex items-center justify-between mb-6">
-                    <div>
-                        <div class="flex items-center gap-2">
-                            @svg('heroicon-o-hashtag', 'w-6 h-6 text-[var(--ui-muted)]')
-                            <h2 class="text-2xl font-bold text-[var(--ui-secondary)]">Top Hashtags</h2>
-                        </div>
-                        <p class="text-[var(--ui-muted)] text-sm">Am häufigsten verwendete Hashtags in deinen Posts</p>
-                    </div>
-                    <span class="px-4 py-2 bg-[var(--ui-muted-5)] text-[var(--ui-secondary)] rounded-full text-sm font-medium">
-                        {{ $topHashtags->count() }} Hashtags
-                    </span>
-                </div>
-
-                {{-- Hashtag Grid --}}
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <x-nx-section icon="heroicon-o-hashtag" title="Top Hashtags" :hint="$topHashtags->count() . ' Hashtags'"
+                          description="Am häufigsten verwendete Hashtags in deinen Posts">
+                <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
                     @foreach ($topHashtags as $hashtag)
-                        <div class="flex items-center justify-between p-4 bg-gradient-to-br from-white to-[var(--ui-muted-5)] rounded-lg border border-[var(--ui-border)]/60 hover:border-purple-200 transition-all duration-200">
+                        <x-nx-card class="flex items-center justify-between">
                             <div class="flex items-center gap-3">
-                                <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-purple-50 text-purple-600 font-semibold">
+                                <div class="flex h-10 w-10 items-center justify-center rounded-[7px] bg-[color:var(--nx-accent-soft)] font-semibold text-[color:var(--nx-muted)]">
                                     #
                                 </div>
                                 <div>
-                                    <p class="font-medium text-[var(--ui-secondary)]">{{ $hashtag['name'] }}</p>
-                                    <p class="text-xs text-[var(--ui-muted)]">
+                                    <p class="font-medium text-[color:var(--nx-text)]">{{ $hashtag['name'] }}</p>
+                                    <p class="text-xs text-[color:var(--nx-faint)]">
                                         {{ $hashtag['usage_count'] > 1 ? $hashtag['usage_count'] . ' Posts' : '1 Post' }}
                                     </p>
                                 </div>
                             </div>
-                            
+
                             {{-- Usage Indicator --}}
                             <div class="flex items-center gap-2">
-                                <div class="w-24 bg-[var(--ui-muted-5)] rounded-full h-2">
+                                <div class="h-2 w-24 rounded-full bg-[color:var(--nx-hover)]">
                                     @php
                                         $maxCount = $topHashtags->max('usage_count');
                                         $percentage = ($hashtag['usage_count'] / $maxCount) * 100;
                                     @endphp
-                                    <div class="bg-purple-500 h-2 rounded-full" 
+                                    <div class="h-2 rounded-full bg-[color:var(--nx-accent)]"
                                          style="width: {{ $percentage }}%">
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </x-nx-card>
                     @endforeach
                 </div>
-            </div>
+            </x-nx-section>
         @endif
 
         {{-- Media Grid --}}
-        <div x-data="{ viewMode: 'grid' }" class="bg-white rounded-xl border border-[var(--ui-border)]/60 shadow-sm p-6">
-            <div class="flex items-center justify-between mb-6">
-                <div>
-                    <h2 class="text-2xl font-bold text-[var(--ui-secondary)]">Media</h2>
-                    <p class="text-[var(--ui-muted)] text-sm">Alle Instagram Posts</p>
-                </div>
-                <div class="flex items-center gap-3">
-                    <span class="px-4 py-2 bg-pink-100 text-pink-700 rounded-full text-sm font-medium">
-                        {{ $media->count() }} Posts
-                    </span>
-                    <button @click="viewMode = viewMode === 'grid' ? 'list' : 'grid'" 
-                            class="p-2 rounded-lg text-[var(--ui-muted)] hover:text-[var(--ui-primary)] hover:bg-[var(--ui-primary-5)] transition-colors duration-200">
-                        @svg('heroicon-o-squares-2x2', 'w-5 h-5', ['x-show' => 'viewMode === "list"'])
-                        @svg('heroicon-o-bars-4', 'w-5 h-5', ['x-show' => 'viewMode === "grid"'])
-                    </button>
-                </div>
-            </div>
+        <x-nx-section x-data="{ viewMode: 'grid' }" icon="heroicon-o-photo" title="Media" :hint="$media->count() . ' Posts'" description="Alle Instagram Posts">
+            <x-slot name="action">
+                <x-nx-button variant="ghost" size="sm" icon @click="viewMode = viewMode === 'grid' ? 'list' : 'grid'">
+                    @svg('heroicon-o-squares-2x2', 'w-5 h-5', ['x-show' => 'viewMode === "list"'])
+                    @svg('heroicon-o-bars-4', 'w-5 h-5', ['x-show' => 'viewMode === "grid"'])
+                </x-nx-button>
+            </x-slot>
 
             {{-- Grid View --}}
-            <div x-show="viewMode === 'grid'" 
+            <div x-show="viewMode === 'grid'"
                  class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
                 @foreach($media as $mediaItem)
-                    <div class="group border border-[var(--ui-border)]/60 rounded-lg overflow-hidden hover:border-[var(--ui-primary)]/60 transition-colors">
+                    <x-nx-card flush class="group overflow-hidden transition-colors hover:bg-[color:var(--nx-hover)]">
                         {{-- Post Header --}}
-                        <div class="p-2 flex items-center gap-2 border-b border-[var(--ui-border)]/60">
-                            <div class="w-4 h-4 rounded-full bg-[var(--ui-primary-5)] flex items-center justify-center">
-                                @svg('heroicon-o-camera', 'w-3 h-3 text-[var(--ui-primary)]')
+                        <div class="flex items-center gap-2 border-b border-[color:var(--nx-line)] p-2">
+                            <div class="flex h-4 w-4 items-center justify-center rounded-full bg-[color:var(--nx-accent-soft)]">
+                                @svg('heroicon-o-camera', 'w-3 h-3 text-[color:var(--nx-muted)]')
                             </div>
                             <div class="flex items-center gap-2">
-                                <p class="text-xs font-medium text-[var(--ui-secondary)] truncate">
+                                <p class="truncate text-xs font-medium text-[color:var(--nx-text)]">
                                     {{ $instagramAccount->username }}
                                 </p>
                                 @if($mediaItem->contextFiles->count() > 1)
-                                    <div class="flex items-center gap-1 text-[var(--ui-muted)]">
+                                    <div class="flex items-center gap-1 text-[color:var(--nx-faint)]">
                                         @svg('heroicon-o-squares-2x2', 'w-3 h-3')
                                         <span class="text-xs">{{ $mediaItem->contextFiles->count() }}</span>
                                     </div>
@@ -635,10 +496,10 @@
                         </div>
 
                         {{-- Media Content --}}
-                        <div class="relative bg-[var(--ui-muted-5)] aspect-square overflow-hidden">
+                        <div class="relative bg-[color:var(--nx-hover)] aspect-square overflow-hidden">
                             @if($mediaItem->media_type === 'CAROUSEL_ALBUM' && $mediaItem->contextFiles->where('meta.role', 'carousel')->count() > 0)
                                 {{-- Carousel Album --}}
-                                @php 
+                                @php
                                     $carouselItems = $mediaItem->contextFiles->where('meta.role', 'carousel')->sortBy(function($file) {
                                         return $file->meta['carousel_index'] ?? 999;
                                     });
@@ -665,7 +526,7 @@
                                             @endif
                                         </div>
                                     @endforeach
-                                    
+
                                     @if($carouselItems->count() > 1)
                                         {{-- Navigation Arrows --}}
                                         <button @click="activeIndex = activeIndex === 0 ? {{ $carouselItems->count() - 1 }} : activeIndex - 1"
@@ -676,7 +537,7 @@
                                                 class="absolute right-1 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-1 transition-colors opacity-0 group-hover:opacity-100 z-10">
                                             @svg('heroicon-o-chevron-right', 'w-4 h-4')
                                         </button>
-                                        
+
                                         {{-- Dots Indicator --}}
                                         <div class="absolute bottom-1 left-1/2 -translate-x-1/2 flex gap-1 z-10">
                                             @foreach($carouselItems as $index => $item)
@@ -709,7 +570,7 @@
                             </div>
 
                             {{-- Post Stats --}}
-                            <div class="border-t border-[var(--ui-border)]/60 bg-white">
+                            <div class="border-t border-[color:var(--nx-line)] bg-[color:var(--nx-surface)]">
                                 <div class="px-3 py-2 flex items-center justify-between">
                                     <div class="flex items-center gap-2">
                                         <div class="flex items-center gap-1">
@@ -717,34 +578,34 @@
                                             <span class="text-sm font-medium">{{ number_format($mediaItem->like_count) }}</span>
                                         </div>
                                         <div class="flex items-center gap-1">
-                                            @svg('heroicon-o-chat-bubble-left', 'w-4 h-4 text-[var(--ui-muted)]')
-                                            <span class="text-sm font-medium text-[var(--ui-secondary)]">{{ number_format($mediaItem->comments_count) }}</span>
+                                            @svg('heroicon-o-chat-bubble-left', 'w-4 h-4 text-[color:var(--nx-faint)]')
+                                            <span class="text-sm font-medium text-[color:var(--nx-text)]">{{ number_format($mediaItem->comments_count) }}</span>
                                         </div>
                                     </div>
                                     @if($mediaItem->timestamp)
-                                        <span class="text-xs text-[var(--ui-muted)]">{{ $mediaItem->timestamp->format('d.m.Y') }}</span>
+                                        <span class="text-xs text-[color:var(--nx-faint)]">{{ $mediaItem->timestamp->format('d.m.Y') }}</span>
                                     @endif
                                 </div>
                                 @if($mediaItem->caption)
-                                    <div class="px-3 py-2 border-t border-[var(--ui-border)]/40">
-                                        <p class="text-sm text-[var(--ui-secondary)] whitespace-pre-line line-clamp-2">{{ $mediaItem->caption }}</p>
+                                    <div class="px-3 py-2 border-t border-[color:var(--nx-line)]">
+                                        <p class="text-sm text-[color:var(--nx-text)] whitespace-pre-line line-clamp-2">{{ $mediaItem->caption }}</p>
                                     </div>
                                 @endif
                         </div>
-                    </div>
+                    </x-nx-card>
                 @endforeach
             </div>
 
             {{-- List View --}}
             <div x-show="viewMode === 'list'" class="space-y-4">
                 @foreach($media as $mediaItem)
-                    <div class="group border border-[var(--ui-border)]/60 rounded-lg overflow-hidden">
+                    <x-nx-card flush class="group overflow-hidden">
                         <div class="grid grid-cols-3">
                             {{-- Media Preview --}}
-                            <div class="relative bg-[var(--ui-muted-5)] aspect-square overflow-hidden">
+                            <div class="relative bg-[color:var(--nx-hover)] aspect-square overflow-hidden">
                                 @if($mediaItem->media_type === 'CAROUSEL_ALBUM' && $mediaItem->contextFiles->where('meta.role', 'carousel')->count() > 0)
                                     {{-- Carousel Album --}}
-                                    @php 
+                                    @php
                                         $carouselItems = $mediaItem->contextFiles->where('meta.role', 'carousel')->sortBy(function($file) {
                                             return $file->meta['carousel_index'] ?? 999;
                                         });
@@ -773,7 +634,7 @@
                                                 @endif
                                             </div>
                                         @endforeach
-                                        
+
                                         @if($carouselItems->count() > 1)
                                             {{-- Navigation Arrows --}}
                                             <button @click="activeIndex = activeIndex === 0 ? {{ $carouselItems->count() - 1 }} : activeIndex - 1"
@@ -784,7 +645,7 @@
                                                     class="absolute right-1 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-1 transition-colors opacity-0 group-hover:opacity-100 z-10">
                                                 @svg('heroicon-o-chevron-right', 'w-4 h-4')
                                             </button>
-                                            
+
                                             {{-- Dots Indicator --}}
                                             <div class="absolute bottom-1 left-1/2 -translate-x-1/2 flex gap-1 z-10">
                                                 @foreach($carouselItems as $index => $item)
@@ -819,16 +680,16 @@
                             {{-- Content --}}
                             <div class="col-span-2 p-4">
                                 {{-- Header --}}
-                                <div class="flex items-center gap-2 mb-3">
-                                    <div class="w-4 h-4 rounded-full bg-[var(--ui-primary-5)] flex items-center justify-center">
-                                        @svg('heroicon-o-camera', 'w-3 h-3 text-[var(--ui-primary)]')
+                                <div class="mb-3 flex items-center gap-2">
+                                    <div class="flex h-4 w-4 items-center justify-center rounded-full bg-[color:var(--nx-accent-soft)]">
+                                        @svg('heroicon-o-camera', 'w-3 h-3 text-[color:var(--nx-muted)]')
                                     </div>
                                     <div class="flex items-center gap-2">
-                                        <p class="text-xs font-medium text-[var(--ui-secondary)] truncate">
+                                        <p class="truncate text-xs font-medium text-[color:var(--nx-text)]">
                                             {{ $instagramAccount->username }}
                                         </p>
                                         @if($mediaItem->contextFiles->count() > 1)
-                                            <div class="flex items-center gap-1 text-[var(--ui-muted)]">
+                                            <div class="flex items-center gap-1 text-[color:var(--nx-faint)]">
                                                 @svg('heroicon-o-squares-2x2', 'w-3 h-3')
                                                 <span class="text-xs">{{ $mediaItem->contextFiles->count() }}</span>
                                             </div>
@@ -838,7 +699,7 @@
 
                                 {{-- Caption --}}
                                 @if($mediaItem->caption)
-                                    <p class="text-sm text-[var(--ui-secondary)] whitespace-pre-line line-clamp-3 mb-4">{{ $mediaItem->caption }}</p>
+                                    <p class="mb-4 line-clamp-3 whitespace-pre-line text-sm text-[color:var(--nx-text)]">{{ $mediaItem->caption }}</p>
                                 @endif
 
                                 {{-- Stats --}}
@@ -848,68 +709,56 @@
                                         <span class="text-sm font-medium">{{ number_format($mediaItem->like_count) }}</span>
                                     </div>
                                     <div class="flex items-center gap-1">
-                                        @svg('heroicon-o-chat-bubble-left', 'w-4 h-4 text-[var(--ui-muted)]')
-                                        <span class="text-sm font-medium text-[var(--ui-secondary)]">{{ number_format($mediaItem->comments_count) }}</span>
+                                        @svg('heroicon-o-chat-bubble-left', 'w-4 h-4 text-[color:var(--nx-faint)]')
+                                        <span class="text-sm font-medium text-[color:var(--nx-text)]">{{ number_format($mediaItem->comments_count) }}</span>
                                     </div>
                                     @if($mediaItem->timestamp)
-                                        <span class="text-xs text-[var(--ui-muted)]">{{ $mediaItem->timestamp->format('d.m.Y') }}</span>
+                                        <span class="text-xs text-[color:var(--nx-faint)]">{{ $mediaItem->timestamp->format('d.m.Y') }}</span>
                                     @endif
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </x-nx-card>
                 @endforeach
             </div>
-        </div>
+        </x-nx-section>
     </x-ui-page-container>
 
     <x-slot name="sidebar">
         <x-ui-page-sidebar title="Instagram Account Details" width="w-80" :defaultOpen="true">
-            <div class="p-6 space-y-6">
+            <div class="p-5 space-y-5">
                 {{-- Details --}}
                 <div>
-                    <h3 class="text-xs font-semibold uppercase tracking-wide text-[var(--ui-muted)] mb-3">Details</h3>
-                    <div class="space-y-2">
-                        <div class="flex justify-between items-center py-2 px-3 bg-[var(--ui-muted-5)] border border-[var(--ui-border)]/40 rounded-lg">
-                            <span class="text-sm text-[var(--ui-muted)]">Username</span>
-                            <span class="text-sm text-[var(--ui-secondary)] font-medium">
-                                {{ $instagramAccount->username }}
-                            </span>
+                    <h3 class="mb-2.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-[color:var(--nx-faint)]">Details</h3>
+                    <div class="overflow-hidden rounded-[8px] border border-[color:var(--nx-line)] bg-[color:var(--nx-surface)] divide-y divide-[color:var(--nx-line)]">
+                        <div class="flex items-center justify-between gap-3 px-3 py-2">
+                            <span class="shrink-0 text-[13px] text-[color:var(--nx-faint)]">Username</span>
+                            <span class="min-w-0 truncate text-right text-[13px] text-[color:var(--nx-text)]">{{ $instagramAccount->username }}</span>
                         </div>
-                        <div class="flex justify-between items-center py-2 px-3 bg-[var(--ui-muted-5)] border border-[var(--ui-border)]/40 rounded-lg">
-                            <span class="text-sm text-[var(--ui-muted)]">External ID</span>
-                            <span class="text-sm text-[var(--ui-secondary)] font-medium">
-                                {{ $instagramAccount->external_id }}
-                            </span>
+                        <div class="flex items-center justify-between gap-3 px-3 py-2">
+                            <span class="shrink-0 text-[13px] text-[color:var(--nx-faint)]">External ID</span>
+                            <span class="min-w-0 truncate text-right text-[13px] text-[color:var(--nx-text)]">{{ $instagramAccount->external_id }}</span>
                         </div>
-                        <div class="flex justify-between items-center py-2 px-3 bg-[var(--ui-muted-5)] border border-[var(--ui-border)]/40 rounded-lg">
-                            <span class="text-sm text-[var(--ui-muted)]">Erstellt</span>
-                            <span class="text-sm text-[var(--ui-secondary)] font-medium">
-                                {{ $instagramAccount->created_at->format('d.m.Y') }}
-                            </span>
+                        <div class="flex items-center justify-between gap-3 px-3 py-2">
+                            <span class="shrink-0 text-[13px] text-[color:var(--nx-faint)]">Erstellt</span>
+                            <span class="min-w-0 truncate text-right text-[13px] text-[color:var(--nx-text)]">{{ $instagramAccount->created_at->format('d.m.Y') }}</span>
                         </div>
                         @if($instagramAccount->brand)
-                            <div class="flex justify-between items-center py-2 px-3 bg-[var(--ui-muted-5)] border border-[var(--ui-border)]/40 rounded-lg">
-                                <span class="text-sm text-[var(--ui-muted)]">Marke</span>
-                                <a href="{{ route('brands.brands.show', $instagramAccount->brand) }}" class="text-sm text-[var(--ui-primary)] font-medium hover:underline">
-                                    {{ $instagramAccount->brand->name }}
-                                </a>
+                            <div class="flex items-center justify-between gap-3 px-3 py-2">
+                                <span class="shrink-0 text-[13px] text-[color:var(--nx-faint)]">Marke</span>
+                                <a href="{{ route('brands.brands.show', $instagramAccount->brand) }}" class="min-w-0 truncate text-right text-[13px] text-[color:var(--nx-info)] hover:underline">{{ $instagramAccount->brand->name }}</a>
                             </div>
                         @endif
                         @if($instagramAccount->facebookPage)
-                            <div class="flex justify-between items-center py-2 px-3 bg-[var(--ui-muted-5)] border border-[var(--ui-border)]/40 rounded-lg">
-                                <span class="text-sm text-[var(--ui-muted)]">Facebook Page</span>
-                                <a href="{{ route('brands.facebook-pages.show', $instagramAccount->facebookPage) }}" class="text-sm text-[var(--ui-primary)] font-medium hover:underline">
-                                    {{ $instagramAccount->facebookPage->name }}
-                                </a>
+                            <div class="flex items-center justify-between gap-3 px-3 py-2">
+                                <span class="shrink-0 text-[13px] text-[color:var(--nx-faint)]">Facebook Page</span>
+                                <a href="{{ route('brands.facebook-pages.show', $instagramAccount->facebookPage) }}" class="min-w-0 truncate text-right text-[13px] text-[color:var(--nx-info)] hover:underline">{{ $instagramAccount->facebookPage->name }}</a>
                             </div>
                         @endif
                         @if($media->count() > 0)
-                            <div class="flex justify-between items-center py-2 px-3 bg-[var(--ui-muted-5)] border border-[var(--ui-border)]/40 rounded-lg">
-                                <span class="text-sm text-[var(--ui-muted)]">Posts</span>
-                                <span class="text-sm text-[var(--ui-secondary)] font-medium">
-                                    {{ $media->count() }}
-                                </span>
+                            <div class="flex items-center justify-between gap-3 px-3 py-2">
+                                <span class="shrink-0 text-[13px] text-[color:var(--nx-faint)]">Posts</span>
+                                <span class="min-w-0 truncate text-right text-[13px] text-[color:var(--nx-text)]">{{ $media->count() }}</span>
                             </div>
                         @endif
                     </div>
@@ -918,4 +767,6 @@
             </div>
         </x-ui-page-sidebar>
     </x-slot>
+
+    <x-slot name="activity">@include('brands::partials.board-activity')</x-slot>
 </x-ui-page>

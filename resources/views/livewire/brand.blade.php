@@ -11,27 +11,27 @@
             {{-- Left: Settings & Export --}}
             <x-slot name="left">
                 @can('update', $brand)
-                    <x-ui-button variant="ghost" size="sm" @click="$dispatch('open-modal-brand-settings', { brandId: {{ $brand->id }} })">
+                    <x-nx-button variant="ghost" size="sm" @click="$dispatch('open-modal-brand-settings', { brandId: {{ $brand->id }} })">
                         @svg('heroicon-o-cog-6-tooth', 'w-4 h-4')
                         <span>Einstellungen</span>
-                    </x-ui-button>
+                    </x-nx-button>
                 @endcan
                 <a href="{{ route('brands.export.show', $brand) }}" wire:navigate>
-                    <x-ui-button variant="ghost" size="sm">
+                    <x-nx-button variant="ghost" size="sm">
                         @svg('heroicon-o-arrow-down-tray', 'w-4 h-4')
                         <span>Export</span>
-                    </x-ui-button>
+                    </x-nx-button>
                 </a>
             </x-slot>
 
             {{-- Right: Board erstellen Dropdown --}}
             @can('update', $brand)
                 <div class="relative" x-data="{ open: false }">
-                    <x-ui-button variant="primary" size="sm" @click="open = !open">
+                    <x-nx-button variant="primary" size="sm" @click="open = !open">
                         @svg('heroicon-o-plus', 'w-4 h-4')
                         <span>Board erstellen</span>
                         @svg('heroicon-o-chevron-down', 'w-4 h-4')
-                    </x-ui-button>
+                    </x-nx-button>
 
                     <div
                         x-show="open"
@@ -42,61 +42,61 @@
                         x-transition:leave="transition ease-in duration-75"
                         x-transition:leave-start="transform opacity-100 scale-100"
                         x-transition:leave-end="transform opacity-0 scale-95"
-                        class="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-[var(--ui-border)]/60 z-10 overflow-hidden"
+                        class="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-[var(--nx-line)]/60 z-10 overflow-hidden"
                         style="display: none;"
                     >
                         <div class="py-1 max-h-96 overflow-y-auto">
-                            <button wire:click="createSocialBoard" @click="open = false" class="w-full text-left px-4 py-2.5 text-sm text-[var(--ui-secondary)] hover:bg-[var(--ui-muted-5)] transition-colors flex items-center gap-3">
+                            <button wire:click="createSocialBoard" @click="open = false" class="w-full text-left px-4 py-2.5 text-sm text-[var(--nx-text)] hover:bg-[var(--nx-hover)] transition-colors flex items-center gap-3">
                                 <div class="flex items-center justify-center w-8 h-8 rounded-md bg-purple-50">@svg('heroicon-o-share', 'w-4 h-4 text-purple-600')</div>
-                                <div><div class="font-medium">Social Board</div><div class="text-xs text-[var(--ui-muted)]">Für Social Media</div></div>
+                                <div><div class="font-medium">Social Board</div><div class="text-xs text-[var(--nx-faint)]">Für Social Media</div></div>
                             </button>
-                            <button wire:click="createCiBoard" @click="open = false" class="w-full text-left px-4 py-2.5 text-sm text-[var(--ui-secondary)] hover:bg-[var(--ui-muted-5)] transition-colors flex items-center gap-3">
+                            <button wire:click="createCiBoard" @click="open = false" class="w-full text-left px-4 py-2.5 text-sm text-[var(--nx-text)] hover:bg-[var(--nx-hover)] transition-colors flex items-center gap-3">
                                 <div class="flex items-center justify-center w-8 h-8 rounded-md bg-amber-50">@svg('heroicon-o-paint-brush', 'w-4 h-4 text-amber-600')</div>
-                                <div><div class="font-medium">CI Board</div><div class="text-xs text-[var(--ui-muted)]">Für Corporate Identity</div></div>
+                                <div><div class="font-medium">CI Board</div><div class="text-xs text-[var(--nx-faint)]">Für Corporate Identity</div></div>
                             </button>
-                            <button wire:click="createKanbanBoard" @click="open = false" class="w-full text-left px-4 py-2.5 text-sm text-[var(--ui-secondary)] hover:bg-[var(--ui-muted-5)] transition-colors flex items-center gap-3">
+                            <button wire:click="createKanbanBoard" @click="open = false" class="w-full text-left px-4 py-2.5 text-sm text-[var(--nx-text)] hover:bg-[var(--nx-hover)] transition-colors flex items-center gap-3">
                                 <div class="flex items-center justify-center w-8 h-8 rounded-md bg-indigo-50">@svg('heroicon-o-view-columns', 'w-4 h-4 text-indigo-600')</div>
-                                <div><div class="font-medium">Kanban Board</div><div class="text-xs text-[var(--ui-muted)]">Für Aufgabenverwaltung</div></div>
+                                <div><div class="font-medium">Kanban Board</div><div class="text-xs text-[var(--nx-faint)]">Für Aufgabenverwaltung</div></div>
                             </button>
-                            <button wire:click="createTypographyBoard" @click="open = false" class="w-full text-left px-4 py-2.5 text-sm text-[var(--ui-secondary)] hover:bg-[var(--ui-muted-5)] transition-colors flex items-center gap-3">
+                            <button wire:click="createTypographyBoard" @click="open = false" class="w-full text-left px-4 py-2.5 text-sm text-[var(--nx-text)] hover:bg-[var(--nx-hover)] transition-colors flex items-center gap-3">
                                 <div class="flex items-center justify-center w-8 h-8 rounded-md bg-rose-50">@svg('heroicon-o-language', 'w-4 h-4 text-rose-600')</div>
-                                <div><div class="font-medium">Typografie Board</div><div class="text-xs text-[var(--ui-muted)]">Schriften & Hierarchien</div></div>
+                                <div><div class="font-medium">Typografie Board</div><div class="text-xs text-[var(--nx-faint)]">Schriften & Hierarchien</div></div>
                             </button>
-                            <button wire:click="createLogoBoard" @click="open = false" class="w-full text-left px-4 py-2.5 text-sm text-[var(--ui-secondary)] hover:bg-[var(--ui-muted-5)] transition-colors flex items-center gap-3">
+                            <button wire:click="createLogoBoard" @click="open = false" class="w-full text-left px-4 py-2.5 text-sm text-[var(--nx-text)] hover:bg-[var(--nx-hover)] transition-colors flex items-center gap-3">
                                 <div class="flex items-center justify-center w-8 h-8 rounded-md bg-emerald-50">@svg('heroicon-o-photo', 'w-4 h-4 text-emerald-600')</div>
-                                <div><div class="font-medium">Logo Board</div><div class="text-xs text-[var(--ui-muted)]">Logo-Varianten verwalten</div></div>
+                                <div><div class="font-medium">Logo Board</div><div class="text-xs text-[var(--nx-faint)]">Logo-Varianten verwalten</div></div>
                             </button>
-                            <button wire:click="createToneOfVoiceBoard" @click="open = false" class="w-full text-left px-4 py-2.5 text-sm text-[var(--ui-secondary)] hover:bg-[var(--ui-muted-5)] transition-colors flex items-center gap-3">
+                            <button wire:click="createToneOfVoiceBoard" @click="open = false" class="w-full text-left px-4 py-2.5 text-sm text-[var(--nx-text)] hover:bg-[var(--nx-hover)] transition-colors flex items-center gap-3">
                                 <div class="flex items-center justify-center w-8 h-8 rounded-md bg-violet-50">@svg('heroicon-o-megaphone', 'w-4 h-4 text-violet-600')</div>
-                                <div><div class="font-medium">Tone of Voice Board</div><div class="text-xs text-[var(--ui-muted)]">Markenstimme & Messaging</div></div>
+                                <div><div class="font-medium">Tone of Voice Board</div><div class="text-xs text-[var(--nx-faint)]">Markenstimme & Messaging</div></div>
                             </button>
-                            <button wire:click="createPersonaBoard" @click="open = false" class="w-full text-left px-4 py-2.5 text-sm text-[var(--ui-secondary)] hover:bg-[var(--ui-muted-5)] transition-colors flex items-center gap-3">
+                            <button wire:click="createPersonaBoard" @click="open = false" class="w-full text-left px-4 py-2.5 text-sm text-[var(--nx-text)] hover:bg-[var(--nx-hover)] transition-colors flex items-center gap-3">
                                 <div class="flex items-center justify-center w-8 h-8 rounded-md bg-teal-50">@svg('heroicon-o-user-group', 'w-4 h-4 text-teal-600')</div>
-                                <div><div class="font-medium">Persona Board</div><div class="text-xs text-[var(--ui-muted)]">Zielgruppen & Personas</div></div>
+                                <div><div class="font-medium">Persona Board</div><div class="text-xs text-[var(--nx-faint)]">Zielgruppen & Personas</div></div>
                             </button>
-                            <button wire:click="createCompetitorBoard" @click="open = false" class="w-full text-left px-4 py-2.5 text-sm text-[var(--ui-secondary)] hover:bg-[var(--ui-muted-5)] transition-colors flex items-center gap-3">
+                            <button wire:click="createCompetitorBoard" @click="open = false" class="w-full text-left px-4 py-2.5 text-sm text-[var(--nx-text)] hover:bg-[var(--nx-hover)] transition-colors flex items-center gap-3">
                                 <div class="flex items-center justify-center w-8 h-8 rounded-md bg-orange-50">@svg('heroicon-o-scale', 'w-4 h-4 text-orange-600')</div>
-                                <div><div class="font-medium">Wettbewerber Board</div><div class="text-xs text-[var(--ui-muted)]">Wettbewerber-Analyse</div></div>
+                                <div><div class="font-medium">Wettbewerber Board</div><div class="text-xs text-[var(--nx-faint)]">Wettbewerber-Analyse</div></div>
                             </button>
-                            <button wire:click="createGuidelineBoard" @click="open = false" class="w-full text-left px-4 py-2.5 text-sm text-[var(--ui-secondary)] hover:bg-[var(--ui-muted-5)] transition-colors flex items-center gap-3">
+                            <button wire:click="createGuidelineBoard" @click="open = false" class="w-full text-left px-4 py-2.5 text-sm text-[var(--nx-text)] hover:bg-[var(--nx-hover)] transition-colors flex items-center gap-3">
                                 <div class="flex items-center justify-center w-8 h-8 rounded-md bg-cyan-50">@svg('heroicon-o-book-open', 'w-4 h-4 text-cyan-600')</div>
-                                <div><div class="font-medium">Guidelines Board</div><div class="text-xs text-[var(--ui-muted)]">Markenregeln & Dos/Don'ts</div></div>
+                                <div><div class="font-medium">Guidelines Board</div><div class="text-xs text-[var(--nx-faint)]">Markenregeln & Dos/Don'ts</div></div>
                             </button>
-                            <button wire:click="createMoodboardBoard" @click="open = false" class="w-full text-left px-4 py-2.5 text-sm text-[var(--ui-secondary)] hover:bg-[var(--ui-muted-5)] transition-colors flex items-center gap-3">
+                            <button wire:click="createMoodboardBoard" @click="open = false" class="w-full text-left px-4 py-2.5 text-sm text-[var(--nx-text)] hover:bg-[var(--nx-hover)] transition-colors flex items-center gap-3">
                                 <div class="flex items-center justify-center w-8 h-8 rounded-md bg-rose-50">@svg('heroicon-o-photo', 'w-4 h-4 text-rose-600')</div>
-                                <div><div class="font-medium">Moodboard</div><div class="text-xs text-[var(--ui-muted)]">Bildsprache & Stilrichtung</div></div>
+                                <div><div class="font-medium">Moodboard</div><div class="text-xs text-[var(--nx-faint)]">Bildsprache & Stilrichtung</div></div>
                             </button>
-                            <button wire:click="createAssetBoard" @click="open = false" class="w-full text-left px-4 py-2.5 text-sm text-[var(--ui-secondary)] hover:bg-[var(--ui-muted-5)] transition-colors flex items-center gap-3">
+                            <button wire:click="createAssetBoard" @click="open = false" class="w-full text-left px-4 py-2.5 text-sm text-[var(--nx-text)] hover:bg-[var(--nx-hover)] transition-colors flex items-center gap-3">
                                 <div class="flex items-center justify-center w-8 h-8 rounded-md bg-sky-50">@svg('heroicon-o-folder-open', 'w-4 h-4 text-sky-600')</div>
-                                <div><div class="font-medium">Asset Board</div><div class="text-xs text-[var(--ui-muted)]">Templates & Brand Assets</div></div>
+                                <div><div class="font-medium">Asset Board</div><div class="text-xs text-[var(--nx-faint)]">Templates & Brand Assets</div></div>
                             </button>
-                            <button wire:click="createSeoBoard" @click="open = false" class="w-full text-left px-4 py-2.5 text-sm text-[var(--ui-secondary)] hover:bg-[var(--ui-muted-5)] transition-colors flex items-center gap-3">
+                            <button wire:click="createSeoBoard" @click="open = false" class="w-full text-left px-4 py-2.5 text-sm text-[var(--nx-text)] hover:bg-[var(--nx-hover)] transition-colors flex items-center gap-3">
                                 <div class="flex items-center justify-center w-8 h-8 rounded-md bg-lime-50">@svg('heroicon-o-magnifying-glass', 'w-4 h-4 text-lime-600')</div>
-                                <div><div class="font-medium">SEO Board</div><div class="text-xs text-[var(--ui-muted)]">Keyword-Recherche</div></div>
+                                <div><div class="font-medium">SEO Board</div><div class="text-xs text-[var(--nx-faint)]">Keyword-Recherche</div></div>
                             </button>
-                            <button wire:click="createContentBriefBoard" @click="open = false" class="w-full text-left px-4 py-2.5 text-sm text-[var(--ui-secondary)] hover:bg-[var(--ui-muted-5)] transition-colors flex items-center gap-3">
+                            <button wire:click="createContentBriefBoard" @click="open = false" class="w-full text-left px-4 py-2.5 text-sm text-[var(--nx-text)] hover:bg-[var(--nx-hover)] transition-colors flex items-center gap-3">
                                 <div class="flex items-center justify-center w-8 h-8 rounded-md bg-fuchsia-50">@svg('heroicon-o-document-magnifying-glass', 'w-4 h-4 text-fuchsia-600')</div>
-                                <div><div class="font-medium">Content Brief Board</div><div class="text-xs text-[var(--ui-muted)]">Content-Planung</div></div>
+                                <div><div class="font-medium">Content Brief Board</div><div class="text-xs text-[var(--nx-faint)]">Content-Planung</div></div>
                             </button>
                         </div>
                     </div>
@@ -591,7 +591,7 @@
                                     <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-[6px] bg-[rgba(25,113,194,.1)]">@svg('heroicon-o-globe-alt', 'w-4 h-4 text-[color:var(--nx-info)]')</span>
                                     <div class="min-w-0 flex-1"><span class="block truncate text-sm font-medium text-[color:var(--nx-text)]">{{ $facebookPage->name }}</span><span class="block text-xs text-[color:var(--nx-faint)]">Facebook Page</span></div>
                                     @can('update', $brand)
-                                        <x-ui-button variant="secondary" size="sm" wire:click="attachFacebookPage({{ $facebookPage->id }})" class="shrink-0">@svg('heroicon-o-plus', 'w-3.5 h-3.5') Verknüpfen</x-ui-button>
+                                        <x-nx-button variant="secondary" size="sm" wire:click="attachFacebookPage({{ $facebookPage->id }})" class="shrink-0">@svg('heroicon-o-plus', 'w-3.5 h-3.5') Verknüpfen</x-nx-button>
                                     @endcan
                                 </div>
                             @endforeach
@@ -600,7 +600,7 @@
                                     <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-[6px] bg-[rgba(224,49,49,.1)]">@svg('heroicon-o-camera', 'w-4 h-4 text-[color:var(--nx-danger)]')</span>
                                     <div class="min-w-0 flex-1"><span class="block truncate text-sm font-medium text-[color:var(--nx-text)]">{{ '@' . $instagramAccount->username }}</span><span class="block text-xs text-[color:var(--nx-faint)]">Instagram</span></div>
                                     @can('update', $brand)
-                                        <x-ui-button variant="secondary" size="sm" wire:click="attachInstagramAccount({{ $instagramAccount->id }})" class="shrink-0">@svg('heroicon-o-plus', 'w-3.5 h-3.5') Verknüpfen</x-ui-button>
+                                        <x-nx-button variant="secondary" size="sm" wire:click="attachInstagramAccount({{ $instagramAccount->id }})" class="shrink-0">@svg('heroicon-o-plus', 'w-3.5 h-3.5') Verknüpfen</x-nx-button>
                                     @endcan
                                 </div>
                             @endforeach
@@ -614,31 +614,21 @@
 
     <x-slot name="sidebar">
         <x-ui-page-sidebar title="Marken-Übersicht" width="w-80" :defaultOpen="true">
-            <div class="p-6 space-y-6">
-                <div class="bg-gradient-to-br from-[var(--ui-primary-5)] to-[var(--ui-primary-10)] rounded-xl p-4 border border-[var(--ui-primary)]/20">
-                    <h3 class="text-xs font-semibold uppercase tracking-wide text-[var(--ui-primary)] mb-4">Dashboard</h3>
+            <div class="p-5 space-y-5">
+                <div>
+                    <h3 class="mb-2.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-[color:var(--nx-faint)]">Dashboard</h3>
                     <div class="space-y-3">
-                        <div class="bg-white/80 backdrop-blur-sm rounded-lg p-3 border border-white/50">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center gap-2">@svg('heroicon-o-squares-2x2', 'w-4 h-4 text-[var(--ui-primary)]')<span class="text-sm font-semibold text-[var(--ui-secondary)]">Boards</span></div>
-                                <span class="text-lg font-bold text-[var(--ui-primary)]">{{ $totalBoards }}</span>
-                            </div>
-                        </div>
+                        <x-nx-stat label="Boards" :value="$totalBoards" icon="heroicon-o-squares-2x2" />
                         @if($accountsCount > 0)
-                            <div class="bg-white/80 backdrop-blur-sm rounded-lg p-3 border border-white/50">
-                                <div class="flex items-center justify-between">
-                                    <div class="flex items-center gap-2">@svg('heroicon-o-share', 'w-4 h-4 text-[var(--ui-primary)]')<span class="text-sm font-semibold text-[var(--ui-secondary)]">Social Accounts</span></div>
-                                    <span class="text-lg font-bold text-[var(--ui-primary)]">{{ $accountsCount }}</span>
-                                </div>
-                            </div>
+                            <x-nx-stat label="Social Accounts" :value="$accountsCount" icon="heroicon-o-share" />
                         @endif
-                        <div class="bg-white/80 backdrop-blur-sm rounded-lg p-3 border border-white/50">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center gap-2">@svg('heroicon-o-link', 'w-4 h-4 text-[var(--ui-primary)]')<span class="text-sm font-semibold text-[var(--ui-secondary)]">Meta Connection</span></div>
+                        <div class="rounded-[8px] border border-[color:var(--nx-line)] bg-[color:var(--nx-surface)] p-4">
+                            <div class="flex items-center justify-between gap-2">
+                                <div class="flex items-center gap-2 text-xs font-medium text-[color:var(--nx-muted)]">@svg('heroicon-o-link', 'w-4 h-4 shrink-0 text-[color:var(--nx-faint)]')<span>Meta Connection</span></div>
                                 @if($metaConnection)
-                                    <span class="inline-flex items-center gap-1.5 text-xs font-medium text-green-600"><span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>Aktiv</span>
+                                    <span class="inline-flex items-center gap-1.5 text-xs font-medium text-[color:var(--nx-success)]"><span class="h-1.5 w-1.5 rounded-full bg-current"></span>Aktiv</span>
                                 @else
-                                    <span class="text-xs font-medium text-[var(--ui-muted)]">Nicht verbunden</span>
+                                    <span class="text-xs font-medium text-[color:var(--nx-faint)]">Nicht verbunden</span>
                                 @endif
                             </div>
                         </div>
@@ -646,28 +636,28 @@
                 </div>
 
                 <div>
-                    <h3 class="text-xs font-semibold uppercase tracking-wide text-[var(--ui-muted)] mb-3">Details</h3>
-                    <div class="space-y-2">
+                    <h3 class="mb-2.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-[color:var(--nx-faint)]">Details</h3>
+                    <div class="overflow-hidden rounded-[8px] border border-[color:var(--nx-line)] bg-[color:var(--nx-surface)] divide-y divide-[color:var(--nx-line)]">
                         @if($verortung)
-                            <div class="flex justify-between items-center py-2 px-3 bg-[var(--ui-muted-5)] border border-[var(--ui-border)]/40">
-                                <span class="text-sm text-[var(--ui-muted)]">Verortung</span>
-                                <span class="text-sm text-[var(--ui-secondary)] font-medium text-right">{{ $verortung['entity'] }}</span>
+                            <div class="flex items-center justify-between gap-3 px-3 py-2">
+                                <span class="shrink-0 text-[13px] text-[color:var(--nx-faint)]">Verortung</span>
+                                <span class="min-w-0 truncate text-right text-[13px] text-[color:var(--nx-text)]">{{ $verortung['entity'] }}</span>
                             </div>
                         @endif
-                        <div class="flex justify-between items-center py-2 px-3 bg-[var(--ui-muted-5)] border border-[var(--ui-border)]/40">
-                            <span class="text-sm text-[var(--ui-muted)]">Erstellt</span>
-                            <span class="text-sm text-[var(--ui-secondary)] font-medium">{{ $brand->created_at->format('d.m.Y') }}</span>
+                        <div class="flex items-center justify-between gap-3 px-3 py-2">
+                            <span class="shrink-0 text-[13px] text-[color:var(--nx-faint)]">Erstellt</span>
+                            <span class="min-w-0 truncate text-right text-[13px] text-[color:var(--nx-text)]">{{ $brand->created_at->format('d.m.Y') }}</span>
                         </div>
                         @if($company)
-                            <div class="flex justify-between items-center py-2 px-3 bg-[var(--ui-muted-5)] border border-[var(--ui-border)]/40">
-                                <span class="text-sm text-[var(--ui-muted)]">Unternehmen</span>
-                                <a href="{{ app(\Platform\Core\Contracts\CrmCompanyResolverInterface::class)->url($company->id) }}" class="text-sm text-[var(--ui-primary)] font-medium hover:underline">{{ app(\Platform\Core\Contracts\CrmCompanyResolverInterface::class)->displayName($company->id) }}</a>
+                            <div class="flex items-center justify-between gap-3 px-3 py-2">
+                                <span class="shrink-0 text-[13px] text-[color:var(--nx-faint)]">Unternehmen</span>
+                                <a href="{{ app(\Platform\Core\Contracts\CrmCompanyResolverInterface::class)->url($company->id) }}" class="min-w-0 truncate text-right text-[13px] text-[color:var(--nx-info)] hover:underline">{{ app(\Platform\Core\Contracts\CrmCompanyResolverInterface::class)->displayName($company->id) }}</a>
                             </div>
                         @endif
                         @if($contact)
-                            <div class="flex justify-between items-center py-2 px-3 bg-[var(--ui-muted-5)] border border-[var(--ui-border)]/40">
-                                <span class="text-sm text-[var(--ui-muted)]">Kontaktperson</span>
-                                <a href="{{ app(\Platform\Core\Contracts\CrmContactResolverInterface::class)->url($contact->id) }}" class="text-sm text-[var(--ui-primary)] font-medium hover:underline">{{ app(\Platform\Core\Contracts\CrmContactResolverInterface::class)->displayName($contact->id) }}</a>
+                            <div class="flex items-center justify-between gap-3 px-3 py-2">
+                                <span class="shrink-0 text-[13px] text-[color:var(--nx-faint)]">Kontaktperson</span>
+                                <a href="{{ app(\Platform\Core\Contracts\CrmContactResolverInterface::class)->url($contact->id) }}" class="min-w-0 truncate text-right text-[13px] text-[color:var(--nx-info)] hover:underline">{{ app(\Platform\Core\Contracts\CrmContactResolverInterface::class)->displayName($contact->id) }}</a>
                             </div>
                         @endif
                     </div>
@@ -676,26 +666,7 @@
         </x-ui-page-sidebar>
     </x-slot>
 
-    <x-slot name="activity">
-        <x-ui-page-sidebar title="Aktivitäten" width="w-80" :defaultOpen="false" storeKey="activityOpen" side="right">
-            <div class="p-6">
-                <h3 class="text-xs font-semibold uppercase tracking-wider text-[var(--ui-muted)] mb-4">Letzte Aktivitäten</h3>
-                <div class="space-y-3">
-                    @forelse(($activities ?? []) as $activity)
-                        <div class="p-3 rounded-lg border border-[var(--ui-border)]/40 bg-[var(--ui-muted-5)]">
-                            <div class="text-sm font-medium text-[var(--ui-secondary)] leading-snug">{{ $activity['title'] ?? 'Aktivität' }}</div>
-                            <div class="flex items-center gap-2 text-xs text-[var(--ui-muted)] mt-1">@svg('heroicon-o-clock', 'w-3 h-3')<span>{{ $activity['time'] ?? '' }}</span></div>
-                        </div>
-                    @empty
-                        <div class="py-8 text-center">
-                            <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-[var(--ui-muted-5)] mb-3">@svg('heroicon-o-clock', 'w-6 h-6 text-[var(--ui-muted)]')</div>
-                            <p class="text-sm text-[var(--ui-muted)]">Noch keine Aktivitäten</p>
-                        </div>
-                    @endforelse
-                </div>
-            </div>
-        </x-ui-page-sidebar>
-    </x-slot>
+    <x-slot name="activity">@include('brands::partials.board-activity')</x-slot>
 
     <livewire:brands.brand-settings-modal/>
     <livewire:brands.facebook-page-modal/>
