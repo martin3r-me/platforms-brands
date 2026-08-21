@@ -43,6 +43,7 @@ class BrandsFlynkContextProvider implements ProvidesFlynkContext
             'visuals'          => $this->visuals($ci, $typo),
             'audience'         => $this->audience($pers),
             'ctas'             => $this->ctas($brand),
+            'references'       => $this->references($brand),
         ], fn ($v) => $v !== null && $v !== [] && $v !== '');
     }
 
@@ -157,5 +158,40 @@ class BrandsFlynkContextProvider implements ProvidesFlynkContext
             ], fn ($v) => $v !== null && $v !== ''))
             ->values()
             ->all();
+    }
+
+    /**
+     * Kuratierte Website-Benchmarks der Marke (Referenzen-Board) — die konkrete Design-
+     * Richtung für den ersten Entwurf. Nach Verdikt gruppiert: `liked` = so soll es werden,
+     * `disliked` = so nicht, `neutral` = zur Orientierung. Je Referenz Domain + Begründung
+     * + betroffene Aspekte (Layout/Typo/Farbe/Bildsprache/…).
+     */
+    protected function references(BrandsBrand $brand): array
+    {
+        $refs = $brand->referenceBoards()->with('references')->get()
+            ->flatMap(fn ($board) => $board->references);
+
+        if ($refs->isEmpty()) {
+            return [];
+        }
+
+        $map = fn ($r) => array_filter([
+            'url'            => $r->url,
+            'host'          => $r->host,
+            'title'         => $r->title,
+            'reason'        => $r->reason,
+            'aspects'       => $r->aspects,
+            'industry'      => $r->industry,
+            'screenshot_url' => $r->screenshot_url,
+        ], fn ($v) => $v !== null && $v !== '' && $v !== []);
+
+        $byVerdict = $refs->groupBy('verdict');
+        $group = fn (string $v) => $byVerdict->get($v, collect())->map($map)->values()->all();
+
+        return array_filter([
+            'liked'    => $group('like'),
+            'disliked' => $group('dislike'),
+            'neutral'  => $group('neutral'),
+        ], fn ($v) => $v !== []);
     }
 }
