@@ -32,6 +32,7 @@ class BrandSettingsModal extends Component
         return [
             'brand.name' => 'required|string|max:255',
             'brand.description' => 'nullable|string',
+            'brand.live_url' => 'nullable|string|max:2048',
             'brand.wireframe_url' => 'nullable|string|max:2048',
             'brand.mockup_url' => 'nullable|string|max:2048',
         ];

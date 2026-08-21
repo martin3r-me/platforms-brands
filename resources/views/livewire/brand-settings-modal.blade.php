@@ -30,6 +30,14 @@
 
                 {{-- Design-Links (Erstentwurf) --}}
                 <x-nx-input-text
+                    name="brand.live_url"
+                    label="Bestandsseite"
+                    wire:model.live.debounce.500ms="brand.live_url"
+                    placeholder="Aktuelle Website (falls online)…"
+                    hint="IST-Zustand · Ausgangspunkt des Relaunches"
+                    :errorKey="'brand.live_url'"
+                />
+                <x-nx-input-text
                     name="brand.wireframe_url"
                     label="Wireframe-Link"
                     wire:model.live.debounce.500ms="brand.wireframe_url"

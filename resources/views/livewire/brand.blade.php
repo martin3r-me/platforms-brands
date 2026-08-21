@@ -135,6 +135,7 @@
 
             // Design-Links normalisieren (klickbar auch ohne Protokoll)
             $normalizeLink = fn($u) => $u ? (preg_match('#^https?://#i', $u) ? $u : 'https://' . ltrim($u, '/')) : null;
+            $liveUrl = $normalizeLink($brand->live_url);
             $wireframeUrl = $normalizeLink($brand->wireframe_url);
             $mockupUrl = $normalizeLink($brand->mockup_url);
 
@@ -229,6 +230,19 @@
             <div class="grid grid-cols-[150px_1fr] items-center rounded-[6px] px-2 py-1.5 hover:bg-[color:var(--nx-hover)]">
                 <span class="flex items-center gap-2 text-[13.5px] text-[color:var(--nx-faint)]">@svg('heroicon-o-calendar', 'w-[15px] h-[15px]') Erstellt</span>
                 <span class="text-[13.5px] text-[color:var(--nx-text)]">{{ $brand->created_at->format('d.m.Y') }}</span>
+            </div>
+            {{-- Bestandsseite (immer sichtbar) --}}
+            <div class="grid grid-cols-[150px_1fr] items-center rounded-[6px] px-2 py-1.5 hover:bg-[color:var(--nx-hover)]">
+                <span class="flex items-center gap-2 text-[13.5px] text-[color:var(--nx-faint)]">@svg('heroicon-o-globe-alt', 'w-[15px] h-[15px]') Bestandsseite</span>
+                @if($liveUrl)
+                    <a href="{{ $liveUrl }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 text-[13.5px] text-[color:var(--nx-info)] hover:underline">Öffnen @svg('heroicon-o-arrow-top-right-on-square', 'w-3.5 h-3.5')</a>
+                @else
+                    @can('update', $brand)
+                        <button type="button" @click="$dispatch('open-modal-brand-settings', { brandId: {{ $brand->id }} })" class="inline-flex items-center gap-1 text-[13.5px] text-[color:var(--nx-faint)] transition-colors hover:text-[color:var(--nx-text)]">@svg('heroicon-o-plus', 'w-3.5 h-3.5') hinterlegen</button>
+                    @else
+                        <span class="text-[13.5px] text-[color:var(--nx-faint)]">–</span>
+                    @endcan
+                @endif
             </div>
             {{-- Wireframe (immer sichtbar) --}}
             <div class="grid grid-cols-[150px_1fr] items-center rounded-[6px] px-2 py-1.5 hover:bg-[color:var(--nx-hover)]">

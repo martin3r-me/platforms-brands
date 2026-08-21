@@ -26,6 +26,7 @@ class BrandsBrand extends Model implements HasKeyResultAncestors, HasDisplayName
         'uuid',
         'name',
         'description',
+        'live_url',
         'wireframe_url',
         'mockup_url',
         'order',
