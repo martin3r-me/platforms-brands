@@ -46,7 +46,7 @@
 
             {{-- Gefällt uns --}}
             @if($liked->isNotEmpty())
-                <x-nx-section icon="heroicon-o-hand-thumb-up" title="Gefällt uns" :hint="$liked->count() . ' Vorbilder'">
+                <x-nx-section icon="heroicon-o-hand-thumb-up" title="Gefällt uns" :hint="$liked->count() . ' ' . ($liked->count() === 1 ? 'Vorbild' : 'Vorbilder')">
                     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                         @foreach($liked as $ref)
                             @include('brands::partials.reference-card', ['ref' => $ref, 'board' => $referenceBoard, 'aspectLabels' => $aspectLabels])
@@ -57,7 +57,7 @@
 
             {{-- Gefällt uns nicht --}}
             @if($disliked->isNotEmpty())
-                <x-nx-section icon="heroicon-o-hand-thumb-down" title="Gefällt uns nicht" :hint="$disliked->count() . ' Gegenbeispiele'">
+                <x-nx-section icon="heroicon-o-hand-thumb-down" title="Gefällt uns nicht" :hint="$disliked->count() . ' ' . ($disliked->count() === 1 ? 'Gegenbeispiel' : 'Gegenbeispiele')">
                     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                         @foreach($disliked as $ref)
                             @include('brands::partials.reference-card', ['ref' => $ref, 'board' => $referenceBoard, 'aspectLabels' => $aspectLabels])
@@ -68,7 +68,7 @@
 
             {{-- Neutral --}}
             @if($neutral->isNotEmpty())
-                <x-nx-section icon="heroicon-o-minus-circle" title="Neutral" :hint="$neutral->count() . ' Notizen'">
+                <x-nx-section icon="heroicon-o-minus-circle" title="Neutral" :hint="$neutral->count() . ' ' . ($neutral->count() === 1 ? 'Notiz' : 'Notizen')">
                     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                         @foreach($neutral as $ref)
                             @include('brands::partials.reference-card', ['ref' => $ref, 'board' => $referenceBoard, 'aspectLabels' => $aspectLabels])

@@ -8,8 +8,8 @@
                 <input type="text" wire:model="url" placeholder="example.com"
                        class="w-full rounded-[6px] border border-[color:var(--nx-line-strong)] bg-[color:var(--nx-surface)] px-2.5 py-2 text-sm text-[color:var(--nx-text)] transition-colors focus:border-[color:var(--nx-accent)] focus:outline-none focus:ring-1 focus:ring-[color:var(--nx-accent)]">
                 <x-nx-button variant="secondary" size="sm" wire:click="fetchPreview" wire:loading.attr="disabled" wire:target="fetchPreview" class="shrink-0">
-                    <span wire:loading.remove wire:target="fetchPreview">@svg('heroicon-o-arrow-down-tray', 'w-4 h-4') Vorschau</span>
-                    <span wire:loading wire:target="fetchPreview">Lädt…</span>
+                    <span wire:loading.remove wire:target="fetchPreview" class="inline-flex items-center gap-1.5 whitespace-nowrap">@svg('heroicon-o-arrow-down-tray', 'w-4 h-4') Vorschau</span>
+                    <span wire:loading wire:target="fetchPreview" class="whitespace-nowrap">Lädt…</span>
                 </x-nx-button>
             </div>
             @error('url')<p class="mt-1 text-xs text-[color:var(--nx-danger)]">{{ $message }}</p>@enderror
