@@ -338,11 +338,7 @@ class BrandsServiceProvider extends ServiceProvider
             $registry->register(new \Platform\Brands\Tools\GetBrandTool());
             $registry->register(new \Platform\Brands\Tools\UpdateBrandTool());
             $registry->register(new \Platform\Brands\Tools\DeleteBrandTool());
-            
-            // CRM-Verknüpfungen
-            $registry->register(new \Platform\Brands\Tools\LinkBrandCompanyTool());
-            $registry->register(new \Platform\Brands\Tools\LinkBrandContactTool());
-            
+
             // CiBoard-Tools
             $registry->register(new \Platform\Brands\Tools\CreateCiBoardTool());
             $registry->register(new \Platform\Brands\Tools\ListCiBoardsTool());

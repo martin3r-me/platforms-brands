@@ -72,7 +72,7 @@ class ListBrandsTool implements ToolContract, ToolMetadataContract
             // Query aufbauen
             $query = BrandsBrand::query()
                 ->where('team_id', $teamIdArg)
-                ->with(['user', 'team', 'companyLinks.company', 'crmContactLinks.contact']);
+                ->with(['user', 'team']);
 
             // Standard-Operationen anwenden
             $this->applyStandardFilters($query, $arguments, [
@@ -101,9 +101,6 @@ class ListBrandsTool implements ToolContract, ToolMetadataContract
 
             // Marken formatieren
             $brandsList = $brands->map(function($brand) {
-                $company = $brand->getCompany();
-                $contact = $brand->getContact();
-                
                 return [
                     'id' => $brand->id,
                     'uuid' => $brand->uuid,
@@ -114,10 +111,6 @@ class ListBrandsTool implements ToolContract, ToolMetadataContract
                     'done' => $brand->done,
                     'done_at' => $brand->done_at?->toIso8601String(),
                     'created_at' => $brand->created_at->toIso8601String(),
-                    'company_id' => $company?->id,
-                    'company_name' => $company ? app(\Platform\Core\Contracts\CrmCompanyResolverInterface::class)->displayName($company->id) : null,
-                    'contact_id' => $contact?->id,
-                    'contact_name' => $contact ? app(\Platform\Core\Contracts\CrmContactResolverInterface::class)->displayName($contact->id) : null,
                 ];
             })->values()->toArray();
 

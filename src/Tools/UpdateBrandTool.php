@@ -105,12 +105,7 @@ class UpdateBrandTool implements ToolContract
             }
 
             $brand->refresh();
-            $brand->load(['user', 'team', 'companyLinks.company', 'crmContactLinks.contact']);
-
-            $company = $brand->getCompany();
-            $contact = $brand->getContact();
-            $companyResolver = app(\Platform\Core\Contracts\CrmCompanyResolverInterface::class);
-            $contactResolver = app(\Platform\Core\Contracts\CrmContactResolverInterface::class);
+            $brand->load(['user', 'team']);
 
             return ToolResult::success([
                 'id' => $brand->id,
@@ -122,10 +117,6 @@ class UpdateBrandTool implements ToolContract
                 'done' => $brand->done,
                 'done_at' => $brand->done_at?->toIso8601String(),
                 'updated_at' => $brand->updated_at->toIso8601String(),
-                'company_id' => $company?->id,
-                'company_name' => $company ? $companyResolver->displayName($company->id) : null,
-                'contact_id' => $contact?->id,
-                'contact_name' => $contact ? $contactResolver->displayName($contact->id) : null,
                 'message' => "Marke '{$brand->name}' erfolgreich aktualisiert."
             ]);
         } catch (\Throwable $e) {

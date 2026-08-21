@@ -51,7 +51,7 @@ class GetBrandTool implements ToolContract, ToolMetadataContract
             }
 
             // Marke holen
-            $brand = BrandsBrand::with(['user', 'team', 'companyLinks.company', 'crmContactLinks.contact'])
+            $brand = BrandsBrand::with(['user', 'team'])
                 ->find($arguments['id']);
 
             if (!$brand) {
@@ -65,11 +65,6 @@ class GetBrandTool implements ToolContract, ToolMetadataContract
                 return ToolResult::error('ACCESS_DENIED', 'Du hast keinen Zugriff auf diese Marke (Policy).');
             }
 
-            $company = $brand->getCompany();
-            $contact = $brand->getContact();
-            $companyResolver = app(\Platform\Core\Contracts\CrmCompanyResolverInterface::class);
-            $contactResolver = app(\Platform\Core\Contracts\CrmContactResolverInterface::class);
-
             return ToolResult::success([
                 'id' => $brand->id,
                 'uuid' => $brand->uuid,
@@ -80,12 +75,6 @@ class GetBrandTool implements ToolContract, ToolMetadataContract
                 'done' => $brand->done,
                 'done_at' => $brand->done_at?->toIso8601String(),
                 'created_at' => $brand->created_at->toIso8601String(),
-                'company_id' => $company?->id,
-                'company_name' => $company ? $companyResolver->displayName($company->id) : null,
-                'company_url' => $company ? $companyResolver->url($company->id) : null,
-                'contact_id' => $contact?->id,
-                'contact_name' => $contact ? $contactResolver->displayName($contact->id) : null,
-                'contact_url' => $contact ? $contactResolver->url($contact->id) : null,
             ]);
         } catch (\Throwable $e) {
             return ToolResult::error('EXECUTION_ERROR', 'Fehler beim Laden der Marke: ' . $e->getMessage());

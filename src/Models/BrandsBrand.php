@@ -11,9 +11,6 @@ use Platform\Core\Traits\HasColors;
 use Platform\Core\Contracts\HasKeyResultAncestors;
 use Platform\Core\Contracts\HasDisplayName;
 use Platform\Core\Contracts\AgendaRenderable;
-use Platform\Crm\Traits\HasCompanyLinksTrait;
-use Platform\Crm\Contracts\CompanyInterface;
-use Platform\Crm\Contracts\ContactInterface;
 use Platform\Integrations\Contracts\SocialMediaAccountLinkableInterface;
 
 /**
@@ -21,7 +18,7 @@ use Platform\Integrations\Contracts\SocialMediaAccountLinkableInterface;
  */
 class BrandsBrand extends Model implements HasKeyResultAncestors, HasDisplayName, SocialMediaAccountLinkableInterface, AgendaRenderable
 {
-    use HasOrganizationContexts, HasColors, HasCompanyLinksTrait;
+    use HasOrganizationContexts, HasColors;
 
     protected $table = 'brands_brands';
 
@@ -61,33 +58,6 @@ class BrandsBrand extends Model implements HasKeyResultAncestors, HasDisplayName
     public function team(): BelongsTo
     {
         return $this->belongsTo(\Platform\Core\Models\Team::class);
-    }
-
-    /**
-     * Beziehung zu CRM-Kontakten über polymorphe Links
-     */
-    public function crmContactLinks()
-    {
-        return $this->morphMany(
-            \Platform\Crm\Models\CrmContactLink::class,
-            'linkable'
-        );
-    }
-
-    /**
-     * Gibt das primäre verknüpfte Unternehmen zurück (über Interface)
-     */
-    public function getCompany(): ?CompanyInterface
-    {
-        return $this->companyLinks()->first()?->company;
-    }
-
-    /**
-     * Gibt den primären verknüpften Kontakt zurück (über Interface)
-     */
-    public function getContact(): ?ContactInterface
-    {
-        return $this->crmContactLinks()->first()?->contact;
     }
 
     /**
