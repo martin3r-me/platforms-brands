@@ -116,16 +116,6 @@ class BrandsBrand extends Model implements HasKeyResultAncestors, HasDisplayName
     }
 
     /**
-     * @deprecated Content Boards wurden entfernt (Ticket #441 – Entfernung 2026-06-01).
-     *             Verwende stattdessen contentBriefBoards().
-     */
-    public function contentBoards()
-    {
-        // Deprecated: gibt leere Collection zurück
-        return $this->hasMany(self::class, 'id')->whereRaw('1 = 0');
-    }
-
-    /**
      * Social Boards dieser Marke
      */
     public function socialBoards()
@@ -136,16 +126,6 @@ class BrandsBrand extends Model implements HasKeyResultAncestors, HasDisplayName
     public function kanbanBoards()
     {
         return $this->hasMany(BrandsKanbanBoard::class, 'brand_id')->orderBy('order');
-    }
-
-    /**
-     * @deprecated Multi Content Boards wurden entfernt (Ticket #441 – Entfernung 2026-06-01).
-     *             Verwende stattdessen contentBriefBoards().
-     */
-    public function multiContentBoards()
-    {
-        // Deprecated: gibt leere Collection zurück
-        return $this->hasMany(self::class, 'id')->whereRaw('1 = 0');
     }
 
     public function typographyBoards()
@@ -235,14 +215,6 @@ class BrandsBrand extends Model implements HasKeyResultAncestors, HasDisplayName
     }
     
     /**
-     * @deprecated Verwende stattdessen metaConnection()
-     */
-    public function metaToken()
-    {
-        return $this->metaConnection();
-    }
-
-    /**
      * Facebook Pages dieser Marke (über lose Verknüpfung)
      */
     public function facebookPages()
@@ -258,16 +230,6 @@ class BrandsBrand extends Model implements HasKeyResultAncestors, HasDisplayName
     {
         $service = app(\Platform\Integrations\Services\IntegrationAccountLinkService::class);
         return $service->getLinkedInstagramAccounts($this);
-    }
-
-    /**
-     * WhatsApp Accounts dieser Marke
-     * TODO: Verknüpfung implementieren, wenn benötigt
-     */
-    public function whatsappAccounts()
-    {
-        // TODO: Verknüpfung implementieren
-        return collect();
     }
 
     /**

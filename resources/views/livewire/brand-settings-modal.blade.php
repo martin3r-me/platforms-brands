@@ -27,63 +27,11 @@
                     placeholder="Beschreibung der Marke eingeben..."
                     :errorKey="'brand.description'"
                 />
-
-                {{-- Company --}}
-                <x-nx-input-select
-                    name="selectedCompanyId"
-                    label="Unternehmen (CRM)"
-                    :options="$this->companyOptions"
-                    optionValue="value"
-                    optionLabel="label"
-                    :nullable="true"
-                    nullLabel="Kein Unternehmen"
-                    wire:model.live="selectedCompanyId"
-                    placeholder="Unternehmen wählen..."
-                    :errorKey="'selectedCompanyId'"
-                />
-
-                {{-- Contact --}}
-                <x-nx-input-select
-                    name="selectedContactId"
-                    label="Kontaktperson (CRM)"
-                    :options="$this->contactOptions"
-                    optionValue="value"
-                    optionLabel="label"
-                    :nullable="true"
-                    nullLabel="Keine Kontaktperson"
-                    wire:model.live="selectedContactId"
-                    placeholder="Kontaktperson wählen..."
-                    :errorKey="'selectedContactId'"
-                />
             @else
                 <div class="flex items-start justify-between gap-3 rounded-[6px] border border-[color:var(--nx-line)] bg-[color:var(--nx-surface)] px-3 py-2 text-sm">
                     <span class="text-[color:var(--nx-faint)]">Beschreibung</span>
                     <span class="text-right font-medium text-[color:var(--nx-text)]">{{ $brand->description ?? '–' }}</span>
                 </div>
-                @if($brand->getCompany())
-                    @php
-                        $company = $brand->getCompany();
-                        $companyResolver = app(\Platform\Core\Contracts\CrmCompanyResolverInterface::class);
-                    @endphp
-                    <div class="flex items-center justify-between rounded-[6px] border border-[color:var(--nx-line)] bg-[color:var(--nx-surface)] px-3 py-2 text-sm">
-                        <span class="text-[color:var(--nx-faint)]">Unternehmen</span>
-                        <a href="{{ $companyResolver->url($company->id) }}" class="font-medium text-[color:var(--nx-accent)] hover:underline">
-                            {{ $companyResolver->displayName($company->id) }}
-                        </a>
-                    </div>
-                @endif
-                @if($brand->getContact())
-                    @php
-                        $contact = $brand->getContact();
-                        $contactResolver = app(\Platform\Core\Contracts\CrmContactResolverInterface::class);
-                    @endphp
-                    <div class="flex items-center justify-between rounded-[6px] border border-[color:var(--nx-line)] bg-[color:var(--nx-surface)] px-3 py-2 text-sm">
-                        <span class="text-[color:var(--nx-faint)]">Kontaktperson</span>
-                        <a href="{{ $contactResolver->url($contact->id) }}" class="font-medium text-[color:var(--nx-accent)] hover:underline">
-                            {{ $contactResolver->displayName($contact->id) }}
-                        </a>
-                    </div>
-                @endif
             @endcan
         </div>
 
