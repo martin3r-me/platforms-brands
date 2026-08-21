@@ -232,9 +232,6 @@
         @include('brands::partials.board-sidebar', ['detailRows' => $moodDetailRows])
     </x-slot>
 
-    <x-slot name="activity">
-        @include('brands::partials.board-activity')
-    </x-slot>
 
     <livewire:brands.moodboard-board-settings-modal />
     <livewire:brands.moodboard-image-modal />

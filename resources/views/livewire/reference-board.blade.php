@@ -91,9 +91,6 @@
         ]])
     </x-slot>
 
-    <x-slot name="activity">
-        @include('brands::partials.board-activity')
-    </x-slot>
 
     <livewire:brands.reference-modal/>
 </x-ui-page>

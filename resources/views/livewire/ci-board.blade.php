@@ -125,9 +125,6 @@
         ]])
     </x-slot>
 
-    <x-slot name="activity">
-        @include('brands::partials.board-activity')
-    </x-slot>
 
     <livewire:brands.ci-board-settings-modal/>
     <livewire:brands.ci-board-color-modal/>

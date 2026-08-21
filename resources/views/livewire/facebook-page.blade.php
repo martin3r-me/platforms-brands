@@ -280,5 +280,4 @@
         </x-ui-page-sidebar>
     </x-slot>
 
-    <x-slot name="activity">@include('brands::partials.board-activity')</x-slot>
 </x-ui-page>

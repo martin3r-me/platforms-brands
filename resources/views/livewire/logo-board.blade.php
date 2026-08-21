@@ -315,9 +315,6 @@
         @include('brands::partials.board-sidebar', ['detailRows' => $logoDetailRows])
     </x-slot>
 
-    <x-slot name="activity">
-        @include('brands::partials.board-activity')
-    </x-slot>
 
     <livewire:brands.logo-board-settings-modal />
     <livewire:brands.logo-variant-modal />

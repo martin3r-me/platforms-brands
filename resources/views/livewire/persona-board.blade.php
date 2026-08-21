@@ -230,9 +230,6 @@
         ]])
     </x-slot>
 
-    <x-slot name="activity">
-        @include('brands::partials.board-activity')
-    </x-slot>
 
     <livewire:brands.persona-board-settings-modal />
     <livewire:brands.persona-modal />

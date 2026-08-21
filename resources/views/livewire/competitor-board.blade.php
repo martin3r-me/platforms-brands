@@ -362,9 +362,6 @@
         ]])
     </x-slot>
 
-    <x-slot name="activity">
-        @include('brands::partials.board-activity')
-    </x-slot>
 
     <livewire:brands.competitor-board-settings-modal />
     <livewire:brands.competitor-modal />

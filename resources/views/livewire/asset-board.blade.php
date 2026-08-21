@@ -240,9 +240,6 @@
         @include('brands::partials.board-sidebar', ['detailRows' => $assetDetailRows])
     </x-slot>
 
-    <x-slot name="activity">
-        @include('brands::partials.board-activity')
-    </x-slot>
 
     <livewire:brands.asset-board-settings-modal />
     <livewire:brands.asset-modal />

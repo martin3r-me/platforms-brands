@@ -36,9 +36,6 @@
         ]])
     </x-slot>
 
-    <x-slot name="activity">
-        @include('brands::partials.board-activity')
-    </x-slot>
 
     {{-- Board-Container: füllt restliche Breite, Spalten scrollen intern --}}
     @if($slots->count() > 0)

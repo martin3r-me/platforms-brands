@@ -97,9 +97,6 @@
         </x-ui-page-sidebar>
     </x-slot>
 
-    <x-slot name="activity">
-        @include('brands::partials.board-activity')
-    </x-slot>
 
     {{-- Board-Container --}}
     <x-ui-page-container spacing="space-y-8" width="contained">

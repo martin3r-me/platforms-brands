@@ -233,9 +233,6 @@
         ]))])
     </x-slot>
 
-    <x-slot name="activity">
-        @include('brands::partials.board-activity')
-    </x-slot>
 
     <livewire:brands.tone-of-voice-board-settings-modal />
     <livewire:brands.tone-of-voice-entry-modal />

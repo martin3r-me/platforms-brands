@@ -246,9 +246,6 @@
         ])])
     </x-slot>
 
-    <x-slot name="activity">
-        @include('brands::partials.board-activity')
-    </x-slot>
 
     <livewire:brands.guideline-board-settings-modal />
     <livewire:brands.guideline-chapter-modal />

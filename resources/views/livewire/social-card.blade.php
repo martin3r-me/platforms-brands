@@ -178,9 +178,6 @@
         ])])
     </x-slot>
 
-    <x-slot name="activity">
-        @include('brands::partials.board-activity')
-    </x-slot>
 </x-ui-page>
 
 @push('styles')

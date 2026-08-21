@@ -109,9 +109,6 @@
         </x-ui-page-sidebar>
     </x-slot>
 
-    <x-slot name="activity">
-        @include('brands::partials.board-activity')
-    </x-slot>
 
     {{-- Board Content --}}
     @if($clusters->count() > 0 || $unclusteredKeywords->count() > 0)
