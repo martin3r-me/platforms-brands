@@ -76,6 +76,11 @@
 
     <x-slot name="footer">
         <x-nx-button variant="ghost" wire:click="closeModal">Abbrechen</x-nx-button>
-        <x-nx-button variant="primary" wire:click="save">{{ $isEdit ? 'Aktualisieren' : 'Hinzufügen' }}</x-nx-button>
+        <x-nx-button variant="primary" wire:click="save"
+                     wire:loading.attr="disabled" wire:target="save,fetchPreview"
+                     wire:loading.class="opacity-50 pointer-events-none">
+            <span wire:loading.remove wire:target="save">{{ $isEdit ? 'Aktualisieren' : 'Hinzufügen' }}</span>
+            <span wire:loading wire:target="save" class="whitespace-nowrap">Speichert…</span>
+        </x-nx-button>
     </x-slot>
 </x-nx-modal>

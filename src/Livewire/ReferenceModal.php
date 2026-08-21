@@ -153,21 +153,34 @@ class ReferenceModal extends Component
         $board = BrandsReferenceBoard::findOrFail($this->referenceBoardId);
         $this->authorize('update', $board);
 
+        // Screenshot-URL defensiv begrenzen (data:-URIs / überlange CDN-Links)
+        $screenshotUrl = $this->screenshotUrl ?: null;
+        if ($screenshotUrl !== null && mb_strlen($screenshotUrl) > 2048) {
+            $screenshotUrl = null;
+        }
+
         $data = [
             'url' => $this->normalizedUrl(),
             'title' => $this->title ?: null,
-            'screenshot_url' => $this->screenshotUrl ?: null,
+            'screenshot_url' => $screenshotUrl,
             'verdict' => $this->verdict,
             'reason' => $this->reason ?: null,
             'aspects' => $this->aspects ?: null,
             'industry' => $this->industry ?: null,
         ];
 
-        if ($this->reference) {
-            $this->reference->update($data);
-        } else {
-            $data['reference_board_id'] = $this->referenceBoardId;
-            BrandsReference::create($data);
+        try {
+            if ($this->reference) {
+                $this->reference->update($data);
+            } else {
+                $data['reference_board_id'] = $this->referenceBoardId;
+                BrandsReference::create($data);
+            }
+        } catch (\Throwable $e) {
+            report($e);
+            // Modal offen lassen und Fehler sichtbar machen – nie still scheitern.
+            session()->flash('reference_error', 'Referenz konnte nicht gespeichert werden. Bitte erneut versuchen.');
+            return;
         }
 
         $this->dispatch('updateReferenceBoard');
