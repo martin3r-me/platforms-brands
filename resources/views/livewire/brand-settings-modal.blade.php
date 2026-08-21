@@ -27,6 +27,24 @@
                     placeholder="Beschreibung der Marke eingeben..."
                     :errorKey="'brand.description'"
                 />
+
+                {{-- Design-Links (Erstentwurf) --}}
+                <x-nx-input-text
+                    name="brand.wireframe_url"
+                    label="Wireframe-Link"
+                    wire:model.live.debounce.500ms="brand.wireframe_url"
+                    placeholder="z. B. Figma-Wireframe…"
+                    hint="Struktur / Low-Fidelity"
+                    :errorKey="'brand.wireframe_url'"
+                />
+                <x-nx-input-text
+                    name="brand.mockup_url"
+                    label="Mockup-Link"
+                    wire:model.live.debounce.500ms="brand.mockup_url"
+                    placeholder="z. B. Figma-Mockup…"
+                    hint="Visuelles Design / High-Fidelity"
+                    :errorKey="'brand.mockup_url'"
+                />
             @else
                 <div class="flex items-start justify-between gap-3 rounded-[6px] border border-[color:var(--nx-line)] bg-[color:var(--nx-surface)] px-3 py-2 text-sm">
                     <span class="text-[color:var(--nx-faint)]">Beschreibung</span>

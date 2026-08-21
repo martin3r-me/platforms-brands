@@ -133,6 +133,11 @@
 
             $accountsCount = $facebookPages->count() + $instagramAccounts->count();
 
+            // Design-Links normalisieren (klickbar auch ohne Protokoll)
+            $normalizeLink = fn($u) => $u ? (preg_match('#^https?://#i', $u) ? $u : 'https://' . ltrim($u, '/')) : null;
+            $wireframeUrl = $normalizeLink($brand->wireframe_url);
+            $mockupUrl = $normalizeLink($brand->mockup_url);
+
             // Font-Fallback-Stacks für echtes Rendering der Katalog-Schriften
             $fontFallbacks = config('brands.font_fallbacks', []);
             $catalogByFamily = collect(config('brands.fonts', []))->keyBy('family');
@@ -225,6 +230,20 @@
                 <span class="flex items-center gap-2 text-[13.5px] text-[color:var(--nx-faint)]">@svg('heroicon-o-calendar', 'w-[15px] h-[15px]') Erstellt</span>
                 <span class="text-[13.5px] text-[color:var(--nx-text)]">{{ $brand->created_at->format('d.m.Y') }}</span>
             </div>
+            {{-- Wireframe --}}
+            @if($wireframeUrl)
+                <div class="grid grid-cols-[150px_1fr] items-center rounded-[6px] px-2 py-1.5 hover:bg-[color:var(--nx-hover)]">
+                    <span class="flex items-center gap-2 text-[13.5px] text-[color:var(--nx-faint)]">@svg('heroicon-o-rectangle-group', 'w-[15px] h-[15px]') Wireframe</span>
+                    <a href="{{ $wireframeUrl }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 text-[13.5px] text-[color:var(--nx-info)] hover:underline">Öffnen @svg('heroicon-o-arrow-top-right-on-square', 'w-3.5 h-3.5')</a>
+                </div>
+            @endif
+            {{-- Mockup --}}
+            @if($mockupUrl)
+                <div class="grid grid-cols-[150px_1fr] items-center rounded-[6px] px-2 py-1.5 hover:bg-[color:var(--nx-hover)]">
+                    <span class="flex items-center gap-2 text-[13.5px] text-[color:var(--nx-faint)]">@svg('heroicon-o-swatch', 'w-[15px] h-[15px]') Mockup</span>
+                    <a href="{{ $mockupUrl }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 text-[13.5px] text-[color:var(--nx-info)] hover:underline">Öffnen @svg('heroicon-o-arrow-top-right-on-square', 'w-3.5 h-3.5')</a>
+                </div>
+            @endif
         </div>
 
         {{-- ══════════ IDENTITÄT ══════════ --}}
