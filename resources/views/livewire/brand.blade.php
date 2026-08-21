@@ -133,9 +133,6 @@
 
             $accountsCount = $facebookPages->count() + $instagramAccounts->count();
 
-            $company = $brand->getCompany();
-            $contact = $brand->getContact();
-
             // Font-Fallback-Stacks für echtes Rendering der Katalog-Schriften
             $fontFallbacks = config('brands.font_fallbacks', []);
             $catalogByFamily = collect(config('brands.fonts', []))->keyBy('family');
@@ -228,22 +225,6 @@
                 <span class="flex items-center gap-2 text-[13.5px] text-[color:var(--nx-faint)]">@svg('heroicon-o-calendar', 'w-[15px] h-[15px]') Erstellt</span>
                 <span class="text-[13.5px] text-[color:var(--nx-text)]">{{ $brand->created_at->format('d.m.Y') }}</span>
             </div>
-            {{-- Unternehmen --}}
-            @if($company)
-                @php $companyResolver = app(\Platform\Core\Contracts\CrmCompanyResolverInterface::class); @endphp
-                <div class="grid grid-cols-[150px_1fr] items-center rounded-[6px] px-2 py-1.5 hover:bg-[color:var(--nx-hover)]">
-                    <span class="flex items-center gap-2 text-[13.5px] text-[color:var(--nx-faint)]">@svg('heroicon-o-briefcase', 'w-[15px] h-[15px]') Unternehmen</span>
-                    <a href="{{ $companyResolver->url($company->id) }}" class="text-[13.5px] text-[color:var(--nx-info)] hover:underline">{{ $companyResolver->displayName($company->id) }}</a>
-                </div>
-            @endif
-            {{-- Kontakt --}}
-            @if($contact)
-                @php $contactResolver = app(\Platform\Core\Contracts\CrmContactResolverInterface::class); @endphp
-                <div class="grid grid-cols-[150px_1fr] items-center rounded-[6px] px-2 py-1.5 hover:bg-[color:var(--nx-hover)]">
-                    <span class="flex items-center gap-2 text-[13.5px] text-[color:var(--nx-faint)]">@svg('heroicon-o-user', 'w-[15px] h-[15px]') Kontakt</span>
-                    <a href="{{ $contactResolver->url($contact->id) }}" class="text-[13.5px] text-[color:var(--nx-info)] hover:underline">{{ $contactResolver->displayName($contact->id) }}</a>
-                </div>
-            @endif
         </div>
 
         {{-- ══════════ IDENTITÄT ══════════ --}}
@@ -686,18 +667,6 @@
                             <span class="shrink-0 text-[13px] text-[color:var(--nx-faint)]">Erstellt</span>
                             <span class="min-w-0 truncate text-right text-[13px] text-[color:var(--nx-text)]">{{ $brand->created_at->format('d.m.Y') }}</span>
                         </div>
-                        @if($company)
-                            <div class="flex items-center justify-between gap-3 px-3 py-2">
-                                <span class="shrink-0 text-[13px] text-[color:var(--nx-faint)]">Unternehmen</span>
-                                <a href="{{ app(\Platform\Core\Contracts\CrmCompanyResolverInterface::class)->url($company->id) }}" class="min-w-0 truncate text-right text-[13px] text-[color:var(--nx-info)] hover:underline">{{ app(\Platform\Core\Contracts\CrmCompanyResolverInterface::class)->displayName($company->id) }}</a>
-                            </div>
-                        @endif
-                        @if($contact)
-                            <div class="flex items-center justify-between gap-3 px-3 py-2">
-                                <span class="shrink-0 text-[13px] text-[color:var(--nx-faint)]">Kontaktperson</span>
-                                <a href="{{ app(\Platform\Core\Contracts\CrmContactResolverInterface::class)->url($contact->id) }}" class="min-w-0 truncate text-right text-[13px] text-[color:var(--nx-info)] hover:underline">{{ app(\Platform\Core\Contracts\CrmContactResolverInterface::class)->displayName($contact->id) }}</a>
-                            </div>
-                        @endif
                     </div>
                 </div>
             </div>
