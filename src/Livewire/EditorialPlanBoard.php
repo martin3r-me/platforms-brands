@@ -12,6 +12,8 @@ use Carbon\Carbon;
 
 class EditorialPlanBoard extends Component
 {
+    use \Platform\Brands\Concerns\DispatchesBoardContext;
+
     public BrandsSocialBoard $socialBoard;
 
     // Filter state

@@ -11,6 +11,8 @@ use Livewire\Attributes\On;
 
 class GuidelineBoard extends Component
 {
+    use \Platform\Brands\Concerns\DispatchesBoardContext;
+
     public BrandsGuidelineBoard $guidelineBoard;
 
     public function mount(BrandsGuidelineBoard $brandsGuidelineBoard)

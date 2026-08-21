@@ -10,6 +10,8 @@ use Livewire\Attributes\On;
 
 class SeoBoard extends Component
 {
+    use \Platform\Brands\Concerns\DispatchesBoardContext;
+
     public BrandsSeoBoard $seoBoard;
 
     public string $viewMode = 'analysis';

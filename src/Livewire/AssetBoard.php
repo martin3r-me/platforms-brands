@@ -14,6 +14,8 @@ class AssetBoard extends Component
 {
     use WithFileUploads;
 
+    use \Platform\Brands\Concerns\DispatchesBoardContext;
+
     public BrandsAssetBoard $assetBoard;
     public $newFiles = [];
     public $filterType = '';

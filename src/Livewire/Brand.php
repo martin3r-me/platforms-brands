@@ -81,6 +81,10 @@ class Brand extends Component
             ],
         ]);
 
+        // Dateien- und Aktivitäten-Tab im Core-Terminal freischalten
+        $this->dispatch('terminal:app:files');
+        $this->dispatch('terminal:app:activity');
+
         // Organization-Kontext setzen - beides erlauben: Zeiten + Entity-Verknüpfung + Dimensionen
         $this->dispatch('organization', [
             'context_type' => get_class($this->brand),

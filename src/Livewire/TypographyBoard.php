@@ -14,6 +14,8 @@ class TypographyBoard extends Component
 {
     use WithFileUploads;
 
+    use \Platform\Brands\Concerns\DispatchesBoardContext;
+
     public BrandsTypographyBoard $typographyBoard;
 
     public function mount(BrandsTypographyBoard $brandsTypographyBoard)

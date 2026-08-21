@@ -10,6 +10,8 @@ use Livewire\Attributes\On;
 
 class CompetitorBoard extends Component
 {
+    use \Platform\Brands\Concerns\DispatchesBoardContext;
+
     public BrandsCompetitorBoard $competitorBoard;
 
     public function mount(BrandsCompetitorBoard $brandsCompetitorBoard)

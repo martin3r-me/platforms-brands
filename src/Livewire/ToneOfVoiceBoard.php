@@ -11,6 +11,8 @@ use Livewire\Attributes\On;
 
 class ToneOfVoiceBoard extends Component
 {
+    use \Platform\Brands\Concerns\DispatchesBoardContext;
+
     public BrandsToneOfVoiceBoard $toneOfVoiceBoard;
 
     public function mount(BrandsToneOfVoiceBoard $brandsToneOfVoiceBoard)

@@ -11,6 +11,8 @@ use Livewire\Attributes\On;
 
 class PersonaBoard extends Component
 {
+    use \Platform\Brands\Concerns\DispatchesBoardContext;
+
     public BrandsPersonaBoard $personaBoard;
 
     public function mount(BrandsPersonaBoard $brandsPersonaBoard)

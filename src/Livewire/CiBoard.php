@@ -10,6 +10,8 @@ use Livewire\Attributes\Computed;
 
 class CiBoard extends Component
 {
+    use \Platform\Brands\Concerns\DispatchesBoardContext;
+
     public BrandsCiBoard $ciBoard;
 
     public function mount(BrandsCiBoard $brandsCiBoard)

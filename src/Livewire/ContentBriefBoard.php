@@ -9,6 +9,8 @@ use Livewire\Attributes\On;
 
 class ContentBriefBoard extends Component
 {
+    use \Platform\Brands\Concerns\DispatchesBoardContext;
+
     public BrandsContentBriefBoard $contentBriefBoard;
 
     // Inline-Editing

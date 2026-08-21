@@ -11,6 +11,8 @@ use Livewire\Attributes\On;
 
 class SocialBoard extends Component
 {
+    use \Platform\Brands\Concerns\DispatchesBoardContext;
+
     public BrandsSocialBoard $socialBoard;
 
     public function mount(BrandsSocialBoard $brandsSocialBoard)

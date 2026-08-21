@@ -14,6 +14,8 @@ class LogoBoard extends Component
 {
     use WithFileUploads;
 
+    use \Platform\Brands\Concerns\DispatchesBoardContext;
+
     public BrandsLogoBoard $logoBoard;
 
     public function mount(BrandsLogoBoard $brandsLogoBoard)

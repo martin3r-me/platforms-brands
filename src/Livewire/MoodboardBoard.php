@@ -14,6 +14,8 @@ class MoodboardBoard extends Component
 {
     use WithFileUploads;
 
+    use \Platform\Brands\Concerns\DispatchesBoardContext;
+
     public BrandsMoodboardBoard $moodboardBoard;
     public $newImages = [];
 

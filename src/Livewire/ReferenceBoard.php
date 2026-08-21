@@ -10,6 +10,8 @@ use Livewire\Attributes\On;
 
 class ReferenceBoard extends Component
 {
+    use \Platform\Brands\Concerns\DispatchesBoardContext;
+
     public BrandsReferenceBoard $referenceBoard;
 
     public function mount(BrandsReferenceBoard $brandsReferenceBoard)
