@@ -78,6 +78,10 @@
                                 <div class="flex items-center justify-center w-8 h-8 rounded-md bg-orange-50">@svg('heroicon-o-scale', 'w-4 h-4 text-orange-600')</div>
                                 <div><div class="font-medium">Wettbewerber Board</div><div class="text-xs text-[var(--nx-faint)]">Wettbewerber-Analyse</div></div>
                             </button>
+                            <button wire:click="createReferenceBoard" @click="open = false" class="w-full text-left px-4 py-2.5 text-sm text-[var(--nx-text)] hover:bg-[var(--nx-hover)] transition-colors flex items-center gap-3">
+                                <div class="flex items-center justify-center w-8 h-8 rounded-md bg-sky-50">@svg('heroicon-o-link', 'w-4 h-4 text-sky-600')</div>
+                                <div><div class="font-medium">Referenzen Board</div><div class="text-xs text-[var(--nx-faint)]">Website-Benchmarks & Vorbilder</div></div>
+                            </button>
                             <button wire:click="createGuidelineBoard" @click="open = false" class="w-full text-left px-4 py-2.5 text-sm text-[var(--nx-text)] hover:bg-[var(--nx-hover)] transition-colors flex items-center gap-3">
                                 <div class="flex items-center justify-center w-8 h-8 rounded-md bg-cyan-50">@svg('heroicon-o-book-open', 'w-4 h-4 text-cyan-600')</div>
                                 <div><div class="font-medium">Guidelines Board</div><div class="text-xs text-[var(--nx-faint)]">Markenregeln & Dos/Don'ts</div></div>
@@ -117,14 +121,14 @@
 
             $totalBoards = $ciBoards->count() + $socialBoards->count() + $kanbanBoards->count()
                 + $typographyBoards->count() + $logoBoards->count() + $toneOfVoiceBoards->count()
-                + $personaBoards->count() + $competitorBoards->count() + $guidelineBoards->count()
+                + $personaBoards->count() + $competitorBoards->count() + $referenceBoards->count() + $guidelineBoards->count()
                 + $moodboardBoards->count() + $seoBoards->count() + $assetBoards->count() + $contentBriefBoards->count();
             $typeCount = collect([$ciBoards, $socialBoards, $kanbanBoards, $typographyBoards, $logoBoards,
-                $toneOfVoiceBoards, $personaBoards, $competitorBoards, $guidelineBoards, $moodboardBoards,
+                $toneOfVoiceBoards, $personaBoards, $competitorBoards, $referenceBoards, $guidelineBoards, $moodboardBoards,
                 $seoBoards, $assetBoards, $contentBriefBoards])->filter->isNotEmpty()->count();
 
             $hasIdentity = $ciBoards->isNotEmpty() || $typographyBoards->isNotEmpty() || $logoBoards->isNotEmpty() || $moodboardBoards->isNotEmpty();
-            $hasStrategie = $personaBoards->isNotEmpty() || $competitorBoards->isNotEmpty() || $toneOfVoiceBoards->isNotEmpty() || $guidelineBoards->isNotEmpty();
+            $hasStrategie = $personaBoards->isNotEmpty() || $competitorBoards->isNotEmpty() || $referenceBoards->isNotEmpty() || $toneOfVoiceBoards->isNotEmpty() || $guidelineBoards->isNotEmpty();
             $hasOps = $socialBoards->isNotEmpty() || $kanbanBoards->isNotEmpty() || $seoBoards->isNotEmpty() || $contentBriefBoards->isNotEmpty() || $assetBoards->isNotEmpty();
 
             $accountsCount = $facebookPages->count() + $instagramAccounts->count();
@@ -476,6 +480,40 @@
                                 <div class="px-4 py-6 text-center text-[13px] text-[color:var(--nx-faint)]">Noch keine Kapitel</div>
                             @endforelse
                         </div>
+                    </div>
+                @endforeach
+
+                {{-- Referenzen / Website-Benchmarks --}}
+                @foreach($referenceBoards as $rB)
+                    @php
+                        $rbLiked = $rB->references->where('verdict', 'like');
+                        $rbDisliked = $rB->references->where('verdict', 'dislike');
+                    @endphp
+                    <div class="mt-7">
+                        <p class="mb-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-[color:var(--nx-faint)]">{{ $rB->name }}<span class="normal-case tracking-normal font-normal"> · <span class="text-emerald-600">{{ $rbLiked->count() }} gefällt</span> · <span class="text-rose-500">{{ $rbDisliked->count() }} gefällt nicht</span></span></p>
+                        <a href="{{ route('brands.reference-boards.show', $rB) }}" wire:navigate class="block overflow-hidden rounded-[8px] border border-[color:var(--nx-line)] bg-[color:var(--nx-surface)] transition-colors hover:bg-[color:var(--nx-hover)]">
+                            @if($rB->references->isNotEmpty())
+                                <div class="grid grid-cols-2 gap-px bg-[color:var(--nx-line)] sm:grid-cols-4">
+                                    @foreach($rB->references->take(8) as $ref)
+                                        <div class="relative bg-[color:var(--nx-surface)]">
+                                            <div class="aspect-[16/10] w-full overflow-hidden bg-[color:var(--nx-accent-soft)]">
+                                                @if($ref->screenshot_url)
+                                                    <img src="{{ $ref->screenshot_url }}" alt="{{ $ref->host }}" class="h-full w-full object-cover" loading="lazy">
+                                                @else
+                                                    <div class="flex h-full w-full items-center justify-center text-[color:var(--nx-faint)]">@svg('heroicon-o-globe-alt', 'w-6 h-6')</div>
+                                                @endif
+                                            </div>
+                                            <div class="flex items-center gap-1.5 px-2.5 py-2">
+                                                <span class="h-2 w-2 shrink-0 rounded-full {{ $ref->verdict === 'like' ? 'bg-emerald-500' : ($ref->verdict === 'dislike' ? 'bg-rose-500' : 'bg-[color:var(--nx-line-strong)]') }}"></span>
+                                                <span class="truncate text-[12px] text-[color:var(--nx-muted)]">{{ $ref->host }}</span>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            @else
+                                <div class="px-4 py-6 text-center text-[13px] text-[color:var(--nx-faint)]">Noch keine Referenzen</div>
+                            @endif
+                        </a>
                     </div>
                 @endforeach
             </section>

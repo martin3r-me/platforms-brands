@@ -226,6 +226,31 @@ class Brand extends Component
         return $this->redirect(route('brands.competitor-boards.show', $competitorBoard), navigate: true);
     }
 
+    public function createReferenceBoard()
+    {
+        $this->authorize('update', $this->brand);
+
+        $user = Auth::user();
+        $team = $user->currentTeam;
+
+        if (!$team) {
+            session()->flash('error', 'Kein Team ausgewählt.');
+            return;
+        }
+
+        $referenceBoard = \Platform\Brands\Models\BrandsReferenceBoard::create([
+            'name' => 'Neues Referenzen Board',
+            'description' => null,
+            'user_id' => $user->id,
+            'team_id' => $team->id,
+            'brand_id' => $this->brand->id,
+        ]);
+
+        $this->brand->refresh();
+
+        return $this->redirect(route('brands.reference-boards.show', $referenceBoard), navigate: true);
+    }
+
     public function createGuidelineBoard()
     {
         $this->authorize('update', $this->brand);
@@ -551,6 +576,7 @@ class Brand extends Component
         $toneOfVoiceBoards = $this->brand->toneOfVoiceBoards()->with(['entries' => fn($q) => $q->limit(6), 'dimensions' => fn($q) => $q->limit(6)])->withCount('entries')->get();
         $personaBoards = $this->brand->personaBoards()->with(['personas' => fn($q) => $q->limit(6)])->get();
         $competitorBoards = $this->brand->competitorBoards()->with(['competitors' => fn($q) => $q->limit(6)])->get();
+        $referenceBoards = $this->brand->referenceBoards()->with(['references' => fn($q) => $q->limit(8)])->get();
         $guidelineBoards = $this->brand->guidelineBoards()->with(['chapters' => fn($q) => $q->with(['entries' => fn($e) => $e->limit(5)])->withCount('entries')->limit(8)])->get();
         $moodboardBoards = $this->brand->moodboardBoards()->with(['images' => fn($q) => $q->limit(12)])->get();
         $assetBoards = $this->brand->assetBoards()->with(['assets' => fn($q) => $q->limit(6)])->withCount('assets')->get();
@@ -646,6 +672,17 @@ class Brand extends Component
                 'boardType' => 'competitor-board',
                 'entryRelation' => 'competitors',
                 'entryLabel' => 'Wettbewerber',
+            ],
+            [
+                'key' => 'reference',
+                'label' => 'Referenzen Boards',
+                'icon' => 'heroicon-o-link',
+                'color' => 'sky',
+                'boards' => $referenceBoards,
+                'routePrefix' => 'brands.reference-boards.show',
+                'boardType' => 'reference-board',
+                'entryRelation' => 'references',
+                'entryLabel' => 'Referenzen',
             ],
             [
                 'key' => 'guideline',
@@ -750,6 +787,7 @@ class Brand extends Component
             'toneOfVoiceBoards' => $toneOfVoiceBoards,
             'personaBoards' => $personaBoards,
             'competitorBoards' => $competitorBoards,
+            'referenceBoards' => $referenceBoards,
             'guidelineBoards' => $guidelineBoards,
             'moodboardBoards' => $moodboardBoards,
             'assetBoards' => $assetBoards,

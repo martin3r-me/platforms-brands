@@ -173,6 +173,11 @@ class BrandsBrand extends Model implements HasKeyResultAncestors, HasDisplayName
         return $this->hasMany(BrandsCompetitorBoard::class, 'brand_id')->orderBy('order');
     }
 
+    public function referenceBoards()
+    {
+        return $this->hasMany(BrandsReferenceBoard::class, 'brand_id')->orderBy('order');
+    }
+
     public function guidelineBoards()
     {
         return $this->hasMany(BrandsGuidelineBoard::class, 'brand_id')->orderBy('order');

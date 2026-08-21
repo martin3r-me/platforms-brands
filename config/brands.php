@@ -72,6 +72,18 @@ return [
         'script'    => 'Script',
     ],
 
+    // Aspekt-Tags für Website-Referenzen (Benchmark-Board)
+    'reference_aspects' => [
+        'layout'     => 'Layout',
+        'typography' => 'Typografie',
+        'color'      => 'Farbe',
+        'imagery'    => 'Bildsprache',
+        'tone'       => 'Tonalität',
+        'motion'     => 'Motion/Interaktion',
+        'navigation' => 'Navigation',
+        'content'    => 'Content/Struktur',
+    ],
+
     'navigation' => [
         'route' => 'brands.dashboard',
         'icon'  => 'heroicon-o-tag',

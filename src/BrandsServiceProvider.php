@@ -30,6 +30,8 @@ use Platform\Brands\Models\BrandsPersonaBoard;
 use Platform\Brands\Models\BrandsPersona;
 use Platform\Brands\Models\BrandsCompetitorBoard;
 use Platform\Brands\Models\BrandsCompetitor;
+use Platform\Brands\Models\BrandsReferenceBoard;
+use Platform\Brands\Models\BrandsReference;
 use Platform\Brands\Models\BrandsGuidelineBoard;
 use Platform\Brands\Models\BrandsGuidelineChapter;
 use Platform\Brands\Models\BrandsGuidelineEntry;
@@ -69,6 +71,8 @@ use Platform\Brands\Policies\PersonaBoardPolicy;
 use Platform\Brands\Policies\PersonaPolicy;
 use Platform\Brands\Policies\CompetitorBoardPolicy;
 use Platform\Brands\Policies\CompetitorPolicy;
+use Platform\Brands\Policies\ReferenceBoardPolicy;
+use Platform\Brands\Policies\ReferencePolicy;
 use Platform\Brands\Policies\GuidelineBoardPolicy;
 use Platform\Brands\Policies\GuidelineChapterPolicy;
 use Platform\Brands\Policies\GuidelineEntryPolicy;
@@ -276,6 +280,8 @@ class BrandsServiceProvider extends ServiceProvider
             BrandsPersona::class => PersonaPolicy::class,
             BrandsCompetitorBoard::class => CompetitorBoardPolicy::class,
             BrandsCompetitor::class => CompetitorPolicy::class,
+            BrandsReferenceBoard::class => ReferenceBoardPolicy::class,
+            BrandsReference::class => ReferencePolicy::class,
             BrandsGuidelineBoard::class => GuidelineBoardPolicy::class,
             BrandsGuidelineChapter::class => GuidelineChapterPolicy::class,
             BrandsGuidelineEntry::class => GuidelineEntryPolicy::class,

@@ -13,6 +13,7 @@ use Platform\Brands\Livewire\LogoBoard;
 use Platform\Brands\Livewire\ToneOfVoiceBoard;
 use Platform\Brands\Livewire\PersonaBoard;
 use Platform\Brands\Livewire\CompetitorBoard;
+use Platform\Brands\Livewire\ReferenceBoard;
 use Platform\Brands\Livewire\GuidelineBoard;
 use Platform\Brands\Livewire\MoodboardBoard;
 use Platform\Brands\Livewire\AssetBoard;
@@ -92,6 +93,10 @@ Route::get('/persona-boards/{brandsPersonaBoard}', PersonaBoard::class)
 // Competitor Board Routes
 Route::get('/competitor-boards/{brandsCompetitorBoard}', CompetitorBoard::class)
     ->name('brands.competitor-boards.show');
+
+// Reference Board Routes (Website-Referenzen / Benchmarks)
+Route::get('/reference-boards/{brandsReferenceBoard}', ReferenceBoard::class)
+    ->name('brands.reference-boards.show');
 
 // Guideline Board Routes
 Route::get('/guideline-boards/{brandsGuidelineBoard}', GuidelineBoard::class)
