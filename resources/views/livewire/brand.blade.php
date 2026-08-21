@@ -46,59 +46,59 @@
                         style="display: none;"
                     >
                         <div class="py-1 max-h-96 overflow-y-auto">
-                            <button wire:click="createSocialBoard" @click="open = false" class="w-full text-left px-4 py-2.5 text-sm text-[var(--nx-text)] hover:bg-[var(--nx-hover)] transition-colors flex items-center gap-3">
+                            <button wire:click="createBoard('social')" @click="open = false" class="w-full text-left px-4 py-2.5 text-sm text-[var(--nx-text)] hover:bg-[var(--nx-hover)] transition-colors flex items-center gap-3">
                                 <div class="flex items-center justify-center w-8 h-8 rounded-md bg-purple-50">@svg('heroicon-o-share', 'w-4 h-4 text-purple-600')</div>
                                 <div><div class="font-medium">Social Board</div><div class="text-xs text-[var(--nx-faint)]">Für Social Media</div></div>
                             </button>
-                            <button wire:click="createCiBoard" @click="open = false" class="w-full text-left px-4 py-2.5 text-sm text-[var(--nx-text)] hover:bg-[var(--nx-hover)] transition-colors flex items-center gap-3">
+                            <button wire:click="createBoard('ci')" @click="open = false" class="w-full text-left px-4 py-2.5 text-sm text-[var(--nx-text)] hover:bg-[var(--nx-hover)] transition-colors flex items-center gap-3">
                                 <div class="flex items-center justify-center w-8 h-8 rounded-md bg-amber-50">@svg('heroicon-o-paint-brush', 'w-4 h-4 text-amber-600')</div>
                                 <div><div class="font-medium">CI Board</div><div class="text-xs text-[var(--nx-faint)]">Für Corporate Identity</div></div>
                             </button>
-                            <button wire:click="createKanbanBoard" @click="open = false" class="w-full text-left px-4 py-2.5 text-sm text-[var(--nx-text)] hover:bg-[var(--nx-hover)] transition-colors flex items-center gap-3">
+                            <button wire:click="createBoard('kanban')" @click="open = false" class="w-full text-left px-4 py-2.5 text-sm text-[var(--nx-text)] hover:bg-[var(--nx-hover)] transition-colors flex items-center gap-3">
                                 <div class="flex items-center justify-center w-8 h-8 rounded-md bg-indigo-50">@svg('heroicon-o-view-columns', 'w-4 h-4 text-indigo-600')</div>
                                 <div><div class="font-medium">Kanban Board</div><div class="text-xs text-[var(--nx-faint)]">Für Aufgabenverwaltung</div></div>
                             </button>
-                            <button wire:click="createTypographyBoard" @click="open = false" class="w-full text-left px-4 py-2.5 text-sm text-[var(--nx-text)] hover:bg-[var(--nx-hover)] transition-colors flex items-center gap-3">
+                            <button wire:click="createBoard('typography')" @click="open = false" class="w-full text-left px-4 py-2.5 text-sm text-[var(--nx-text)] hover:bg-[var(--nx-hover)] transition-colors flex items-center gap-3">
                                 <div class="flex items-center justify-center w-8 h-8 rounded-md bg-rose-50">@svg('heroicon-o-language', 'w-4 h-4 text-rose-600')</div>
                                 <div><div class="font-medium">Typografie Board</div><div class="text-xs text-[var(--nx-faint)]">Schriften & Hierarchien</div></div>
                             </button>
-                            <button wire:click="createLogoBoard" @click="open = false" class="w-full text-left px-4 py-2.5 text-sm text-[var(--nx-text)] hover:bg-[var(--nx-hover)] transition-colors flex items-center gap-3">
+                            <button wire:click="createBoard('logo')" @click="open = false" class="w-full text-left px-4 py-2.5 text-sm text-[var(--nx-text)] hover:bg-[var(--nx-hover)] transition-colors flex items-center gap-3">
                                 <div class="flex items-center justify-center w-8 h-8 rounded-md bg-emerald-50">@svg('heroicon-o-photo', 'w-4 h-4 text-emerald-600')</div>
                                 <div><div class="font-medium">Logo Board</div><div class="text-xs text-[var(--nx-faint)]">Logo-Varianten verwalten</div></div>
                             </button>
-                            <button wire:click="createToneOfVoiceBoard" @click="open = false" class="w-full text-left px-4 py-2.5 text-sm text-[var(--nx-text)] hover:bg-[var(--nx-hover)] transition-colors flex items-center gap-3">
+                            <button wire:click="createBoard('tone-of-voice')" @click="open = false" class="w-full text-left px-4 py-2.5 text-sm text-[var(--nx-text)] hover:bg-[var(--nx-hover)] transition-colors flex items-center gap-3">
                                 <div class="flex items-center justify-center w-8 h-8 rounded-md bg-violet-50">@svg('heroicon-o-megaphone', 'w-4 h-4 text-violet-600')</div>
                                 <div><div class="font-medium">Tone of Voice Board</div><div class="text-xs text-[var(--nx-faint)]">Markenstimme & Messaging</div></div>
                             </button>
-                            <button wire:click="createPersonaBoard" @click="open = false" class="w-full text-left px-4 py-2.5 text-sm text-[var(--nx-text)] hover:bg-[var(--nx-hover)] transition-colors flex items-center gap-3">
+                            <button wire:click="createBoard('persona')" @click="open = false" class="w-full text-left px-4 py-2.5 text-sm text-[var(--nx-text)] hover:bg-[var(--nx-hover)] transition-colors flex items-center gap-3">
                                 <div class="flex items-center justify-center w-8 h-8 rounded-md bg-teal-50">@svg('heroicon-o-user-group', 'w-4 h-4 text-teal-600')</div>
                                 <div><div class="font-medium">Persona Board</div><div class="text-xs text-[var(--nx-faint)]">Zielgruppen & Personas</div></div>
                             </button>
-                            <button wire:click="createCompetitorBoard" @click="open = false" class="w-full text-left px-4 py-2.5 text-sm text-[var(--nx-text)] hover:bg-[var(--nx-hover)] transition-colors flex items-center gap-3">
+                            <button wire:click="createBoard('competitor')" @click="open = false" class="w-full text-left px-4 py-2.5 text-sm text-[var(--nx-text)] hover:bg-[var(--nx-hover)] transition-colors flex items-center gap-3">
                                 <div class="flex items-center justify-center w-8 h-8 rounded-md bg-orange-50">@svg('heroicon-o-scale', 'w-4 h-4 text-orange-600')</div>
                                 <div><div class="font-medium">Wettbewerber Board</div><div class="text-xs text-[var(--nx-faint)]">Wettbewerber-Analyse</div></div>
                             </button>
-                            <button wire:click="createReferenceBoard" @click="open = false" class="w-full text-left px-4 py-2.5 text-sm text-[var(--nx-text)] hover:bg-[var(--nx-hover)] transition-colors flex items-center gap-3">
+                            <button wire:click="createBoard('reference')" @click="open = false" class="w-full text-left px-4 py-2.5 text-sm text-[var(--nx-text)] hover:bg-[var(--nx-hover)] transition-colors flex items-center gap-3">
                                 <div class="flex items-center justify-center w-8 h-8 rounded-md bg-sky-50">@svg('heroicon-o-link', 'w-4 h-4 text-sky-600')</div>
                                 <div><div class="font-medium">Referenzen Board</div><div class="text-xs text-[var(--nx-faint)]">Website-Benchmarks & Vorbilder</div></div>
                             </button>
-                            <button wire:click="createGuidelineBoard" @click="open = false" class="w-full text-left px-4 py-2.5 text-sm text-[var(--nx-text)] hover:bg-[var(--nx-hover)] transition-colors flex items-center gap-3">
+                            <button wire:click="createBoard('guideline')" @click="open = false" class="w-full text-left px-4 py-2.5 text-sm text-[var(--nx-text)] hover:bg-[var(--nx-hover)] transition-colors flex items-center gap-3">
                                 <div class="flex items-center justify-center w-8 h-8 rounded-md bg-cyan-50">@svg('heroicon-o-book-open', 'w-4 h-4 text-cyan-600')</div>
                                 <div><div class="font-medium">Guidelines Board</div><div class="text-xs text-[var(--nx-faint)]">Markenregeln & Dos/Don'ts</div></div>
                             </button>
-                            <button wire:click="createMoodboardBoard" @click="open = false" class="w-full text-left px-4 py-2.5 text-sm text-[var(--nx-text)] hover:bg-[var(--nx-hover)] transition-colors flex items-center gap-3">
+                            <button wire:click="createBoard('moodboard')" @click="open = false" class="w-full text-left px-4 py-2.5 text-sm text-[var(--nx-text)] hover:bg-[var(--nx-hover)] transition-colors flex items-center gap-3">
                                 <div class="flex items-center justify-center w-8 h-8 rounded-md bg-rose-50">@svg('heroicon-o-photo', 'w-4 h-4 text-rose-600')</div>
                                 <div><div class="font-medium">Moodboard</div><div class="text-xs text-[var(--nx-faint)]">Bildsprache & Stilrichtung</div></div>
                             </button>
-                            <button wire:click="createAssetBoard" @click="open = false" class="w-full text-left px-4 py-2.5 text-sm text-[var(--nx-text)] hover:bg-[var(--nx-hover)] transition-colors flex items-center gap-3">
+                            <button wire:click="createBoard('asset')" @click="open = false" class="w-full text-left px-4 py-2.5 text-sm text-[var(--nx-text)] hover:bg-[var(--nx-hover)] transition-colors flex items-center gap-3">
                                 <div class="flex items-center justify-center w-8 h-8 rounded-md bg-sky-50">@svg('heroicon-o-folder-open', 'w-4 h-4 text-sky-600')</div>
                                 <div><div class="font-medium">Asset Board</div><div class="text-xs text-[var(--nx-faint)]">Templates & Brand Assets</div></div>
                             </button>
-                            <button wire:click="createSeoBoard" @click="open = false" class="w-full text-left px-4 py-2.5 text-sm text-[var(--nx-text)] hover:bg-[var(--nx-hover)] transition-colors flex items-center gap-3">
+                            <button wire:click="createBoard('seo')" @click="open = false" class="w-full text-left px-4 py-2.5 text-sm text-[var(--nx-text)] hover:bg-[var(--nx-hover)] transition-colors flex items-center gap-3">
                                 <div class="flex items-center justify-center w-8 h-8 rounded-md bg-lime-50">@svg('heroicon-o-magnifying-glass', 'w-4 h-4 text-lime-600')</div>
                                 <div><div class="font-medium">SEO Board</div><div class="text-xs text-[var(--nx-faint)]">Keyword-Recherche</div></div>
                             </button>
-                            <button wire:click="createContentBriefBoard" @click="open = false" class="w-full text-left px-4 py-2.5 text-sm text-[var(--nx-text)] hover:bg-[var(--nx-hover)] transition-colors flex items-center gap-3">
+                            <button wire:click="createBoard('content-brief')" @click="open = false" class="w-full text-left px-4 py-2.5 text-sm text-[var(--nx-text)] hover:bg-[var(--nx-hover)] transition-colors flex items-center gap-3">
                                 <div class="flex items-center justify-center w-8 h-8 rounded-md bg-fuchsia-50">@svg('heroicon-o-document-magnifying-glass', 'w-4 h-4 text-fuchsia-600')</div>
                                 <div><div class="font-medium">Content Brief Board</div><div class="text-xs text-[var(--nx-faint)]">Content-Planung</div></div>
                             </button>

@@ -84,6 +84,31 @@ return [
         'content'    => 'Content/Struktur',
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Board-Typen (Single Source of Truth)
+    |--------------------------------------------------------------------------
+    | Zentrale Registry aller Board-Typen einer Marke. Steuert das generische
+    | Anlegen (Brand::createBoard). Ein neuer Board-Typ = ein Eintrag hier
+    | (+ Model, Route, View) – keine 14. copy-paste-Methode mehr.
+    */
+    'board_types' => [
+        'ci'            => ['model' => \Platform\Brands\Models\BrandsCiBoard::class,           'name' => 'Neues CI Board',            'route' => 'brands.ci-boards.show'],
+        'social'        => ['model' => \Platform\Brands\Models\BrandsSocialBoard::class,       'name' => 'Neues Social Board',        'route' => 'brands.social-boards.show'],
+        'kanban'        => ['model' => \Platform\Brands\Models\BrandsKanbanBoard::class,       'name' => 'Neues Kanban Board',        'route' => 'brands.kanban-boards.show'],
+        'typography'    => ['model' => \Platform\Brands\Models\BrandsTypographyBoard::class,   'name' => 'Neues Typografie Board',    'route' => 'brands.typography-boards.show'],
+        'logo'          => ['model' => \Platform\Brands\Models\BrandsLogoBoard::class,         'name' => 'Neues Logo Board',          'route' => 'brands.logo-boards.show'],
+        'tone-of-voice' => ['model' => \Platform\Brands\Models\BrandsToneOfVoiceBoard::class,  'name' => 'Neues Tone of Voice Board', 'route' => 'brands.tone-of-voice-boards.show'],
+        'persona'       => ['model' => \Platform\Brands\Models\BrandsPersonaBoard::class,      'name' => 'Neues Persona Board',       'route' => 'brands.persona-boards.show'],
+        'competitor'    => ['model' => \Platform\Brands\Models\BrandsCompetitorBoard::class,   'name' => 'Neues Wettbewerber Board',  'route' => 'brands.competitor-boards.show'],
+        'reference'     => ['model' => \Platform\Brands\Models\BrandsReferenceBoard::class,    'name' => 'Neues Referenzen Board',    'route' => 'brands.reference-boards.show'],
+        'guideline'     => ['model' => \Platform\Brands\Models\BrandsGuidelineBoard::class,    'name' => 'Neues Guidelines Board',    'route' => 'brands.guideline-boards.show'],
+        'moodboard'     => ['model' => \Platform\Brands\Models\BrandsMoodboardBoard::class,    'name' => 'Neues Moodboard',           'route' => 'brands.moodboard-boards.show'],
+        'asset'         => ['model' => \Platform\Brands\Models\BrandsAssetBoard::class,        'name' => 'Neues Asset Board',         'route' => 'brands.asset-boards.show'],
+        'seo'           => ['model' => \Platform\Brands\Models\BrandsSeoBoard::class,          'name' => 'Neues SEO Board',           'route' => 'brands.seo-boards.show'],
+        'content-brief' => ['model' => \Platform\Brands\Models\BrandsContentBriefBoard::class, 'name' => 'Neues Content Brief',       'route' => 'brands.content-brief-boards.show'],
+    ],
+
     'navigation' => [
         'route' => 'brands.dashboard',
         'icon'  => 'heroicon-o-tag',
