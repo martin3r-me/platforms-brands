@@ -87,7 +87,18 @@ class LogoVariantModal extends Component
         return [
             'variantName' => 'required|string|max:255',
             'variantType' => 'required|string|in:' . implode(',', array_keys(BrandsLogoVariant::TYPES)),
-            'logoUpload' => 'nullable|file|max:10240|mimes:svg,png,pdf,jpg,jpeg,webp,eps,ai',
+            // Format über die Datei-Endung prüfen statt über mimes: die inhaltsbasierte
+            // MIME-Erkennung liefert für prolog-lose SVGs je nach Server text/plain und
+            // ließ den Upload dann fälschlich scheitern.
+            'logoUpload' => ['nullable', 'file', 'max:10240', function ($attribute, $value, $fail) {
+                if (! $value) {
+                    return;
+                }
+                $ext = strtolower($value->getClientOriginalExtension());
+                if (! in_array($ext, ['svg', 'png', 'pdf', 'jpg', 'jpeg', 'webp', 'eps', 'ai'], true)) {
+                    $fail('Nicht unterstütztes Format. Erlaubt: SVG, PNG, PDF, JPG, WEBP, EPS, AI.');
+                }
+            }],
         ];
     }
 
