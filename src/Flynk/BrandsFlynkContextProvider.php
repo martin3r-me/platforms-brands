@@ -50,10 +50,29 @@ class BrandsFlynkContextProvider implements ProvidesFlynkContext
     protected function resolveBrand(OrganizationEntity $node): ?BrandsBrand
     {
         // Verortung wie überall via Dimension-Link (Morph-Alias 'brands_brand').
-        $link = EntityDimensionBridge::linksForEntity($node->id)
-            ->first(fn ($l) => $l->linkable_type === 'brands_brand');
+        //
+        // Der FLYNK-Container hängt am Website-Knoten (z. B. "PausePlus Landingpage"),
+        // die Marke aber am Venture darüber. Deshalb den Org-Baum vom Knoten aus
+        // nach oben laufen und die erste gefundene Marke nehmen.
+        //
+        // Der Wurzel-/Träger-Knoten (parent_entity_id === null, z. B. BHG.DIGITAL)
+        // wird bewusst NICHT als Marken-Quelle für seine Kinder herangezogen –
+        // sonst würde jeder beliebige Knoten die Dach-Marke erben.
+        $current = $node;
+        $guard = 0;
 
-        return $link ? BrandsBrand::find($link->linkable_id) : null;
+        while ($current && $current->parent_entity_id !== null && $guard++ < 12) {
+            $link = EntityDimensionBridge::linksForEntity($current->id)
+                ->first(fn ($l) => $l->linkable_type === 'brands_brand');
+
+            if ($link) {
+                return BrandsBrand::find($link->linkable_id);
+            }
+
+            $current = OrganizationEntity::find($current->parent_entity_id);
+        }
+
+        return null;
     }
 
     protected function identity($ci, Collection $entriesByType): array
