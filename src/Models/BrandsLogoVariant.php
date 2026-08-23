@@ -6,12 +6,15 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Symfony\Component\Uid\UuidV7;
 use Platform\Core\Contracts\HasDisplayName;
+use Platform\Core\Traits\HasContextFileReferences;
 
 /**
  * Model für einzelne Logo-Varianten (Primary, Secondary, Monochrome, Favicon, Icon, etc.)
  */
 class BrandsLogoVariant extends Model implements HasDisplayName
 {
+    use HasContextFileReferences;
+
     protected $table = 'brands_logo_variants';
 
     protected $fillable = [
@@ -88,14 +91,21 @@ class BrandsLogoVariant extends Model implements HasDisplayName
     }
 
     /**
-     * Gibt die URL zur Hauptdatei zurück
+     * Gibt die URL zur Hauptdatei zurück — bevorzugt das ContextFile,
+     * Fallback auf das alte public-Storage-Feld (Legacy-Daten).
      */
     public function getFileUrlAttribute(): ?string
     {
-        if (!$this->file_path) {
-            return null;
+        $ref = $this->getOrderedFileReferences()->first();
+        if ($ref && $ref->url) {
+            return $ref->url;
         }
-        return asset('storage/' . $this->file_path);
+
+        if ($this->file_path) {
+            return asset('storage/' . $this->file_path);
+        }
+
+        return null;
     }
 
     /**

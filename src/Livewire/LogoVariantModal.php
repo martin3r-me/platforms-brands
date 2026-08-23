@@ -4,7 +4,8 @@ namespace Platform\Brands\Livewire;
 
 use Livewire\Component;
 use Livewire\WithFileUploads;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Auth;
+use Platform\Core\Services\ContextFileService;
 use Platform\Brands\Models\BrandsLogoBoard;
 use Platform\Brands\Models\BrandsLogoVariant;
 use Livewire\Attributes\On;
@@ -144,26 +145,44 @@ class LogoVariantModal extends Component
             'donts' => !empty($this->dontsList) ? array_values(array_filter($this->dontsList, fn($d) => !empty($d['text']))) : null,
         ];
 
+        $contextFileService = app(ContextFileService::class);
+        $contextFile = null;
+
         try {
-            // Handle logo file upload
+            // Upload läuft über ContextFiles (core) – wie überall im System,
+            // nicht in den lokalen public-Storage. Datei hängt am Logo-Board-Kontext.
             if ($this->logoUpload) {
-                $path = $this->logoUpload->store('brands/logos', 'public');
-                $data['file_path'] = $path;
                 $data['file_name'] = $this->logoUpload->getClientOriginalName();
                 $data['file_format'] = strtolower($this->logoUpload->getClientOriginalExtension());
+
+                $contextFile = $contextFileService->uploadForContext(
+                    $this->logoUpload,
+                    BrandsLogoBoard::class,
+                    $this->logoBoardId,
+                    ['team_id' => $board->team_id, 'user_id' => Auth::id()],
+                );
             }
 
             if ($this->variant) {
-                // Update existing variant - delete old file if replacing
-                if ($this->logoUpload && $this->variant->file_path) {
-                    if (Storage::disk('public')->exists($this->variant->file_path)) {
-                        Storage::disk('public')->delete($this->variant->file_path);
+                // Bei Ersatz: alte ContextFiles der Variante entfernen
+                if ($this->logoUpload) {
+                    foreach ($this->variant->getOrderedFileReferences() as $ref) {
+                        if ($ref->context_file_id) {
+                            $contextFileService->delete($ref->context_file_id);
+                        }
+                        $this->variant->removeFileReference($ref->id);
                     }
                 }
                 $this->variant->update($data);
+                if ($contextFile) {
+                    $this->variant->addFileReference($contextFile['id']);
+                }
             } else {
                 $data['logo_board_id'] = $this->logoBoardId;
-                BrandsLogoVariant::create($data);
+                $variant = BrandsLogoVariant::create($data);
+                if ($contextFile) {
+                    $variant->addFileReference($contextFile['id']);
+                }
             }
         } catch (\Throwable $e) {
             report($e);

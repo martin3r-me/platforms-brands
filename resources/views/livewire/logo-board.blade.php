@@ -82,7 +82,7 @@
                                 {{-- Light Background --}}
                                 <div class="flex min-h-[200px] flex-col items-center justify-center border-b border-[color:var(--nx-line)] bg-white p-8 lg:border-b-0 lg:border-r">
                                     <div class="mb-4 text-[10px] font-semibold uppercase tracking-[0.12em] text-[color:var(--nx-faint)]">Heller Hintergrund</div>
-                                    @if($variant->file_path)
+                                    @if($variant->file_url)
                                         <div class="relative">
                                             @if($variant->is_svg)
                                                 <img src="{{ $variant->file_url }}" alt="{{ $variant->name }}" class="max-w-[200px] max-h-[120px] object-contain">
@@ -101,7 +101,7 @@
                                 {{-- Dark Background --}}
                                 <div class="flex min-h-[200px] flex-col items-center justify-center bg-gray-900 p-8">
                                     <div class="mb-4 text-[10px] font-semibold uppercase tracking-[0.12em] text-gray-400">Dunkler Hintergrund</div>
-                                    @if($variant->file_path)
+                                    @if($variant->file_url)
                                         <div class="relative">
                                             <img src="{{ $variant->file_url }}" alt="{{ $variant->name }}" class="max-w-[200px] max-h-[120px] object-contain">
                                         </div>
@@ -187,7 +187,7 @@
                             @endif
 
                             {{-- File Formats Info --}}
-                            @if($variant->file_path || ($variant->additional_formats && count($variant->additional_formats) > 0))
+                            @if($variant->file_url || ($variant->additional_formats && count($variant->additional_formats) > 0))
                                 <div class="border-t border-[color:var(--nx-line)] px-4 py-4">
                                     <div class="mb-3 flex items-center gap-2">
                                         @svg('heroicon-o-document-duplicate', 'w-4 h-4 text-[color:var(--nx-faint)]')
