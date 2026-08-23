@@ -200,8 +200,13 @@
     </div>
 
     <x-slot name="footer">
-        <x-nx-button variant="primary" wire:click="save">
-            {{ $variant ? 'Aktualisieren' : 'Erstellen' }}
+        {{-- Hinweis, solange die Datei noch hochlädt (verhindert Speichern ohne Datei) --}}
+        <span wire:loading wire:target="logoUpload" class="mr-auto text-xs text-[color:var(--nx-faint)]">Datei wird hochgeladen…</span>
+        <x-nx-button variant="primary" wire:click="save"
+                     wire:loading.attr="disabled" wire:target="logoUpload,save"
+                     wire:loading.class="opacity-50 pointer-events-none">
+            <span wire:loading.remove wire:target="save">{{ $variant ? 'Aktualisieren' : 'Erstellen' }}</span>
+            <span wire:loading wire:target="save">Speichert…</span>
         </x-nx-button>
     </x-slot>
 </x-nx-modal>

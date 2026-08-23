@@ -144,25 +144,32 @@ class LogoVariantModal extends Component
             'donts' => !empty($this->dontsList) ? array_values(array_filter($this->dontsList, fn($d) => !empty($d['text']))) : null,
         ];
 
-        // Handle logo file upload
-        if ($this->logoUpload) {
-            $path = $this->logoUpload->store('brands/logos', 'public');
-            $data['file_path'] = $path;
-            $data['file_name'] = $this->logoUpload->getClientOriginalName();
-            $data['file_format'] = strtolower($this->logoUpload->getClientOriginalExtension());
-        }
-
-        if ($this->variant) {
-            // Update existing variant - delete old file if replacing
-            if ($this->logoUpload && $this->variant->file_path) {
-                if (Storage::disk('public')->exists($this->variant->file_path)) {
-                    Storage::disk('public')->delete($this->variant->file_path);
-                }
+        try {
+            // Handle logo file upload
+            if ($this->logoUpload) {
+                $path = $this->logoUpload->store('brands/logos', 'public');
+                $data['file_path'] = $path;
+                $data['file_name'] = $this->logoUpload->getClientOriginalName();
+                $data['file_format'] = strtolower($this->logoUpload->getClientOriginalExtension());
             }
-            $this->variant->update($data);
-        } else {
-            $data['logo_board_id'] = $this->logoBoardId;
-            BrandsLogoVariant::create($data);
+
+            if ($this->variant) {
+                // Update existing variant - delete old file if replacing
+                if ($this->logoUpload && $this->variant->file_path) {
+                    if (Storage::disk('public')->exists($this->variant->file_path)) {
+                        Storage::disk('public')->delete($this->variant->file_path);
+                    }
+                }
+                $this->variant->update($data);
+            } else {
+                $data['logo_board_id'] = $this->logoBoardId;
+                BrandsLogoVariant::create($data);
+            }
+        } catch (\Throwable $e) {
+            report($e);
+            // Fehler sichtbar machen statt still als 500 verpuffen zu lassen.
+            $this->addError('logoUpload', 'Speichern fehlgeschlagen: ' . $e->getMessage());
+            return;
         }
 
         $this->dispatch('updateLogoBoard');
