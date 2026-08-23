@@ -41,6 +41,9 @@ class BrandsFlynkContextProvider implements ProvidesFlynkContext
             'identity'         => $this->identity($ci, $entriesByType),
             'voice'            => $this->voice($tov, $guide),
             'visuals'          => $this->visuals($ci, $typo),
+            'logos'            => $this->logos($brand),
+            'moodboard'        => $this->moodboard($brand),
+            'design'           => $this->design($brand),
             'audience'         => $this->audience($pers),
             'ctas'             => $this->ctas($brand),
             'references'       => $this->references($brand),
@@ -143,6 +146,86 @@ class BrandsFlynkContextProvider implements ProvidesFlynkContext
             'font_family' => $ci?->font_family,
             'typography'  => $typography,
         ], fn ($v) => $v !== null && $v !== [] && $v !== '');
+    }
+
+    /**
+     * Logo-Varianten mit lang gültigen Datei-URLs für den FLYNK-Ingest.
+     * Die ContextFile-Standard-URL läuft nach 60 Min ab; für den Push nutzen wir
+     * getUrlForExternalService() mit 7 Tagen TTL (S3-presign-kompatibel).
+     */
+    protected function logos(BrandsBrand $brand): array
+    {
+        $board = $brand->logoBoards()->with('variants')->first();
+        if (! $board) {
+            return [];
+        }
+
+        $ttl = 60 * 24 * 7; // 7 Tage
+
+        return $board->variants
+            ->map(function ($v) use ($ttl) {
+                $file = $v->getOrderedFileReferences()->first()?->contextFile;
+                $url  = $file?->getUrlForExternalService($ttl);
+                if (! $url) {
+                    return null;
+                }
+
+                return array_filter([
+                    'name'   => $v->name,
+                    'type'   => $v->type,
+                    'format' => $v->file_format,
+                    'url'    => $url,
+                ], fn ($x) => $x !== null && $x !== '');
+            })
+            ->filter()
+            ->values()
+            ->all();
+    }
+
+    /**
+     * Moodboard-Bilder (Bildsprache/Stilrichtung) mit lang gültigen URLs.
+     */
+    protected function moodboard(BrandsBrand $brand): array
+    {
+        $board = $brand->moodboardBoards()->with('images')->first();
+        if (! $board) {
+            return [];
+        }
+
+        $ttl = 60 * 24 * 7; // 7 Tage
+
+        return $board->images
+            ->map(function ($img) use ($ttl) {
+                $file = $img->getOrderedFileReferences()->first()?->contextFile;
+                $url  = $file?->getUrlForExternalService($ttl);
+                if (! $url) {
+                    return null;
+                }
+
+                return array_filter([
+                    'title'      => $img->title,
+                    'annotation' => $img->annotation,
+                    'type'       => $img->type,
+                    'tags'       => $img->tags,
+                    'url'        => $url,
+                ], fn ($x) => $x !== null && $x !== '' && $x !== []);
+            })
+            ->filter()
+            ->values()
+            ->all();
+    }
+
+    /**
+     * Design-Richtung: Bestandsseite (IST), Wireframe (SOLL-Struktur),
+     * Mockup (SOLL-Design). Externe, dauerhaft gültige Links (Artifact/Figma/Live).
+     */
+    protected function design(BrandsBrand $brand): array
+    {
+        return array_filter([
+            'live_url'      => $brand->live_url,
+            'wireframe_url' => $brand->wireframe_url,
+            'mockup_url'    => $brand->mockup_url,
+        ], fn ($v) => $v !== null && $v !== '');
     }
 
     protected function audience($pers): array
