@@ -187,7 +187,7 @@
                             @endif
 
                             {{-- File Formats Info --}}
-                            @if($variant->file_url || ($variant->additional_formats && count($variant->additional_formats) > 0))
+                            @if($variant->file_url || (is_array($variant->additional_formats) && count($variant->additional_formats) > 0))
                                 <div class="border-t border-[color:var(--nx-line)] px-4 py-4">
                                     <div class="mb-3 flex items-center gap-2">
                                         @svg('heroicon-o-document-duplicate', 'w-4 h-4 text-[color:var(--nx-faint)]')
@@ -200,7 +200,7 @@
                                                 {{ strtoupper($variant->file_format) }} (Haupt)
                                             </x-nx-badge>
                                         @endif
-                                        @if($variant->additional_formats)
+                                        @if(is_array($variant->additional_formats))
                                             @foreach($variant->additional_formats as $format)
                                                 <x-nx-badge variant="neutral">
                                                     @svg('heroicon-o-document', 'w-3.5 h-3.5')
@@ -227,7 +227,7 @@
                             @endif
 
                             {{-- Do's & Don'ts --}}
-                            @if(($variant->dos && count($variant->dos) > 0) || ($variant->donts && count($variant->donts) > 0))
+                            @if((is_array($variant->dos) && count($variant->dos) > 0) || (is_array($variant->donts) && count($variant->donts) > 0))
                                 <div class="border-t border-[color:var(--nx-line)] px-4 py-5">
                                     <div class="mb-4 flex items-center gap-2">
                                         @svg('heroicon-o-hand-thumb-up', 'w-4 h-4 text-[color:var(--nx-faint)]')
@@ -235,7 +235,7 @@
                                     </div>
                                     <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
                                         {{-- Do's --}}
-                                        @if($variant->dos && count($variant->dos) > 0)
+                                        @if(is_array($variant->dos) && count($variant->dos) > 0)
                                             <div>
                                                 <div class="mb-3 flex items-center gap-2">
                                                     <x-nx-badge variant="success" dot>Do's</x-nx-badge>
@@ -252,7 +252,7 @@
                                         @endif
 
                                         {{-- Don'ts --}}
-                                        @if($variant->donts && count($variant->donts) > 0)
+                                        @if(is_array($variant->donts) && count($variant->donts) > 0)
                                             <div>
                                                 <div class="mb-3 flex items-center gap-2">
                                                     <x-nx-badge variant="danger" dot>Don'ts</x-nx-badge>
