@@ -155,7 +155,7 @@
                                             @endif
 
                                             {{-- Querverweise --}}
-                                            @if(!empty($entry->cross_references))
+                                            @if(is_array($entry->cross_references) && !empty($entry->cross_references))
                                                 <div class="mt-4 flex flex-wrap items-center gap-2">
                                                     @svg('heroicon-o-link', 'w-4 h-4 shrink-0 text-[color:var(--nx-faint)]')
                                                     @foreach($entry->cross_references as $ref)
