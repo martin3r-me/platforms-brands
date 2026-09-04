@@ -8,8 +8,8 @@
             @if($asset && !$assetFile)
                 <div class="mb-3 p-4 rounded-[6px] border border-[color:var(--nx-line)] bg-[color:var(--nx-hover)]">
                     <div class="flex items-center gap-3">
-                        @if($asset->mime_type && str_starts_with($asset->mime_type, 'image/'))
-                            <img src="{{ asset('storage/' . $asset->file_path) }}" alt="{{ $asset->name }}" class="w-16 h-16 object-cover rounded-lg">
+                        @if($asset->is_image && $asset->file_url)
+                            <img src="{{ $asset->file_url }}" alt="{{ $asset->name }}" class="w-16 h-16 rounded-lg {{ $asset->is_svg ? 'object-contain p-1 bg-white' : 'object-cover' }}">
                         @else
                             <div class="w-16 h-16 rounded-lg bg-gray-100 flex items-center justify-center">
                                 @svg('heroicon-o-document', 'w-8 h-8 text-gray-400')
@@ -132,7 +132,7 @@
                                 @endif
                                 <p class="text-xs text-[color:var(--nx-faint)]">{{ $version->created_at->format('d.m.Y H:i') }}</p>
                             </div>
-                            <a href="{{ asset('storage/' . $version->file_path) }}" download="{{ $version->file_name }}" class="p-1.5 text-[color:var(--nx-faint)] hover:text-sky-600 transition-colors" title="Version {{ $version->version_number }} herunterladen">
+                            <a href="{{ $version->file_url }}" target="_blank" rel="noopener noreferrer" class="p-1.5 text-[color:var(--nx-faint)] hover:text-sky-600 transition-colors" title="Version {{ $version->version_number }} öffnen">
                                 @svg('heroicon-o-arrow-down-tray', 'w-4 h-4')
                             </a>
                         </div>
@@ -143,8 +143,12 @@
     </div>
 
     <x-slot name="footer">
-        <x-nx-button variant="primary" wire:click="save">
-            {{ $asset ? 'Aktualisieren' : 'Erstellen' }}
+        <span wire:loading wire:target="assetFile" class="mr-auto text-xs text-[color:var(--nx-faint)]">Datei wird hochgeladen…</span>
+        <x-nx-button variant="primary" wire:click="save"
+                     wire:loading.attr="disabled" wire:target="assetFile,save"
+                     wire:loading.class="opacity-50 pointer-events-none">
+            <span wire:loading.remove wire:target="save">{{ $asset ? 'Aktualisieren' : 'Erstellen' }}</span>
+            <span wire:loading wire:target="save">Speichert…</span>
         </x-nx-button>
     </x-slot>
 </x-nx-modal>

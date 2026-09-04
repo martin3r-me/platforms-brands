@@ -43,6 +43,7 @@ class BrandsFlynkContextProvider implements ProvidesFlynkContext
             'visuals'          => $this->visuals($ci, $typo),
             'logos'            => $this->logos($brand),
             'moodboard'        => $this->moodboard($brand),
+            'assets'           => $this->assets($brand),
             'design'           => $this->design($brand),
             'audience'         => $this->audience($pers),
             'ctas'             => $this->ctas($brand),
@@ -208,6 +209,39 @@ class BrandsFlynkContextProvider implements ProvidesFlynkContext
                     'type'       => $img->type,
                     'tags'       => $img->tags,
                     'url'        => $url,
+                ], fn ($x) => $x !== null && $x !== '' && $x !== []);
+            })
+            ->filter()
+            ->values()
+            ->all();
+    }
+
+    /**
+     * Marken-Assets (Templates, Briefköpfe, Banner …) mit lang gültigen URLs.
+     */
+    protected function assets(BrandsBrand $brand): array
+    {
+        $board = $brand->assetBoards()->with('assets')->first();
+        if (! $board) {
+            return [];
+        }
+
+        $ttl = 60 * 24 * 7; // 7 Tage
+
+        return $board->assets
+            ->map(function ($asset) use ($ttl) {
+                $file = $asset->getOrderedFileReferences()->first()?->contextFile;
+                $url  = $file?->getUrlForExternalService($ttl);
+                if (! $url) {
+                    return null;
+                }
+
+                return array_filter([
+                    'name'      => $asset->name,
+                    'type'      => $asset->asset_type,
+                    'mime_type' => $asset->mime_type,
+                    'tags'      => $asset->tags,
+                    'url'       => $url,
                 ], fn ($x) => $x !== null && $x !== '' && $x !== []);
             })
             ->filter()

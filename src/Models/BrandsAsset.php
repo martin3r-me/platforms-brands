@@ -7,12 +7,15 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Symfony\Component\Uid\UuidV7;
 use Platform\Core\Contracts\HasDisplayName;
+use Platform\Core\Traits\HasContextFileReferences;
 
 /**
  * Model für einzelne Assets mit Typ, Dateien, Tags und Versionierung
  */
 class BrandsAsset extends Model implements HasDisplayName
 {
+    use HasContextFileReferences;
+
     protected $table = 'brands_assets';
 
     protected $fillable = [
@@ -70,6 +73,37 @@ class BrandsAsset extends Model implements HasDisplayName
     public function getDisplayName(): ?string
     {
         return $this->name ?? 'Asset #' . $this->id;
+    }
+
+    /**
+     * URL zur Datei — bevorzugt das ContextFile, Fallback auf das alte
+     * public-Storage-Feld (Legacy-Daten).
+     */
+    public function getFileUrlAttribute(): ?string
+    {
+        $ref = $this->getOrderedFileReferences()->first();
+        if ($ref && $ref->url) {
+            return $ref->url;
+        }
+
+        if ($this->file_path) {
+            return asset('storage/' . $this->file_path);
+        }
+
+        return null;
+    }
+
+    /**
+     * Ist die Datei ein Bild (inkl. SVG) — für Inline-Vorschau.
+     */
+    public function getIsImageAttribute(): bool
+    {
+        return $this->mime_type && str_starts_with($this->mime_type, 'image/');
+    }
+
+    public function getIsSvgAttribute(): bool
+    {
+        return in_array($this->mime_type, ['image/svg+xml', 'image/svg'], true);
     }
 
     /**

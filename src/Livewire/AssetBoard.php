@@ -5,6 +5,7 @@ namespace Platform\Brands\Livewire;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use Illuminate\Support\Facades\Auth;
+use Platform\Core\Services\ContextFileService;
 use Platform\Brands\Models\BrandsAssetBoard;
 use Platform\Brands\Models\BrandsAsset;
 use Platform\Brands\Models\BrandsAssetVersion;
@@ -43,33 +44,41 @@ class AssetBoard extends Component
         ]);
 
         $user = Auth::user();
+        $contextFileService = app(ContextFileService::class);
 
         foreach ($this->newFiles as $file) {
-            $path = $file->store('brands/assets/' . $this->assetBoard->id, 'public');
             $originalName = $file->getClientOriginalName();
+
+            // Upload über ContextFiles (core) – nicht lokaler Storage.
+            $contextFile = $contextFileService->uploadForContext(
+                $file,
+                BrandsAssetBoard::class,
+                $this->assetBoard->id,
+                ['team_id' => $this->assetBoard->team_id, 'user_id' => $user->id],
+            );
 
             $asset = BrandsAsset::create([
                 'asset_board_id' => $this->assetBoard->id,
                 'name' => pathinfo($originalName, PATHINFO_FILENAME),
-                'file_path' => $path,
                 'file_name' => $originalName,
                 'mime_type' => $file->getMimeType(),
                 'file_size' => $file->getSize(),
                 'asset_type' => 'other',
                 'current_version' => 1,
             ]);
+            $asset->addFileReference($contextFile['id']);
 
             // Erste Version anlegen
-            BrandsAssetVersion::create([
+            $version = BrandsAssetVersion::create([
                 'asset_id' => $asset->id,
                 'version_number' => 1,
-                'file_path' => $path,
                 'file_name' => $originalName,
                 'mime_type' => $file->getMimeType(),
                 'file_size' => $file->getSize(),
                 'change_note' => 'Erstversion',
                 'user_id' => $user->id,
             ]);
+            $version->addFileReference($contextFile['id']);
         }
 
         $this->newFiles = [];
@@ -81,7 +90,23 @@ class AssetBoard extends Component
     {
         $this->authorize('update', $this->assetBoard);
 
-        $asset = BrandsAsset::findOrFail($assetId);
+        $asset = BrandsAsset::with('versions')->findOrFail($assetId);
+
+        // ContextFiles von Asset + Versionen aufräumen (keine verwaisten Dateien).
+        $contextFileService = app(ContextFileService::class);
+        $fileIds = collect();
+        foreach ($asset->getOrderedFileReferences() as $ref) {
+            if ($ref->context_file_id) { $fileIds->push($ref->context_file_id); }
+        }
+        foreach ($asset->versions as $version) {
+            foreach ($version->getOrderedFileReferences() as $ref) {
+                if ($ref->context_file_id) { $fileIds->push($ref->context_file_id); }
+            }
+        }
+        foreach ($fileIds->unique() as $fileId) {
+            try { $contextFileService->delete($fileId); } catch (\Throwable $e) { report($e); }
+        }
+
         $asset->delete();
 
         $this->assetBoard->refresh();

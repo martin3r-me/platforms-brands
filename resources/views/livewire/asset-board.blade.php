@@ -115,8 +115,8 @@
                     <x-nx-card flush class="group relative overflow-hidden">
                         {{-- Thumbnail / Preview --}}
                         <div class="relative flex aspect-[4/3] items-center justify-center overflow-hidden bg-[color:var(--nx-hover)]">
-                            @if($asset->mime_type && str_starts_with($asset->mime_type, 'image/'))
-                                <img src="{{ asset('storage/' . $asset->file_path) }}" alt="{{ $asset->name }}" class="h-full w-full object-cover" loading="lazy">
+                            @if($asset->is_image && $asset->file_url)
+                                <img src="{{ $asset->file_url }}" alt="{{ $asset->name }}" class="h-full w-full {{ $asset->is_svg ? 'object-contain p-4' : 'object-cover' }}" loading="lazy">
                             @else
                                 <div class="p-4 text-center">
                                     @php
@@ -155,9 +155,11 @@
                                     >
                                         @svg('heroicon-o-pencil', 'w-4 h-4')
                                     </button>
-                                    <a href="{{ asset('storage/' . $asset->file_path) }}" download="{{ $asset->file_name }}" class="rounded-[6px] bg-white/90 p-2 text-[color:var(--nx-text)] backdrop-blur-sm transition-colors hover:bg-white" title="Download">
-                                        @svg('heroicon-o-arrow-down-tray', 'w-4 h-4')
-                                    </a>
+                                    @if($asset->file_url)
+                                        <a href="{{ $asset->file_url }}" target="_blank" rel="noopener noreferrer" class="rounded-[6px] bg-white/90 p-2 text-[color:var(--nx-text)] backdrop-blur-sm transition-colors hover:bg-white" title="Öffnen / Download">
+                                            @svg('heroicon-o-arrow-down-tray', 'w-4 h-4')
+                                        </a>
+                                    @endif
                                     <button
                                         wire:click="deleteAsset({{ $asset->id }})"
                                         wire:confirm="Asset wirklich löschen? Alle Versionen werden ebenfalls gelöscht."

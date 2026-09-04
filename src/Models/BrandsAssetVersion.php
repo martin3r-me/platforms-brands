@@ -6,12 +6,15 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Symfony\Component\Uid\UuidV7;
 use Platform\Core\Contracts\HasDisplayName;
+use Platform\Core\Traits\HasContextFileReferences;
 
 /**
  * Model für Asset-Versionen – Ältere Versionen eines Assets aufbewahren
  */
 class BrandsAssetVersion extends Model implements HasDisplayName
 {
+    use HasContextFileReferences;
+
     protected $table = 'brands_asset_versions';
 
     protected $fillable = [
@@ -56,5 +59,22 @@ class BrandsAssetVersion extends Model implements HasDisplayName
     public function getDisplayName(): ?string
     {
         return 'Version ' . $this->version_number;
+    }
+
+    /**
+     * URL zur Versions-Datei — ContextFile bevorzugt, Legacy-Fallback.
+     */
+    public function getFileUrlAttribute(): ?string
+    {
+        $ref = $this->getOrderedFileReferences()->first();
+        if ($ref && $ref->url) {
+            return $ref->url;
+        }
+
+        if ($this->file_path) {
+            return asset('storage/' . $this->file_path);
+        }
+
+        return null;
     }
 }

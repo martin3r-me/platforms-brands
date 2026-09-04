@@ -5,6 +5,7 @@ namespace Platform\Brands\Livewire;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use Illuminate\Support\Facades\Auth;
+use Platform\Core\Services\ContextFileService;
 use Platform\Brands\Models\BrandsAssetBoard;
 use Platform\Brands\Models\BrandsAsset;
 use Platform\Brands\Models\BrandsAssetVersion;
@@ -120,6 +121,7 @@ class AssetModal extends Component
         $this->authorize('update', $board);
 
         $user = Auth::user();
+        $contextFileService = app(ContextFileService::class);
 
         $data = [
             'name' => $this->assetName,
@@ -129,57 +131,78 @@ class AssetModal extends Component
             'available_formats' => !empty($this->assetFormats) ? $this->assetFormats : null,
         ];
 
-        if ($this->asset) {
-            // Update
-            if ($this->assetFile) {
-                $path = $this->assetFile->store('brands/assets/' . $this->assetBoardId, 'public');
-                $originalName = $this->assetFile->getClientOriginalName();
+        // Upload läuft über ContextFiles (core) – wie überall (Logo/Moodboard),
+        // nicht in den lokalen public-Storage. Datei hängt am Asset-Board-Kontext.
+        $upload = fn () => $contextFileService->uploadForContext(
+            $this->assetFile,
+            BrandsAssetBoard::class,
+            $this->assetBoardId,
+            ['team_id' => $board->team_id, 'user_id' => $user->id],
+        );
 
-                // Neue Version erstellen
-                $newVersion = $this->asset->current_version + 1;
-                BrandsAssetVersion::create([
-                    'asset_id' => $this->asset->id,
-                    'version_number' => $newVersion,
-                    'file_path' => $path,
-                    'file_name' => $originalName,
-                    'mime_type' => $this->assetFile->getMimeType(),
-                    'file_size' => $this->assetFile->getSize(),
-                    'change_note' => $this->changeNote ?: null,
-                    'user_id' => $user->id,
-                ]);
+        try {
+            if ($this->asset) {
+                // Update
+                if ($this->assetFile) {
+                    $contextFile = $upload();
+                    $newVersion = $this->asset->current_version + 1;
 
-                $data['file_path'] = $path;
-                $data['file_name'] = $originalName;
+                    // Asset-Referenz auf die neue Datei umhängen. Die ALTE Datei
+                    // NICHT löschen – die vorige Version referenziert sie weiter.
+                    foreach ($this->asset->getOrderedFileReferences() as $ref) {
+                        $this->asset->removeFileReference($ref->id);
+                    }
+
+                    $data['file_name'] = $this->assetFile->getClientOriginalName();
+                    $data['mime_type'] = $this->assetFile->getMimeType();
+                    $data['file_size'] = $this->assetFile->getSize();
+                    $data['current_version'] = $newVersion;
+
+                    $this->asset->update($data);
+                    $this->asset->addFileReference($contextFile['id']);
+
+                    $version = BrandsAssetVersion::create([
+                        'asset_id' => $this->asset->id,
+                        'version_number' => $newVersion,
+                        'file_name' => $data['file_name'],
+                        'mime_type' => $data['mime_type'],
+                        'file_size' => $data['file_size'],
+                        'change_note' => $this->changeNote ?: null,
+                        'user_id' => $user->id,
+                    ]);
+                    $version->addFileReference($contextFile['id']);
+                } else {
+                    $this->asset->update($data);
+                }
+            } else {
+                // Create
+                $contextFile = $upload();
+
+                $data['asset_board_id'] = $this->assetBoardId;
+                $data['file_name'] = $this->assetFile->getClientOriginalName();
                 $data['mime_type'] = $this->assetFile->getMimeType();
                 $data['file_size'] = $this->assetFile->getSize();
-                $data['current_version'] = $newVersion;
+                $data['current_version'] = 1;
+
+                $asset = BrandsAsset::create($data);
+                $asset->addFileReference($contextFile['id']);
+
+                $version = BrandsAssetVersion::create([
+                    'asset_id' => $asset->id,
+                    'version_number' => 1,
+                    'file_name' => $data['file_name'],
+                    'mime_type' => $data['mime_type'],
+                    'file_size' => $data['file_size'],
+                    'change_note' => 'Erstversion',
+                    'user_id' => $user->id,
+                ]);
+                $version->addFileReference($contextFile['id']);
             }
-            $this->asset->update($data);
-        } else {
-            // Create
-            $path = $this->assetFile->store('brands/assets/' . $this->assetBoardId, 'public');
-            $originalName = $this->assetFile->getClientOriginalName();
-
-            $data['asset_board_id'] = $this->assetBoardId;
-            $data['file_path'] = $path;
-            $data['file_name'] = $originalName;
-            $data['mime_type'] = $this->assetFile->getMimeType();
-            $data['file_size'] = $this->assetFile->getSize();
-            $data['current_version'] = 1;
-
-            $asset = BrandsAsset::create($data);
-
-            // Erste Version anlegen
-            BrandsAssetVersion::create([
-                'asset_id' => $asset->id,
-                'version_number' => 1,
-                'file_path' => $path,
-                'file_name' => $originalName,
-                'mime_type' => $this->assetFile->getMimeType(),
-                'file_size' => $this->assetFile->getSize(),
-                'change_note' => 'Erstversion',
-                'user_id' => $user->id,
-            ]);
+        } catch (\Throwable $e) {
+            report($e);
+            // Fehler sichtbar machen statt still als 500 verpuffen zu lassen.
+            $this->addError('assetFile', 'Speichern fehlgeschlagen: ' . $e->getMessage());
+            return;
         }
 
         $this->dispatch('updateAssetBoard');
