@@ -4,7 +4,6 @@ namespace Platform\Brands;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Schedule;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
@@ -178,7 +177,7 @@ class BrandsServiceProvider extends ServiceProvider
         if (
             config()->has('brands.routing') &&
             config()->has('brands.navigation') &&
-            Schema::hasTable('modules')
+            PlatformCore::modulesTableExists()
         ) {
             PlatformCore::registerModule([
                 'key'        => 'brands',
