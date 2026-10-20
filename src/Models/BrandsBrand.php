@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Symfony\Component\Uid\UuidV7;
 use Illuminate\Support\Facades\Log;
-use Platform\Organization\Traits\HasOrganizationContexts;
 use Platform\Core\Traits\HasColors;
 use Platform\Core\Contracts\HasKeyResultAncestors;
 use Platform\Core\Contracts\HasDisplayName;
@@ -18,7 +17,7 @@ use Platform\Integrations\Contracts\SocialMediaAccountLinkableInterface;
  */
 class BrandsBrand extends Model implements HasKeyResultAncestors, HasDisplayName, SocialMediaAccountLinkableInterface, AgendaRenderable
 {
-    use HasOrganizationContexts, HasColors;
+    use HasColors;
 
     protected $table = 'brands_brands';
 
