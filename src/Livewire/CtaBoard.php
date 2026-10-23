@@ -3,6 +3,8 @@
 namespace Platform\Brands\Livewire;
 
 use Livewire\Component;
+use Illuminate\Database\Eloquent\Model;
+use Platform\Core\Livewire\Concerns\HasPageContext;
 use Illuminate\Support\Facades\Auth;
 use Platform\Brands\Models\BrandsCtaBoard;
 use Platform\Brands\Models\BrandsCta;
@@ -10,6 +12,8 @@ use Livewire\Attributes\On;
 
 class CtaBoard extends Component
 {
+    use HasPageContext;
+
     public BrandsCtaBoard $ctaBoard;
 
     public string $groupBy = 'funnel_stage';
@@ -27,6 +31,19 @@ class CtaBoard extends Component
         $this->ctaBoard = $brandsCtaBoard->fresh()->load('ctas');
 
         $this->authorize('view', $this->ctaBoard);
+    }
+
+    protected function pageContext(): ?Model
+    {
+        return $this->ctaBoard;
+    }
+
+    protected function pageContextOptions(): array
+    {
+        return [
+            'url' => route('brands.cta-boards.show', $this->ctaBoard),
+            'source' => 'brands.board.view',
+        ];
     }
 
     #[On('updateCtaBoard')]

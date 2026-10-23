@@ -3,6 +3,8 @@
 namespace Platform\Brands\Livewire;
 
 use Livewire\Component;
+use Illuminate\Database\Eloquent\Model;
+use Platform\Core\Livewire\Concerns\HasPageContext;
 use Illuminate\Support\Facades\Auth;
 use Platform\Core\Livewire\Concerns\WithExtraFields;
 use Platform\Brands\Models\BrandsKanbanCard;
@@ -10,7 +12,7 @@ use Livewire\Attributes\On;
 
 class KanbanCard extends Component
 {
-    use WithExtraFields;
+    use WithExtraFields, HasPageContext;
     public BrandsKanbanCard $card;
     public string $title = '';
     public string $description = '';
@@ -72,12 +74,17 @@ class KanbanCard extends Component
         $this->dispatch('updateSidebar');
     }
 
-    public function rendered()
+    protected function pageContext(): ?Model
     {
-        $this->dispatch('extrafields', [
-            'context_type' => get_class($this->card->kanbanBoard),
-            'context_id' => $this->card->kanbanBoard->id,
-        ]);
+        return $this->card;
+    }
+
+    protected function pageContextOptions(): array
+    {
+        return [
+            'url' => route('brands.kanban-cards.show', $this->card),
+            'source' => 'brands.kanban-card.view',
+        ];
     }
 
     public function render()

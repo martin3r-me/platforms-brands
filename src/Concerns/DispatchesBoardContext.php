@@ -3,27 +3,36 @@
 namespace Platform\Brands\Concerns;
 
 use Illuminate\Database\Eloquent\Model;
-use Platform\Brands\Models\BrandsBrand;
+use Platform\Core\Livewire\Concerns\HasPageContext;
 
 /**
- * Verdrahtet eine Board-Livewire-Komponente mit dem Core-Terminal:
- * Dateien + Aktivitäten werden im Core gebündelt, die Komponente setzt nur den
- * Kontext (analog Planner-Task).
+ * Seitenkontext für Board-Livewire-Komponenten (Terminal + Kontext-Panel) über
+ * den Core-Trait HasPageContext: Kontext = das Board der Komponente, Apps werden
+ * aus dem Board-Modell abgeleitet.
  *
- *   context = Board (context_type + context_id)
- *   linked  = Parent-Brand (damit die Zuordnung nach oben eindeutig ist)
- *
- * 13 Boards nutzen das automatische rendered() dieses Traits. Boards mit eigenem
- * rendered() (z. B. KanbanBoard) rufen dispatchBoardContext() dort selbst auf.
+ * 13 Boards nutzen das automatische rendered() von HasPageContext. Boards mit eigenem
+ * rendered() rufen dort dispatchPageContext() (oder weiterhin dispatchBoardContext()) auf.
  */
 trait DispatchesBoardContext
 {
-    public function rendered(): void
+    use HasPageContext;
+
+    protected function pageContext(): ?Model
+    {
+        return $this->resolveContextBoard();
+    }
+
+    protected function pageContextOptions(): array
     {
         $board = $this->resolveContextBoard();
-        if ($board) {
-            $this->dispatchBoardContext($board);
-        }
+        $def = $board ? collect(config('brands.board_types', []))->firstWhere('model', get_class($board)) : null;
+
+        return [
+            'url' => ($board && ($def['route'] ?? null)) ? route($def['route'], $board) : null,
+            'source' => 'brands.board.view',
+            // Board-Modelle haben weder LogsActivity noch HasTimeEntries — Tabs wie bisher erzwingen
+            'apps' => ['activity' => true, 'time' => true],
+        ];
     }
 
     /**
@@ -43,43 +52,11 @@ trait DispatchesBoardContext
     }
 
     /**
-     * Setzt den Terminal-Kontext auf das Board und schaltet Dateien/Aktivitäten frei.
+     * Kompatibilität für Boards mit eigenem rendered(): delegiert an dispatchPageContext().
+     * Das Board wird über resolveContextBoard() bestimmt.
      */
-    protected function dispatchBoardContext(Model $board): void
+    protected function dispatchBoardContext(?Model $board = null): void
     {
-        $class = get_class($board);
-        $def = collect(config('brands.board_types', []))->firstWhere('model', $class);
-        $url = ($def['route'] ?? null) ? route($def['route'], $board) : null;
-        $brandId = $board->brand_id ?? null;
-
-        // 1) Kontext setzen (Board als primärer Kontext)
-        $this->dispatch('comms', [
-            'model' => $class,
-            'modelId' => $board->id,
-            'subject' => method_exists($board, 'getDisplayName') ? $board->getDisplayName() : ($board->name ?? null),
-            'description' => $board->description ?? '',
-            'url' => $url,
-            'source' => 'brands.board.view',
-            'recipients' => [],
-            'capabilities' => [
-                'manage_channels' => false,
-                'threads' => true,
-            ],
-            'meta' => [],
-        ]);
-
-        // 2) Organization-Kontext mit Parent-Brand als linked_context
-        $this->dispatch('organization', [
-            'context_type' => $class,
-            'context_id' => $board->id,
-            'linked_contexts' => $brandId ? [['type' => BrandsBrand::class, 'id' => $brandId]] : [],
-            'allow_time_entry' => true,
-            'allow_entities' => false,
-            'allow_dimensions' => false,
-        ]);
-
-        // 3) Dateien- und Aktivitäten-Tab im Core-Terminal freischalten
-        $this->dispatch('terminal:app:files');
-        $this->dispatch('terminal:app:activity');
+        $this->dispatchPageContext();
     }
 }

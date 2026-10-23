@@ -3,6 +3,8 @@
 namespace Platform\Brands\Livewire;
 
 use Livewire\Component;
+use Illuminate\Database\Eloquent\Model;
+use Platform\Core\Livewire\Concerns\HasPageContext;
 use Illuminate\Support\Facades\Auth;
 use Platform\Brands\Models\BrandsBrand;
 use Platform\Brands\Services\BrandVerortungResolver;
@@ -10,6 +12,8 @@ use Livewire\Attributes\On;
 
 class Brand extends Component
 {
+    use HasPageContext;
+
     public BrandsBrand $brand;
 
     public function mount(BrandsBrand $brandsBrand)
@@ -62,43 +66,23 @@ class Brand extends Component
         return $this->redirect(route($def['route'], $board), navigate: true);
     }
 
-    public function rendered()
+    protected function pageContext(): ?Model
     {
-        $this->dispatch('comms', [
-            'model' => get_class($this->brand),
-            'modelId' => $this->brand->id,
-            'subject' => $this->brand->name,
-            'description' => $this->brand->description ?? '',
+        return $this->brand;
+    }
+
+    protected function pageContextOptions(): array
+    {
+        return [
             'url' => route('brands.brands.show', $this->brand),
             'source' => 'brands.brand.view',
-            'recipients' => [],
-            'capabilities' => [
-                'manage_channels' => true,
-                'threads' => false,
-            ],
+            'capabilities' => ['manage_channels' => true, 'threads' => false],
             'meta' => [
                 'created_at' => $this->brand->created_at,
             ],
-        ]);
-
-        // Dateien- und Aktivitäten-Tab im Core-Terminal freischalten
-        $this->dispatch('terminal:app:files');
-        $this->dispatch('terminal:app:activity');
-
-        // Organization-Kontext setzen - beides erlauben: Zeiten + Entity-Verknüpfung + Dimensionen
-        $this->dispatch('organization', [
-            'context_type' => get_class($this->brand),
-            'context_id' => $this->brand->id,
-            'allow_time_entry' => true,
-            'allow_entities' => true,
-            'allow_dimensions' => true,
-        ]);
-
-        // KeyResult-Kontext setzen - ermöglicht Verknüpfung von KeyResults mit dieser Marke
-        $this->dispatch('keyresult', [
-            'context_type' => get_class($this->brand),
-            'context_id' => $this->brand->id,
-        ]);
+            // BrandsBrand hat weder LogsActivity noch HasTimeEntries — Tabs wie bisher erzwingen
+            'apps' => ['activity' => true, 'time' => true],
+        ];
     }
 
 

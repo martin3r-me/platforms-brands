@@ -3,12 +3,16 @@
 namespace Platform\Brands\Livewire;
 
 use Livewire\Component;
+use Illuminate\Database\Eloquent\Model;
+use Platform\Core\Livewire\Concerns\HasPageContext;
 use Illuminate\Support\Facades\Auth;
 use Platform\Brands\Models\BrandsSocialCard;
 use Livewire\Attributes\On;
 
 class SocialCard extends Component
 {
+    use HasPageContext;
+
     public BrandsSocialCard $card;
     public string $title = '';
     public string $bodyMd = '';
@@ -24,6 +28,19 @@ class SocialCard extends Component
         $this->title = $this->card->title ?? '';
         $this->bodyMd = $this->card->body_md ?? '';
         $this->description = $this->card->description ?? '';
+    }
+
+    protected function pageContext(): ?Model
+    {
+        return $this->card;
+    }
+
+    protected function pageContextOptions(): array
+    {
+        return [
+            'url' => route('brands.social-cards.show', $this->card),
+            'source' => 'brands.social-card.view',
+        ];
     }
 
     #[On('updateSocialCard')] 
